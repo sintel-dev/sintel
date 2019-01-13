@@ -1,0 +1,27 @@
+version: "3"
+services:
+  db:
+    image: mongo:4.0
+    container_name: db
+    ports:
+      - "27017:27017"
+    command: mongod --port 27017 --dbpath /data/db --logpath /data/logs/db.log
+    volumes:
+      - db-data::/data/db
+      - db-logs:/data/logs
+  web:
+    build: .
+    container_name: mtv
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      # - NODE_ENV=development
+      - DB_PORT_27017_TCP_ADDR=db
+    command: python run_server.py
+    volumes:
+      - .:/mtv
+volumes:
+  db-data:
+  db-logs:
