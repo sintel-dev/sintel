@@ -3,7 +3,7 @@
 
 # mtv
 
-go
+go!
 
 
 - Free software: MIT license
