@@ -29,6 +29,7 @@ before_script:
 
 # Command to run tests
 script: 
+  - cd $TRAVIS_BUILD_DIR
   - tox # test back-end
   - npm -C client run test:karma # test front-end
 
