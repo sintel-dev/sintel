@@ -38,7 +38,7 @@ install: clean-build clean-pyc clean-client ## install the packages for running 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	npm -C client install
+	cd client && npm install
 
 
 # ----------------------- session: test ----------------------- #

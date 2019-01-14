@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es5",
-        //   "lib" : ["es2015", "es2015.iterable", "dom"],
+        "module": "commonjs",
         "typeRoots": [
             "./node_modules/@types"
         ],
