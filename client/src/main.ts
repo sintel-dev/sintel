@@ -1,9 +1,44 @@
 import * as _ from 'lodash';
-import * as pipClient from './services/pip-client';
-import pipServer from './services/pip-server';
+import Header from './components/header';
+import Dashboard from './components/dashboard';
+import Content from './components/content';
+
+/**
+ * basic layout
+ * ------------------------------
+ * |          header            |
+ * |-----------------------------
+ * |        |                   |
+ * | Dash   |     Content       |
+ * | Board  |                   |
+ * |        |                   |
+ * -----------------------------|
+ */
+
+class App {
+
+    public header: Header;
+    public dashboard: Dashboard;
+    public content: Content;
+
+    public bootstrap() {
+        // init header
+        this.header = new Header('#hearder');
+        this.dashboard = new Dashboard('#dashboard');
+        this.content = new Content('#content');
+    }
+
+    constructor() {
+        // initialize your app here
+    }
+}
+
+let app = new App();
+app.bootstrap();
 
 
 
+// used for karma test
 export class Calculator {
     public static Sum(a: number[]): number {
         return _.sum(a);
@@ -14,13 +49,3 @@ export class Calculator {
         return c;
     }
 }
-
-function bootstrap() {
-    // initialize app here
-    // load components here
-    // let a = pipServer;
-    pipClient;
-    pipServer;
-}
-
-bootstrap();

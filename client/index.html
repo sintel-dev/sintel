@@ -1,29 +1,97 @@
 <html>
 
 <head>
-    <!-- build:css -->
-    <!-- endbuild -->
+	<!-- build:theme-css -->
+	<link rel="stylesheet" href="./public/lib-static/theme/bootstrap.css">
+	<link rel="stylesheet" href="./public/lib-static/theme/font-awesome.css">
+	<link rel="stylesheet" href="./public/lib-static/theme/animate.min.css">
+	<link rel="stylesheet" href="./public/lib-static/theme/lobipanel.min.css">
+	<link rel="stylesheet" href="./public/lib-static/theme/main.css">
+	<!-- endbuild -->
 
 
 
+	<!-- build:lib-css -->
+	<link rel="stylesheet" href="./public/lib/bundle.lib.min.css">
+	<!-- endbuild -->
 
-    <link rel="stylesheet" type="text/css" href="public/dist/main.css">
+
+
+	<!-- build:app-css -->
+	<link rel="stylesheet" href="./public/dist/main.min.css">
+	<!-- endbuild -->
+
+
 </head>
 
 <body>
-    <div>
-        hello template!
+	<!-- header: begin -->
+	<div id="hearder" class="row navbar-fixed-top">
+		<div class="col-sm-6 col-md-3">
+			<div class="header-text ml-20">
+				<!-- 
+					<a href="/">
+						<img src="./public/static/logo.png" class="brand-logo" height="25" width="25" />
+					</a> 
+				-->
+				<span class="logo">MTV</span>
+			</div>
+		</div>
+		<div class="col-md-6 col-md-9">
+			<div class="header-text mr-20" style="float:right">
+				<span>Help</span>
+			</div>
+		</div>
+	</div>
+	<!-- header: end -->
+
+	<!-- dashboard: begin -->
+	<div id="dashboard" style="display: none">
+	</div>
+	<!-- dashboard: end -->
+
+	<!-- content: begin -->
+  <div id="content" class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 pr-n">
+					vis content
+        </div>
+      </div>
     </div>
-    <div class="cs">
-        hello red template!
-    </div>
-
-    <!-- build:js -->
-    <!-- endbuild -->
+	</div>
+	<!-- content: end -->
+	
 
 
+	<!-- build:theme-js -->
+	<script src="./public/lib-static/theme/bootstrap.min.js"></script>
+	<script src="./public/lib-static/theme/jquery-2.2.4.min.js"></script>
+	<script src="./public/lib-static/theme/jquery-ui.min.js"></script>
+	<script src="./public/lib-static/theme/bootstrap.min.js"></script>
+	<script src="./public/lib-static/theme/pace.min.js"></script>
+	<script src="./public/lib-static/theme/lobipanel.min.js"></script>
+	<script src="./public/lib-static/theme/iscroll.js"></script>
+	<script src="./public/lib-static/theme/main.js"></script>
+	<!-- endbuild -->
 
-    <script src="public/dist/main.js"></script>
+
+
+
+	<!-- build:lib-js -->
+	<script src="./public/lib/d3.js"></script>
+	<!-- endbuild -->
+
+
+
+
+	<script src="./public/lib_static/math.js"></script>
+	<script src="./public/lib_static/science.js"></script>
+
+	<!-- build:app-js -->
+	<script src="./public/dist/main.min.js"></script>
+	<!-- endbuild -->
+
 
 </body>
 

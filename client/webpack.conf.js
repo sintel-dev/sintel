@@ -66,7 +66,7 @@ module.exports = (options) => {
     externals: [],
     output: {
       path: path.join(options.outputDir),
-      filename: '[name].js'
+      filename: options.name
     },
     module: {
       rules: [

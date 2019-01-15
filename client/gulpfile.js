@@ -3,6 +3,7 @@
 //******************************************************************************
 //* IMPORT PACKAGES
 //******************************************************************************
+const _ = require('lodash');
 const fs = require('fs');
 const gulp = require('gulp');
 const series = gulp.series;
@@ -16,7 +17,7 @@ const assets = require('./assets');
 
 
 
-// compie and bundle user-writen typescript codes
+/********************* build TYPESCRIPT ***********************/
 const registerTypescriptBuildTasks = (options) => {
 
     const handleWebpackOutput = (err, stats) => {
@@ -28,14 +29,22 @@ const registerTypescriptBuildTasks = (options) => {
     };
 
     const getDevCompiler = () => {
+        options.name = `${options.filename}` + '.js';
         return webpack(webpackConfig(options));
     };
 
     const getReleaseCompiler = () => {
+        options.name = `${options.filename}` + '.min.js';
         return webpack(webpackConfigProd(options));
     };
 
-    gulp.task('ts:build:dev', (done) => {
+    gulp.task('ts:clean', () =>
+        gulp.src([`${options.outputDir}/${options.filename}*.js*`], 
+                { read: false, allowEmpty: true })
+            .pipe(plugins.clean())
+    );
+
+    gulp.task('ts:compile:dev', (done) => {
         const compiler = getDevCompiler();
         compiler.run((err, stats) => {
             handleWebpackOutput(err, stats);
@@ -43,13 +52,48 @@ const registerTypescriptBuildTasks = (options) => {
         });
     });
 
-    gulp.task('ts:build:prod', (done) => {
+    gulp.task('ts:compile:prod', (done) => {
         const compiler = getReleaseCompiler();
         compiler.run((err, stats) => {
             handleWebpackOutput(err, stats);
             done();
         });
     });
+
+    let outputRelativeDir = '.' + options.outputDir.substring(__dirname.length);
+    gulp.task(`ts:writeToHTML:dev`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace({
+                    'app-js': `${outputRelativeDir}/${options.filename}.js`
+                }, {
+                    keepUnassigned: true,
+                    keepBlockTags: true,
+                    resolvePaths: false
+                }
+            ))
+            .pipe(gulp.dest('./'))
+    );
+
+    gulp.task(`ts:writeToHTML:prod`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace({
+                    'app-js': `${outputRelativeDir}/${options.filename}.min.js`
+                }, {
+                    keepUnassigned: true,
+                    keepBlockTags: true,
+                    resolvePaths: false
+                }
+            ))
+            .pipe(gulp.dest('./'))
+    );
+
+    gulp.task('ts:build:dev', series(
+        'ts:clean', 'ts:compile:dev', 'ts:writeToHTML:dev'
+    ));
+    
+    gulp.task('ts:build:prod', series(
+        'ts:clean', 'ts:compile:prod', 'ts:writeToHTML:prod'
+    ));
 
     gulp.task('ts:watch', () => {
         const compiler = getDevCompiler();
@@ -64,6 +108,7 @@ const registerTypescriptBuildTasks = (options) => {
 
 registerTypescriptBuildTasks(
     {
+        filename: 'main',
         entryPoints: {
             'main': __dirname + '/src/main.ts'
         },
@@ -72,149 +117,251 @@ registerTypescriptBuildTasks(
 );
 
 
-// compie and bundle user-writen less codes
-gulp.task('clean:css', () =>
-    gulp.src('./public/dist/css/**', { read: false })
-        .pipe(plugins.clean())
-);
+/********************* build LESS ***********************/
+const registerLessBuildTasks = (options) => {
 
-gulp.task('less:compile', () =>
-    gulp.src('src/**/*.less')
-        .pipe(plugins.less().on('error', function (err) {
-            gutil.log(err);
-            this.emit('end');
-        }))
-        .pipe(plugins.autoprefixer())
-        .pipe(gulp.dest('./public/dist/css/'))
-);
+    let { src, dir, bundleDir, bundleFileName } = options;
+    
+    gulp.task('less:clean', () =>
+        gulp.src([dir, `${bundleDir}/${bundleFileName}*.css`], 
+                 { read: false, allowEmpty: true })
+            .pipe(plugins.clean())
+    );
 
-gulp.task('less:bundle', () =>
-    gulp.src('./public/dist/css/**/*.css')
-        .pipe(plugins.concat('main.css'))
-        .pipe(gulp.dest('./public/dist'))
-);
+    gulp.task('less:compile', () =>
+        gulp.src(src)
+            .pipe(plugins.less().on('error', function (err) {
+                gutil.log(err);
+                this.emit('end');
+            }))
+            .pipe(plugins.autoprefixer())
+            .pipe(gulp.dest(dir))
+    );
 
-gulp.task('cssmin', () =>
-    gulp.src('./public/dist/main.css')
-        .pipe(plugins.cssmin())
-        .pipe(gulp.dest('./public/dist'))
-);
+    gulp.task('less:bundle', () =>
+        gulp.src(`${dir}/**/*.css`)
+            .pipe(plugins.concat(`${bundleFileName}.css`))
+            .pipe(gulp.dest(bundleDir))
+    );
 
-gulp.task('less:build:dev', series('clean:css', 'less:compile', 'less:bundle'));
-gulp.task('less:build:prod', series('clean:css', 'less:compile', 'less:bundle', 'cssmin'));
+    gulp.task('less:min', () =>
+        gulp.src(`${bundleDir}/${bundleFileName}.css`)
+            .pipe(plugins.cssmin())
+            .pipe(plugins.rename(`${bundleFileName}.min.css`))
+            .pipe(gulp.dest(bundleDir))
+    );
 
-gulp.task('less:watch', () => {
-    gulp.watch('src/**/*.less', series('less:build:dev'));
-});
+    gulp.task(`less:writeToHTML:dev`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace({
+                    'app-css': `${bundleDir}/${bundleFileName}.css`
+                }, {
+                    keepUnassigned: true,
+                    keepBlockTags: true,
+                    resolvePaths: false
+                }
+            ))
+            .pipe(gulp.dest('./'))
+    );
 
+    gulp.task(`less:writeToHTML:prod`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace({
+                    'app-css': `${bundleDir}/${bundleFileName}.min.css`
+                }, {
+                    keepUnassigned: true,
+                    keepBlockTags: true,
+                    resolvePaths: false
+                }
+            ))
+            .pipe(gulp.dest('./'))
+    );
 
+    gulp.task('less:build:dev', series(
+        'less:clean', 'less:compile', 'less:bundle', 'less:writeToHTML:dev'
+    ));
+    
+    gulp.task('less:build:prod', series(
+        'less:clean', 'less:compile', 'less:bundle',
+        'less:min', 'less:writeToHTML:prod'
+    ));
 
-// compie and bundle the files listed in assets
-gulp.task('lib:copy', (done) => {
-    if (assets.ALL.length === 0) {
-        return done();
-    } else {
-        return gulp.src(assets.ALL)
-            .pipe(gulp.dest('./public/libs'));
+    gulp.task('less:watch', () => {
+        gulp.watch(src, series('less:build:dev'));
+    });
+}
+
+registerLessBuildTasks(
+    {
+        src: './src/**/*.less',
+        dir: './public/dist/css',
+        bundleDir: './public/dist',
+        bundleFileName: 'main'
     }
-});
+)
 
-gulp.task('lib:css:bundle', (done) => {
-    if (assets.CSS.length === 0) {
-        let dir = './public/libs';
-        if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
-        fs.writeFile('./public/libs/bundle.lib.css', '', (err) => {
-            if (err) throw err;
-        });
-        return done();
-    } else {
-        return gulp.src(assets.CSS)
-            .pipe(plugins.concat('bundle.lib.css'))
-            .pipe(gulp.dest('./public/libs'));
+
+/********************* build Assets ***********************/
+const registerAssetsBuildTasks = (options) => {
+
+    let { src, dir, filename } = options;
+
+    let [all, js, css] = [
+        assets[src].all,
+        assets[src].js,
+        assets[src].css
+    ];
+
+    gulp.task(`${src}:clean`, () =>
+        gulp.src(`${dir}`, { read: false, allowEmpty: true })
+            .pipe(plugins.clean())
+    );
+
+    gulp.task(`${src}:copy`, (done) => {
+        if (all.length === 0) {
+            return done();
+        } else {
+            return gulp.src(all)
+                .pipe(gulp.dest(dir));
+        }
+    });
+
+    gulp.task(`${src}:css:bundle`, (done) => {
+        if (css.length === 0) {
+            if (!fs.existsSync(dir)) { fs.mkdirSync(dir); }
+            fs.writeFile(`${dir}/${filename}.${src}.css`, ' ', (err) => {
+                if (err) throw err;
+            });
+            return done();
+        } else {
+            return gulp.src(css)
+                .pipe(plugins.concat(`${filename}.${src}.css`))
+                .pipe(gulp.dest(dir));
+        }
+    });
+
+    gulp.task(`${src}:css:min`, () => {
+        return gulp.src(`${dir}/${filename}.${src}.css`)
+            .pipe(plugins.cssmin())
+            .pipe(plugins.rename(`${filename}.${src}.min.css`))
+            .pipe(gulp.dest(options.dir));
+    });
+
+    gulp.task(`${src}:js:bundle`, (done) => {
+        if (js.length === 0) {
+            if (!fs.existsSync(dir)) { fs.mkdirSync(dir); }
+            fs.writeFile(`${dir}/${filename}.${src}.js`, ' ', (err) => {
+                if (err) throw err;
+            });
+            return done();
+        } else {
+            return gulp.src(js)
+                .pipe(plugins.concat(`${filename}.${src}.js`))
+                .pipe(gulp.dest(dir));
+        }
+    });
+
+    gulp.task(`${src}:js:min`, () =>
+        gulp.src(`${dir}/${filename}.${src}.js`)
+            .pipe(plugins.minify({
+                ext: {
+                    min: '.min.js'
+                }
+            }))
+            .pipe(gulp.dest(dir))
+    );
+
+    let replacementDev = {};
+    replacementDev[`${src}-css`] = _.map(css,
+        o => dir + o.substring(o.lastIndexOf('/')));
+    replacementDev[`${src}-js`] = _.map(js,
+        o => dir + o.substring(o.lastIndexOf('/')));
+
+    gulp.task(`${src}:writeToHTML:dev`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace(replacementDev, {
+                keepUnassigned: true,
+                keepBlockTags: true,
+                resolvePaths: false
+            }))
+            .pipe(gulp.dest('./'))
+    );
+
+    let replacementProd = {};
+    replacementProd[`${src}-css`] = `${dir}/${filename}.${src}.min.css`;
+    replacementProd[`${src}-js`] = `${dir}/${filename}.${src}.min.js`;
+
+    gulp.task(`${src}:writeToHTML:prod`, () =>
+        gulp.src('index.html')
+            .pipe(plugins.htmlReplace(replacementProd, {
+                keepUnassigned: true,
+                keepBlockTags: true,
+                resolvePaths: false
+            }))
+            .pipe(gulp.dest('./'))
+    );
+
+    gulp.task(`${src}:build:dev`, series(
+        `${src}:clean`,
+        `${src}:copy`,
+        parallel(
+            `${src}:css:bundle`,
+            `${src}:js:bundle`,
+            `${src}:writeToHTML:dev`
+        )
+    ));
+
+    gulp.task(`${src}:build:prod`, series(
+        `${src}:clean`,
+        `${src}:copy`,
+        parallel(
+            series(`${src}:css:bundle`, `${src}:css:min`),
+            series(`${src}:js:bundle`, `${src}:js:min`),
+            `${src}:writeToHTML:prod`
+        )
+    ));
+
+    // gulp.task(`${src}:watch`, () => {
+    //     gulp.watch('assets.js', series('less:build:dev'));
+    // });
+};
+
+registerAssetsBuildTasks(
+    {
+        src: 'lib',
+        dir: './public/lib',
+        filename: 'bundle'
     }
-});
+);
 
-gulp.task('lib:mincss', () => {
-    return gulp.src('./public/libs/bundle.lib.css')
-        .pipe(plugins.cssmin())
-        .pipe(plugins.rename('bundle.lib.min.css'))
-        .pipe(gulp.dest('./public/libs'));
-});
-
-gulp.task('lib:js:bundle', (done) => {
-    if (assets.JS.length === 0) {
-        let dir = './public/libs';
-        if (!fs.existsSync(dir)){ fs.mkdirSync(dir); }
-        fs.writeFile('./public/libs/bundle.lib.js', '', (err) => {
-            if (err) throw err;
-        });
-        return done();
-    } else {
-        return gulp.src(assets.JS)
-            .pipe(plugins.concat('bundle.lib.js'))
-            .pipe(gulp.dest('./public/libs'));
+registerAssetsBuildTasks(
+    {
+        src: 'theme',
+        dir: './public/lib-static/theme',
+        filename: 'bundle'
     }
-});
-
-gulp.task('lib:minjs', () =>
-    gulp.src('./public/libs/bundle.lib.js')
-        .pipe(plugins.minify({
-            ext: {
-                min: '.min.js'
-            }
-        }))
-        .pipe(gulp.dest('./public/libs'))
 );
 
-gulp.task('lib:writeToHTML:dev', () => 
-    gulp.src('index.html')
-        .pipe(plugins.htmlReplace({
-            'css': assets.CSS,
-			'js': assets.JS
-        }, {
-            keepUnassigned: false,
-            keepBlockTags: true,
-            resolvePaths: false
-        }))
-        .pipe(gulp.dest('./'))
-);
 
-gulp.task('lib:writeToHTML:prod', () => 
-    gulp.src('index.html')
-        .pipe(plugins.htmlReplace({
-            'css': './public/libs/bundle.min.css',
-			'js': './public/libs/bundle.min.js'
-        }, {
-            keepUnassigned: false,
-            keepBlockTags: true,
-            resolvePaths: false
-        }))
-        .pipe(gulp.dest('./'))
-);
-
-gulp.task('lib:build:dev', series(
-    'lib:copy',
-    parallel(series('lib:css:bundle', 'lib:mincss'), series('lib:js:bundle', 'lib:minjs')),
-    'lib:writeToHTML:dev'
-));
-
-gulp.task('lib:build:prod', series(
-    'lib:copy',
-    parallel(series('lib:css:bundle', 'lib:mincss'), series('lib:js:bundle', 'lib:minjs')),
-    'lib:writeToHTML:prod'
-));
-
-
-
-
-// ---------------------------  main  ------------------------------
+/********************* MAIN ***********************/
 
 // index.html:  list all css and js in libraries
-gulp.task('dev', parallel('less:build:dev', 'ts:build:dev', 'lib:build:dev'));
+gulp.task('build:dev', parallel(
+    'less:build:dev',
+    'ts:build:dev',
+    'lib:build:dev'
+));
 
 // index.html:  use bundled css and js in libraries
-gulp.task('prod', parallel('less:build:prod', 'ts:build:prod', 'lib:build:prod'));
+gulp.task('build:prod', parallel(
+    'less:build:prod',
+    'ts:build:prod',
+    'lib:build:prod'
+));
 
-gulp.task('default', series('dev', parallel('less:watch', 'ts:watch')));
-
+// watching mode for development use
+gulp.task('default', series(
+    'build:dev',
+    parallel('less:watch', 'ts:watch')
+));
 

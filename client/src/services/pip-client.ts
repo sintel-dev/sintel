@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
-import * as Backbone from 'backbone';
+import {Events as BackboneEvents} from 'backbone';
 
 
 
-export class BackboneEvents {
+export class Events {
     constructor() {
-        _.extend(this, Backbone.Events);
+        _.extend(this, BackboneEvents);
     }
 
     public on(eventName: string, callback?: Function, context?: any): any { return; }
@@ -20,7 +20,11 @@ export class BackboneEvents {
     public stopListening(object?: any, events?: string, callback?: Function): any { return; }
 }
 
-// add your global instance here
 
-// example:
-export let data = new BackboneEvents();
+
+// add your global event instances here
+// export let data = new Events();
+
+
+
+

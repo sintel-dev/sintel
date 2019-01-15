@@ -6,25 +6,27 @@
   "scripts": {
     "clean": "rm -rf node_modules/ public/libs/ public/dist/ coverage/ .nyc_output/ package-lock.json",
     "reinstall": "npm cache clean && npm run clean && npm install",
-    "postinstall": "gulp prod",
+    "postinstall": "gulp build:dev",
     "start": "gulp",
-    "start:dev": "gulp dev",
-    "start:prod": "gulp prod",
+    "build:dev": "gulp build:dev",
+    "build:prod": "gulp build:prod",
     "test:karma": "karma start karma.unit.js",
     "test:karma:coverage": "karma start karma.coverage.js"
   },
   "author": "Dongyu Liu",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.4",
-    "knockout": "^3.4.2",
     "backbone": "^1.3.3",
+    "d3": "^5.7.0",
     "jquery": "^3.3.0",
-    "jquery.rest": "^1.0.2"
+    "jquery.rest": "^1.0.2",
+    "knockout": "^3.4.2",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@types/backbone": "^1.3.45",
     "@types/chai": "^4.1.7",
+    "@types/d3": "^5.5.0",
     "@types/jquery": "^3.3.28",
     "@types/knockout": "^3.4.60",
     "@types/lodash": "^4.14.119",
