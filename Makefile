@@ -43,7 +43,7 @@ install-develop: clean-build clean-pyc clean-client ## install the package in ed
 
 .PHONY: install-theme
 install-theme:
-	curl -o theme.zip "http://dongyu.name/themes/options-admin.zip"
+	curl -o theme.zip "http://dongyu.name/themes/AdminLTE-2.4.2.zip"
 	unzip theme.zip -d "./client/public/themes/"
 	rm -f theme.zip
 

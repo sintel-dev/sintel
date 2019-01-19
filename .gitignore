@@ -28,7 +28,8 @@ wheels/
 # Client
 node_modules/
 client/public/lib/
-client/public/dist/
+!client/public/dist/
+client/public/dist/css
 client/public/themes/
 client/public/data/
 npm-debug.log

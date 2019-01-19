@@ -14,9 +14,11 @@ let assets = {
         `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`
 ],
     js: [
-        `${NPM}/jquery/dist/jquery.min.js`,
+        `${STATIC}/jquery.min.js`,
+        // `${NPM}/jquery/dist/jquery.min.js`,
         `${THEME}/bower_components/jquery-ui/jquery-ui.min.js`,
-        `${NPM}/jquery.rest/dist/jquery.rest.js`,
+        `${STATIC}/jquery.rest/dist/jquery.rest.js`,
+        // `${NPM}/jquery.rest/dist/jquery.rest.js`,
         `${STATIC}/jquery-ui-resolve-conflict.js`,
         `${THEME}/bower_components/bootstrap/dist/js/bootstrap.min.js`,
         `${THEME}/bower_components/raphael/raphael.min.js`,

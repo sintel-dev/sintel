@@ -1,5 +1,6 @@
-import os
 import csv
+import os
+
 import numpy as np
 
 # n = np.reshape([1,2,3,4,5,6], (2, 2))
@@ -7,14 +8,13 @@ import numpy as np
 # print(n.shape)
 
 
-
 # train = np.load(os.path.join("data", "train", 'T-12' + ".npy"))
 # print(train.shape)
 
 
 def dump_to_csv(X, dest_file_path):
-    ''' transform npy data to csv 
-    
+    ''' transform npy data to csv
+
     Args:
         data (numpy data):
 
@@ -36,13 +36,13 @@ def dump_to_csv(X, dest_file_path):
         # for i in range(X.shape[0]):
         #     v = X[i, 0]
         #     writer.writerow([i, v])
-    
+
+
 def classify_files():
     classes = {}
     name_set = set([])
     with open('labeled_anomalies.csv', mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
-        line_count = 0
         for row in csv_reader:
             # if line_count == 0:
             #     line_count += 1
@@ -53,6 +53,7 @@ def classify_files():
             classes[row['spacecraft']].add(row['chan_id'])
             # line_count += 1
     return classes
+
 
 if __name__ == "__main__":
     ori_folder_path = 'data/train'
@@ -65,8 +66,8 @@ if __name__ == "__main__":
 
     # create directory for storing dumped data
     for cs in classes:
-        if not os.path.isdir('data/csv_%s' %cs):
-            os.mkdir('data/csv_%s' %cs)
+        if not os.path.isdir('data/csv_%s' % cs):
+            os.mkdir('data/csv_%s' % cs)
 
     files = []
     for (dirpath, dirnames, filenames) in os.walk(ori_folder_path):
@@ -79,7 +80,7 @@ if __name__ == "__main__":
                     dest_folder_path += cs
                     break
             if (not dest_folder_path[-1] == '_'):
-                dump_to_csv(data, os.path.join(dest_folder_path, 
-                    name.replace('.npy', '.csv')))
+                dump_to_csv(data, os.path.join(dest_folder_path,
+                                               name.replace('.npy', '.csv')))
             else:
                 print(name)

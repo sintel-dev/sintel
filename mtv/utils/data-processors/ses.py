@@ -1,6 +1,5 @@
 import os
-import csv
-import numpy as np
+
 
 def get_files(dir):
     result = []
@@ -11,9 +10,9 @@ def get_files(dir):
 
 if __name__ == "__main__":
 
-    work_dir = os.getcwd();
+    work_dir = os.getcwd()
 
-    ori_folder_path = '{}\client\public\data\SES'.format(work_dir)
+    ori_folder_path = r'{}\client\public\data\SES'.format(work_dir)
 
     files = get_files(ori_folder_path)
 
@@ -24,7 +23,6 @@ if __name__ == "__main__":
             os.remove(path_to_file)
         if file.endswith('.csv_'):
             os.rename(path_to_file, path_to_file[:-1])
-
 
     # remove first column
     # for file in files:
