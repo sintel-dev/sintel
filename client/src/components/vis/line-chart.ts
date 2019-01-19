@@ -1,21 +1,10 @@
-import { Events } from '../../services/pip-client';
-import { gConfig, gSession } from '../../services/globals';
+import * as pip from '../../services/pip-client';
+import { TimeSeriesData } from './chart-data.interface';
 import { Smooth } from '../../services/algorithms';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
 
-
-export interface ChartDataEle {
-    x: number;      // timestamp || step
-    y: number;      // value
-}
-
-// time-sorted data for one time-series
-export interface ChartData extends Array<ChartDataEle> { }
-
-// multiple time-series in one chart
-export interface ChartMultiData extends Array<ChartData> { }
 
 export interface LineChartOption {
     // layout
@@ -42,7 +31,7 @@ export interface LineChartOption {
     windows?: Array<[number, number]>;
 }
 
-export class LineChart extends Events {
+export class LineChart extends pip.Events {
 
     private svg: d3.Selection<any, any, any, any>;
     private option: LineChartOption = {
@@ -70,7 +59,7 @@ export class LineChart extends Events {
 
     constructor(
         ele: HTMLElement,
-        private data: ChartData,
+        private data: TimeSeriesData,
         option?: LineChartOption
     ) {
         super();
@@ -103,7 +92,6 @@ export class LineChart extends Events {
 
     private addCharts() {
         let self = this;
-
         // define paint board size
 
         let w = self.option.width - self.option.margin.left - self.option.margin.right;
@@ -112,7 +100,7 @@ export class LineChart extends Events {
 
         // define scale
         let x, x2;
-        if (self.data[0].x === 0) { // step
+        if (self.data[0][0] === 0) { // step
             x = d3.scaleLinear().range([0, w]);
             x2 = d3.scaleLinear().range([0, w]);
         } else {    // timestamp
@@ -125,8 +113,8 @@ export class LineChart extends Events {
         let yAxis = d3.axisLeft(y);
         let xAxis2 = d3.axisBottom(x2);
 
-        x.domain(d3.extent(self.data, d => new Date(d.x)));
-        y.domain(d3.extent(self.data, d => d.y));
+        x.domain(d3.extent(self.data, d => new Date(d[0])));
+        y.domain(d3.extent(self.data, d => d[1]));
         x2.domain(x.domain());
         y2.domain(y.domain());
 
@@ -143,9 +131,9 @@ export class LineChart extends Events {
             .extent([[0, 0], [w, h]])
             .on('zoom', zoomed);
 
-        let line = d3.line<ChartDataEle>()
-            .x(d => x(d.x))
-            .y(d => y(d.y));
+        let line = d3.line<[number, number]>()
+            .x(d => x(d[0]))
+            .y(d => y(d[1]));
 
 
         let clip = self.svg.append('defs').append('svg:clipPath')
@@ -183,9 +171,9 @@ export class LineChart extends Events {
             .extent([[0, 0], [w, h2]])
             .on('brush end', brushed);
 
-        let line2 = d3.line<ChartDataEle>()
-            .x(d => x2(d.x))
-            .y(d => y2(d.y));
+        let line2 = d3.line<[number, number]>()
+            .x(d => x2(d[0]))
+            .y(d => y2(d[1]));
 
         let context = self.svg.append('g')
             .attr('class', 'context')
@@ -205,8 +193,8 @@ export class LineChart extends Events {
         // test smooth curve
         let smoothedLine;
         let ySmoothed = new Smooth().loess(
-            _.map(self.data, d => x(d.x)),
-            _.map(self.data, d => y(d.y))
+            _.map(self.data, d => x(d[0])),
+            _.map(self.data, d => y(d[1]))
         );
 
         if (self.option.smooth) {
@@ -215,9 +203,7 @@ export class LineChart extends Events {
                 .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
                 .attr('clip-path', 'url(#clip)')
                 .append('path')
-                .datum(_.range(self.data.length).map(i => {
-                    return { x: self.data[i].x, y: y.invert(ySmoothed[i]) };
-                }))
+                .datum(_.range(self.data.length).map(i => [self.data[i][0], y.invert(ySmoothed[i])]))
                 .attr('class', 'line-smooth')
                 .attr('d', line);
         }

@@ -1,19 +1,10 @@
-import { Events } from '../../services/pip-client';
+import * as pip from '../../services/pip-client';
+import { TimeSeriesData } from './chart-data.interface';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
-export interface ChartDataEle {
-    x: number;      // timestamp || step
-    y: number;      // value
-}
 
-// time-sorted data for one time-series
-export interface ChartData extends Array<ChartDataEle> { }
-
-// multiple time-series in one chart
-export interface ChartMultiData extends Array<ChartData> { }
-
-export interface ChartOption {
+export interface Option {
     // layout
     height?: number;
     width?: number;
@@ -28,10 +19,10 @@ export interface ChartOption {
     normalized?: boolean;
 }
 
-export class HorizonChart extends Events {
+export class HorizonChart extends pip.Events {
 
     private svg: d3.Selection<any, any, any, any>;
-    private option: ChartOption = {
+    private option: Option = {
         // layout
         height: null,
         width: null,
@@ -39,7 +30,7 @@ export class HorizonChart extends Events {
         // horizon-chart config
         step: 200,
         bands: 3,
-        mode: 'offset',
+        mode: 'mirror',
         defined: undefined,
         colorScheme: ['#d62728', '#fff', '#1f77b4'],
         // data format
@@ -50,8 +41,8 @@ export class HorizonChart extends Events {
 
     constructor(
         ele: HTMLElement,
-        private data: ChartData,
-        option?: ChartOption
+        private data: TimeSeriesData,
+        option?: Option
     ) {
         super();
         let self = this;
@@ -94,14 +85,15 @@ export class HorizonChart extends Events {
         let d3_horizonId = 0;
 
         function d3_horizonTransform(bands, h, mode) {
-            return mode == 'offset'
-                ? function (d) { return 'translate(0,' + (d + (d < 0) - bands) * h + ')'; }
-                : function (d) { return (d < 0 ? 'scale(1,-1)' : '') + 'translate(0,' + (d - bands) * h + ')'; };
+            return mode == 'mirror'
+                ? function (d) { return (d < 0 ? 'scale(1,-1)' : '') + 'translate(0,' + (d - bands) * h + ')'; }
+                : function (d) { return 'translate(0,' + (d + (d < 0) - bands) * h + ')'; };
+                
         }
 
         function horizon() {
             let bands = 1, // between 1 and 5, typically
-                mode = 'offset', // or mirror
+                mode = 'mirror', // or offset
                 curve = d3.curveLinear, // or basis, monotone, step-before, etc.
                 x = d => d[0],
                 y = d => d[1],
@@ -288,13 +280,15 @@ export class HorizonChart extends Events {
             .width(w)
             .height(h)
             .bands(1)
-            .mode('offset')
+            .mode('mirror')
             .curve(d3.curveMonotoneX)
             // .name('nm')
             .cname(self.svgContainer.attr('id'))
             // .curve(d3.curveStep)
-            .colors([d3.interpolateOranges(0.8), d3.interpolateOranges(0.25),
-                d3.interpolateBlues(0.25), d3.interpolateBlues(0.8)]);
+            .colors([d3.interpolateOranges(0.6), d3.interpolateOranges(0.3),
+                d3.interpolateBlues(0.3), d3.interpolateBlues(0.6)]);
+            // .colors([d3.interpolateOranges(0.8), d3.interpolateOranges(0.25),
+            //     d3.interpolateBlues(0.25), d3.interpolateBlues(0.8)]);
 
 
         let g = self.svg.append('g')
@@ -307,12 +301,12 @@ export class HorizonChart extends Events {
         if (self.option.normalized) {
             self.data = _.cloneDeep(self.data);
             let nm = d3.scaleLinear()
-                .domain(d3.extent(self.data, d => d.y)).nice()
+                .domain(d3.extent(self.data, d => d[1])).nice()
                 .range([0, 1]);
-            _.each(self.data, o => { o.y = nm(o.y); });
+            _.each(self.data, o => { o[1] = nm(o[1]); });
         }
 
-        let data = _.map(self.data, d => [d.x, d.y]);
+        let data = _.map(self.data, d => [d[0], d[1]]);
         // let data = self.genData();
         g.data([data]).call(chart);
 

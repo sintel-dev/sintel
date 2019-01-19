@@ -55220,6 +55220,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ko = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.debug.js");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 var data_processor_1 = __webpack_require__(/*! ../services/data-processor */ "./src/services/data-processor.ts");
+var line_chart_1 = __webpack_require__(/*! ./vis/line-chart */ "./src/components/vis/line-chart.ts");
+var area_chart_1 = __webpack_require__(/*! ./vis/area-chart */ "./src/components/vis/area-chart.ts");
+var horizon_chart_1 = __webpack_require__(/*! ./vis/horizon-chart */ "./src/components/vis/horizon-chart.ts");
 var radial_area_chart_1 = __webpack_require__(/*! ./vis/radial-area-chart */ "./src/components/vis/radial-area-chart.ts");
 var pip = __webpack_require__(/*! ../services/pip-client */ "./src/services/pip-client.ts");
 var Content = (function () {
@@ -55279,7 +55282,6 @@ var Content = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log('addChart', this);
                         self = this;
                         name = conf.db + "_" + conf.signal;
                         dbSignals = self.dbSignals();
@@ -55297,6 +55299,21 @@ var Content = (function () {
                     case 1:
                         data = _a.sent();
                         ele = void 0;
+                        ele = $("#" + name + "-line")[0];
+                        new line_chart_1.LineChart(ele, data, {
+                            height: 240,
+                            height2: 40,
+                            width: ele.parentElement.getBoundingClientRect().width,
+                            width2: ele.parentElement.getBoundingClientRect().width
+                        });
+                        ele = $("#" + name + "-area")[0];
+                        new area_chart_1.AreaChart($("#" + name + "-area")[0], data, {
+                            width: ele.parentElement.getBoundingClientRect().width
+                        });
+                        ele = $("#" + name + "-horizon")[0];
+                        new horizon_chart_1.HorizonChart($("#" + name + "-horizon")[0], data, {
+                            width: ele.parentElement.getBoundingClientRect().width
+                        });
                         if (conf.db === 'SES') {
                             ele = $("#" + name + "-radial-area-year")[0];
                             ndata = data_processor_1.default.normalizeTimeSeries(data);
@@ -55423,6 +55440,649 @@ var Sidebar = (function () {
     return Sidebar;
 }());
 exports.default = Sidebar;
+
+
+/***/ }),
+
+/***/ "./src/components/vis/area-chart.ts":
+/*!******************************************!*\
+  !*** ./src/components/vis/area-chart.ts ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var pip = __webpack_require__(/*! ../../services/pip-client */ "./src/services/pip-client.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
+var AreaChart = (function (_super) {
+    __extends(AreaChart, _super);
+    function AreaChart(ele, data, option) {
+        var _this = _super.call(this) || this;
+        _this.data = data;
+        _this.option = {
+            svgHeight: 300,
+            height: null,
+            width: null,
+            margin: { top: 20, right: 20, bottom: 30, left: 50 },
+            normalized: false
+        };
+        var self = _this;
+        _.extend(self.option, option);
+        self.svgContainer = d3.select(ele);
+        self.option.width = self.option.width === null ?
+            ele.getBoundingClientRect().width : self.option.width;
+        self.option.height = self.option.height === null ?
+            self.option.svgHeight : self.option.height;
+        self.svg = self.svgContainer.append('svg')
+            .attr('width', self.option.width)
+            .attr('height', self.option.height);
+        self.addCharts();
+        return _this;
+    }
+    AreaChart.prototype.addCharts = function () {
+        var self = this;
+        var _a = [
+            self.option.width - self.option.margin.left - self.option.margin.right,
+            self.option.height - self.option.margin.top - self.option.margin.bottom
+        ], w = _a[0], h = _a[1];
+        if (self.option.normalized) {
+            self.data = _.cloneDeep(self.data);
+            var nm_1 = d3.scaleLinear()
+                .domain(d3.extent(self.data, function (d) { return d[1]; })).nice()
+                .range([0, 1]);
+            _.each(self.data, function (o) { o[1] = nm_1(o[1]); });
+        }
+        var x = self.data[0][0] === 0 ?
+            d3.scaleLinear().range([0, w]) : d3.scaleTime().range([0, w]);
+        var y = d3.scaleLinear()
+            .range([h, 0]);
+        var xAxis = d3.axisBottom(x);
+        var yAxis = d3.axisLeft(y).tickFormat(d3.format('.6'));
+        x.domain(d3.extent(self.data, function (d) { return new Date(d[0]); }));
+        y.domain(d3.extent(self.data, function (d) { return d[1]; })).nice();
+        var areaChart = self.svg.append('g')
+            .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")");
+        var area = d3.area()
+            .x(function (d) { return x(d[0]); })
+            .y0(y(0))
+            .y1(function (d) { return y(d[1]); });
+        areaChart.append('path')
+            .datum(self.data)
+            .attr('fill', '#637bb6')
+            .attr('d', area);
+        areaChart.append('g')
+            .attr('class', 'axis axis--x')
+            .attr('transform', "translate(0, " + h + ")")
+            .call(xAxis);
+        areaChart.append('g')
+            .attr('class', 'axis axis--y')
+            .call(yAxis);
+    };
+    return AreaChart;
+}(pip.Events));
+exports.AreaChart = AreaChart;
+
+
+/***/ }),
+
+/***/ "./src/components/vis/horizon-chart.ts":
+/*!*********************************************!*\
+  !*** ./src/components/vis/horizon-chart.ts ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var pip = __webpack_require__(/*! ../../services/pip-client */ "./src/services/pip-client.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
+var HorizonChart = (function (_super) {
+    __extends(HorizonChart, _super);
+    function HorizonChart(ele, data, option) {
+        var _this = _super.call(this) || this;
+        _this.data = data;
+        _this.option = {
+            height: null,
+            width: null,
+            margin: { top: 0, right: 0, bottom: 0, left: 0 },
+            step: 200,
+            bands: 3,
+            mode: 'mirror',
+            defined: undefined,
+            colorScheme: ['#d62728', '#fff', '#1f77b4'],
+            normalized: false
+        };
+        var self = _this;
+        _.extend(self.option, option);
+        self.svgContainer = d3.select(ele);
+        self.option.width = self.option.width === null ?
+            ele.getBoundingClientRect().width : self.option.width;
+        self.option.height = 1 * (self.option.step) +
+            self.option.margin.top + self.option.margin.bottom;
+        self.svg = self.svgContainer.append('svg')
+            .attr('width', self.option.width)
+            .attr('height', self.option.height);
+        self.addCharts();
+        return _this;
+    }
+    HorizonChart.prototype.addCharts = function () {
+        var self = this;
+        var _a = self.option, step = _a.step, margin = _a.margin;
+        var _b = [
+            self.option.width - margin.left - margin.right,
+            self.option.height - margin.top - margin.bottom
+        ], w = _b[0], h = _b[1];
+        var d3_ = d3;
+        var d3_horizonArea = d3.area();
+        var d3_horizonId = 0;
+        function d3_horizonTransform(bands, h, mode) {
+            return mode == 'mirror'
+                ? function (d) { return (d < 0 ? 'scale(1,-1)' : '') + 'translate(0,' + (d - bands) * h + ')'; }
+                : function (d) { return 'translate(0,' + (d + (d < 0) - bands) * h + ')'; };
+        }
+        function horizon() {
+            var bands = 1, mode = 'mirror', curve = d3.curveLinear, x = function (d) { return d[0]; }, y = function (d) { return d[1]; }, w = 960, h = 40, duration = 0, cname = 'clip';
+            var color = d3_.scaleLinear()
+                .domain([-1, 0, 0, 1])
+                .range(['#08519c', '#bdd7e7', '#bae4b3', '#006d2c']);
+            function horizon(g) {
+                g.each(function (d, i) {
+                    var g = d3.select(this), n = 2 * bands + 1, xMin = Infinity, xMax = -Infinity, yMax = -Infinity, x0, y0, t0, id;
+                    var data = d.map(function (d, i) {
+                        var xv = x.call(this, d, i), yv = y.call(this, d, i);
+                        if (xv < xMin) {
+                            xMin = xv;
+                        }
+                        if (xv > xMax) {
+                            xMax = xv;
+                        }
+                        if (-yv > yMax) {
+                            yMax = -yv;
+                        }
+                        if (yv > yMax) {
+                            yMax = yv;
+                        }
+                        return [xv, yv];
+                    });
+                    var x1 = d3.scaleLinear().domain([xMin, xMax]).range([0, w]), y1 = d3.scaleLinear().domain([0, yMax]).range([0, h * bands]), t1 = d3_horizonTransform(bands, h, mode);
+                    if (this.__chart__) {
+                        x0 = this.__chart__.x;
+                        y0 = this.__chart__.y;
+                        t0 = this.__chart__.t;
+                        id = this.__chart__.id;
+                    }
+                    else {
+                        x0 = x1.copy();
+                        y0 = y1.copy();
+                        t0 = t1;
+                        id = ++d3_horizonId;
+                    }
+                    var defs = g.selectAll('defs')
+                        .data([null]);
+                    defs.enter().append('defs').append('clipPath')
+                        .attr('id', cname + "_" + id)
+                        .append('rect')
+                        .attr('width', w)
+                        .attr('height', h);
+                    defs.select('rect').transition()
+                        .duration(duration)
+                        .attr('width', w)
+                        .attr('height', h);
+                    g.selectAll('g')
+                        .data([null])
+                        .enter().append('g')
+                        .attr('clip-path', "url(#" + cname + "_" + id + ")");
+                    var path = g.select('g').selectAll('path')
+                        .data(d3_.range(-1, -bands - 1, -1).concat(d3.range(1, bands + 1)));
+                    var d0 = d3_horizonArea
+                        .curve(curve)
+                        .x(function (d) { return x0(d[0]); })
+                        .y0(h * bands)
+                        .y1(function (d) { return h * bands - y0(d[1]); })(data);
+                    var d1 = d3_horizonArea
+                        .x(function (d) { return x1(d[0]); })
+                        .y1(function (d) { return h * bands - y1(d[1]); })(data);
+                    path.enter().append('path')
+                        .style('fill', color)
+                        .attr('transform', t0)
+                        .attr('d', d0);
+                    path.transition()
+                        .duration(duration)
+                        .style('fill', color)
+                        .attr('transform', t1)
+                        .attr('d', d1);
+                    path.exit().transition()
+                        .duration(duration)
+                        .attr('transform', t1)
+                        .attr('d', d1)
+                        .remove();
+                    this.__chart__ = { x: x1, y: y1, t: t1, id: id };
+                });
+                d3.timerFlush();
+            }
+            horizon.duration = function (x) {
+                if (!arguments.length) {
+                    return duration;
+                }
+                duration = +x;
+                return horizon;
+            };
+            horizon.bands = function (x) {
+                if (!arguments.length) {
+                    return bands;
+                }
+                bands = +x;
+                color.domain([-bands, -1, 1, bands]);
+                return horizon;
+            };
+            horizon.mode = function (x) {
+                if (!arguments.length) {
+                    return mode;
+                }
+                mode = x + '';
+                return horizon;
+            };
+            horizon.colors = function (x) {
+                if (!arguments.length) {
+                    return color.range();
+                }
+                color.range(x);
+                return horizon;
+            };
+            horizon.curve = function (x) {
+                if (!arguments.length) {
+                    return curve;
+                }
+                curve = x;
+                return horizon;
+            };
+            horizon.x = function (z) {
+                if (!arguments.length) {
+                    return x;
+                }
+                x = z;
+                return horizon;
+            };
+            horizon.y = function (z) {
+                if (!arguments.length) {
+                    return y;
+                }
+                y = z;
+                return horizon;
+            };
+            horizon.width = function (x) {
+                if (!arguments.length) {
+                    return w;
+                }
+                w = +x;
+                return horizon;
+            };
+            horizon.height = function (x) {
+                if (!arguments.length) {
+                    return h;
+                }
+                h = +x;
+                return horizon;
+            };
+            horizon.cname = function (n) {
+                if (!arguments.length) {
+                    return cname;
+                }
+                cname = n + '_clip';
+                return horizon;
+            };
+            return horizon;
+        }
+        var chart = horizon();
+        chart
+            .width(w)
+            .height(h)
+            .bands(1)
+            .mode('mirror')
+            .curve(d3.curveMonotoneX)
+            .cname(self.svgContainer.attr('id'))
+            .colors([d3.interpolateOranges(0.6), d3.interpolateOranges(0.3),
+            d3.interpolateBlues(0.3), d3.interpolateBlues(0.6)]);
+        var g = self.svg.append('g')
+            .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+            .append('g');
+        if (self.option.normalized) {
+            self.data = _.cloneDeep(self.data);
+            var nm_1 = d3.scaleLinear()
+                .domain(d3.extent(self.data, function (d) { return d[1]; })).nice()
+                .range([0, 1]);
+            _.each(self.data, function (o) { o[1] = nm_1(o[1]); });
+        }
+        var data = _.map(self.data, function (d) { return [d[0], d[1]]; });
+        g.data([data]).call(chart);
+        d3.select(self.svgContainer.node())
+            .select('.horizon-bands-value').text(chart.bands());
+        d3.select(self.svgContainer.node())
+            .selectAll('.horizon-controls input[name=mode]')
+            .on('click', function () {
+            g.call(chart.duration(0).mode(this.value));
+        });
+        d3.select(self.svgContainer.node())
+            .selectAll('.horizon-bands button').data([-1, 1])
+            .on('click', function (d) {
+            var n = Math.max(1, chart.bands() + d);
+            d3.select(self.svgContainer.node())
+                .select('.horizon-bands-value').text(n);
+            g.call(chart.duration(0).bands(n + 1));
+            g.call(chart.duration(0).bands(n));
+        });
+    };
+    HorizonChart.prototype.genData = function () {
+        function seededRandom(s) {
+            var m_w = 987654321 + s;
+            var m_z = 987654321 - s;
+            var mask = 0xffffffff;
+            return function () {
+                m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
+                m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
+                var result = ((m_z << 16) + m_w) & mask;
+                result /= 4294967296;
+                return result + 0.5;
+            };
+        }
+        var seed = 1, t = 0;
+        function random() {
+            var rand = seededRandom(seed);
+            var data = [];
+            for (var i = -t, variance = 0; i < 1000; i++) {
+                variance += (rand() - 0.5) / 10;
+                if (i > 0) {
+                    data.push([i, Math.cos((i + t) / 100) + variance]);
+                }
+            }
+            return data;
+        }
+        return random();
+    };
+    return HorizonChart;
+}(pip.Events));
+exports.HorizonChart = HorizonChart;
+
+
+/***/ }),
+
+/***/ "./src/components/vis/line-chart.ts":
+/*!******************************************!*\
+  !*** ./src/components/vis/line-chart.ts ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var pip = __webpack_require__(/*! ../../services/pip-client */ "./src/services/pip-client.ts");
+var algorithms_1 = __webpack_require__(/*! ../../services/algorithms */ "./src/services/algorithms.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
+var LineChart = (function (_super) {
+    __extends(LineChart, _super);
+    function LineChart(ele, data, option) {
+        var _this = _super.call(this) || this;
+        _this.data = data;
+        _this.option = {
+            svgHeight: 300,
+            height: null,
+            width: null,
+            margin: { top: 10, right: 20, bottom: 30, left: 60 },
+            height2: 80,
+            width2: null,
+            margin2: { top: 0, right: 20, bottom: 20, left: 60 },
+            duration: 750,
+            delay: 50,
+            circle: true,
+            circleSize: 2,
+            zoom: true,
+            context: true,
+            smooth: false,
+            windows: null
+        };
+        var self = _this;
+        _.extend(self.option, option);
+        self.svgContainer = d3.select(ele);
+        var w = ele.getBoundingClientRect().width;
+        self.option.width = self.option.width === null ? w : self.option.width;
+        if (self.option.height === null) {
+            self.option.height = self.option.context === true ?
+                (self.option.svgHeight - self.option.height2) : self.option.svgHeight;
+        }
+        self.svgContainer
+            .classed('scroll-style-0', true)
+            .style('overflow-x', 'hidden')
+            .style('overflow-y', 'hidden');
+        var totalHeight = self.option.context === true ?
+            (self.option.height + self.option.height2) : self.option.height;
+        self.svg = self.svgContainer.append('svg')
+            .attr('width', self.option.width)
+            .attr('height', totalHeight);
+        self.addCharts();
+        return _this;
+    }
+    LineChart.prototype.addCharts = function () {
+        var self = this;
+        var w = self.option.width - self.option.margin.left - self.option.margin.right;
+        var h = self.option.height - self.option.margin.top - self.option.margin.bottom;
+        var h2 = self.option.height2 - self.option.margin2.top - self.option.margin2.bottom;
+        var x, x2;
+        if (self.data[0][0] === 0) {
+            x = d3.scaleLinear().range([0, w]);
+            x2 = d3.scaleLinear().range([0, w]);
+        }
+        else {
+            x = d3.scaleTime().range([0, w]);
+            x2 = d3.scaleTime().range([0, w]);
+        }
+        var y = d3.scaleLinear().range([h, 0]);
+        var y2 = d3.scaleLinear().range([h2, 0]);
+        var xAxis = d3.axisBottom(x);
+        var yAxis = d3.axisLeft(y);
+        var xAxis2 = d3.axisBottom(x2);
+        x.domain(d3.extent(self.data, function (d) { return new Date(d[0]); }));
+        y.domain(d3.extent(self.data, function (d) { return d[1]; }));
+        x2.domain(x.domain());
+        y2.domain(y.domain());
+        if (y.domain()[0] < 0 && y.domain()[1] > 0) {
+        }
+        var zoom = d3.zoom()
+            .scaleExtent([1, Infinity])
+            .translateExtent([[0, 0], [w, h]])
+            .extent([[0, 0], [w, h]])
+            .on('zoom', zoomed);
+        var line = d3.line()
+            .x(function (d) { return x(d[0]); })
+            .y(function (d) { return y(d[1]); });
+        var clip = self.svg.append('defs').append('svg:clipPath')
+            .attr('id', 'clip')
+            .append('svg:rect')
+            .attr('width', w)
+            .attr('height', h)
+            .attr('x', 0)
+            .attr('y', 0);
+        var focusLine = self.svg.append('g')
+            .attr('class', 'focus')
+            .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+            .attr('clip-path', 'url(#clip)');
+        var focusAxis = self.svg.append('g')
+            .attr('class', 'focus')
+            .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")");
+        var focusWindows, focusWindowLines;
+        if (self.option.windows !== null) {
+            focusWindows = self.svg.selectAll('.line-highlight')
+                .data(self.option.windows)
+                .enter()
+                .append('g')
+                .attr('class', 'focus')
+                .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+                .attr('clip-path', 'url(#clip)');
+        }
+        var brush = d3.brushX()
+            .extent([[0, 0], [w, h2]])
+            .on('brush end', brushed);
+        var line2 = d3.line()
+            .x(function (d) { return x2(d[0]); })
+            .y(function (d) { return y2(d[1]); });
+        var context = self.svg.append('g')
+            .attr('class', 'context')
+            .attr('transform', "translate(" + self.option.margin2.left + "," + (self.option.margin2.top + self.option.height) + ")");
+        var contextWindows;
+        if (self.option.windows !== null) {
+            contextWindows = self.svg.selectAll('.line-highlight')
+                .data(self.option.windows)
+                .enter()
+                .append('g')
+                .attr('class', 'focus')
+                .attr('transform', "translate(" + self.option.margin2.left + "," + (self.option.margin2.top + self.option.height) + ")");
+        }
+        var smoothedLine;
+        var ySmoothed = new algorithms_1.Smooth().loess(_.map(self.data, function (d) { return x(d[0]); }), _.map(self.data, function (d) { return y(d[1]); }));
+        if (self.option.smooth) {
+            smoothedLine = self.svg.append('g')
+                .attr('class', 'focus')
+                .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+                .attr('clip-path', 'url(#clip)')
+                .append('path')
+                .datum(_.range(self.data.length).map(function (i) { return [self.data[i][0], y.invert(ySmoothed[i])]; }))
+                .attr('class', 'line-smooth')
+                .attr('d', line);
+        }
+        focusAxis.append('g')
+            .attr('class', 'axis axis--x')
+            .attr('transform', "translate(0, " + h + ")")
+            .call(xAxis);
+        focusAxis.append('g')
+            .attr('class', 'axis axis--y')
+            .call(yAxis.tickFormat(d3.format('.6')));
+        focusLine.append('path')
+            .datum(self.data)
+            .attr('class', 'line')
+            .attr('d', line);
+        if (self.option.windows !== null) {
+            focusWindowLines = focusWindows.append('path')
+                .datum(function (d) {
+                var part = _.slice(self.data, d[0], d[1]);
+                return part;
+            })
+                .attr('class', 'line-highlight')
+                .attr('d', line);
+        }
+        if (self.option.context) {
+            context.append('path')
+                .datum(self.data)
+                .attr('class', 'line')
+                .attr('d', line2);
+            context.append('g')
+                .attr('class', 'axis axis--x')
+                .attr('transform', "translate(0, " + h2 + ")")
+                .call(xAxis2);
+            context.append('g')
+                .attr('class', 'brush')
+                .call(brush)
+                .call(brush.move, x.range());
+            if (self.option.windows !== null) {
+                contextWindows.append('path')
+                    .datum(function (d) {
+                    var part = _.slice(self.data, d[0], d[1]);
+                    return part;
+                })
+                    .attr('class', 'line-highlight')
+                    .attr('d', line2);
+            }
+        }
+        if (self.option.zoom) {
+            self.svg.append('rect')
+                .attr('class', 'zoom')
+                .attr('width', w)
+                .attr('height', h)
+                .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+                .call(zoom);
+        }
+        function zoomed() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
+                return;
+            }
+            var t = d3.event.transform;
+            x.domain(t.rescaleX(x2).domain());
+            focusLine.select('.line').attr('d', line);
+            if (self.option.smooth) {
+                smoothedLine.attr('d', line);
+            }
+            if (self.option.windows !== null && self.option.windows.length > 0) {
+                focusWindowLines.attr('d', line);
+            }
+            focusAxis.select('.axis--x').call(xAxis);
+            context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
+        }
+        function brushed() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
+                return;
+            }
+            var s = d3.event.selection || x2.range();
+            x.domain([x2.invert(s[0]), x2.invert(s[1])]);
+            focusLine.select('.line').attr('d', line);
+            if (self.option.smooth) {
+                smoothedLine.attr('d', line);
+            }
+            if (self.option.windows !== null && self.option.windows.length > 0) {
+                focusWindowLines.attr('d', line);
+            }
+            focusAxis.select('.axis--x').call(xAxis);
+            self.svg.select('.zoom').call(zoom.transform, d3.zoomIdentity
+                .scale(w / (s[1] - s[0]))
+                .translate(-s[0], 0));
+        }
+    };
+    return LineChart;
+}(pip.Events));
+exports.LineChart = LineChart;
 
 
 /***/ }),
@@ -55617,6 +56277,106 @@ exports.App = App;
 var app = new App();
 app.bootstrap();
 app.setupEventHandlers();
+
+
+/***/ }),
+
+/***/ "./src/services/algorithms.ts":
+/*!************************************!*\
+  !*** ./src/services/algorithms.ts ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var pip_client_1 = __webpack_require__(/*! ./pip-client */ "./src/services/pip-client.ts");
+var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+var Smooth = (function (_super) {
+    __extends(Smooth, _super);
+    function Smooth() {
+        return _super.call(this) || this;
+    }
+    Smooth.prototype.loess = function (x, y, bandwidth) {
+        if (bandwidth === void 0) { bandwidth = 0.25; }
+        var ls = science.stats.loess();
+        ls.bandwidth(bandwidth);
+        return ls(x, y);
+    };
+    return Smooth;
+}(pip_client_1.Events));
+exports.Smooth = Smooth;
+var Anomaly = (function (_super) {
+    __extends(Anomaly, _super);
+    function Anomaly(data) {
+        var _this = _super.call(this) || this;
+        _this.data = data;
+        return _this;
+    }
+    Anomaly.prototype.findPeakWidowsByThreshold = function (th) {
+        if (th === void 0) { th = 0.1; }
+        var v = this.data;
+        var windows = [];
+    };
+    Anomaly.prototype.findPeakWidows = function (p, th) {
+        if (p === void 0) { p = 5; }
+        if (th === void 0) { th = 2; }
+        var _a, _b, _c;
+        var v = this.data;
+        var windows = [];
+        var mean = v[0];
+        var meanDev = math.var(_.slice(v, 0, p));
+        var len = v.length - 1;
+        for (var i = 1; i < len; i += 1) {
+            if ((math.abs(v[i] - mean) / meanDev) > th && v[i] > v[i - 1]) {
+                var start = void 0, end = void 0;
+                start = i - 1;
+                while ((i < len) && (v[i] > v[i - 1])) {
+                    _a = update(mean, meanDev, v[i]), mean = _a[0], meanDev = _a[1];
+                    i++;
+                }
+                while ((i < len) && (v[i] > v[start])) {
+                    if ((math.abs(v[i] - mean) / meanDev > th) && (v[i] > v[i - 1])) {
+                        end = --i;
+                        break;
+                    }
+                    else {
+                        _b = update(mean, meanDev, v[i]), mean = _b[0], meanDev = _b[1];
+                        end = i++;
+                    }
+                }
+                windows.push([start, end]);
+            }
+            else {
+                _c = update(mean, meanDev, v[i]), mean = _c[0], meanDev = _c[1];
+            }
+        }
+        return windows;
+        function update(oldMean, oldMeanDev, updateValue, alpha) {
+            if (alpha === void 0) { alpha = 0.125; }
+            var diff = math.abs(oldMean - oldMeanDev);
+            var newMeanDev = alpha * diff + (1 - alpha) * oldMeanDev;
+            var newMean = alpha * updateValue + (1 - alpha) * oldMean;
+            return [newMean, newMeanDev];
+        }
+    };
+    return Anomaly;
+}(pip_client_1.Events));
+exports.Anomaly = Anomaly;
 
 
 /***/ }),

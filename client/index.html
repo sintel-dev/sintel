@@ -193,12 +193,13 @@
 												<!-- /.tab-pane -->
 												<div class="tab-pane" data-bind="attr: {id: `${$data}-horizon`}">
 													<div class="horizon-controls">
-														<input name="mode" type="radio" value="offset" data-bind="attr: {id: `horizon-mode-offset-${$data}`}"
-														 checked>
+														<input name="mode" type="radio" value="mirror" data-bind="attr: {id: `horizon-mode-mirror-${$data}`}"  checked>
+														<label data-bind="attr: {for: `horizon-mode-mirror-${$data}`}"> Mirror</label>
+
+														<input name="mode" type="radio" value="offset" data-bind="attr: {id: `horizon-mode-offset-${$data}`}">
 														<label data-bind="attr: {for: `horizon-mode-offset-${$data}`}"> Offset</label>
 
-														<input name="mode" type="radio" value="mirror" data-bind="attr: {id: `horizon-mode-mirror-${$data}`}">
-														<label data-bind="attr: {for: `horizon-mode-mirror-${$data}`}"> Mirror</label>
+														
 
 														<span class="horizon-bands">
 															<span class="horizon-bands-value">1</span>

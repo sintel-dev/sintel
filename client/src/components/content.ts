@@ -60,7 +60,6 @@ class Content {
     // private methods
 
     private async addChart(conf: { db: string, signal: string }) {
-        console.log('addChart', this);
         let self = this;
         let name = `${conf.db}_${conf.signal}`;
         let dbSignals = self.dbSignals();
@@ -86,32 +85,31 @@ class Content {
             // add charts to the right places
             let ele;
 
-            // // add line chart
-            // // let anomaly = new alg.Anomaly(_.map(data, d => d.y));
-            // // let windows = anomaly.findPeakWidows(5, 2);
-            // ele = $(`#${name}-line`)[0];
-            // new LineChart(ele, data, {
-            //     height: 240,
-            //     height2: 40,
-            //     width: ele.parentElement.getBoundingClientRect().width,
-            //     width2: ele.parentElement.getBoundingClientRect().width
-            //     // smooth: true,
-            //     // windows: windows
-            // });
+            // add line chart
+            // let anomaly = new alg.Anomaly(_.map(data, d => d.y));
+            // let windows = anomaly.findPeakWidows(5, 2);
+            ele = $(`#${name}-line`)[0];
+            new LineChart(ele, data, {
+                height: 240,
+                height2: 40,
+                width: ele.parentElement.getBoundingClientRect().width,
+                width2: ele.parentElement.getBoundingClientRect().width
+                // smooth: true,
+                // windows: windows
+            });
 
-            // // add area chart
-            // ele = $(`#${name}-area`)[0];
-            // new AreaChart($(`#${name}-area`)[0], data, {
-            //     width: ele.parentElement.getBoundingClientRect().width,
-            //     normalized: true
-            // });
+            // add area chart
+            ele = $(`#${name}-area`)[0];
+            new AreaChart($(`#${name}-area`)[0], data, {
+                width: ele.parentElement.getBoundingClientRect().width
+            });
 
             // // add horizon chart
-            // ele = $(`#${name}-horizon`)[0];
-            // new HorizonChart($(`#${name}-horizon`)[0], data, {
-            //     width: ele.parentElement.getBoundingClientRect().width,
-            //     normalized: true
-            // });
+            ele = $(`#${name}-horizon`)[0];
+            new HorizonChart($(`#${name}-horizon`)[0], data, {
+                width: ele.parentElement.getBoundingClientRect().width
+                // normalized: true
+            });
 
             // add radial area chart
             // only activated when dataset is SES

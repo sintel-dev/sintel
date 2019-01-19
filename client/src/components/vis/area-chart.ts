@@ -1,18 +1,9 @@
-import { Events } from '../../services/pip-client';
+import * as pip from '../../services/pip-client';
+import { TimeSeriesData } from './chart-data.interface';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
 
-export interface ChartDataEle {
-    x: number;      // timestamp || step
-    y: number;      // value
-}
-
-// time-sorted data for one time-series
-export interface ChartData extends Array<ChartDataEle> { }
-
-// multiple time-series in one chart
-export interface ChartMultiData extends Array<ChartData> { }
 
 export interface ChartOption {
     // layout
@@ -23,7 +14,7 @@ export interface ChartOption {
     normalized?: boolean;
 }
 
-export class AreaChart extends Events {
+export class AreaChart extends pip.Events {
 
     private svg: d3.Selection<any, any, any, any>;
     private option: ChartOption = {
@@ -39,7 +30,7 @@ export class AreaChart extends Events {
 
     constructor(
         ele: HTMLElement,
-        private data: ChartData,
+        private data: TimeSeriesData,
         option?: ChartOption
     ) {
         super();
@@ -76,13 +67,13 @@ export class AreaChart extends Events {
         if (self.option.normalized) {
             self.data = _.cloneDeep(self.data);
             let nm = d3.scaleLinear()
-                .domain(d3.extent(self.data, d => d.y)).nice()
+                .domain(d3.extent(self.data, d => d[1])).nice()
                 .range([0, 1]);
-            _.each(self.data, o => { o.y = nm(o.y); });
+            _.each(self.data, o => { o[1] = nm(o[1]); });
         }
 
         // define scale
-        let x = self.data[0].x === 0 ?  // timestep or timestamp
+        let x = self.data[0][0] === 0 ?  // timestep or timestamp
             d3.scaleLinear().range([0, w]) : d3.scaleTime().range([0, w]);
         let y = d3.scaleLinear()
             .range([h, 0]);
@@ -91,8 +82,9 @@ export class AreaChart extends Events {
         let yAxis = d3.axisLeft(y).tickFormat(d3.format('.6'));
 
 
-        x.domain(d3.extent(self.data, d => new Date(d.x)));
-        y.domain([0, d3.max(self.data, d => d.y)]).nice();
+        x.domain(d3.extent(self.data, d => new Date(d[0])));
+        y.domain(d3.extent(self.data, d => d[1])).nice();
+        // y.domain([0, d3.max(self.data, d => d[1])]).nice();
         // y.domain(d3.extent(self.data, d => d.y));
 
 
@@ -100,10 +92,10 @@ export class AreaChart extends Events {
         let areaChart = self.svg.append('g')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`);
 
-        let area = d3.area<ChartDataEle>()
-            .x(d => x(d.x))
+        let area = d3.area<[number, number]>()
+            .x(d => x(d[0]))
             .y0(y(0))
-            .y1(d => y(d.y));
+            .y1(d => y(d[1]));
 
         areaChart.append('path')
             .datum(self.data)
