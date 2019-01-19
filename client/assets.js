@@ -17,7 +17,7 @@ let assets = {
         `${STATIC}/jquery.min.js`,
         // `${NPM}/jquery/dist/jquery.min.js`,
         `${THEME}/bower_components/jquery-ui/jquery-ui.min.js`,
-        `${STATIC}/jquery.rest/dist/jquery.rest.js`,
+        `${STATIC}/jquery.rest.js`,
         // `${NPM}/jquery.rest/dist/jquery.rest.js`,
         `${STATIC}/jquery-ui-resolve-conflict.js`,
         `${THEME}/bower_components/bootstrap/dist/js/bootstrap.min.js`,
