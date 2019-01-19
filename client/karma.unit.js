@@ -1,4 +1,6 @@
-let webpackConfig = require("./webpack.conf");
+const webpack = require('webpack');
+const webpackConfig = require("./webpack.conf");
+
 
 let wpConfig = webpackConfig({
     entryPoints: {
@@ -6,6 +8,14 @@ let wpConfig = webpackConfig({
     },
     outputDir: __dirname + '/public/dist'
 });
+
+// wpConfig.plugins = [
+//     new webpack.ProvidePlugin({
+//         $: 'jquery',
+//         jQuery: 'jquery',
+//         $ext1: 'jquery.rest'
+//     })
+// ];
 
 module.exports = function (config) {
     config.set({

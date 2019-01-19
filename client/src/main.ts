@@ -1,31 +1,35 @@
-import * as _ from 'lodash';
 import Header from './components/header';
-import Dashboard from './components/dashboard';
+import Sidebar from './components/sidebar';
 import Content from './components/content';
 
 /**
- * basic layout
+ * Basic layout
  * ------------------------------
- * |          header            |
+ * |          Header            |
  * |-----------------------------
  * |        |                   |
- * | Dash   |     Content       |
- * | Board  |                   |
+ * | Side   |     Content       |
+ * | Bar    |                   |
  * |        |                   |
  * -----------------------------|
  */
 
-class App {
+export class App {
 
     public header: Header;
-    public dashboard: Dashboard;
+    public sidebar: Sidebar;
     public content: Content;
 
     public bootstrap() {
-        // init header
-        this.header = new Header('#hearder');
-        this.dashboard = new Dashboard('#dashboard');
+        this.header = new Header('#header');
+        this.sidebar = new Sidebar('#sidebar');
         this.content = new Content('#content');
+    }
+
+    public setupEventHandlers() {
+        this.header.setupEventHandlers();
+        this.sidebar.setupEventHandlers();
+        this.content.setupEventHandlers();
     }
 
     constructor() {
@@ -35,17 +39,5 @@ class App {
 
 let app = new App();
 app.bootstrap();
-
-
-
-// used for karma test
-export class Calculator {
-    public static Sum(a: number[]): number {
-        return _.sum(a);
-    }
-
-    public static Difference(a: number, b: number): number {
-        let c = a - b;
-        return c;
-    }
-}
+// setup event handler when app was created
+app.setupEventHandlers();

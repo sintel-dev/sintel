@@ -34,11 +34,18 @@ help:
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
 	pip install .
+	cd client && npm install
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
 	cd client && npm install
+
+.PHONY: install-theme
+install-theme:
+	curl -o theme.zip "http://dongyu.name/themes/options-admin.zip"
+	unzip theme.zip -d "./client/public/themes/"
+	rm -f theme.zip
 
 
 # ----------------------- session: test ----------------------- #
@@ -49,6 +56,10 @@ test: test-server test-client ## run tests on both server and client
 .PHONY: test-server
 test-server: ## run tests on server
 	py.test -n 2 ./tests
+
+.PHONY: test-server-flask
+test-server-flask: ## run tests on server
+	py.test ./tests/test_flask.py
 
 .PHONY: test-client
 test-client: ## run tests on client
@@ -81,7 +92,6 @@ fix-lint: ## fix lint issues using autoflake, autopep8, and isort
 	find tests -name '*.py' | xargs autoflake --in-place --remove-all-unused-imports --remove-unused-variables
 	autopep8 --in-place --recursive --aggressive tests
 	isort --apply --atomic --recursive tests
-
 
 
 # ---------------------- session: docs ----------------------- #

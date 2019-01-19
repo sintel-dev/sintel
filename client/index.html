@@ -1,96 +1,337 @@
 <html>
 
 <head>
-	<!-- build:theme-css -->
-	<link rel="stylesheet" href="./public/lib-static/theme/bootstrap.css">
-	<link rel="stylesheet" href="./public/lib-static/theme/font-awesome.css">
-	<link rel="stylesheet" href="./public/lib-static/theme/animate.min.css">
-	<link rel="stylesheet" href="./public/lib-static/theme/lobipanel.min.css">
-	<link rel="stylesheet" href="./public/lib-static/theme/main.css">
+	<!-- build:assets-css -->
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
 	<!-- endbuild -->
 
 
 
-	<!-- build:lib-css -->
-	<link rel="stylesheet" href="./public/lib/bundle.lib.min.css">
-	<!-- endbuild -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 	<!-- build:app-css -->
-	<link rel="stylesheet" href="./public/dist/main.min.css">
+	<link rel="stylesheet" href="./public/dist/main.css">
 	<!-- endbuild -->
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- Google Font -->
+	<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"> -->
 </head>
 
-<body>
-	<!-- header: begin -->
-	<div id="hearder" class="row navbar-fixed-top">
-		<div class="col-sm-6 col-md-3">
-			<div class="header-text ml-20">
-				<!-- 
-					<a href="/">
-						<img src="./public/static/logo.png" class="brand-logo" height="25" width="25" />
-					</a> 
-				-->
-				<span class="logo">MTV</span>
-			</div>
+<body class="hold-transition skin-blue fixed sidebar-mini">
+	<div class="wrapper">
+		<!-- header: begin -->
+		<header id="header" class="main-header">
+			<!-- Logo -->
+			<a href="#" class="logo">
+				<!-- mini logo for sidebar mini 50x50 pixels -->
+				<span class="logo-mini"><b>MTV</b></span>
+				<!-- logo for regular state and mobile devices -->
+				<span class="logo-lg"><b>MTV</b></span>
+			</a>
+			<!-- Header Navbar: style can be found in header.less -->
+			<nav class="navbar navbar-static-top">
+				<!-- Sidebar toggle button-->
+				<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+					<span class="sr-only">Toggle navigation</span>
+				</a>
+				<div class="navbar-custom-menu">
+					<ul class="nav navbar-nav">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dataset
+								<span class="caret"></span>
+							</a>
+							<ul data-bind="foreach: dbList" class="dropdown-menu db-menu" aria-labelledby="Dataset">
+								<li data-bind="css: {active: $index() == $parent.selected.db().index}, 
+									click: $parent.onSelectDB.bind($parent, $data, $index())">
+									<a href="#" data-bind="text: $data"></a>
+								</li>
+							</ul>
+						</li>
+						<li class="dropdown" data-bind="html: selected.db().html"></li>
+
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Signal
+								<span class="caret"></span>
+							</a>
+							<ul data-bind="foreach: signalList" class="dropdown-menu signal-menu" aria-labelledby="Signal">
+								<li data-bind="css: {active: $parent.activatedSignalList().has(`${$parent.selected.db().name}_${$data}`)},
+									click: $parent.onSelectSignal.bind($parent, $data, $index())">
+									<a href="#" data-bind="text: $data"></a>
+								</li>
+							</ul>
+						</li>
+						<li class="dropdown" data-bind="html: selected.signal().html"></li>
+
+						<li><button id="load-all-signals" type="button" class="btn margin" title="Auto Load All Signals"
+							data-bind="click: onLoadAllSignals()"><i class="fa fa-play"></i></button></li>
+					</ul>
+				</div>
+			</nav>
+		</header>
+		<!-- header: end -->
+		<!-- sidebar: begin -->
+		<aside id="sidebar" class="main-sidebar">
+			<section class="sidebar">
+				<ul class="sidebar-menu" data-widget="tree">
+					<li class="header">Config</li>
+					<li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>
+					<li class="header">Pipeline</li>
+					<li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>
+					<li class="header">Exploration</li>
+					<li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
+					<li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span>Information</span></a></li>
+				</ul>
+			</section>
+		</aside>
+		<!-- sidebar: end -->
+		<!-- content: begin -->
+		<div class="content-wrapper">
+			<!-- Main content -->
+			<section id="content" class="content" data-bind="foreach: dbSignals">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="box" data-bind="attr: {name: $data}">
+							<div class="box-header with-border">
+								<h3 class="box-title" data-bind="text: $data"></h3>
+
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-bind="attr: {name: `${$data}-collapse`}">
+										<i class="fa fa-minus"></i>
+									</button>
+									<button type="button" class="btn btn-box-tool" data-bind="attr: {name: `${$data}-remove`},
+										click: ()=>{ $parent.onRemoveDBSignal($data); }"><i
+										 class="fa fa-times"></i>
+									</button>
+								</div>
+								<!-- /.box-tools -->
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body" data-bind="attr: {name: $data}">
+								<div class="row">
+									<div class="col-md-8 signal-trend">
+										<div class="nav-tabs-custom nav-tabs-custom-mtv">
+											<ul class="nav nav-tabs pull-right">
+												<li class="active"><a data-toggle="tab" data-bind="attr: {href: `#${$data}-line`}">Line</a></li>
+												<li><a data-toggle="tab" data-bind="attr: {href: `#${$data}-horizon`}">Horizon</a></li>
+												<li><a data-toggle="tab" data-bind="attr: {href: `#${$data}-area`}">Area</a></li>
+												<li class="dropdown">
+													<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+														Dropdown <span class="caret"></span>
+													</a>
+													<ul class="dropdown-menu">
+														<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action1</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action2</a></li>
+														<li role="presentation" class="divider"></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Voice Record</a></li>
+													</ul>
+												</li>
+												<li class="pull-left header">Trend</li>
+											</ul>
+											<div class="tab-content">
+												<div class="tab-pane active" data-bind="attr: {id: `${$data}-line`}"> </div>
+												<!-- /.tab-pane -->
+												<div class="tab-pane" data-bind="attr: {id: `${$data}-horizon`}">
+													<div class="horizon-controls">
+														<input name="mode" type="radio" value="offset" data-bind="attr: {id: `horizon-mode-offset-${$data}`}"
+														 checked>
+														<label data-bind="attr: {for: `horizon-mode-offset-${$data}`}"> Offset</label>
+
+														<input name="mode" type="radio" value="mirror" data-bind="attr: {id: `horizon-mode-mirror-${$data}`}">
+														<label data-bind="attr: {for: `horizon-mode-mirror-${$data}`}"> Mirror</label>
+
+														<span class="horizon-bands">
+															<span class="horizon-bands-value">1</span>
+															<button class="first">&#x2212;</button>
+															<button class="last">+</button>
+														</span>
+													</div>
+												</div>
+												<div class="tab-pane" data-bind="attr: {id: `${$data}-area`}"> </div>
+												<!-- /.tab-pane -->
+											</div>
+											<!-- /.tab-content -->
+										</div>
+									</div>
+									<div class="col-md-4 signal-period">
+										<div class="nav-tabs-custom nav-tabs-custom-mtv">
+											<ul class="nav nav-tabs pull-right">
+												<li class="active"><a data-toggle="tab" data-bind="attr: {href: `#${$data}-radial-area-year`}">Year</a></li>
+												<li><a data-toggle="tab" data-bind="attr: {href: `#${$data}-radial-area-month`}">Month</a></li>
+												<!-- <li><a data-toggle="tab" data-bind="attr: {href: `#${$data}-radiao-area-day`}">Day</a></li> -->
+												<li class="pull-left header" data-bind="attr: {id: `${$data}-radial-area-title`}">Period</li>
+											</ul>
+											<div class="tab-content">
+												<div class="tab-pane active" data-bind="attr: {id: `${$data}-radial-area-year`}"> </div>
+												<!-- /.tab-pane -->
+												<div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-month`}">	</div>
+												<!-- <div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-day`}"> </div> -->
+												<!-- /.tab-pane -->
+											</div>
+											<!-- /.tab-content -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- /.box-body -->
+						</div>
+						<!-- /.box -->
+					</div>
+					<!-- /.col -->
+				</div>
+			</section>
+			<!-- /.content -->
 		</div>
-		<div class="col-md-6 col-md-9">
-			<div class="header-text mr-20" style="float:right">
-				<span>Help</span>
+		<!-- content: end -->
+		<!-- footer: begin -->
+		<footer class="main-footer">
+			<div class="pull-right hidden-xs">
+				<b>Version</b> 1.0.0
 			</div>
-		</div>
+			<strong>Copyright &copy; 2019 <a href="https://dai.lids.mit.edu/">MIT DAI Lab</a>.</strong> All rights
+			reserved.
+		</footer>
+		<!-- footer: end -->
 	</div>
-	<!-- header: end -->
-
-	<!-- dashboard: begin -->
-	<div id="dashboard" style="display: none">
-	</div>
-	<!-- dashboard: end -->
-
-	<!-- content: begin -->
-  <div id="content" class="content">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-12 pr-n">
-					vis content
-        </div>
-      </div>
-    </div>
-	</div>
-	<!-- content: end -->
-	
-
-
-	<!-- build:theme-js -->
-	<script src="./public/lib-static/theme/bootstrap.min.js"></script>
-	<script src="./public/lib-static/theme/jquery-2.2.4.min.js"></script>
-	<script src="./public/lib-static/theme/jquery-ui.min.js"></script>
-	<script src="./public/lib-static/theme/bootstrap.min.js"></script>
-	<script src="./public/lib-static/theme/pace.min.js"></script>
-	<script src="./public/lib-static/theme/lobipanel.min.js"></script>
-	<script src="./public/lib-static/theme/iscroll.js"></script>
-	<script src="./public/lib-static/theme/main.js"></script>
+	<!-- build:assets-js -->
+	<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-ui/jquery-ui.min.js"></script>
+	<script src="./node_modules/jquery.rest/dist/jquery.rest.js"></script>
+	<script src="./public/lib-static/jquery-ui-resolve-conflict.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/raphael/raphael.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/morris.js/morris.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/moment/min/moment.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/fastclick/lib/fastclick.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/dist/js/adminlte.min.js"></script>
+	<script src="./public/lib-static/math.js"></script>
+	<script src="./public/lib-static/science.js"></script>
 	<!-- endbuild -->
 
 
 
 
-	<!-- build:lib-js -->
-	<script src="./public/lib/d3.js"></script>
-	<!-- endbuild -->
 
 
 
 
-	<script src="./public/lib_static/math.js"></script>
-	<script src="./public/lib_static/science.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<!-- build:app-js -->
-	<script src="./public/dist/main.min.js"></script>
+	<script src="./public/dist/main.js"></script>
 	<!-- endbuild -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </body>

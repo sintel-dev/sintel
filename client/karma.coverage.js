@@ -1,4 +1,5 @@
-let webpackConfig = require("./webpack.conf");
+const webpack = require('webpack');
+const webpackConfig = require("./webpack.conf");
 
 let wpConfig = webpackConfig({
     entryPoints: {
@@ -6,6 +7,11 @@ let wpConfig = webpackConfig({
     },
     outputDir: __dirname + '/public/dist'
 });
+
+// add global variables
+// wpConfig.plugins = [
+//     new webpack.ProvidePlugin({$: 'jquery', jQuery: 'jquery'})
+// ];
 
 wpConfig.module.rules = [{
     test: /\.ts$/,

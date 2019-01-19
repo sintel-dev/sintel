@@ -30,6 +30,18 @@ def create_dirs(path_to_dir):
          should be a string or a list of strings")
 
 
+def get_dirs(dir):
+    return [name for name in os.listdir(dir)
+            if os.path.isdir(os.path.join(dir, name))]
+
+
+def get_files(dir):
+    result = []
+    for (root, dirs, files) in os.walk(dir):
+        result.extend(files)
+    return result
+
+
 def setup_logging(path_to_log):
     '''Configure logging object...
 

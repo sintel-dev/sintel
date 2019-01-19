@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import {Events as BackboneEvents} from 'backbone';
 
 
-
 export class Events {
     constructor() {
         _.extend(this, BackboneEvents);
@@ -20,11 +19,7 @@ export class Events {
     public stopListening(object?: any, events?: string, callback?: Function): any { return; }
 }
 
-
-
-// add your global event instances here
-// export let data = new Events();
-
-
-
-
+export let app = new Events();
+export let header = new Events();
+export let sidebar = new Events();
+export let content = new Events();

@@ -19,7 +19,7 @@ services:
     environment:
       # - NODE_ENV=development
       - DB_PORT_27017_TCP_ADDR=db
-    command: python run_server.py
+    command: python run-server.py
     volumes:
       - .:/mtv
 volumes:

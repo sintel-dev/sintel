@@ -60,4 +60,4 @@ RUN make install-develop
 # EXPOSE 80 443 3000
 
 # start app
-# CMD [ "python", "./run_server.py" ]
+# CMD [ "python", "./run-server.py" ]

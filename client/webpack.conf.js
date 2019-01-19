@@ -63,7 +63,7 @@ module.exports = (options) => {
       extensions: ['.js', '.ts', '.jsx', '.tsx']
     },
     entry: options.entryPoints,
-    externals: [],
+    externals: {jquery: 'jQuery'},
     output: {
       path: path.join(options.outputDir),
       filename: options.name
@@ -84,14 +84,8 @@ module.exports = (options) => {
         }
       ]
     },
-    plugins: [new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery'
-      // 'window.jQuery': 'jquery',
-      // 'window.$': 'jquery',
-      
-    })],
-    devtool: 'cheap-source-map',
+    plugins: [],
+    devtool: 'cheap-source-map', // use "inline-source-map" for originals
     performance: {
       maxAssetSize: 1500000,
       maxEntrypointSize: 1500000

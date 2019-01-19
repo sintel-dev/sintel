@@ -64,17 +64,17 @@ def run():
                 'Starting up FLASK APP in development mode',
                 'yellow'))
             print(colored('Available on:', 'yellow'))
-            print('  http://127.0.0.1:' + colored('3001', 'green'))
+            print('  http://127.0.0.1:' + colored('3000', 'green'))
             sys.stdout.flush()
-            server = WSGIServer(('127.0.0.1', 3001), DebuggedApplication(app))
+            server = WSGIServer(('127.0.0.1', 3000), DebuggedApplication(app))
             server.serve_forever()
         run_with_reloader(http_server)
     elif (env == 'prod'):
         # production mode
         print(colored('Starting up FLASK APP in production mode', 'yellow'))
         print(colored('Available on:', 'yellow'))
-        print('  http://127.0.0.1:' + colored('3001', 'green'))
-        http_server = WSGIServer(('127.0.0.1', 3001), app)
+        print('  http://127.0.0.1:' + colored('3000', 'green'))
+        http_server = WSGIServer(('127.0.0.1', 3000), app)
         sys.stdout.flush()
         http_server.serve_forever()
 

@@ -1,48 +1,47 @@
-const LIB_BASE_PATH = './node_modules';
-const THEME_BASE_PATH = './public/themes/options';
+const NPM = './node_modules';                       // package.json
+const STATIC = './public/lib-static';               // manually installed
+const THEME = './public/themes/AdminLTE-2.4.2';     // theme template
 
 
-let theme = {
+let assets = {
     css: [
-        `${THEME_BASE_PATH}/css/bootstrap.css`,
-        `${THEME_BASE_PATH}/css/font-awesome.css`,
-        `${THEME_BASE_PATH}/css/animate-css/animate.min.css`,
-        `${THEME_BASE_PATH}/css/lobipanel/lobipanel.min.css`,
-        `${THEME_BASE_PATH}/css/main.css`
-    ],
+        `${THEME}/bower_components/bootstrap/dist/css/bootstrap.min.css`,
+        `${THEME}/bower_components/font-awesome/css/font-awesome.min.css`,
+        `${THEME}/bower_components/Ionicons/css/ionicons.min.css`,
+        `${THEME}/dist/css/AdminLTE.min.css`,
+        `${THEME}/dist/css/skins/_all-skins.min.css`,
+        `${THEME}/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css`,
+        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`
+],
     js: [
-        `${THEME_BASE_PATH}/js/bootstrap/bootstrap.min.js`,
-        `${THEME_BASE_PATH}/js/jquery/jquery-2.2.4.min.js`,
-        `${THEME_BASE_PATH}/js/jquery-ui/jquery-ui.min.js`,
-        `${THEME_BASE_PATH}/js/bootstrap/bootstrap.min.js`,
-        `${THEME_BASE_PATH}/js/pace/pace.min.js`,
-        `${THEME_BASE_PATH}/js/lobipanel/lobipanel.min.js`,
-        `${THEME_BASE_PATH}/js/iscroll/iscroll.js`,
-        `${THEME_BASE_PATH}/js/main.js`
+        `${NPM}/jquery/dist/jquery.min.js`,
+        `${THEME}/bower_components/jquery-ui/jquery-ui.min.js`,
+        `${NPM}/jquery.rest/dist/jquery.rest.js`,
+        `${STATIC}/jquery-ui-resolve-conflict.js`,
+        `${THEME}/bower_components/bootstrap/dist/js/bootstrap.min.js`,
+        `${THEME}/bower_components/raphael/raphael.min.js`,
+        `${THEME}/bower_components/morris.js/morris.min.js`,
+        `${THEME}/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js`,
+        `${THEME}/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js`,
+        `${THEME}/plugins/jvectormap/jquery-jvectormap-world-mill-en.js`,
+        `${THEME}/bower_components/jquery-knob/dist/jquery.knob.min.js`,
+        `${THEME}/bower_components/moment/min/moment.min.js`,
+        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.js`,
+        `${THEME}/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js`,
+        `${THEME}/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js`,
+        `${THEME}/bower_components/jquery-slimscroll/jquery.slimscroll.min.js`,
+        `${THEME}/bower_components/fastclick/lib/fastclick.js`,
+        `${THEME}/dist/js/adminlte.min.js`,
+        `${STATIC}/math.js`,
+        `${STATIC}/science.js`
+        // `${THEME}/dist/js/pages/dashboard.js`,
+        // `${THEME}/dist/js/demo.js`,
     ]
 }
 
-
-
-
-let lib = {
-    css: [
-        // `${LIB_BASE_PATH}/libName/pathToCSSFile`,
-    ],
-    js: [
-        `${LIB_BASE_PATH}/d3/dist/d3.js`,
-    ]
-}
 
 module.exports = {
-    theme: {
-        css: theme.css,
-        js: theme.js,
-        all: [...theme.css, ...theme.js]
-    },
-    lib: {
-        css: lib.css,
-        js: lib.js,
-        all: [...lib.css, ...lib.js]
-    }
+    css: assets.css,
+    js: assets.js,
+    all: [...assets.css, ...assets.js]
 };

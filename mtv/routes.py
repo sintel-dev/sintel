@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_restful import Api
 
-from mtv.controllers import test
+from mtv.controllers import info
 
 
 def add_routes(app):
@@ -14,5 +14,5 @@ def add_routes(app):
 
     # configure RESTful APIs
     api = Api(app)
-    api.add_resource(test.Test1, '/api/v1/test1/')
-    api.add_resource(test.Test2, '/api/v1/test2/')
+    api.add_resource(info.DBs, '/api/v1/dbs/')
+    api.add_resource(info.Signals, '/api/v1/dbs/<string:db_name>/signals/')

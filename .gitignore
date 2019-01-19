@@ -27,9 +27,10 @@ wheels/
 
 # Client
 node_modules/
-client/public/libs/
+client/public/lib/
 client/public/dist/
 client/public/themes/
+client/public/data/
 npm-debug.log
 package-lock.json
 coverage/
