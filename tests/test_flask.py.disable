@@ -13,12 +13,12 @@ def test_info_DBs(client):
 def test_info_Signals(client):
     res_1 = client.get('/api/v1/dbs/SES/signals/')
 
-    res_2 = client.get('/api/v1/dbs/SES/signals/pid_781/')
+    res_2 = client.get('/api/v1/dbs/SES/signals/781/')
 
     st = datetime(2015, 1, 1).timestamp()
     ed = datetime(2015, 3, 1).timestamp()
-    print('/api/v1/dbs/SES/signals/pid_781/?start={}&end={}'.format(st, ed))
-    res_3 = client.get('/api/v1/dbs/SES/signals/pid_781/?start={}&end={}'
+    print('/api/v1/dbs/SES/signals/781/?start={}&end={}'.format(st, ed))
+    res_3 = client.get('/api/v1/dbs/SES/signals/781/?start={}&end={}'
                        .format(st, ed))
 
     assert b'165_6hr' in res_1.data
