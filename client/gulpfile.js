@@ -21,9 +21,9 @@ const DIST = './public/dist';
 
 
 gulp.task('htmlCleanEmptyLines', (done) => {
-    // let content = fs.readFileSync('index.html', 'utf-8');
-    // let newContent = content.replace(/^\s*[\r\n]/gm, '');
-    // fs.writeFileSync('index.html', newContent, 'utf-8');
+    let content = fs.readFileSync('index.html', 'utf-8');
+    let newContent = content.replace(/^\s*[\r\n]/gm, '');
+    fs.writeFileSync('index.html', newContent, 'utf-8');
     done();
 });
 

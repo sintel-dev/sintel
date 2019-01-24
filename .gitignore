@@ -38,7 +38,7 @@ logs/
 
 # Data
 client/public/data/
-mtv/data-processors/raw_data
+mtv/data-processors/raw-data
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

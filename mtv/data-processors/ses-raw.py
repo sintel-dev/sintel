@@ -35,8 +35,8 @@ def transform_to_db_docs(pid, data):
         day_bins.append([])
     for d in data:
         nd = datetime.fromtimestamp(d[0])
-        if ((od is None) or not (nd.year == od.year and
-                                 nd.month == od.month and nd.day == od.day)):
+        if ((od is None) or not (nd.year == od.year and nd.month == od.month
+                                 and nd.day == od.day)):
             if (od is not None):
                 bins = []
                 counts = []
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     work_dir = os.getcwd()
 
-    ori_folder_path = './raw_data/ses/pids'
+    ori_folder_path = './raw-data/ses/pids'
 
     pids = get_files(ori_folder_path)
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             time2 = time.time()
             print('sorting over', time2 - time1)
 
-            docs = transform_to_db_docs(pid[0:-4], data)
+            docs = transform_to_db_docs(pid[4:-4], data)
 
             conn.writeCollection(docs, 'pids')
 

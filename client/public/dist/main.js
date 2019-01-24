@@ -55292,8 +55292,9 @@ var Content = (function () {
                 else {
                     ed = new Date(st.getFullYear(), st.getMonth() + 1, 0);
                 }
-                if (_.lowerCase(conf.db) === 'ses' && _.startsWith(conf.signal, '781')) {
-                    rest_server_1.default.dbs.signals.read('ses', 'pid_781', {}, { start: st.valueOf() / 1000, end: ed.valueOf() / 1000 }).done(function (data, textStatus) {
+                var pid = conf.signal.substring(0, conf.signal.length - 4);
+                if (_.lowerCase(conf.db) === 'ses') {
+                    rest_server_1.default.dbs.signals.read('ses', pid, {}, { start: st.valueOf() / 1000, end: ed.valueOf() / 1000 }).done(function (data, textStatus) {
                         var min = Number.MAX_SAFE_INTEGER;
                         var max = Number.MIN_SAFE_INTEGER;
                         var dayData = _.map(data, function (d, i) {
@@ -55335,10 +55336,10 @@ var Content = (function () {
                             .range([0, 1]);
                         _.each(dayData, function (d) {
                             for (var i = 0; i < d.bins.length; i++) {
-                                d.bins[i] = isNaN(d.bins[i]) ? 0 : nm(d.bins[i]);
+                                d.bins[i] = isNaN(d.bins[i]) ? -1 : nm(d.bins[i]);
                             }
                         });
-                        console.log('ses_pid_781', dayData);
+                        console.log("ses_pid_" + pid, dayData);
                         $("a[href=\"#" + name + "-radial-area-day\"]").tab('show');
                         $("#" + name + "-radial-area-title").text("Period - Year: " + o.parent.name + ", Month: " + o.name);
                         dayChart.trigger('update', dayData);
@@ -55386,12 +55387,18 @@ var Content = (function () {
                             ndata = data_processor_1.default.normalizeTimeSeries(data);
                             tdata = data_processor_1.default.transformTimeSeriesToPeriodYear(ndata);
                             yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-year")[0], tdata, {
-                                width: ele.parentElement.getBoundingClientRect().width
+                                width: ele.parentElement.getBoundingClientRect().width,
+                                cw: 90,
+                                ch: 90,
+                                size: 100
                             });
                             ele = $("#" + name + "-radial-area-month")[0];
                             fakeMonthData = data_processor_1.default.genRadialAreaChartData(12, 30);
                             monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-month")[0], fakeMonthData, {
-                                width: ele.parentElement.getBoundingClientRect().width
+                                width: ele.parentElement.getBoundingClientRect().width,
+                                cw: 90,
+                                ch: 90,
+                                size: 100
                             });
                             ele = $("#" + name + "-radial-area-day")[0];
                             fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24);
@@ -56202,7 +56209,7 @@ var RadialAreaChart = (function (_super) {
         _this.option = {
             height: null,
             width: null,
-            margin: { top: 20, right: 20, bottom: 20, left: 20 },
+            margin: { top: 10, right: 10, bottom: 10, left: 10 },
             padding: 4,
             nCol: null,
             cw: 120,
@@ -56226,7 +56233,7 @@ var RadialAreaChart = (function (_super) {
     }
     RadialAreaChart.prototype.addCharts = function () {
         var self = this;
-        var _a = self.option, margin = _a.margin, padding = _a.padding, cw = _a.cw, ch = _a.ch, nCol = _a.nCol;
+        var _a = self.option, width = _a.width, height = _a.height, margin = _a.margin, padding = _a.padding, cw = _a.cw, ch = _a.ch, nCol = _a.nCol;
         var _b = [
             self.option.width - margin.left - margin.right,
             self.option.height - margin.top - margin.bottom
@@ -56238,7 +56245,8 @@ var RadialAreaChart = (function (_super) {
         var angle = d3.scaleLinear()
             .range([0, 2 * Math.PI]);
         var radius = d3.scaleLinear()
-            .range([innerRadius, outerRadius]);
+            .range([innerRadius, outerRadius])
+            .clamp(true);
         var area = d3.areaRadial()
             .angle(function (d, i) { return angle(i); })
             .innerRadius(function (d) { return radius(0); })
@@ -56254,7 +56262,21 @@ var RadialAreaChart = (function (_super) {
             d.col = i % nCol;
             d.row = Math.floor(i / nCol);
         });
-        var g = self.svg.append('g')
+        var zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .translateExtent([[0, 0], [width, height]])
+            .extent([[0, 0], [width, height]])
+            .on('zoom', zoomed);
+        self.svg.append('rect')
+            .attr('class', 'radial-zoom')
+            .attr('width', width)
+            .attr('height', height)
+            .call(zoom);
+        var zoomg = self.svg.append('g');
+        function zoomed() {
+            zoomg.attr('transform', d3.event.transform);
+        }
+        var g = zoomg.append('g')
             .attr('transform', "translate(" + self.option.margin.left + ",\n                " + self.option.margin.top + ")");
         var cell = g.selectAll('.feature-cell')
             .data(data)
@@ -56270,7 +56292,7 @@ var RadialAreaChart = (function (_super) {
             radius.domain([0, 1]);
             var path = _cell.append('path')
                 .datum(o.bins)
-                .attr('class', 'feature-area')
+                .attr('class', 'feature-area radial-cursor')
                 .style('fill', function () {
                 return '#637bb6';
             })
@@ -56287,6 +56309,7 @@ var RadialAreaChart = (function (_super) {
             path.append('title')
                 .text(o.name);
             var circle = _cell.append('circle')
+                .attr('class', 'radial-cursor')
                 .attr('cx', 0)
                 .attr('cy', 0)
                 .attr('r', innerRadius)
@@ -56297,6 +56320,23 @@ var RadialAreaChart = (function (_super) {
             })
                 .append('title')
                 .text(o.name);
+            var missedData = [];
+            _.each(o.bins, function (b, bi) {
+                if (b === -1) {
+                    missedData.push(bi);
+                }
+            });
+            var missedBins = _cell.selectAll('.missed-bins')
+                .data(missedData)
+                .enter()
+                .append('circle')
+                .attr('class', 'missed-bins')
+                .attr('cx', function (bi) { return Math.sin(angle(bi)) * innerRadius; })
+                .attr('cy', function (bi) { return -Math.cos(angle(bi)) * innerRadius; })
+                .attr('r', 1)
+                .attr('fill', 'red')
+                .attr('fill-opacity', 0.6)
+                .style('stroke-width', 0);
         }
         self.on('update', function (o) {
             console.log('radial-area-chart: update', o);
@@ -56571,17 +56611,49 @@ var DataProcessor = (function () {
             last.children[now.getMonth()].bins[now.getDate() - 1] += data[i][1];
             last.children[now.getMonth()].counts[now.getDate() - 1] += 1;
         }
-        _.each(res, function (d) {
+        var minYear = Number.MAX_SAFE_INTEGER;
+        var maxYear = Number.MIN_SAFE_INTEGER;
+        var minMonth = new Array(res.length).fill(Number.MAX_SAFE_INTEGER);
+        var maxMonth = new Array(res.length).fill(Number.MIN_SAFE_INTEGER);
+        _.each(res, function (d, di) {
             for (var i = 0; i < d.bins.length; i++) {
                 if (d.counts[i] > 0) {
-                    d.bins[i] /= d.counts[i];
+                    var v = d.bins[i] / d.counts[i];
+                    d.bins[i] = v;
+                    minYear = minYear > v ? v : minYear;
+                    maxYear = maxYear < v ? v : maxYear;
+                }
+                else {
+                    d.bins[i] = NaN;
                 }
             }
             _.each(d.children, function (m) {
                 for (var i = 0; i < m.bins.length; i++) {
                     if (m.counts[i] > 0) {
-                        m.bins[i] /= m.counts[i];
+                        var v = m.bins[i] / m.counts[i];
+                        m.bins[i] = v;
+                        minMonth[di] = minMonth[di] > v ? v : minMonth[di];
+                        maxMonth[di] = maxMonth[di] < v ? v : maxMonth[di];
                     }
+                    else {
+                        m.bins[i] = NaN;
+                    }
+                }
+            });
+        });
+        var nmYear = d3.scaleLinear()
+            .domain([minYear, maxYear])
+            .range([0, 1]);
+        _.each(res, function (d, di) {
+            for (var i = 0; i < d.bins.length; i++) {
+                d.bins[i] = isNaN(d.bins[i]) ? -1 : nmYear(d.bins[i]);
+            }
+            var nmMonth = d3.scaleLinear()
+                .domain([minMonth[di], maxMonth[di]])
+                .range([0, 1]);
+            _.each(d.children, function (m) {
+                for (var i = 0; i < m.bins.length; i++) {
+                    m.bins[i] = isNaN(m.bins[i]) ? -1 : nmMonth(m.bins[i]);
                 }
             });
         });

@@ -27,7 +27,7 @@ export class RadialAreaChart extends pip.Events {
     private option: Option = {
         height: null,
         width: null,
-        margin: { top: 20, right: 20, bottom: 20, left: 20 },
+        margin: { top: 10, right: 10, bottom: 10, left: 10 },
         padding: 4,
         nCol: null,
         cw: 120,
@@ -68,7 +68,7 @@ export class RadialAreaChart extends pip.Events {
     private addCharts() {
         let self = this;
 
-        let { margin, padding, cw, ch, nCol } = self.option;
+        let { width, height, margin, padding, cw, ch, nCol } = self.option;
         // define paint board size
         let [w, h] = [
             self.option.width - margin.left - margin.right,
@@ -87,7 +87,8 @@ export class RadialAreaChart extends pip.Events {
             .range([0, 2 * Math.PI]);
 
         let radius = d3.scaleLinear()
-            .range([innerRadius, outerRadius]);
+            .range([innerRadius, outerRadius])
+            .clamp(true);
 
         let area = d3.areaRadial<number>()
             .angle((d, i) => angle(i))
@@ -108,7 +109,25 @@ export class RadialAreaChart extends pip.Events {
             d.row = Math.floor(i / nCol);
         });
 
-        let g = self.svg.append('g')
+        let zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .translateExtent([[0, 0], [width, height]])
+            .extent([[0, 0], [width, height]])
+            .on('zoom', zoomed);
+
+        self.svg.append('rect')
+            .attr('class', 'radial-zoom')
+            .attr('width', width)
+            .attr('height', height)
+            .call(zoom);
+
+        let zoomg = self.svg.append('g');
+
+        function zoomed() {
+            zoomg.attr('transform', d3.event.transform);
+        }
+
+        let g = zoomg.append('g')
             .attr('transform', `translate(${self.option.margin.left},
                 ${self.option.margin.top})`);
 
@@ -121,6 +140,8 @@ export class RadialAreaChart extends pip.Events {
             })
             .each(featurePlot);
 
+
+
         function featurePlot(o: Data) {
             let _cell = d3.select(this);
 
@@ -130,7 +151,7 @@ export class RadialAreaChart extends pip.Events {
 
             let path = _cell.append('path')
                 .datum(o.bins)
-                .attr('class', 'feature-area')
+                .attr('class', 'feature-area radial-cursor')
                 .style('fill', function () {
                     return '#637bb6';
                 })
@@ -152,6 +173,7 @@ export class RadialAreaChart extends pip.Events {
                 .text(o.name);
 
             let circle = _cell.append('circle')
+                .attr('class', 'radial-cursor')
                 .attr('cx', 0)
                 .attr('cy', 0)
                 .attr('r', innerRadius)
@@ -164,6 +186,24 @@ export class RadialAreaChart extends pip.Events {
                 })
                 .append('title')
                 .text(o.name);
+
+            let missedData = [];
+            _.each(o.bins, (b, bi) => {
+                if (b === -1) {
+                    missedData.push(bi);   // [idx, value]
+                }
+            });
+            let missedBins = _cell.selectAll('.missed-bins')
+                .data(missedData)
+                .enter()
+                .append('circle')
+                .attr('class', 'missed-bins')
+                .attr('cx', bi => Math.sin(angle(bi)) * innerRadius)
+                .attr('cy', bi => -Math.cos(angle(bi)) * innerRadius)
+                .attr('r', 1)
+                .attr('fill', 'red')
+                .attr('fill-opacity', 0.6)
+                .style('stroke-width', 0);
         }
 
         self.on('update', (o: Data[]) => {

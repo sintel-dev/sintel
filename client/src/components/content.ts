@@ -121,7 +121,10 @@ class Content {
                 let yearChart = new RadialAreaChart($(`#${name}-radial-area-year`)[0],
                     tdata,
                     {
-                        width: ele.parentElement.getBoundingClientRect().width
+                        width: ele.parentElement.getBoundingClientRect().width,
+                        cw: 90,
+                        ch: 90,
+                        size: 100
                     }
                 );
 
@@ -130,7 +133,10 @@ class Content {
                 let monthChart = new RadialAreaChart($(`#${name}-radial-area-month`)[0],
                     fakeMonthData,
                     {
-                        width: ele.parentElement.getBoundingClientRect().width
+                        width: ele.parentElement.getBoundingClientRect().width,
+                        cw: 90,
+                        ch: 90,
+                        size: 100
                     }
                 );
 
@@ -181,9 +187,9 @@ class Content {
                 ed = new Date(st.getFullYear(), st.getMonth() + 1, 0);
             }
 
-            if (_.lowerCase(conf.db) === 'ses' && _.startsWith(conf.signal, '781')) {
-                // server.dbs.read({}, {'foo': 12, 'boo': 13});
-                server.dbs.signals.read('ses', 'pid_781',
+            let pid = conf.signal.substring(0, conf.signal.length - 4);
+            if (_.lowerCase(conf.db) === 'ses') {
+                server.dbs.signals.read('ses', pid,
                     {}, // empty body
                     {start: st.valueOf() / 1000, end: ed.valueOf() / 1000}
                 ).done((data, textStatus) => {
@@ -231,10 +237,10 @@ class Content {
                         .range([0, 1]);
                     _.each(dayData, d => {
                         for (let i = 0; i < d.bins.length; i++) {
-                            d.bins[i] = isNaN(d.bins[i]) ? 0 : nm(d.bins[i]);
+                            d.bins[i] = isNaN(d.bins[i]) ? -1 : nm(d.bins[i]);
                         }
                     });
-                    console.log('ses_pid_781', dayData);
+                    console.log(`ses_pid_${pid}`, dayData);
 
                     // switch tag
                     ($(`a[href="#${name}-radial-area-day"]`) as any).tab('show');

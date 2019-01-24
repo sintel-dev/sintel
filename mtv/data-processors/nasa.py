@@ -32,7 +32,8 @@ def dump_to_csv(X, dest_file_path):
             writer.writerow({'timestamp': i, 'value': v})
 
         # normal writer
-        # writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        # writer = csv.writer(f, delimiter=',', quotechar='"',
+        #   quoting=csv.QUOTE_MINIMAL)
         # for i in range(X.shape[0]):
         #     v = X[i, 0]
         #     writer.writerow([i, v])

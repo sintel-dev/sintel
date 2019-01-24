@@ -254,3 +254,11 @@ body {
   stroke-width: 1;
   fill-opacity: 0;
 }
+.radial-cursor {
+  cursor: pointer;
+}
+.radial-zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}

@@ -80,7 +80,7 @@ test-pyversion: ## run tests on every Python version with tox
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
-	flake8 mtv tests
+	flake8 mtv tests --ignore W503
 	isort -c --recursive mtv tests
 
 .PHONY: fix-lint

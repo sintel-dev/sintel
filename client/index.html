@@ -10,69 +10,8 @@
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
 	<!-- endbuild -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	<!-- build:app-css -->
-	<link rel="stylesheet" href="./public/dist/main.css">
-	<!-- endbuild -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<link rel="stylesheet" href="./public/dist/main.css"> <!-- endbuild -->
 	<!-- Google Font -->
 	<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"> -->
 </head>
@@ -108,7 +47,6 @@
 							</ul>
 						</li>
 						<li class="dropdown" data-bind="html: selected.db().html"></li>
-
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Signal
 								<span class="caret"></span>
@@ -121,9 +59,8 @@
 							</ul>
 						</li>
 						<li class="dropdown" data-bind="html: selected.signal().html"></li>
-
-						<li><button id="load-all-signals" type="button" class="btn margin" title="Auto Load All Signals"
-							data-bind="click: onLoadAllSignals()"><i class="fa fa-play"></i></button></li>
+						<li><button id="load-all-signals" type="button" class="btn margin" title="Auto Load All Signals" data-bind="click: onLoadAllSignals()"><i
+								 class="fa fa-play"></i></button></li>
 					</ul>
 				</div>
 			</nav>
@@ -158,7 +95,6 @@
 						<div class="box" data-bind="attr: {name: $data}">
 							<div class="box-header with-border">
 								<h3 class="box-title" data-bind="text: $data"></h3>
-
 								<div class="box-tools pull-right">
 									<button type="button" class="btn btn-box-tool" data-bind="attr: {name: `${$data}-collapse`}">
 										<i class="fa fa-minus"></i>
@@ -197,14 +133,11 @@
 												<!-- /.tab-pane -->
 												<div class="tab-pane" data-bind="attr: {id: `${$data}-horizon`}">
 													<div class="horizon-controls">
-														<input name="mode" type="radio" value="mirror" data-bind="attr: {id: `horizon-mode-mirror-${$data}`}"  checked>
+														<input name="mode" type="radio" value="mirror" data-bind="attr: {id: `horizon-mode-mirror-${$data}`}"
+														 checked>
 														<label data-bind="attr: {for: `horizon-mode-mirror-${$data}`}"> Mirror</label>
-
 														<input name="mode" type="radio" value="offset" data-bind="attr: {id: `horizon-mode-offset-${$data}`}">
 														<label data-bind="attr: {for: `horizon-mode-offset-${$data}`}"> Offset</label>
-
-														
-
 														<span class="horizon-bands">
 															<span class="horizon-bands-value">1</span>
 															<button class="first">&#x2212;</button>
@@ -228,8 +161,8 @@
 											</ul>
 											<div class="tab-content">
 												<div class="tab-pane active" data-bind="attr: {id: `${$data}-radial-area-year`}"> </div>
-												<div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-month`}">	</div>
-												<div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-day`}">	</div>
+												<div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-month`}"> </div>
+												<div class="tab-pane" data-bind="attr: {id: `${$data}-radial-area-day`}"> </div>
 											</div>
 											<!-- /.tab-content -->
 										</div>
@@ -276,71 +209,9 @@
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/fastclick/lib/fastclick.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/dist/js/adminlte.min.js"></script>
 	<script src="./public/lib-static/math.js"></script>
-	<script src="./public/lib-static/science.js"></script>
-	<!-- endbuild -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<script src="./public/lib-static/science.js"></script> <!-- endbuild -->
 	<!-- build:app-js -->
-	<script src="./public/dist/main.js"></script>
-	<!-- endbuild -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<script src="./public/dist/main.js"></script> <!-- endbuild -->
 </body>
 
 </html>

@@ -80,16 +80,56 @@ class DataProcessor {
             last.children[now.getMonth()].counts[now.getDate() - 1] += 1;
         }
 
+        let minYear = Number.MAX_SAFE_INTEGER;
+        let maxYear = Number.MIN_SAFE_INTEGER;
+        let minMonth = new Array(res.length).fill(Number.MAX_SAFE_INTEGER);
+        let maxMonth = new Array(res.length).fill(Number.MIN_SAFE_INTEGER);
+
         // year
-        _.each(res, d => {
+        _.each(res, (d, di) => {
+
             for (let i = 0; i < d.bins.length; i++) {
-                if (d.counts[i] > 0) { d.bins[i] /= d.counts[i]; }
+                if (d.counts[i] > 0) {
+                    let v = d.bins[i] / d.counts[i];
+                    d.bins[i] = v;
+                    minYear = minYear > v ? v : minYear;
+                    maxYear = maxYear < v ? v : maxYear;
+                } else {
+                    d.bins[i] = NaN;
+                }
             }
 
             // month
             _.each(d.children, m => {
                 for (let i = 0; i < m.bins.length; i++) {
-                    if (m.counts[i] > 0) { m.bins[i] /= m.counts[i]; }
+                    if (m.counts[i] > 0) {
+                        let v = m.bins[i] / m.counts[i];
+                        m.bins[i] = v;
+                        minMonth[di] = minMonth[di] > v ? v : minMonth[di];
+                        maxMonth[di] = maxMonth[di] < v ? v : maxMonth[di];
+                    } else {
+                        m.bins[i] = NaN;
+                    }
+                }
+            });
+        });
+
+        let nmYear = d3.scaleLinear()
+            .domain([minYear, maxYear])
+            .range([0, 1]);
+        // normalization
+        _.each(res, (d, di) => {
+            for (let i = 0; i < d.bins.length; i++) {
+                d.bins[i] = isNaN(d.bins[i]) ? -1 : nmYear(d.bins[i]);
+            }
+
+             // month
+             let nmMonth = d3.scaleLinear()
+                .domain([minMonth[di], maxMonth[di]])
+                .range([0, 1]);
+             _.each(d.children, m => {
+                for (let i = 0; i < m.bins.length; i++) {
+                    m.bins[i] = isNaN(m.bins[i]) ? -1 : nmMonth(m.bins[i]);
                 }
             });
         });

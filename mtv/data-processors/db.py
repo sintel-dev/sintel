@@ -30,7 +30,8 @@ class MongoDB:
             if (isinstance(data, list) or isinstance(data, dict)):
                 self.db[col].insert_many(data)
             else:
-                print('input data type is not "list" or "dict" when execute insert_many')
+                print('input data type is not "list" or "dict" when execute \
+                    insert_many')
         elif insert_type == 'one':
             if (isinstance(data, list)):
                 for v in data:
@@ -63,18 +64,8 @@ class MongoDB:
 
     def createIndex(self, col):
         if (col == 'pids'):
-            self.db[col].create_index([('pid', ASCENDING), ('date',
-                                                            ASCENDING)], unique=True)
-            # self.db[col].create_index(, [('pid', ASCENDING), ('date', ASCENDING)])
-        # elif (col == 'crm_customer'):
-        #     self.db[col].create_index([('regDate', ASCENDING)])
-        # elif (col == 'st_cameras' or col == 'st_zones'):
-        #     self.db[col].create_index([('sfId', ASCENDING)])
-        # elif (col[-15:] == 'zone_statistics'):
-        #     self.db[col].create_index([('date', ASCENDING)])
-        #     self.db[col].create_index([('time', ASCENDING)])
-        # elif (col[0:3] == 'nyt'):
-        #     self.db[col].create_index([('date', ASCENDING)])
+            self.db[col].create_index([('pid', ASCENDING),
+                                       ('date', ASCENDING)], unique=True)
 
         print('create index successfully on collection "{}"'.format(col))
 
