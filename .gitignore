@@ -31,12 +31,14 @@ client/public/lib/
 !client/public/dist/
 client/public/dist/css
 client/public/themes/
-client/public/data/
 npm-debug.log
 package-lock.json
 coverage/
 logs/
 
+# Data
+client/public/data/
+mtv/data-processors/raw_data
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

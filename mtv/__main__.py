@@ -16,7 +16,6 @@ from flask_cors import CORS
 from gevent.wsgi import WSGIServer
 from termcolor import colored
 
-from mtv._globals import setup_global
 from mtv.routes import add_routes
 
 
@@ -51,7 +50,7 @@ def run():
     app = create_flask_app(env)
 
     # set up global env
-    setup_global(app)
+    # setup_global(app)
 
     # run flask server
     if (env == 'dev'):

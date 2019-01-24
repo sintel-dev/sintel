@@ -13,4 +13,5 @@ export interface PeriodData {
     bins: number[];      // month bin, storing aggregated value
     counts?: number[];   // number of data items on each bin
     children?: PeriodData[];
+    parent?: PeriodData;
 }

@@ -2,6 +2,10 @@ import {TimeSeriesData, PeriodData} from '../components/vis/chart-data.interface
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 
+// let dt = new Date(1548257576796);
+// console.log(dt.toTimeString());
+// console.log(dt.toUTCString());
+
 
 class DataProcessor {
 
@@ -105,7 +109,8 @@ class DataProcessor {
                     name: n,
                     bins: new Array(monDayNum[i]).fill(0),
                     counts: new Array(monDayNum[i]).fill(0),
-                    children: undefined
+                    children: undefined,
+                    parent: o
                 };
                 newMon.children = initDay(newMon);
                 return newMon;

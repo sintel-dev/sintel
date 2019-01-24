@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from flask import json
 
@@ -11,12 +12,18 @@ def test_info_DBs(client):
 
 def test_info_Signals(client):
     res_1 = client.get('/api/v1/dbs/SES/signals/')
-    res_2 = client.get('/api/v1/dbs/SES/signals/?id=165_6hr')
-    res_3 = client.get('/api/v1/dbs/SES/signals/?id=165')
+
+    res_2 = client.get('/api/v1/dbs/SES/signals/pid_781/')
+
+    st = datetime(2015, 1, 1).timestamp()
+    ed = datetime(2015, 3, 1).timestamp()
+    print('/api/v1/dbs/SES/signals/pid_781/?start={}&end={}'.format(st, ed))
+    res_3 = client.get('/api/v1/dbs/SES/signals/pid_781/?start={}&end={}'
+                       .format(st, ed))
 
     assert b'165_6hr' in res_1.data
-    assert b'success' in res_2.data
-    assert res_3.status_code == 404
+    assert res_2.status_code == 200
+    assert res_3.status_code == 200
 
 
 # def test_app1(client):

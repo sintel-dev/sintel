@@ -55224,7 +55224,9 @@ var line_chart_1 = __webpack_require__(/*! ./vis/line-chart */ "./src/components
 var area_chart_1 = __webpack_require__(/*! ./vis/area-chart */ "./src/components/vis/area-chart.ts");
 var horizon_chart_1 = __webpack_require__(/*! ./vis/horizon-chart */ "./src/components/vis/horizon-chart.ts");
 var radial_area_chart_1 = __webpack_require__(/*! ./vis/radial-area-chart */ "./src/components/vis/radial-area-chart.ts");
+var rest_server_1 = __webpack_require__(/*! ../services/rest-server */ "./src/services/rest-server.ts");
 var pip = __webpack_require__(/*! ../services/pip-client */ "./src/services/pip-client.ts");
+var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 var Content = (function () {
     function Content(eleId) {
         this.dbSignals = ko.observableArray([]);
@@ -55278,7 +55280,72 @@ var Content = (function () {
     };
     Content.prototype.addChart = function (conf) {
         return __awaiter(this, void 0, void 0, function () {
-            var self, name, dbSignals, pathToFile, data, ele, ndata, tdata, yearChart, monthChart_1;
+            function hackDayData(o, dayChart) {
+                var monNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+                    'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var monthToIndex = _.zipObject(monNames, _.range(12));
+                var st = new Date(+o.parent.name, monthToIndex[o.name]);
+                var ed;
+                if (st.getMonth() === 11) {
+                    ed = new Date(st.getFullYear() + 1, 0, 0);
+                }
+                else {
+                    ed = new Date(st.getFullYear(), st.getMonth() + 1, 0);
+                }
+                if (_.lowerCase(conf.db) === 'ses' && _.startsWith(conf.signal, '781')) {
+                    rest_server_1.default.dbs.signals.read('ses', 'pid_781', {}, { start: st.valueOf() / 1000, end: ed.valueOf() / 1000 }).done(function (data, textStatus) {
+                        var min = Number.MAX_SAFE_INTEGER;
+                        var max = Number.MIN_SAFE_INTEGER;
+                        var dayData = _.map(data, function (d, i) {
+                            var bins = [];
+                            var counts = [];
+                            var sum = 0;
+                            var count = 0;
+                            for (var j = 0; j < d.bins.length; j++) {
+                                sum += d.bins[j] * d.counts[j];
+                                count += d.counts[j];
+                                if ((j + 1) % 30 === 0) {
+                                    if (count > 0) {
+                                        var v = sum / count;
+                                        bins.push(v);
+                                        counts.push(count);
+                                        min = min > v ? v : min;
+                                        max = max < v ? v : max;
+                                    }
+                                    else {
+                                        bins.push(NaN);
+                                        counts.push(0);
+                                    }
+                                    sum = 0;
+                                    count = 0;
+                                }
+                            }
+                            var newDay = {
+                                level: 'day',
+                                name: i + 1,
+                                bins: bins,
+                                counts: counts,
+                                children: undefined,
+                                parent: o
+                            };
+                            return newDay;
+                        });
+                        var nm = d3.scaleLinear()
+                            .domain([min, max])
+                            .range([0, 1]);
+                        _.each(dayData, function (d) {
+                            for (var i = 0; i < d.bins.length; i++) {
+                                d.bins[i] = isNaN(d.bins[i]) ? 0 : nm(d.bins[i]);
+                            }
+                        });
+                        console.log('ses_pid_781', dayData);
+                        $("a[href=\"#" + name + "-radial-area-day\"]").tab('show');
+                        $("#" + name + "-radial-area-title").text("Period - Year: " + o.parent.name + ", Month: " + o.name);
+                        dayChart.trigger('update', dayData);
+                    });
+                }
+            }
+            var self, name, dbSignals, pathToFile, data, ele, ndata, tdata, yearChart, fakeMonthData, monthChart_1, fakeDayData, dayChart_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -55321,13 +55388,27 @@ var Content = (function () {
                             yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-year")[0], tdata, {
                                 width: ele.parentElement.getBoundingClientRect().width
                             });
-                            monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-month")[0], tdata[0].children, {
+                            ele = $("#" + name + "-radial-area-month")[0];
+                            fakeMonthData = data_processor_1.default.genRadialAreaChartData(12, 30);
+                            monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-month")[0], fakeMonthData, {
                                 width: ele.parentElement.getBoundingClientRect().width
+                            });
+                            ele = $("#" + name + "-radial-area-day")[0];
+                            fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24);
+                            dayChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-day")[0], fakeDayData, {
+                                width: ele.parentElement.getBoundingClientRect().width,
+                                cw: 60,
+                                ch: 60,
+                                size: 70
                             });
                             yearChart.on('select', function (o) {
                                 $("a[href=\"#" + name + "-radial-area-month\"]").tab('show');
                                 $("#" + name + "-radial-area-title").text("Period - Year: " + o.name);
                                 monthChart_1.trigger('update', o.children);
+                            });
+                            monthChart_1.on('select', function (o) {
+                                console.log(o, conf);
+                                hackDayData(o, dayChart_1);
                             });
                         }
                         _a.label = 2;
@@ -56198,9 +56279,7 @@ var RadialAreaChart = (function (_super) {
             })
                 .attr('d', area0)
                 .on('click', function (d) {
-                if (o.children) {
-                    self.trigger('select', o);
-                }
+                self.trigger('select', o);
             });
             path.transition()
                 .duration(750)
@@ -56214,9 +56293,7 @@ var RadialAreaChart = (function (_super) {
                 .style('fill', 'white')
                 .style('stroke-width', 0)
                 .on('click', function (d) {
-                if (o.children) {
-                    self.trigger('select', o);
-                }
+                self.trigger('select', o);
             })
                 .append('title')
                 .text(o.name);
@@ -56230,6 +56307,7 @@ var RadialAreaChart = (function (_super) {
             g.selectAll('.feature-cell').remove();
             var gd = g.selectAll('.feature-cell').data(o);
             gd.enter().append('g')
+                .merge(gd)
                 .attr('class', 'feature-cell')
                 .attr('transform', function (d) {
                 return 'translate(' + (d.col * cw + cw / 2) + ',' + (d.row * ch + ch / 2) + ')';
@@ -56521,7 +56599,8 @@ var DataProcessor = (function () {
                     name: n,
                     bins: new Array(monDayNum[i]).fill(0),
                     counts: new Array(monDayNum[i]).fill(0),
-                    children: undefined
+                    children: undefined,
+                    parent: o
                 };
                 newMon.children = initDay(newMon);
                 return newMon;

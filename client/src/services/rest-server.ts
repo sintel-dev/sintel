@@ -16,7 +16,35 @@ let server: Server = new jqueryExt.RestClient(
 
 // step2: add your resources
 server.add('dbs');
+/**
+ * usage:
+ *
+ * return the db list
+ * server.dbs.read()
+ * Get  /dbs/
+ */
+
+
 server.dbs.add('signals');
+/**
+ * usage:
+ *
+ * return the signal list of a db
+ * server.dbs.signals.read('dbName')
+ * Get  /dbs/dbName/signals/
+ *
+ * return all the signal data
+ * server.dbs.signals.read('dbName', 'sigName')
+ * Get  /dbs/dbName/signals/sigName/
+ *
+ * return the signal date from start_time to end_time
+ * server.dbs.signals.read('dbName', 'sigName', {},
+ *      {'start': timestamp1, 'end': timestamp2})
+ * Get  /dbs/dbName/signals/sigName/?start=timestamp1&end=timestamp2
+ */
+
+// server.dbs.signals.read('dbName', 'sigName', {'start': timestamp1}, {'end': timestamp2})
+
 
 
 // step3: remember to modify the PipServer interface accordingly

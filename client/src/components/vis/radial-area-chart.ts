@@ -139,9 +139,9 @@ export class RadialAreaChart extends pip.Events {
                 })
                 .attr('d', area0)
                 .on('click', (d) => {
-                    if (o.children) {
+                    // if (o.children) {
                         self.trigger('select', o);
-                    }
+                    // }
                 });
 
             path.transition()
@@ -158,9 +158,9 @@ export class RadialAreaChart extends pip.Events {
                 .style('fill', 'white')
                 .style('stroke-width', 0)
                 .on('click', (d) => {
-                    if (o.children) {
+                    // if (o.children) {
                         self.trigger('select', o);
-                    }
+                    // }
                 })
                 .append('title')
                 .text(o.name);
@@ -178,6 +178,7 @@ export class RadialAreaChart extends pip.Events {
             let gd = g.selectAll('.feature-cell').data(o);
 
             gd.enter().append('g')
+                .merge(gd as any)
                 .attr('class', 'feature-cell')
                 .attr('transform', function (d) {
                     return 'translate(' + (d.col * cw + cw / 2) + ',' + (d.row * ch + ch / 2) + ')';

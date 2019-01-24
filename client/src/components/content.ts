@@ -7,6 +7,7 @@ import { HorizonChart } from './vis/horizon-chart';
 import { Data as RadialAreaChartData, RadialAreaChart } from './vis/radial-area-chart';
 import server from '../services/rest-server';
 import * as pip from '../services/pip-client';
+import * as d3 from 'd3';
 import { App } from '../main';
 
 class Content {
@@ -123,19 +124,28 @@ class Content {
                         width: ele.parentElement.getBoundingClientRect().width
                     }
                 );
+
+                ele = $(`#${name}-radial-area-month`)[0];
+                let fakeMonthData = dataProcessor.genRadialAreaChartData(12, 30);
                 let monthChart = new RadialAreaChart($(`#${name}-radial-area-month`)[0],
-                    tdata[0].children,
+                    fakeMonthData,
                     {
                         width: ele.parentElement.getBoundingClientRect().width
                     }
                 );
-                // let dayChart;
-                // new RadialAreaChart($(`#${name}-radial-area-day`)[0],
-                //     tdata[0].months[0].days,
-                //     {
-                //         width: ele.parentElement.getBoundingClientRect().width
-                //     }
-                // );
+
+                ele = $(`#${name}-radial-area-day`)[0];
+                let fakeDayData = dataProcessor.genRadialAreaChartData(30, 24);
+                let dayChart = new RadialAreaChart($(`#${name}-radial-area-day`)[0],
+                    fakeDayData,
+                    {
+                        width: ele.parentElement.getBoundingClientRect().width,
+                        cw: 60,
+                        ch: 60,
+                        size: 70
+                    }
+                );
+
                 yearChart.on('select', (o: RadialAreaChartData) => {
                     // switch tag
                     ($(`a[href="#${name}-radial-area-month"]`) as any).tab('show');
@@ -145,6 +155,95 @@ class Content {
                     monthChart.trigger('update', o.children);
                 });
 
+                monthChart.on('select', (o: RadialAreaChartData) => {
+                    console.log(o, conf);
+                    hackDayData(o, dayChart);
+                    // switch tag
+                    // ($(`a[href="#${name}-radial-area-month"]`) as any).tab('show');
+                    // change tab title
+                    // $(`#${name}-radial-area-title`).text(`Period - Year: ${o.name}`);
+
+                    // monthChart.trigger('update', o.children);
+                });
+
+            }
+        }
+
+        function hackDayData(o: RadialAreaChartData, dayChart) {
+            const monNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+                'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let monthToIndex = _.zipObject(monNames, _.range(12));
+            let st = new Date(+o.parent.name, monthToIndex[o.name]);
+            let ed: Date;
+            if (st.getMonth() === 11) {
+                ed = new Date(st.getFullYear() + 1, 0, 0);
+            } else {
+                ed = new Date(st.getFullYear(), st.getMonth() + 1, 0);
+            }
+
+            if (_.lowerCase(conf.db) === 'ses' && _.startsWith(conf.signal, '781')) {
+                // server.dbs.read({}, {'foo': 12, 'boo': 13});
+                server.dbs.signals.read('ses', 'pid_781',
+                    {}, // empty body
+                    {start: st.valueOf() / 1000, end: ed.valueOf() / 1000}
+                ).done((data, textStatus) => {
+                    let min = Number.MAX_SAFE_INTEGER;
+                    let max = Number.MIN_SAFE_INTEGER;
+                    let dayData = _.map(data, (d, i) => {
+                        let bins = [];
+                        let counts = [];
+                        let sum = 0;
+                        let count = 0;
+                        for (let j = 0; j < d.bins.length; j++) {
+                            sum += d.bins[j] * d.counts[j];
+                            count += d.counts[j];
+                            if ((j + 1) % 30 === 0) {
+                                if (count > 0) {
+                                    let v = sum / count;
+                                    bins.push(v);
+                                    counts.push(count);
+                                    min = min > v ? v : min;
+                                    max = max < v ? v : max;
+                                } else {
+                                    bins.push(NaN);
+                                    counts.push(0);
+                                }
+                                sum = 0;
+                                count = 0;
+                            }
+                        }
+
+                        let newDay = {
+                            level: 'day',
+                            name: i + 1,  // date
+                            bins,
+                            counts,
+                            children: undefined,
+                            parent: o
+                        };
+
+                        return newDay;
+                    });
+
+                    // normalized
+                    let nm = d3.scaleLinear()
+                        .domain([min, max])
+                        .range([0, 1]);
+                    _.each(dayData, d => {
+                        for (let i = 0; i < d.bins.length; i++) {
+                            d.bins[i] = isNaN(d.bins[i]) ? 0 : nm(d.bins[i]);
+                        }
+                    });
+                    console.log('ses_pid_781', dayData);
+
+                    // switch tag
+                    ($(`a[href="#${name}-radial-area-day"]`) as any).tab('show');
+                    // change tab title
+                    $(`#${name}-radial-area-title`).text(
+                        `Period - Year: ${o.parent.name}, Month: ${o.name}`);
+
+                    dayChart.trigger('update', dayData);
+                });
             }
         }
     }
