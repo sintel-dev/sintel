@@ -189,6 +189,11 @@ class Content {
 
             let pid = conf.signal.substring(0, conf.signal.length - 4);
             if (_.lowerCase(conf.db) === 'ses') {
+
+                let dayEleTab = $(`a[href="#${name}-radial-area-day"]`);
+                dayEleTab.addClass('overlay');
+                dayEleTab.append(`<i class="fa fa-refresh fa-spin"></i>`);
+
                 server.dbs.signals.read('ses', pid,
                     {}, // empty body
                     {start: st.valueOf() / 1000, end: ed.valueOf() / 1000}
@@ -243,11 +248,12 @@ class Content {
                     console.log(`ses_pid_${pid}`, dayData);
 
                     // switch tag
-                    ($(`a[href="#${name}-radial-area-day"]`) as any).tab('show');
+                    (dayEleTab as any).tab('show');
+                    dayEleTab.removeClass('overlay');
+                    dayEleTab.find('i').remove();
                     // change tab title
                     $(`#${name}-radial-area-title`).text(
                         `Period - Year: ${o.parent.name}, Month: ${o.name}`);
-
                     dayChart.trigger('update', dayData);
                 });
             }

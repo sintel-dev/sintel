@@ -55294,6 +55294,9 @@ var Content = (function () {
                 }
                 var pid = conf.signal.substring(0, conf.signal.length - 4);
                 if (_.lowerCase(conf.db) === 'ses') {
+                    var dayEleTab_1 = $("a[href=\"#" + name + "-radial-area-day\"]");
+                    dayEleTab_1.addClass('overlay');
+                    dayEleTab_1.append("<i class=\"fa fa-refresh fa-spin\"></i>");
                     rest_server_1.default.dbs.signals.read('ses', pid, {}, { start: st.valueOf() / 1000, end: ed.valueOf() / 1000 }).done(function (data, textStatus) {
                         var min = Number.MAX_SAFE_INTEGER;
                         var max = Number.MIN_SAFE_INTEGER;
@@ -55340,7 +55343,9 @@ var Content = (function () {
                             }
                         });
                         console.log("ses_pid_" + pid, dayData);
-                        $("a[href=\"#" + name + "-radial-area-day\"]").tab('show');
+                        dayEleTab_1.tab('show');
+                        dayEleTab_1.removeClass('overlay');
+                        dayEleTab_1.find('i').remove();
                         $("#" + name + "-radial-area-title").text("Period - Year: " + o.parent.name + ", Month: " + o.name);
                         dayChart.trigger('update', dayData);
                     });
