@@ -27,7 +27,7 @@ export class RadialAreaChart extends pip.Events {
     private option: Option = {
         height: null,
         width: null,
-        margin: { top: 10, right: 10, bottom: 10, left: 10 },
+        margin: { top: 20, right: 10, bottom: 5, left: 10 },
         padding: 4,
         nCol: null,
         cw: 120,
@@ -52,10 +52,24 @@ export class RadialAreaChart extends pip.Events {
             ele.getBoundingClientRect().width : self.option.width;
 
         // if not specify the height, set it as the default height
-        let { ch, width, padding, size, margin } = self.option;
-        self.option.nCol = Math.floor((width - padding) / size);
+        let { nCol, width, padding, margin } = self.option;
+        if (nCol !== null) {
+            [self.option.cw, self.option.ch, self.option.size] = [
+                Math.floor((width - padding - margin.left - margin.right)
+                            / nCol) - 10,
+                Math.floor((width - padding - margin.left - margin.right)
+                            / nCol) - 10,
+                Math.floor((width - padding - margin.left - margin.right)
+                            / nCol)
+            ];
+        }
+        let { cw, ch, size } = self.option;
+        console.log(cw, ch, size);
+        self.option.nCol = Math.floor((width - padding - margin.left
+            - margin.right) / size);
         self.option.height = ch * Math.ceil(data.length / self.option.nCol)
             + padding + margin.top + margin.bottom;
+        // if (data[0].level === 'day') { self.option.height += ch; }
 
         // append svg to the container
         self.svg = self.svgContainer.append<SVGElement>('svg')
@@ -75,10 +89,10 @@ export class RadialAreaChart extends pip.Events {
             self.option.height - margin.top - margin.bottom
         ];
 
-        let x = d3.scaleLinear().range([padding / 2, cw - padding / 2]);
+        // let x = d3.scaleLinear().range([padding / 2, cw - padding / 2]);
 
-        let y = d3.scaleLinear()
-            .range([ch - padding / 2, padding / 2]);
+        // let y = d3.scaleLinear()
+        //     .range([ch - padding / 2, padding / 2]);
 
         let outerRadius = ch / 2 - padding / 2,
             innerRadius = 12;
@@ -115,7 +129,7 @@ export class RadialAreaChart extends pip.Events {
             .extent([[0, 0], [width, height]])
             .on('zoom', zoomed);
 
-        self.svg.append('rect')
+        let zoomRect = self.svg.append('rect')
             .attr('class', 'radial-zoom')
             .attr('width', width)
             .attr('height', height)
@@ -140,6 +154,21 @@ export class RadialAreaChart extends pip.Events {
             })
             .each(featurePlot);
 
+        if (data[0].level === 'day') {
+            console.log('plot weekdays');
+            // add weekdays text on the top
+            let names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            g.append('g')
+             .attr('class', 'weekdays')
+             .selectAll('.weekday-text')
+             .data(_.range(7))
+             .enter()
+             .append('text')
+             .attr('class', 'radial-text-md weekday-text')
+             .attr('x', d => d * cw + cw / 2)
+             .attr('y', -7)
+             .text(d => names[d]);
+        }
 
 
         function featurePlot(o: Data) {
@@ -161,7 +190,7 @@ export class RadialAreaChart extends pip.Events {
                 .attr('d', area0)
                 .on('click', (d) => {
                     // if (o.children) {
-                        self.trigger('select', o);
+                    self.trigger('select', o);
                     // }
                 });
 
@@ -172,7 +201,7 @@ export class RadialAreaChart extends pip.Events {
             path.append('title')
                 .text(o.name);
 
-            let circle = _cell.append('circle')
+            _cell.append('circle')
                 .attr('class', 'radial-cursor')
                 .attr('cx', 0)
                 .attr('cy', 0)
@@ -181,11 +210,19 @@ export class RadialAreaChart extends pip.Events {
                 .style('stroke-width', 0)
                 .on('click', (d) => {
                     // if (o.children) {
-                        self.trigger('select', o);
+                    self.trigger('select', o);
                     // }
                 })
                 .append('title')
                 .text(o.name);
+
+            if (o.level !== 'day') {
+                _cell.append('text')
+                .attr('class', 'radial-text-sm')
+                .attr('x', -7)
+                .attr('y', outerRadius)
+                .text(o.name);
+            }
 
             let missedData = [];
             _.each(o.bins, (b, bi) => {
@@ -193,7 +230,7 @@ export class RadialAreaChart extends pip.Events {
                     missedData.push(bi);   // [idx, value]
                 }
             });
-            let missedBins = _cell.selectAll('.missed-bins')
+           _cell.selectAll('.missed-bins')
                 .data(missedData)
                 .enter()
                 .append('circle')
@@ -207,12 +244,33 @@ export class RadialAreaChart extends pip.Events {
         }
 
         self.on('update', (o: Data[]) => {
-            console.log('radial-area-chart: update', o);
-            _.each(o, (d, i) => {
-                d.col = i % nCol;
-                d.row = Math.floor(i / nCol);
-            });
+            // calendar layout if in day level
+            console.log('update', o[0].level);
+            if (o[0].level === 'day') {
+                let [m, y] = [o[0].parent.name, o[0].parent.parent.name];
+                let offset = new Date(`${m} 1, ${y} 00:00:00`).getDay();
+                let newHeight = ch * Math.ceil((data.length + offset) / nCol)
+                        + padding + margin.top + margin.bottom;
 
+                self.svg.attr('height', newHeight);
+                zoom.translateExtent([[0, 0], [width, newHeight]])
+                    .extent([[0, 0], [width, newHeight]]);
+
+                zoomRect.attr('height', newHeight)
+                    .call(zoom);
+
+                _.each(o, (d, i) => {
+                    let dt = new Date(`${m} ${i + 1}, ${y} 00:00:00`);
+                    d.col = (i + offset) % nCol;
+                    d.row = Math.floor( (i + offset) / nCol);
+                    d.name += `[${dt.toString().substring(0, 3)}]`;
+                });
+            } else {
+                _.each(o, (d, i) => {
+                    d.col = i % nCol;
+                    d.row = Math.floor(i / nCol);
+                });
+            }
 
             g.selectAll('.feature-cell').remove();
             let gd = g.selectAll('.feature-cell').data(o);

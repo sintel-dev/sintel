@@ -55374,13 +55374,14 @@ var Content = (function () {
                         ele = void 0;
                         ele = $("#" + name + "-line")[0];
                         new line_chart_1.LineChart(ele, data, {
-                            height: 240,
-                            height2: 40,
+                            height: 360,
+                            height2: 60,
                             width: ele.parentElement.getBoundingClientRect().width,
                             width2: ele.parentElement.getBoundingClientRect().width
                         });
                         ele = $("#" + name + "-area")[0];
                         new area_chart_1.AreaChart($("#" + name + "-area")[0], data, {
+                            height: 400,
                             width: ele.parentElement.getBoundingClientRect().width
                         });
                         ele = $("#" + name + "-horizon")[0];
@@ -55393,25 +55394,19 @@ var Content = (function () {
                             tdata = data_processor_1.default.transformTimeSeriesToPeriodYear(ndata);
                             yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-year")[0], tdata, {
                                 width: ele.parentElement.getBoundingClientRect().width,
-                                cw: 90,
-                                ch: 90,
-                                size: 100
+                                nCol: 4
                             });
                             ele = $("#" + name + "-radial-area-month")[0];
                             fakeMonthData = data_processor_1.default.genRadialAreaChartData(12, 30);
                             monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-month")[0], fakeMonthData, {
                                 width: ele.parentElement.getBoundingClientRect().width,
-                                cw: 90,
-                                ch: 90,
-                                size: 100
+                                nCol: 4
                             });
                             ele = $("#" + name + "-radial-area-day")[0];
-                            fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24);
+                            fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24, 'day');
                             dayChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-day")[0], fakeDayData, {
                                 width: ele.parentElement.getBoundingClientRect().width,
-                                cw: 60,
-                                ch: 60,
-                                size: 70
+                                nCol: 7
                             });
                             yearChart.on('select', function (o) {
                                 $("a[href=\"#" + name + "-radial-area-month\"]").tab('show');
@@ -55572,7 +55567,7 @@ var AreaChart = (function (_super) {
             svgHeight: 300,
             height: null,
             width: null,
-            margin: { top: 20, right: 20, bottom: 30, left: 50 },
+            margin: { top: 20, right: 20, bottom: 20, left: 50 },
             normalized: false
         };
         var self = _this;
@@ -55669,7 +55664,7 @@ var HorizonChart = (function (_super) {
             height: null,
             width: null,
             margin: { top: 0, right: 0, bottom: 0, left: 0 },
-            step: 200,
+            step: 400,
             bands: 3,
             mode: 'mirror',
             defined: undefined,
@@ -55966,7 +55961,7 @@ var LineChart = (function (_super) {
             svgHeight: 300,
             height: null,
             width: null,
-            margin: { top: 10, right: 20, bottom: 30, left: 60 },
+            margin: { top: 30, right: 20, bottom: 30, left: 60 },
             height2: 80,
             width2: null,
             margin2: { top: 0, right: 20, bottom: 20, left: 60 },
@@ -56209,12 +56204,13 @@ var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 var RadialAreaChart = (function (_super) {
     __extends(RadialAreaChart, _super);
     function RadialAreaChart(ele, data, option) {
+        var _a;
         var _this = _super.call(this) || this;
         _this.data = data;
         _this.option = {
             height: null,
             width: null,
-            margin: { top: 10, right: 10, bottom: 10, left: 10 },
+            margin: { top: 20, right: 10, bottom: 5, left: 10 },
             padding: 4,
             nCol: null,
             cw: 120,
@@ -56226,8 +56222,21 @@ var RadialAreaChart = (function (_super) {
         self.svgContainer = d3.select(ele);
         self.option.width = self.option.width === null ?
             ele.getBoundingClientRect().width : self.option.width;
-        var _a = self.option, ch = _a.ch, width = _a.width, padding = _a.padding, size = _a.size, margin = _a.margin;
-        self.option.nCol = Math.floor((width - padding) / size);
+        var _b = self.option, nCol = _b.nCol, width = _b.width, padding = _b.padding, margin = _b.margin;
+        if (nCol !== null) {
+            _a = [
+                Math.floor((width - padding - margin.left - margin.right)
+                    / nCol) - 10,
+                Math.floor((width - padding - margin.left - margin.right)
+                    / nCol) - 10,
+                Math.floor((width - padding - margin.left - margin.right)
+                    / nCol)
+            ], self.option.cw = _a[0], self.option.ch = _a[1], self.option.size = _a[2];
+        }
+        var _c = self.option, cw = _c.cw, ch = _c.ch, size = _c.size;
+        console.log(cw, ch, size);
+        self.option.nCol = Math.floor((width - padding - margin.left
+            - margin.right) / size);
         self.option.height = ch * Math.ceil(data.length / self.option.nCol)
             + padding + margin.top + margin.bottom;
         self.svg = self.svgContainer.append('svg')
@@ -56243,9 +56252,6 @@ var RadialAreaChart = (function (_super) {
             self.option.width - margin.left - margin.right,
             self.option.height - margin.top - margin.bottom
         ], w = _b[0], h = _b[1];
-        var x = d3.scaleLinear().range([padding / 2, cw - padding / 2]);
-        var y = d3.scaleLinear()
-            .range([ch - padding / 2, padding / 2]);
         var outerRadius = ch / 2 - padding / 2, innerRadius = 12;
         var angle = d3.scaleLinear()
             .range([0, 2 * Math.PI]);
@@ -56272,7 +56278,7 @@ var RadialAreaChart = (function (_super) {
             .translateExtent([[0, 0], [width, height]])
             .extent([[0, 0], [width, height]])
             .on('zoom', zoomed);
-        self.svg.append('rect')
+        var zoomRect = self.svg.append('rect')
             .attr('class', 'radial-zoom')
             .attr('width', width)
             .attr('height', height)
@@ -56291,6 +56297,20 @@ var RadialAreaChart = (function (_super) {
             return 'translate(' + (d.col * cw + cw / 2) + ',' + (d.row * ch + ch / 2) + ')';
         })
             .each(featurePlot);
+        if (data[0].level === 'day') {
+            console.log('plot weekdays');
+            var names_1 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            g.append('g')
+                .attr('class', 'weekdays')
+                .selectAll('.weekday-text')
+                .data(_.range(7))
+                .enter()
+                .append('text')
+                .attr('class', 'radial-text-md weekday-text')
+                .attr('x', function (d) { return d * cw + cw / 2; })
+                .attr('y', -7)
+                .text(function (d) { return names_1[d]; });
+        }
         function featurePlot(o) {
             var _cell = d3.select(this);
             angle.domain([0, o.bins.length - 0.88]);
@@ -56313,7 +56333,7 @@ var RadialAreaChart = (function (_super) {
                 .attr('d', area);
             path.append('title')
                 .text(o.name);
-            var circle = _cell.append('circle')
+            _cell.append('circle')
                 .attr('class', 'radial-cursor')
                 .attr('cx', 0)
                 .attr('cy', 0)
@@ -56325,13 +56345,20 @@ var RadialAreaChart = (function (_super) {
             })
                 .append('title')
                 .text(o.name);
+            if (o.level !== 'day') {
+                _cell.append('text')
+                    .attr('class', 'radial-text-sm')
+                    .attr('x', -7)
+                    .attr('y', outerRadius)
+                    .text(o.name);
+            }
             var missedData = [];
             _.each(o.bins, function (b, bi) {
                 if (b === -1) {
                     missedData.push(bi);
                 }
             });
-            var missedBins = _cell.selectAll('.missed-bins')
+            _cell.selectAll('.missed-bins')
                 .data(missedData)
                 .enter()
                 .append('circle')
@@ -56344,11 +56371,30 @@ var RadialAreaChart = (function (_super) {
                 .style('stroke-width', 0);
         }
         self.on('update', function (o) {
-            console.log('radial-area-chart: update', o);
-            _.each(o, function (d, i) {
-                d.col = i % nCol;
-                d.row = Math.floor(i / nCol);
-            });
+            console.log('update', o[0].level);
+            if (o[0].level === 'day') {
+                var _a = [o[0].parent.name, o[0].parent.parent.name], m_1 = _a[0], y_1 = _a[1];
+                var offset_1 = new Date(m_1 + " 1, " + y_1 + " 00:00:00").getDay();
+                var newHeight = ch * Math.ceil((data.length + offset_1) / nCol)
+                    + padding + margin.top + margin.bottom;
+                self.svg.attr('height', newHeight);
+                zoom.translateExtent([[0, 0], [width, newHeight]])
+                    .extent([[0, 0], [width, newHeight]]);
+                zoomRect.attr('height', newHeight)
+                    .call(zoom);
+                _.each(o, function (d, i) {
+                    var dt = new Date(m_1 + " " + (i + 1) + ", " + y_1 + " 00:00:00");
+                    d.col = (i + offset_1) % nCol;
+                    d.row = Math.floor((i + offset_1) / nCol);
+                    d.name += "[" + dt.toString().substring(0, 3) + "]";
+                });
+            }
+            else {
+                _.each(o, function (d, i) {
+                    d.col = i % nCol;
+                    d.row = Math.floor(i / nCol);
+                });
+            }
             g.selectAll('.feature-cell').remove();
             var gd = g.selectAll('.feature-cell').data(o);
             gd.enter().append('g')
@@ -56724,10 +56770,11 @@ var DataProcessor = (function () {
         }
         return random();
     };
-    DataProcessor.prototype.genRadialAreaChartData = function (nFeatures, mBins) {
+    DataProcessor.prototype.genRadialAreaChartData = function (nFeatures, mBins, level) {
+        if (level === void 0) { level = 'fake'; }
         return _.range(nFeatures).map(function (i) {
             return {
-                'level': 'fake',
+                'level': level,
                 'name': 'feature' + i,
                 'bins': _.range(mBins).map(function (j) {
                     return Math.random();

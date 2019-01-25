@@ -262,3 +262,15 @@ body {
   fill: none;
   pointer-events: all;
 }
+.radial-text-sm {
+  font-size: 13px;
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.radial-text-md {
+  font-size: 16px;
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.radial-text-lg {
+  font-size: 20px;
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}

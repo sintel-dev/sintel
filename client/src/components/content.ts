@@ -91,8 +91,8 @@ class Content {
             // let windows = anomaly.findPeakWidows(5, 2);
             ele = $(`#${name}-line`)[0];
             new LineChart(ele, data, {
-                height: 240,
-                height2: 40,
+                height: 360,
+                height2: 60,
                 width: ele.parentElement.getBoundingClientRect().width,
                 width2: ele.parentElement.getBoundingClientRect().width
                 // smooth: true,
@@ -102,6 +102,7 @@ class Content {
             // add area chart
             ele = $(`#${name}-area`)[0];
             new AreaChart($(`#${name}-area`)[0], data, {
+                height: 400,
                 width: ele.parentElement.getBoundingClientRect().width
             });
 
@@ -122,9 +123,7 @@ class Content {
                     tdata,
                     {
                         width: ele.parentElement.getBoundingClientRect().width,
-                        cw: 90,
-                        ch: 90,
-                        size: 100
+                        nCol: 4
                     }
                 );
 
@@ -134,21 +133,20 @@ class Content {
                     fakeMonthData,
                     {
                         width: ele.parentElement.getBoundingClientRect().width,
-                        cw: 90,
-                        ch: 90,
-                        size: 100
+                        nCol: 4
                     }
                 );
 
                 ele = $(`#${name}-radial-area-day`)[0];
-                let fakeDayData = dataProcessor.genRadialAreaChartData(30, 24);
+                let fakeDayData = dataProcessor.genRadialAreaChartData(30, 24, 'day');
                 let dayChart = new RadialAreaChart($(`#${name}-radial-area-day`)[0],
                     fakeDayData,
                     {
                         width: ele.parentElement.getBoundingClientRect().width,
-                        cw: 60,
-                        ch: 60,
-                        size: 70
+                        nCol: 7
+                        // cw: 60,
+                        // ch: 60,
+                        // size: 70
                     }
                 );
 

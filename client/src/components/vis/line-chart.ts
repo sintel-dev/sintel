@@ -39,7 +39,7 @@ export class LineChart extends pip.Events {
         svgHeight: 300, // used when height is not defined
         height: null,
         width: null,
-        margin: { top: 10, right: 20, bottom: 30, left: 60 },
+        margin: { top: 30, right: 20, bottom: 30, left: 60 },
         height2: 80,
         width2: null,
         margin2: { top: 0, right: 20, bottom: 20, left: 60 },

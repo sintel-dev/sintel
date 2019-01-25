@@ -216,10 +216,10 @@ class DataProcessor {
     /* tslint:enable */
 
 
-    public genRadialAreaChartData(nFeatures, mBins): PeriodData[] {
+    public genRadialAreaChartData(nFeatures, mBins, level= 'fake'): PeriodData[] {
         return _.range(nFeatures).map(function (i) {
             return {
-                'level': 'fake',
+                'level': level,
                 'name': 'feature' + i,
                 'bins': _.range(mBins).map(function (j) {
                     return Math.random();

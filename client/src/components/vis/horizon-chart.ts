@@ -28,7 +28,7 @@ export class HorizonChart extends pip.Events {
         width: null,
         margin: { top: 0, right: 0, bottom: 0, left: 0 },
         // horizon-chart config
-        step: 200,
+        step: 400,
         bands: 3,
         mode: 'mirror',
         defined: undefined,
