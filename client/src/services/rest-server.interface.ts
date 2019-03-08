@@ -2,6 +2,9 @@ interface Response {
     done(data: any, textStatus?: any, xhrObject?: any): any;
 }
 
+// textStatus values: 
+// ['timeout', 'error', 'notmodified', 'success', 'parseerror']
+
 interface AddResource {
     /**
      * add a resource
@@ -40,19 +43,18 @@ interface Verb {
 
 /***************** add your interface here******************/
 
-interface DBs extends Resource {
+interface Datasets extends Resource {
     // sub-resources
-    signals: Resource;
+    dataruns: Resource;
 
     // verbs
     // foo: Verb;
 }
 
-
 export interface Server {
     add: AddResource;
     // resource list
-    dbs: DBs;
+    datasets: Datasets;
 }
 
 

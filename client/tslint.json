@@ -38,7 +38,7 @@
         "check-whitespace"
       ],
       "quotemark": [true, "single", "avoid-escape"],
-      "radix": true,
+      "radix": false,
       "semicolon": [true, "always"],
       "trailing-comma": [false, {
         "singleline": "never",

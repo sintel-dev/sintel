@@ -15,7 +15,7 @@ let server: Server = new jqueryExt.RestClient(
 
 
 // step2: add your resources
-server.add('dbs');
+server.add('datasets');
 /**
  * usage:
  *
@@ -25,7 +25,7 @@ server.add('dbs');
  */
 
 
-server.dbs.add('signals');
+server.datasets.add('dataruns');
 /**
  * usage:
  *

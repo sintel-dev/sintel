@@ -1,15 +1,8 @@
 import csv
 import os
-
 import numpy as np
+from db import MongoDB
 
-# n = np.reshape([1,2,3,4,5,6], (2, 2))
-# print(n)
-# print(n.shape)
-
-
-# train = np.load(os.path.join("data", "train", 'T-12' + ".npy"))
-# print(train.shape)
 
 
 def dump_to_csv(X, dest_file_path):
@@ -22,66 +15,61 @@ def dump_to_csv(X, dest_file_path):
     '''
 
     with open(dest_file_path, 'w', newline='') as f:
-
-        # dict writer
         fieldnames = ['timestamp', 'value']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for i in range(X.shape[0]):
             v = X[i, 0]
-            writer.writerow({'timestamp': i, 'value': v})
-
-        # normal writer
-        # writer = csv.writer(f, delimiter=',', quotechar='"',
-        #   quoting=csv.QUOTE_MINIMAL)
-        # for i in range(X.shape[0]):
-        #     v = X[i, 0]
-        #     writer.writerow([i, v])
+            # faked timestamp starting from 
+            # Wednesday, October 1, 2008 12:00:00 AM （GMT）
+            # with interval 21600s, namely 6 hours
+            writer.writerow({'timestamp': 1222819200 + i * 21600, 'value': v})
 
 
-def classify_files():
+def classify_files(dir):
     classes = {}
     name_set = set([])
-    with open('labeled_anomalies.csv', mode='r') as csv_file:
+    with open(os.path.join(dir, 'labeled_anomalies.csv'), mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         for row in csv_reader:
-            # if line_count == 0:
-            #     line_count += 1
-            #     continue
             if row['spacecraft'] not in name_set:
                 name_set.add(row['spacecraft'])
                 classes[row['spacecraft']] = set()
             classes[row['spacecraft']].add(row['chan_id'])
-            # line_count += 1
     return classes
 
 
 if __name__ == "__main__":
-    ori_folder_path = 'data/train'
 
     # test single file
     # path_to_file = 'data/train/A-1.npy'
     # data = np.load(path_to_file)
     # dump_to_csv(data, dest_folder_path + '/A-1.csv')
-    classes = classify_files()
-
-    # create directory for storing dumped data
+    
+    # nasa dataset contains two different sub-datasets
+    classes = classify_files('raw-data/nasa/')
     for cs in classes:
-        if not os.path.isdir('data/csv_%s' % cs):
-            os.mkdir('data/csv_%s' % cs)
+        if not os.path.isdir('raw-data/nasa/{}'.format(cs)):
+            os.mkdir('raw-data/nasa/{}'.format(cs))
 
+    data_dir = 'raw-data/nasa/raw';
+
+    # process every file
     files = []
-    for (dirpath, dirnames, filenames) in os.walk(ori_folder_path):
+    for (dirpath, dirnames, filenames) in os.walk(data_dir):
         for name in filenames:
             file_path = os.path.join(dirpath, name)
             data = np.load(file_path)
-            dest_folder_path = 'data/csv_'
+            dest_folder_path = 'raw-data/nasa/'
+            found = False
             for cs in classes:
                 if name[:-4] in classes[cs]:
                     dest_folder_path += cs
+                    found = True
                     break
-            if (not dest_folder_path[-1] == '_'):
+            if (found):
                 dump_to_csv(data, os.path.join(dest_folder_path,
                                                name.replace('.npy', '.csv')))
             else:
-                print(name)
+                print('error when processing signal {}'.format(name))
+

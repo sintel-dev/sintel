@@ -64,7 +64,7 @@ export class RadialAreaChart extends pip.Events {
             ];
         }
         let { cw, ch, size } = self.option;
-        console.log(cw, ch, size);
+        // console.log(cw, ch, size);
         self.option.nCol = Math.floor((width - padding - margin.left
             - margin.right) / size);
         self.option.height = ch * Math.ceil(data.length / self.option.nCol)
@@ -155,7 +155,7 @@ export class RadialAreaChart extends pip.Events {
             .each(featurePlot);
 
         if (data[0].level === 'day') {
-            console.log('plot weekdays');
+            // console.log('plot weekdays');
             // add weekdays text on the top
             let names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             g.append('g')

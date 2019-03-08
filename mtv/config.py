@@ -1,23 +1,24 @@
-class BaseConfig(object):
+class Base(object):
     DEBUG = None
     TESTING = None
-    MONGODB = {
+    DATABASE = {
         'host': 'localhost',
         'port': 27017,
-        'db': 'mtv'
+        'name': 'mtv'
     }
 
 
-class DevelopmentConfig(BaseConfig):
+class Development(Base):
     DEBUG = True
     TESTING = True
 
 
-class ProductionConfig(BaseConfig):
+class Production(Base):
     DEBUG = False
     TESTING = False
 
 
-class TestingConfig(BaseConfig):
+class Test(Base):
     DEBUG = False
     TESTING = True
+

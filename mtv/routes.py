@@ -14,7 +14,12 @@ def add_routes(app):
 
     # configure RESTful APIs
     api = Api(app)
-    api.add_resource(info.DBList, '/api/v1/dbs/')
-    api.add_resource(info.SignalList, '/api/v1/dbs/<string:db_name>/signals/')
-    api.add_resource(ses.Signals,
-                     '/api/v1/dbs/<string:db_name>/signals/<string:sig_name>/')
+    
+    api.add_resource(info.Datasets, '/api/v1/datasets/')
+    
+    api.add_resource(info.Dataruns,
+                    '/api/v1/datasets/<string:dataset>/dataruns/')
+
+    api.add_resource(info.Data,
+                    '/api/v1/datasets/<string:dataset>/'
+                    'dataruns/<string:datarun>/')

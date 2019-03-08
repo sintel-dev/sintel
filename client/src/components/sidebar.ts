@@ -8,6 +8,9 @@ class Sidebar {
     }
 
     constructor(eleId: string) {
+        let self = this;
+
+        // initialize Knockout Variables
         ko.applyBindings(this, $(eleId)[0]);
     }
 }

@@ -18,8 +18,8 @@ requirements = [
     'termcolor==1.1.0',
 
     # Math
-    'scipy==1.0.0',
-    'numpy==1.14.0',
+    'numpy>=1.15.4,<1.17',
+    'pandas>=0.23.4,<0.25',
 
     # Flask
     'Flask>=1.0.2',
@@ -29,7 +29,8 @@ requirements = [
     'gevent==1.2.2',
 
     # Database
-    'pymongo>=3.5.1',
+    'mongoengine>=0.16.3,<0.17',
+    'pymongo>=3.7.2,<4'
 ]
 
 setup_requirements = [
@@ -68,30 +69,29 @@ development_requirements = [
     # distribute on PyPI
     'twine>=1.10.0',
     'wheel>=0.30.0',
+    'jupyter>=1.0.0'
 ]
 
 
 setup(
-    author="Dongyu Liu",
-    author_email='ustdongyu@gmail.com',
+    author="MIT Data To AI Lab",
+    author_email='dailabmit@gmail.com',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.6'
     ],
-    description="A system for anomaly analysis of multiple time-series data",
-    # entry_points={
-    #     'console_scripts': [
-    #         'mtv=mtv.cli:main',
-    #     ],
-    # },
+    description="MTV is a visual analytics system built for satellite data analysis.",
+    entry_points={
+        'console_scripts': [
+            'mtv=mtv.cli:main',
+        ],
+    },
     extras_require={
+        'test': test_requirements,
         'dev': development_requirements + test_requirements,
     },
     install_package_data=True,
@@ -103,11 +103,11 @@ setup(
     keywords='mtv',
     name='mtv',
     packages=find_packages(include=['mtv', 'mtv.*']),
-    python_requires='>=3.4',
+    python_requires='>=3.6',
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/HDI-Project/MTV',
-    version='0.1.0',
+    version='0.1.0-dev',
     zip_safe=False,
 )

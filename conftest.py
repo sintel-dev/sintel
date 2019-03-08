@@ -1,11 +1,18 @@
 # config file for py.test: test flask application
 
-from mtv.__main__ import create_flask_app
+from mtv.explorer import MTVExplorer
 import pytest
 
 
 
+# @pytest.fixture
+# def app():
+#     app = create_flask_app()
+#     return app
+
+
 @pytest.fixture
 def app():
-    app = create_flask_app()
+    explorer = MTVExplorer()
+    app = explorer._init_flask_app('test')
     return app

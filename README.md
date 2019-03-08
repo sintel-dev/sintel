@@ -5,6 +5,10 @@
 
 go!
 
+TODO:
+1. mongodb consistent
+2. visualize anomalies
+3. voice record
 
 - Free software: MIT license
 - Documentation: https://HDI-Project.github.io/MTV

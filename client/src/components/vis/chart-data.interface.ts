@@ -15,3 +15,5 @@ export interface PeriodData {
     children?: PeriodData[];
     parent?: PeriodData;
 }
+
+export interface WindowData extends Array<[number, number, number]> { }

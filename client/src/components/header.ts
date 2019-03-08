@@ -1,74 +1,79 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
 import server from '../services/rest-server';
-import {App} from '../main';
 
 class Header {
 
-    public dbList = ko.observableArray([]);
-    public signalList = ko.observableArray([]);
+    public datasets = ko.observableArray([]);
+    public dataruns = ko.observableArray([]);
     public selected = {
-        db: ko.observable({name: '', index: 0, html: ''}),
-        signal: ko.observable({name: '', index: 0, html: ''})
+        dataset: ko.observable({name: '', index: 0, html: ''}),
+        datarun: ko.observable({name: '', id: '', index: 0, html: ''})
     };
-    public activatedSignalList = ko.observable(new Set());
+    public activeDatasets = ko.observable(new Set());
+    public activeDataruns = ko.observable(new Set());
 
 
-    public initKnockoutVariables(eleId: string) {
+    constructor(eleId: string) {
         let self = this;
+
+        // initialize Knockout Variables
         ko.applyBindings(self, $(eleId)[0]);
-        server.dbs.read().done(dbs => {
-            self.dbList(dbs);
+
+        server.datasets.read().done((datasets_: string[]) => {
+            self.datasets(datasets_);
         });
     }
 
     // handle events coming from other components
     public setupEventHandlers() {
         let self = this;
-        pip.header.on('signal:updateActivation', (dbSignals: string[]) => {
-            // dbSignal: dbName_signalName;
-            self.activatedSignalList(new Set(dbSignals));
+        pip.header.on('datarun:updateActives', (dataruns_: string[]) => {
+            self.activeDataruns(new Set(dataruns_));
         });
     }
 
-    constructor(eleId: string) {
-        this.initKnockoutVariables(eleId);
-    }
 
-    // the following methods are triggered by user interactions
+    // the following public methods are triggered by user interactions
 
-    public onSelectDB(name: string, index: number) {
+    public onSelectDataset(name: string, index: number) {
         let self = this;
-        let oldName = self.selected.db().name;
+        let oldName = self.selected.dataset().name;
         if (oldName !== name) {
             let html = `<a href="#" class="text">${name}</a>`;
-            self.selected.db({name, index, html});
-            server.dbs.signals.read(name).done(signals => {
-                self.signalList(signals);
+            self.selected.dataset({name, index, html});
+
+            server.datasets.dataruns.read(name).done(dataruns_ => {
+                self.dataruns(dataruns_);
             });
         }
     }
 
-    public onSelectSignal(name: string, index: number) {
+    public onSelectDatarun(datarun_, index: number) {
         let self = this;
-        let oldName = self.selected.signal().name;
-        if (oldName !== name) {
-            let html = `<a href="#" class="text">${name}</a>`;
-            self.selected.signal({name, index, html});
-            // send updated signal to content view
-            pip.content.trigger('signal:select', {
-                db: self.selected.db().name,
-                signal: self.selected.signal().name
+        let oid = self.selected.datarun().id;
+        if (oid !== datarun_.id) {
+            let html = `<a href="#" class="text">${datarun_.insert_time}</a>`;
+            self.selected.datarun({
+                name: datarun_.insert_time,
+                id: datarun_.id,
+                index,
+                html
+            });
+
+            pip.content.trigger('datarun:select', {
+                dataset: self.selected.dataset().name,
+                datarun: self.selected.datarun().id
             });
         }
     }
 
-    public onLoadAllSignals() {
+    public onLoadAllDataruns() {
         let self = this;
-        if (self.selected.db().name !== '') {
-            pip.content.trigger('signal:loadAll', {
-                db: self.selected.db().name,
-                signalList: self.signalList()
+        if (self.selected.dataset().name !== '') {
+            pip.content.trigger('datarun:loadAll', {
+                dataset: self.selected.dataset().name,
+                dataruns: self.dataruns()
             });
         }
     }

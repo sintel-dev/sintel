@@ -39,5 +39,4 @@ export class App {
 
 let app = new App();
 app.bootstrap();
-// setup event handler when app was created
 app.setupEventHandlers();

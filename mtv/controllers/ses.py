@@ -1,13 +1,10 @@
+import logging
 from flask import request
 from flask_restful import Resource
 from pymongo import MongoClient
+from mtv.db import db
 
-# print(datetime.fromtimestamp(1548257576796/1000))
-# dt2 = datetime.utcfromtimestamp(1548257576796/1000)
-# print(dt2.hour, dt2.minute)
-
-
-db = MongoClient('localhost', 27017)['mtv']
+LOGGER = logging.getLogger(__name__)
 
 
 class Signals(Resource):
@@ -35,7 +32,7 @@ class Signals(Resource):
                 {'timestamp': {'$lte': float(end)}},
             ]}
             proj = {'_id': 0}
-            finds = db['pids'].find(cond, proj)
+            finds = conn['pids'].find(cond, proj)
             for doc in finds:
                 docs.append(doc)
             return docs
@@ -44,7 +41,7 @@ class Signals(Resource):
             docs = []
             cond = {'pid': sig_name}
             proj = {'_id': 0}
-            finds = db['pids'].find(cond, proj)
+            finds = conn['pids'].find(cond, proj)
             for doc in finds:
                 docs.append(doc)
             return docs

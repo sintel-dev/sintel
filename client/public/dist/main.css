@@ -102,8 +102,8 @@ body {
 .box-body {
   padding: 0;
 }
-.navbar-nav .db-menu,
-.navbar-nav .signal-menu {
+.navbar-nav .dataset-menu,
+.navbar-nav .datarun-menu {
   max-height: 500px;
   margin: 0;
   padding: 0;
@@ -111,8 +111,8 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-.navbar-nav .db-menu > li > a,
-.navbar-nav .signal-menu > li > a {
+.navbar-nav .dataset-menu > li > a,
+.navbar-nav .datarun-menu > li > a {
   display: block;
   white-space: nowrap;
   /* Prevent text from breaking */
@@ -175,8 +175,8 @@ body {
 .box-body {
   padding: 0;
 }
-.navbar-nav .db-menu,
-.navbar-nav .signal-menu {
+.navbar-nav .dataset-menu,
+.navbar-nav .datarun-menu {
   max-height: 500px;
   margin: 0;
   padding: 0;
@@ -184,8 +184,8 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-.navbar-nav .db-menu > li > a,
-.navbar-nav .signal-menu > li > a {
+.navbar-nav .dataset-menu > li > a,
+.navbar-nav .datarun-menu > li > a {
   display: block;
   white-space: nowrap;
   /* Prevent text from breaking */

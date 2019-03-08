@@ -1,3 +1,4 @@
-import * as d3 from 'd3';
+import * as _ from 'lodash'
 
-console.log(d3.range(10));
+
+console.log(_.sum([1,2,3]))

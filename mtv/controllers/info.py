@@ -1,29 +1,114 @@
+
+import logging
+import pandas as pd
+from flask import request
 from flask_restful import Resource
+from mtv.utils import get_dirs, get_files
+from mtv import model
+from mtv.utils import json_encoder
+from bson import ObjectId
 
-from mtv.utils.helper import get_dirs, get_files
+LOGGER = logging.getLogger(__name__)
 
 
-class DBList(Resource):
+class Datasets(Resource):
     def get(self):
-        ''' Return database list.
+        """ Return database list.
+        
+        GET /api/v1/datasets/
+        """
 
-        Returns:
-            (array[string]): array of database names
+        documents = model.Dataset.find()
+
+        names = list()
+        for document in documents:
+            names.append(document.name)
+
+        return names
+
+class Dataruns(Resource):
+    def get(self, dataset):
+        """ Return datarun list of a given dataset.
+        
+        GET /api/v1/datasets/<string:dataset>/dataruns/
+        """
+
+        dataset_id = model.Dataset.find_one(name=dataset).id
+
+        query = {
+            'dataset': dataset_id
+        }
+
+        documents = model.Datarun.find(**query)
+
+        docs = list()
+        for document in documents:
+            docs.append({
+                'id': str(document.id),
+                'insert_time': document.insert_time.isoformat()
+            })
+
+        return docs
+
+class Data(Resource):
+    def get(self, dataset, datarun):
+        ''' Return data.
+
+        GET /api/v1/datasets/<string:dataset>/dataruns/<string:datarun>/
         '''
-        return get_dirs("./client/public/data/")
 
+        data = dict()
 
-class SignalList(Resource):
-    def get(self, db_name):
-        '''Return the signal list of a database.
+        year = request.args.get('year', None)
+        month = request.args.get('month', None)
 
-        Args:
-            db_name (string): name of the database
+        # fetch collection "raw"
+        query = {
+            'dataset': dataset
+        }
+        documents = model.Raw.find(**query).order_by('+year')
 
-        Returns:
-        '''
+        raw = list()
+        for document in documents:
+            raw.append({
+                'year': document.year,
+                'data': document.data
+            })
 
-        signal_list = get_files("./client/public/data/{}/".format(db_name))
-        signal_list = [s[:-4] for s in signal_list]   # remove .csv
+        # fetch collection "prediction"
+        query = {
+            'dataset': dataset,
+            'datarun': ObjectId(datarun)
+        }
+        document = model.Prediction.find_one(**query)
 
-        return signal_list
+        prediction = {
+            'names': document.names,
+            'data': document.data,
+            'offset': document.offset
+        }
+
+        # fetch collection "events"
+        query = {
+            'datarun': ObjectId(datarun)
+        }
+        documents = model.Event.find(**query).order_by('+start_time')
+        events = list()
+        for document in documents:
+            events.append({
+                'start_time': document.start_time,
+                'stop_time': document.stop_time,
+                'score': document.score,
+            })
+
+        return {
+            'raw': raw,
+            'prediction': prediction,
+            'events': events,
+        }
+
+class Pipelines(Resource):
+    pass
+
+class Events(Resource):
+    pass
