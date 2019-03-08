@@ -22,7 +22,10 @@ class Datasets(Resource):
 
         names = list()
         for document in documents:
-            names.append(document.name)
+            doc = model.Dataset.find_one(name=document.name)
+            # only add dataset with some dataruns
+            if doc is not None:
+                names.append(document.name)
 
         return names
 
@@ -33,7 +36,12 @@ class Dataruns(Resource):
         GET /api/v1/datasets/<string:dataset>/dataruns/
         """
 
-        dataset_id = model.Dataset.find_one(name=dataset).id
+        document = model.Dataset.find_one(name=dataset)
+
+        if document is None:
+            return []
+
+        dataset_id = document.id
 
         query = {
             'dataset': dataset_id
@@ -99,6 +107,7 @@ class Data(Resource):
                 'start_time': document.start_time,
                 'stop_time': document.stop_time,
                 'score': document.score,
+                'id': str(document.id),
             })
 
         return {

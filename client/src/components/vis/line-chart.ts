@@ -28,7 +28,7 @@ export interface LineChartOption {
     zoom?: boolean;
     context?: boolean;
     smooth?: boolean;
-    windows?: Array<[number, number]>;
+    windows?: Array<[number, number, number, number]>;  // start_time, stop_time, score, event_id
 }
 
 export class LineChart extends pip.Events {
@@ -153,9 +153,22 @@ export class LineChart extends pip.Events {
             .attr('class', 'focus')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`);
 
+        if (self.option.zoom) {
+            self.svg.append('rect')
+                .attr('class', 'zoom')
+                .attr('width', w)
+                .attr('height', h)
+                .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
+                .call(zoom);
+        }
+
         // highlight windows
-        let focusWindows, focusWindowLines;
+        let focusWindows, focusWindowLines, focusWindowBars, focusWindowDots;
+        let scoreScale = d3.scaleLinear().range([0.25, 0.85]);
+        let scoreColor = (v: number) => d3.interpolateReds(scoreScale(v));
         if (self.option.windows !== null) {
+            // scoreScale.domain(d3.extent(self.option.windows, o => o[2]));
+            scoreScale.domain([0, d3.max(self.option.windows, o => o[2])]);
             focusWindows = self.svg.selectAll('.line-highlight')
                 .data(self.option.windows)
                 .enter()
@@ -222,6 +235,7 @@ export class LineChart extends pip.Events {
             .attr('class', 'line')
             .attr('d', line);
 
+        // plot anomalies in focusWindows
         if (self.option.windows !== null) {
             focusWindowLines = focusWindows.append('path')
                 .datum(d => {
@@ -230,6 +244,34 @@ export class LineChart extends pip.Events {
                 })
                 .attr('class', 'line-highlight')
                 .attr('d', line);
+
+            // highlight with bars
+            focusWindowBars = focusWindows.append('rect')
+                .attr('class', 'bar-highlight')
+                .attr('x', d => x(self.data[d[0]][0]))
+                .attr('y', 0)
+                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10))
+                .attr('height', 7)
+                .attr('fill', d => scoreColor(d[2]))
+                .on('click', d => {
+                    pip.modal.trigger('comment:start', d[3]);
+                });
+
+            focusWindowBars.append('title')
+                .text(d => `score: ${d[2]}`);
+
+            // highlight with dots
+            // focusWindowDots = focusWindows.append('circle')
+            //     .attr('class', 'circle-highlight')
+            //     .attr('cx', d => {
+            //         const st = self.data[d[0]][0];
+            //         const ed = self.data[d[1]][0];
+            //         const mid = st + (ed - st) / 2;
+            //         return x(mid);
+            //     })
+            //     .attr('cy', 4)
+            //     .attr('r', 4)
+            //     .attr('fill', d => scoreColor(d[2]));
         }
 
         if (self.option.context) {
@@ -248,6 +290,7 @@ export class LineChart extends pip.Events {
                 .call(brush)
                 .call(brush.move, x.range());
 
+            // plot anomalies in contextWindows
             if (self.option.windows !== null) {
                 contextWindows.append('path')
                     .datum(d => {
@@ -259,13 +302,19 @@ export class LineChart extends pip.Events {
             }
         }
 
-        if (self.option.zoom) {
-            self.svg.append('rect')
-                .attr('class', 'zoom')
-                .attr('width', w)
-                .attr('height', h)
-                .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-                .call(zoom);
+        function updateFocusWindows() {
+            focusWindowLines.attr('d', line);
+
+            // focusWindowDots.attr('cx', d => {
+            //     const st = self.data[d[0]][0];
+            //     const ed = self.data[d[1]][0];
+            //     const mid = st + (ed - st) / 2;
+            //     return x(mid);
+            // });
+
+            focusWindowBars
+                .attr('x', d => x(self.data[d[0]][0]))
+                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10));
         }
 
         function zoomed() {
@@ -274,7 +323,7 @@ export class LineChart extends pip.Events {
             x.domain(t.rescaleX(x2).domain());
             focusLine.select('.line').attr('d', line);
             if (self.option.smooth) { smoothedLine.attr('d', line); }
-            if (self.option.windows !== null && self.option.windows.length > 0) { focusWindowLines.attr('d', line); }
+            if (self.option.windows !== null && self.option.windows.length > 0) { updateFocusWindows(); }
             focusAxis.select('.axis--x').call(xAxis);
             context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
         }

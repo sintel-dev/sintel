@@ -212,11 +212,22 @@ body {
   fill: none;
   stroke: #637bb6;
   stroke-width: 1px;
+  opacity: 0.7;
+  shape-rendering: crispEdges;
 }
 .line-highlight {
   fill: none;
   stroke: #d1655d;
-  stroke-width: 1px;
+  stroke-width: 4px;
+}
+.circle-highlight,
+.bar-highlight {
+  stroke: #b70e13;
+  stroke-opacity: #b70e13;
+  stroke-width: 1;
+  fill-opacity: 0.7;
+  shape-rendering: crispEdges;
+  cursor: pointer;
 }
 .line-smooth {
   fill: none;

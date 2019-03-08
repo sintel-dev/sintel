@@ -2,7 +2,7 @@ interface Response {
     done(data: any, textStatus?: any, xhrObject?: any): any;
 }
 
-// textStatus values: 
+// textStatus values:
 // ['timeout', 'error', 'notmodified', 'success', 'parseerror']
 
 interface AddResource {

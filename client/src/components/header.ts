@@ -45,6 +45,8 @@ class Header {
 
             server.datasets.dataruns.read(name).done(dataruns_ => {
                 self.dataruns(dataruns_);
+                // auto select the first one
+                self.onSelectDatarun(dataruns_[0], 0);
             });
         }
     }
@@ -52,7 +54,8 @@ class Header {
     public onSelectDatarun(datarun_, index: number) {
         let self = this;
         let oid = self.selected.datarun().id;
-        if (oid !== datarun_.id) {
+
+        if (!self.activeDataruns().has(datarun_.id)) {
             let html = `<a href="#" class="text">${datarun_.insert_time}</a>`;
             self.selected.datarun({
                 name: datarun_.insert_time,
@@ -63,7 +66,7 @@ class Header {
 
             pip.content.trigger('datarun:select', {
                 dataset: self.selected.dataset().name,
-                datarun: self.selected.datarun().id
+                datarun: self.selected.datarun()
             });
         }
     }

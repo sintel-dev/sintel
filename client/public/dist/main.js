@@ -50232,10 +50232,10 @@ var Content = (function () {
         var self = this;
         setTimeout(function () {
             var boxs = self.boxs();
-            var idx = _.findIndex(boxs, function (o) { return o === name; });
+            var idx = _.findIndex(boxs, function (o) { return o[0] === name; });
             boxs.splice(idx, 1);
             self.boxs(boxs);
-            pip.header.trigger('datarun:updateActives', boxs);
+            pip.header.trigger('datarun:updateActives', _.map(boxs, function (b) { return b[0]; }));
         }, self.config.speed);
     };
     Content.prototype.addChart = function (msg) {
@@ -50245,24 +50245,26 @@ var Content = (function () {
                 switch (_a.label) {
                     case 0:
                         self = this;
-                        name = msg.datarun;
+                        name = [
+                            msg.datarun.id,
+                            msg.dataset + " : " + msg.datarun.name.split('.')[0]
+                        ];
                         boxs = self.boxs();
-                        console.log();
                         if (!(_.findIndex(boxs, function (o) { return o === name; }) < 0)) return [3, 2];
                         boxs.unshift(name);
                         self.boxs(boxs);
-                        pip.header.trigger('datarun:updateActives', boxs);
-                        $(".box[name='" + name + "']").boxWidget({
+                        pip.header.trigger('datarun:updateActives', _.map(boxs, function (b) { return b[0]; }));
+                        $(".box[name='" + name[0] + "']").boxWidget({
                             animationSpeed: self.config.speed,
-                            collapseTrigger: "button[name='" + name + "-collapse']",
-                            removeTrigger: "button[name='" + name + "-remove']"
+                            collapseTrigger: "button[name='" + name[0] + "-collapse']",
+                            removeTrigger: "button[name='" + name[0] + "-remove']"
                         });
-                        return [4, data_processor_1.default.loadData(msg.dataset, msg.datarun)];
+                        return [4, data_processor_1.default.loadData(msg.dataset, msg.datarun.id)];
                     case 1:
                         data = _a.sent();
                         console.log(data);
                         ele = void 0;
-                        ele = $("#" + name + "-line")[0];
+                        ele = $("#" + name[0] + "-line")[0];
                         new line_chart_1.LineChart(ele, data.timeseries, {
                             height: 360,
                             height2: 60,
@@ -50270,42 +50272,42 @@ var Content = (function () {
                             width2: ele.parentElement.getBoundingClientRect().width,
                             windows: data.windows
                         });
-                        ele = $("#" + name + "-area")[0];
-                        new area_chart_1.AreaChart($("#" + name + "-area")[0], data.timeseries, {
+                        ele = $("#" + name[0] + "-area")[0];
+                        new area_chart_1.AreaChart($("#" + name[0] + "-area")[0], data.timeseries, {
                             height: 400,
                             width: ele.parentElement.getBoundingClientRect().width
                         });
-                        ele = $("#" + name + "-horizon")[0];
-                        new horizon_chart_1.HorizonChart($("#" + name + "-horizon")[0], data.timeseries, {
+                        ele = $("#" + name[0] + "-horizon")[0];
+                        new horizon_chart_1.HorizonChart($("#" + name[0] + "-horizon")[0], data.timeseries, {
                             width: ele.parentElement.getBoundingClientRect().width
                         });
-                        ele = $("#" + name + "-radial-area-year")[0];
-                        yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-year")[0], data.period, {
+                        ele = $("#" + name[0] + "-radial-area-year")[0];
+                        yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-year")[0], data.period, {
                             width: ele.parentElement.getBoundingClientRect().width,
                             nCol: 4
                         });
-                        ele = $("#" + name + "-radial-area-month")[0];
+                        ele = $("#" + name[0] + "-radial-area-month")[0];
                         fakeMonthData = data_processor_1.default.genRadialAreaChartData(12, 30);
-                        monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-month")[0], fakeMonthData, {
+                        monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-month")[0], fakeMonthData, {
                             width: ele.parentElement.getBoundingClientRect().width,
                             nCol: 4
                         });
-                        ele = $("#" + name + "-radial-area-day")[0];
+                        ele = $("#" + name[0] + "-radial-area-day")[0];
                         fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24, 'day');
-                        dayChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name + "-radial-area-day")[0], fakeDayData, {
+                        dayChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-day")[0], fakeDayData, {
                             width: ele.parentElement.getBoundingClientRect().width,
                             nCol: 7
                         });
                         yearChart.on('select', function (o) {
-                            $("a[href=\"#" + name + "-radial-area-month\"]").tab('show');
-                            $("#" + name + "-radial-area-title")
+                            $("a[href=\"#" + name[0] + "-radial-area-month\"]").tab('show');
+                            $("#" + name[0] + "-radial-area-title")
                                 .text("Period - Year: " + o.name);
                             monthChart_1.trigger('update', o.children);
                         });
                         monthChart_1.on('select', function (o) {
                             console.log('month selected', name);
-                            $("a[href=\"#" + name + "-radial-area-day\"]").tab('show');
-                            $("#" + name + "-radial-area-title")
+                            $("a[href=\"#" + name[0] + "-radial-area-day\"]").tab('show');
+                            $("#" + name[0] + "-radial-area-title")
                                 .text("Period - Year: " + o.parent.name + ", Month: " + o.name);
                             dayChart_1.trigger('update', o.children);
                         });
@@ -50365,13 +50367,14 @@ var Header = (function () {
             self.selected.dataset({ name: name, index: index, html: html });
             rest_server_1.default.datasets.dataruns.read(name).done(function (dataruns_) {
                 self.dataruns(dataruns_);
+                self.onSelectDatarun(dataruns_[0], 0);
             });
         }
     };
     Header.prototype.onSelectDatarun = function (datarun_, index) {
         var self = this;
         var oid = self.selected.datarun().id;
-        if (oid !== datarun_.id) {
+        if (!self.activeDataruns().has(datarun_.id)) {
             var html = "<a href=\"#\" class=\"text\">" + datarun_.insert_time + "</a>";
             self.selected.datarun({
                 name: datarun_.insert_time,
@@ -50381,7 +50384,7 @@ var Header = (function () {
             });
             pip.content.trigger('datarun:select', {
                 dataset: self.selected.dataset().name,
-                datarun: self.selected.datarun().id
+                datarun: self.selected.datarun()
             });
         }
     };
@@ -50397,6 +50400,63 @@ var Header = (function () {
     return Header;
 }());
 exports.default = Header;
+
+
+/***/ }),
+
+/***/ "./src/components/modal.ts":
+/*!*********************************!*\
+  !*** ./src/components/modal.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var pip = __webpack_require__(/*! ../services/pip-client */ "./src/services/pip-client.ts");
+var ko = __webpack_require__(/*! knockout */ "./node_modules/_knockout@3.5.0@knockout/build/output/knockout-latest.js");
+var Modal = (function () {
+    function Modal(eleId) {
+        this.eventId = ko.observable('');
+        this.transcript = ko.observable('');
+        var self = this;
+        ko.applyBindings(this, $(eleId)[0]);
+        self.modalEle = $(eleId);
+        var window_ = window;
+        self.SpeechRecognition = window_.webkitSpeechRecognition || window_.SpeechRecognition;
+    }
+    Modal.prototype.setupEventHandlers = function () {
+        var self = this;
+        pip.modal.on('comment:start', function (eventId_) {
+            console.log(eventId_);
+            self.eventId(eventId_);
+            self.modalEle.modal('show');
+        });
+    };
+    Modal.prototype.record = function () {
+        var self = this;
+        if ('SpeechRecognition' in window) {
+            console.log('speech recognition API supported');
+        }
+        else {
+            console.log('speech recognition API not supported');
+        }
+        var recognition = new self.SpeechRecognition();
+        recognition.interimResults = true;
+        recognition.continuous = true;
+        recognition.onresult = function (event) {
+            var speechToText = event.results[0][0].transcript;
+            self.transcript(speechToText);
+        };
+        recognition.start();
+    };
+    Modal.prototype.save = function () {
+        console.log('save');
+    };
+    return Modal;
+}());
+exports.default = Modal;
 
 
 /***/ }),
@@ -50937,8 +50997,19 @@ var LineChart = (function (_super) {
         var focusAxis = self.svg.append('g')
             .attr('class', 'focus')
             .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")");
-        var focusWindows, focusWindowLines;
+        if (self.option.zoom) {
+            self.svg.append('rect')
+                .attr('class', 'zoom')
+                .attr('width', w)
+                .attr('height', h)
+                .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
+                .call(zoom);
+        }
+        var focusWindows, focusWindowLines, focusWindowBars, focusWindowDots;
+        var scoreScale = d3.scaleLinear().range([0.25, 0.85]);
+        var scoreColor = function (v) { return d3.interpolateReds(scoreScale(v)); };
         if (self.option.windows !== null) {
+            scoreScale.domain([0, d3.max(self.option.windows, function (o) { return o[2]; })]);
             focusWindows = self.svg.selectAll('.line-highlight')
                 .data(self.option.windows)
                 .enter()
@@ -50996,6 +51067,18 @@ var LineChart = (function (_super) {
             })
                 .attr('class', 'line-highlight')
                 .attr('d', line);
+            focusWindowBars = focusWindows.append('rect')
+                .attr('class', 'bar-highlight')
+                .attr('x', function (d) { return x(self.data[d[0]][0]); })
+                .attr('y', 0)
+                .attr('width', function (d) { return Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10); })
+                .attr('height', 7)
+                .attr('fill', function (d) { return scoreColor(d[2]); })
+                .on('click', function (d) {
+                pip.modal.trigger('comment:start', d[3]);
+            });
+            focusWindowBars.append('title')
+                .text(function (d) { return "score: " + d[2]; });
         }
         if (self.option.context) {
             context.append('path')
@@ -51020,13 +51103,11 @@ var LineChart = (function (_super) {
                     .attr('d', line2);
             }
         }
-        if (self.option.zoom) {
-            self.svg.append('rect')
-                .attr('class', 'zoom')
-                .attr('width', w)
-                .attr('height', h)
-                .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
-                .call(zoom);
+        function updateFocusWindows() {
+            focusWindowLines.attr('d', line);
+            focusWindowBars
+                .attr('x', function (d) { return x(self.data[d[0]][0]); })
+                .attr('width', function (d) { return Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10); });
         }
         function zoomed() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
@@ -51039,7 +51120,7 @@ var LineChart = (function (_super) {
                 smoothedLine.attr('d', line);
             }
             if (self.option.windows !== null && self.option.windows.length > 0) {
-                focusWindowLines.attr('d', line);
+                updateFocusWindows();
             }
             focusAxis.select('.axis--x').call(xAxis);
             context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
@@ -51320,6 +51401,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var header_1 = __webpack_require__(/*! ./components/header */ "./src/components/header.ts");
 var sidebar_1 = __webpack_require__(/*! ./components/sidebar */ "./src/components/sidebar.ts");
 var content_1 = __webpack_require__(/*! ./components/content */ "./src/components/content.ts");
+var modal_1 = __webpack_require__(/*! ./components/modal */ "./src/components/modal.ts");
 var App = (function () {
     function App() {
     }
@@ -51327,11 +51409,13 @@ var App = (function () {
         this.header = new header_1.default('#header');
         this.sidebar = new sidebar_1.default('#sidebar');
         this.content = new content_1.default('#content');
+        this.modal = new modal_1.default('#modal-audio');
     };
     App.prototype.setupEventHandlers = function () {
         this.header.setupEventHandlers();
         this.sidebar.setupEventHandlers();
         this.content.setupEventHandlers();
+        this.modal.setupEventHandlers();
     };
     return App;
 }());
@@ -51550,210 +51634,6 @@ var DataProcessor = (function () {
         var normalizedData = _.map(data, function (o) { return [o[0], nm(o[1])]; });
         return normalizedData;
     };
-    DataProcessor.prototype._toTimeSeriesData = function (data, attr) {
-        var valueIdx = data.names.indexOf(attr);
-        return _.map(data.data, function (d) { return [
-            parseInt(d[0]) * 1000,
-            d[valueIdx]
-        ]; });
-    };
-    DataProcessor.prototype._toEventWindows = function (data, timestamps) {
-        return _.map(data, function (d) { return [
-            timestamps.indexOf(parseInt(d.start_time) * 1000),
-            timestamps.indexOf(parseInt(d.stop_time) * 1000),
-            d.score
-        ]; });
-    };
-    DataProcessor.prototype._toPeriodData = function (data) {
-        var years = [];
-        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
-            'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var max = Number.MIN_SAFE_INTEGER;
-        var min = Number.MAX_SAFE_INTEGER;
-        for (var yy = 0; yy < data.length; yy++) {
-            var year = {
-                level: 'year',
-                name: data[yy].year,
-                bins: [],
-                counts: [],
-                children: []
-            };
-            years.push(year);
-            for (var mm = 0; mm < 12; mm++) {
-                var month = {
-                    level: 'month',
-                    name: monthNames[mm],
-                    bins: new Array(data[yy]['data'][mm].length).fill(0),
-                    counts: new Array(data[yy]['data'][mm].length).fill(0),
-                    children: [],
-                    parent: year
-                };
-                year.children.push(month);
-                for (var dd = 0; dd < data[yy]['data'][mm].length; dd++) {
-                    var day = {
-                        level: 'day',
-                        name: dd + 1,
-                        bins: data[yy]['data'][mm][dd].means,
-                        counts: data[yy]['data'][mm][dd].counts,
-                        children: undefined,
-                        parent: month
-                    };
-                    month.children.push(day);
-                    var i = 0, sum = 0, d = data[yy]['data'][mm][dd];
-                    while (i < d.means.length) {
-                        if (d.counts[i] > 0) {
-                            min = min > d.means[i] ? d.means[i] : min;
-                            max = max < d.means[i] ? d.means[i] : max;
-                        }
-                        sum += d.means[i] * d.counts[i];
-                        i += 1;
-                    }
-                    var count = _.sum(d.counts);
-                    var mean = count === 0 ? 0 : sum / count;
-                    year.bins.push(mean);
-                    year.counts.push(count);
-                    month.bins.push(mean);
-                    month.counts.push(count);
-                    if (count > 0) {
-                        min = min > mean ? mean : min;
-                        max = max < mean ? mean : max;
-                    }
-                }
-            }
-        }
-        var nm = d3.scaleLinear()
-            .domain([min, max])
-            .range([0, 1]);
-        var nmm = function (node) {
-            return _.map(node.bins, function (d, i) {
-                if (node.counts[i] === 0)
-                    return 0;
-                return nm(d);
-            });
-        };
-        for (var i = 0; i < years.length; i += 1) {
-            years[i].bins = nmm(years[i]);
-            for (var j = 0; j < years[i].children.length; j += 1) {
-                years[i].children[j].bins = nmm(years[i].children[j]);
-                for (var k = 0; k < years[i].children[j].children.length; k += 1) {
-                    years[i].children[j].children[k].bins = nmm(years[i].children[j].children[k]);
-                }
-            }
-        }
-        return years;
-    };
-    DataProcessor.prototype.transformTimeSeriesToPeriodYear = function (data) {
-        var res = [];
-        var yearSet = new Set();
-        var start;
-        for (var i = 0; i < data.length; i++) {
-            var now = new Date(data[i][0]);
-            var year = now.getFullYear();
-            var dayNum = leapYear(year) ? 366 : 365;
-            if (!yearSet.has(year)) {
-                var newYear = {
-                    level: 'year',
-                    name: year,
-                    bins: new Array(dayNum).fill(0),
-                    counts: new Array(dayNum).fill(0),
-                    children: undefined
-                };
-                res.push(newYear);
-                yearSet.add(year);
-                start = new Date(now.getFullYear(), 0, 0);
-                newYear.children = initMonth(newYear);
-            }
-            var diff = (now - start) + ((start.getTimezoneOffset() -
-                now.getTimezoneOffset()) * 60 * 1000);
-            var oneDay = 1000 * 60 * 60 * 24;
-            var day = Math.floor(diff / oneDay);
-            var last = _.last(res);
-            last.bins[day - 1] += data[i][1];
-            last.counts[day - 1] += 1;
-            last.children[now.getMonth()].bins[now.getDate() - 1] += data[i][1];
-            last.children[now.getMonth()].counts[now.getDate() - 1] += 1;
-        }
-        var minYear = Number.MAX_SAFE_INTEGER;
-        var maxYear = Number.MIN_SAFE_INTEGER;
-        var minMonth = new Array(res.length).fill(Number.MAX_SAFE_INTEGER);
-        var maxMonth = new Array(res.length).fill(Number.MIN_SAFE_INTEGER);
-        _.each(res, function (d, di) {
-            for (var i = 0; i < d.bins.length; i++) {
-                if (d.counts[i] > 0) {
-                    var v = d.bins[i] / d.counts[i];
-                    d.bins[i] = v;
-                    minYear = minYear > v ? v : minYear;
-                    maxYear = maxYear < v ? v : maxYear;
-                }
-                else {
-                    d.bins[i] = NaN;
-                }
-            }
-            _.each(d.children, function (m) {
-                for (var i = 0; i < m.bins.length; i++) {
-                    if (m.counts[i] > 0) {
-                        var v = m.bins[i] / m.counts[i];
-                        m.bins[i] = v;
-                        minMonth[di] = minMonth[di] > v ? v : minMonth[di];
-                        maxMonth[di] = maxMonth[di] < v ? v : maxMonth[di];
-                    }
-                    else {
-                        m.bins[i] = NaN;
-                    }
-                }
-            });
-        });
-        var nmYear = d3.scaleLinear()
-            .domain([minYear, maxYear])
-            .range([0, 1]);
-        _.each(res, function (d, di) {
-            for (var i = 0; i < d.bins.length; i++) {
-                d.bins[i] = isNaN(d.bins[i]) ? -1 : nmYear(d.bins[i]);
-            }
-            var nmMonth = d3.scaleLinear()
-                .domain([minMonth[di], maxMonth[di]])
-                .range([0, 1]);
-            _.each(d.children, function (m) {
-                for (var i = 0; i < m.bins.length; i++) {
-                    m.bins[i] = isNaN(m.bins[i]) ? -1 : nmMonth(m.bins[i]);
-                }
-            });
-        });
-        function leapYear(year) {
-            return !(year % (year % 100 ? 4 : 400));
-        }
-        function initMonth(o) {
-            var monNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
-                'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            var monDayNum = leapYear(o.name) ? [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-                : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-            var monRes = _.map(monNames, function (n, i) {
-                var newMon = {
-                    level: 'month',
-                    name: n,
-                    bins: new Array(monDayNum[i]).fill(0),
-                    counts: new Array(monDayNum[i]).fill(0),
-                    children: undefined,
-                    parent: o
-                };
-                newMon.children = initDay(newMon);
-                return newMon;
-            });
-            return monRes;
-        }
-        function initDay(o) {
-            var timeInterval = 1;
-            var newDay = {
-                level: 'day',
-                name: 0,
-                bins: new Array(24 / timeInterval).fill(0),
-                counts: new Array(24 / timeInterval).fill(0),
-                children: undefined
-            };
-            return undefined;
-        }
-        return res;
-    };
     DataProcessor.prototype.genTimeSeriesData = function (timesteps) {
         function seededRandom(s) {
             var m_w = 987654321 + s;
@@ -51792,6 +51672,100 @@ var DataProcessor = (function () {
                 })
             };
         });
+    };
+    DataProcessor.prototype._toTimeSeriesData = function (data, attr) {
+        var valueIdx = data.names.indexOf(attr);
+        return _.map(data.data, function (d) { return [
+            parseInt(d[0]) * 1000,
+            d[valueIdx]
+        ]; });
+    };
+    DataProcessor.prototype._toEventWindows = function (data, timestamps) {
+        return _.map(data, function (d) { return [
+            timestamps.indexOf(parseInt(d.start_time) * 1000),
+            timestamps.indexOf(parseInt(d.stop_time) * 1000),
+            d.score,
+            d.id
+        ]; });
+    };
+    DataProcessor.prototype._toPeriodData = function (data) {
+        var years = [];
+        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+            'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var max = Number.MIN_SAFE_INTEGER;
+        var min = Number.MAX_SAFE_INTEGER;
+        for (var yy = 0; yy < data.length; yy++) {
+            var year = {
+                level: 'year',
+                name: data[yy].year,
+                bins: [],
+                counts: [],
+                children: []
+            };
+            years.push(year);
+            for (var mm = 0; mm < 12; mm++) {
+                var month = {
+                    level: 'month',
+                    name: monthNames[mm],
+                    bins: new Array(data[yy].data[mm].length).fill(0),
+                    counts: new Array(data[yy].data[mm].length).fill(0),
+                    children: [],
+                    parent: year
+                };
+                year.children.push(month);
+                for (var dd = 0; dd < data[yy].data[mm].length; dd++) {
+                    var day = {
+                        level: 'day',
+                        name: dd + 1,
+                        bins: data[yy].data[mm][dd].means,
+                        counts: data[yy].data[mm][dd].counts,
+                        children: undefined,
+                        parent: month
+                    };
+                    month.children.push(day);
+                    var i = 0, sum = 0, d = data[yy].data[mm][dd];
+                    while (i < d.means.length) {
+                        if (d.counts[i] > 0) {
+                            min = min > d.means[i] ? d.means[i] : min;
+                            max = max < d.means[i] ? d.means[i] : max;
+                        }
+                        sum += d.means[i] * d.counts[i];
+                        i += 1;
+                    }
+                    var count = _.sum(d.counts);
+                    var mean = count === 0 ? 0 : sum / count;
+                    year.bins.push(mean);
+                    year.counts.push(count);
+                    month.bins.push(mean);
+                    month.counts.push(count);
+                    if (count > 0) {
+                        min = min > mean ? mean : min;
+                        max = max < mean ? mean : max;
+                    }
+                }
+            }
+        }
+        var nm = d3.scaleLinear()
+            .domain([min, max])
+            .range([0, 1]);
+        var nmm = function (node) {
+            return _.map(node.bins, function (d, i) {
+                if (node.counts[i] === 0) {
+                    return 0;
+                }
+                return nm(d);
+            });
+        };
+        for (var i = 0; i < years.length; i += 1) {
+            years[i].bins = nmm(years[i]);
+            for (var j = 0; j < years[i].children.length; j += 1) {
+                years[i].children[j].bins = nmm(years[i].children[j]);
+                for (var k = 0; k < years[i].children[j].children.length; k += 1) {
+                    years[i].children[j].children[k].bins = nmm(years[i].children[j].children[k]);
+                }
+            }
+        }
+        return years;
     };
     return DataProcessor;
 }());
@@ -51839,6 +51813,7 @@ exports.app = new Events();
 exports.header = new Events();
 exports.sidebar = new Events();
 exports.content = new Events();
+exports.modal = new Events();
 
 
 /***/ }),
