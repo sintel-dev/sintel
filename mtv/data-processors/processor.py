@@ -122,13 +122,16 @@ if __name__ == "__main__":
     work_dir = os.getcwd()
 
     # SES
-    ori_folder_path = './raw-data/ses/'
+    ori_folder_path = '/home/dongyu/ses-data/pids/set1'
 
     pids = get_files(ori_folder_path)
 
+    count = 0
     for pid in pids:
         path = os.path.join(ori_folder_path, pid)
         print(pid)
+        count += 1
+        print('{}/{}'.format(count, len(pids)))
         with open(path, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             old_time = None
