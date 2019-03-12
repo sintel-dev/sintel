@@ -51611,6 +51611,10 @@ var DataProcessor = (function () {
                         rest_server_1.default.datasets.dataruns.read(dataset, datarun)
                             .done(function (data, textStatus) {
                             if (textStatus === 'success') {
+<<<<<<< HEAD
+=======
+                                console.log(data);
+>>>>>>> 885b9932b59a1c051ab19c02179766589791b7e6
                                 var timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
                                 var windows = self._toEventWindows(data.events, _.map(timeseries, function (d) { return d[0]; }));
                                 resolve({

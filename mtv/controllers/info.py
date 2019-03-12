@@ -82,6 +82,7 @@ class Data(Resource):
                 'year': document.year,
                 'data': document.data
             })
+        print('***********%%%%%%%%%%************', dataset, len(raw))
 
         # fetch collection "prediction"
         query = {
