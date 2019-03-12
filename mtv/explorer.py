@@ -17,7 +17,7 @@ class MTVExplorer:
 
     def __init__(self, database, **kwargs):
         # self._db = db.connect(database=database)
-        self._db = connect(database, **kwargs)
+        self._db = connect(database, port=27018)
 
     def _init_flask_app(self, env):
         app = Flask(

@@ -45,6 +45,7 @@ class DataProcessor {
             server.datasets.dataruns.read(dataset, datarun)
                 .done((data, textStatus) => {
                     if (textStatus === 'success') {
+                        console.log(data);
                         const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
                         const windows = self._toEventWindows(
                             data.events,
