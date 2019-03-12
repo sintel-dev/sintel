@@ -81,7 +81,3 @@ class MongoDB:
 
         w_conn = MongoDB(address='localhost', port=27018, db=des_db)
         w_conn.writeCollection(docs, des_col, insert_type='bulk')
-
-
-db = MongoDB(port=27018, db='orion')
-db.move_col('dataset', 'mtv', 'dataset')
