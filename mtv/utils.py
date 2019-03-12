@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import json
+import yaml
 from bson import ObjectId
 
 
@@ -16,12 +17,25 @@ class _JSONEncoder(json.JSONEncoder):
 
 json_encoder = _JSONEncoder().encode
 
-def _is_string(o):
-    return isinstance(o, str)
 
+def read_config(path_to_config):
+    """Loads parameters from config.yaml into global object"""
+    if os.path.isfile(path_to_config):    
+        pass
+    else:
+        path_to_config = '../{}'.format(path_to_config)
 
-def _is_list(o):
-    return isinstance(o, list)
+    dictionary = None
+    
+    try:
+        with open(path_to_config, "r") as f:
+            dictionary = yaml.load(f.read())
+    except Exception:
+        LOGGER.exception('Error loading config file {}'.format(path_to_config))
+        raise Exception
+    
+    return dictionary
+
 
 def import_object(object_name):
     """Import an object from its Fully Qualified Name."""
@@ -35,12 +49,11 @@ def create_dirs(dirs):
     Args:
         dirs (str or str[]): Path(s) to the directorie(s).
     """
-
-    if _is_string(dirs):
+    if isinstance(dirs, str):
         if not os.path.isdir(dirs):
             os.mkdir(dirs)
 
-    elif _is_list(dirs):
+    elif isinstance(dirs, list):
         for p in dirs:
             if not os.path.isdir(p):
                 os.mkdir(p)

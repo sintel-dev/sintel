@@ -1,19 +1,18 @@
 import argparse
 from mtv.explorer import MTVExplorer
-from mtv.utils import setup_logging
+from mtv.utils import setup_logging, read_config
 
 
 def _run(explorer, args):
     explorer.run_server(args.env, args.port)
 
+def _add_rawdata(explorer, args):
+    explorer.add_rawdata(args.col, args.path)
+
 def get_parser():
     
     # Common Parent - Shared options
     common = argparse.ArgumentParser(add_help=False)
-
-    common.add_argument('-D', '--database', default='mtv',
-                        help='Name of the database to connect to. '
-                             'Defaults to "mtv"')
 
     common.add_argument('-l', '--logfile',
                         help='Name of the logfile.'
@@ -30,16 +29,25 @@ def get_parser():
     action.required = True
 
     # mtv run
-    server = action.add_parser('run', help='run server', parents=[common])
-    server.set_defaults(function=_run)
+    run = action.add_parser('run', help='Start flask server', parents=[common])
+    run.set_defaults(function=_run)
 
-    server.add_argument('-P', '--port', default=3000, type=int,
-                             help='flask server port')
-    server.add_argument('-E', '--env', default='development', type=str,
-                             help='running environment')   
+    run.add_argument('-P', '--port', type=int, help='Flask server port')
+    run.add_argument('-E', '--env', type=str, help='Flask environment')   
 
-    # mtv process xxx
-    # TODO: preprocess data
+    # mtv add
+    add = action.add_parser('add', help='Add an object to the database')
+    add_model = add.add_subparsers(title='model', dest='model')
+    add_model.required = True
+    
+    # mtv add rawdata
+    add_rawdata = add_model.add_parser('rawdata', parents=[common],
+                                       help='Add raw data to the database')
+    add_rawdata.set_defaults(function=_add_rawdata)
+
+    add_rawdata.add_argument('--col', default='raw', help='Collection name')
+    add_rawdata.add_argument('--path', required=True, 
+                             help='Path to the folder storing the raw data')
 
     return parser
 
@@ -48,8 +56,9 @@ def main():
 
     parser = get_parser()
     args = parser.parse_args()
-
+    
     setup_logging(args.verbose, args.logfile)
-    explorer = MTVExplorer(args.database)
+    config = read_config('./mtv/config.yaml')
+    explorer = MTVExplorer(config)
 
     args.function(explorer, args)

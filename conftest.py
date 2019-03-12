@@ -1,18 +1,11 @@
-# config file for py.test: test flask application
-
 from mtv.explorer import MTVExplorer
+from mtv.utils import read_config
 import pytest
-
-
-
-# @pytest.fixture
-# def app():
-#     app = create_flask_app()
-#     return app
 
 
 @pytest.fixture
 def app():
-    explorer = MTVExplorer()
+    config = read_config('./mtv/config.yaml')
+    explorer = MTVExplorer(config)
     app = explorer._init_flask_app('test')
     return app

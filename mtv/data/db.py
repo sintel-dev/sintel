@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from pymongo import ASCENDING, MongoClient
+from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.errors import BulkWriteError
 
 
@@ -62,10 +62,12 @@ class MongoDB:
         else:
             return self.db[col].initialize_ordered_bulk_op()
 
-    def createIndex(self, col):
-        if (col == 'raw'):
-            self.db[col].create_index([('name', ASCENDING),
-                                       ('timestamp', ASCENDING)], unique=True)
+    def createIndex(self, col, pairs, unique=True):
+        indexes = list()
+        for pair in pairs:
+            order = ASCENDING if pair[1] == '+' else DESCENDING
+            indexes.append((pair[0], order))
+        self.db[col].create_index(indexes, unique=unique)
 
         print('create index successfully on collection "{}"'.format(col))
 

@@ -5,8 +5,11 @@ from datetime import datetime, timezone
 from calendar import monthrange
 
 import numpy as np
+import logging
+from mtv.data.db import MongoDB
+from mtv.utils import get_files
 
-from db import MongoDB
+LOGGER = logging.getLogger(__name__)
 
 # test code
 # t1 = datetime.fromtimestamp(1328214364)
@@ -19,12 +22,6 @@ from db import MongoDB
 # print("Date =", timestamp2.second)
 # print(datetime(2018, 9, 12))
 
-
-def get_files(dir):
-    result = []
-    for (root, dirs, files) in os.walk(dir):
-        result.extend(files)
-    return result
 
 
 def transform_to_db_docs(pid, data, interval=30):
@@ -119,24 +116,24 @@ def transform_to_db_docs(pid, data, interval=30):
     return docs
 
 
-if __name__ == "__main__":
+def add_raw(conn_config, col, data_folder_path):
+    conn = MongoDB(**conn_config)
 
-    conn = MongoDB(address='localhost', port=27017, db='mtv')
+    if not os.path.exists(data_folder_path):    
+        LOGGER.exception('Data folder path "{}" does not exist'
+                        .format(data_folder_path))
+        raise
 
-    work_dir = os.getcwd()
 
-    # SES
-    ori_folder_path = './raw-data/ses/'
+    files = get_files(data_folder_path)
 
-    pids = get_files(ori_folder_path)
-
-    for pid in pids:
-        path = os.path.join(ori_folder_path, pid)
-        print(pid)
-        with open(path, 'r') as csv_file:
+    for file in files:
+        file_path = os.path.join(data_folder_path, file)
+        print('processing', file)
+        
+        with open(file_path, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
-            old_time = None
-            data = []
+            data = list()
             time0 = time.time()
             for (i, v) in enumerate(csv_reader):
                 data.append([float(v[2]), float(v[3])])
@@ -147,10 +144,13 @@ if __name__ == "__main__":
             time2 = time.time()
             print('sorting over', time2 - time1)
 
-            docs = transform_to_db_docs(pid[0:-4], data)
+            docs = transform_to_db_docs(file[0:-4], data)
 
             if docs:
-                conn.writeCollection(docs, 'raw')
+                conn.writeCollection(docs, col)
+    
+    conn.createIndex(col, [('dataset', '+')], unique=False)
+    conn.createIndex(col, [('dataset', '+'), ('year', '+')])
 
     # # NASA MSL
     # ori_folder_path = './raw-data/nasa/MSL/'

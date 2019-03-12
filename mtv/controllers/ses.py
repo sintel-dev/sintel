@@ -2,7 +2,6 @@ import logging
 from flask import request
 from flask_restful import Resource
 from pymongo import MongoClient
-from mtv.db import db
 
 LOGGER = logging.getLogger(__name__)
 
