@@ -17,6 +17,7 @@ LABEL maintainer="Dongyu Liu <windliudy@gmail.com>"
 # install utilities
 RUN apt-get update -yqq  \
  && apt-get install -yqq \
+ unzip \
  curl \
  git \
  ssh \
