@@ -1,12 +1,11 @@
 
 import logging
-import pandas as pd
+
+from bson import ObjectId
 from flask import request
 from flask_restful import Resource
-from mtv.utils import get_dirs, get_files
+
 from mtv import model
-from mtv.utils import json_encoder
-from bson import ObjectId
 
 LOGGER = logging.getLogger(__name__)
 
@@ -14,25 +13,31 @@ LOGGER = logging.getLogger(__name__)
 class Datasets(Resource):
     def get(self):
         """ Return database list.
-        
+
         GET /api/v1/datasets/
         """
 
         documents = model.Dataset.find()
 
-        names = list()
+        docs = list()
         for document in documents:
-            doc = model.Dataset.find_one(name=document.name)
-            # only add dataset with some dataruns
-            if doc is not None:
-                names.append(document.name)
+            docs.append({
+                'id': str(document.id),
+                'insert_time': document.insert_time.isoformat(),
+                'name': document.name,
+                'signal_set': document.signal_set,
+                'start_time': document.start_time,
+                'stop_time': document.stop_time,
+                'created_by': document.created_by
+            })
 
-        return names
+        return docs
+
 
 class Dataruns(Resource):
     def get(self, dataset):
         """ Return datarun list of a given dataset.
-        
+
         GET /api/v1/datasets/<string:dataset>/dataruns/
         """
 
@@ -53,10 +58,39 @@ class Dataruns(Resource):
         for document in documents:
             docs.append({
                 'id': str(document.id),
-                'insert_time': document.insert_time.isoformat()
+                'insert_time': document.insert_time.isoformat(),
+                'start_time': document.start_time.isoformat(),
+                'end_time': document.end_time.isoformat(),
+                'status': document.status,
+                'created_by': document.created_by,
+                'events': document.events,
+                'pipeline': str(document.pipeline.id)
             })
 
         return docs
+
+
+class Pipeline(Resource):
+    def get(self, pipeline):
+        """ Return the pipeline information by given a pipeline id.
+
+        GET /api/v1/pipelines/<string:pipeline>/
+        """
+
+        pipeline_id = ObjectId(pipeline)
+
+        document = model.Pipeline.find_one(id=pipeline_id)
+
+        if document is None:
+            return False
+
+        return {
+            'insert_time': document.insert_time.isoformat(),
+            'name': document.name,
+            'mlpipeline': document.mlpipeline,
+            'created_by': document.created_by
+        }
+
 
 class Data(Resource):
     def get(self, dataset, datarun):
@@ -65,10 +99,8 @@ class Data(Resource):
         GET /api/v1/datasets/<string:dataset>/dataruns/<string:datarun>/
         '''
 
-        data = dict()
-
-        year = request.args.get('year', None)
-        month = request.args.get('month', None)
+        request.args.get('year', None)
+        request.args.get('month', None)
 
         # fetch collection "raw"
         query = {
@@ -116,9 +148,3 @@ class Data(Resource):
             'prediction': prediction,
             'events': events,
         }
-
-class Pipelines(Resource):
-    pass
-
-class Events(Resource):
-    pass

@@ -33,7 +33,8 @@ let assets = {
         `${THEME}/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js`,
         `${THEME}/bower_components/jquery-slimscroll/jquery.slimscroll.min.js`,
         `${THEME}/bower_components/fastclick/lib/fastclick.js`,
-        `${THEME}/dist/js/adminlte.min.js`,
+        `${THEME}/dist/js/adminlte.js`,
+        // `${THEME}/dist/js/adminlte.min.js`,
         `${STATIC}/math.js`,
         `${STATIC}/science.js`
         // `${THEME}/dist/js/pages/dashboard.js`,

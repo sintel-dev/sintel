@@ -50,6 +50,7 @@ WORKDIR /mtv
 
 
 # install application packages for python and node
+RUN make install-theme
 RUN make install-develop
 
 

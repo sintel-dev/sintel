@@ -1,13 +1,16 @@
 import logging
 import os
 import sys
+
 from flask import Flask
+from flask_cors import CORS
 from gevent.wsgi import WSGIServer
-from termcolor import colored
 from mongoengine import connect
+from termcolor import colored
+
+from mtv.data.processor import add_raw
 from mtv.routes import add_routes
 from mtv.utils import import_object
-from mtv.data.processor import add_raw
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,7 +20,7 @@ class MTVExplorer:
     def __init__(self, cf):
         self._cf = cf.copy()
 
-        self._db = connect(db=cf['db'], host=cf['host'], port=cf['port'], 
+        self._db = connect(db=cf['db'], host=cf['host'], port=cf['port'],
                            username=cf['username'], password=cf['password'])
 
     def _init_flask_app(self, env):
@@ -32,12 +35,14 @@ class MTVExplorer:
 
         if env == 'production':
             app.config.from_mapping(DEBUG=False, TESTING=False)
-    
+
         elif env == 'development':
             app.config.from_mapping(DEBUG=True, TESTING=True)
-        
+
         elif env == 'test':
             app.config.from_mapping(DEBUG=False, TESTING=True)
+
+        CORS(app)
 
         add_routes(app)
 
@@ -51,8 +56,8 @@ class MTVExplorer:
         # env validation
         if env not in ['development', 'production', 'test']:
             LOGGER.exception("env '%s' is not in "
-                            "['development', 'production', 'test']", env)
-            raise ValueError                        
+                             "['development', 'production', 'test']", env)
+            raise ValueError
 
         # just in case running app with the absolute path
         sys.path.append(os.path.dirname(__file__))
@@ -61,20 +66,20 @@ class MTVExplorer:
 
         def http_server():
             LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
-                    'yellow'))
+                                'yellow'))
 
-            LOGGER.info(colored('Available on:', 'yellow') +
-                        '  http://127.0.0.1:' + colored(port, 'green'))
+            LOGGER.info(colored('Available on:', 'yellow')
+                        + '  http://127.0.0.1:' + colored(port, 'green'))
 
             if env == 'development':
                 debug = import_object('werkzeug.debug.DebuggedApplication')
                 server = WSGIServer(('127.0.0.1', port), debug(app))
-            
+
             elif env == 'production':
                 server = WSGIServer(('127.0.0.1', port), app, log=None)
-            
+
             server.serve_forever()
-        
+
         if env == 'development':
             reloader = import_object('werkzeug.serving.run_with_reloader')
             reloader(http_server)

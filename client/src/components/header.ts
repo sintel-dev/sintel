@@ -1,6 +1,8 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
+import * as _ from 'lodash';
 import server from '../services/rest-server';
+import { Dataset, Datarun } from '../services/rest-server.interface';
 
 class Header {
 
@@ -33,32 +35,39 @@ class Header {
         });
     }
 
-
     // the following public methods are triggered by user interactions
 
-    public onSelectDataset(name: string, index: number) {
+    public onSelectDataset(dataset_: Dataset, index: number) {
         let self = this;
-        let oldName = self.selected.dataset().name;
-        if (oldName !== name) {
-            let html = `<a href="#" class="text">${name}</a>`;
-            self.selected.dataset({name, index, html});
+        const oldName = self.selected.dataset().name;
+        if (oldName !== dataset_.name) {
+            let html = `<a href="#" class="text">${dataset_.name}</a>`;
+            self.selected.dataset({name: dataset_.name, index, html});
 
-            server.datasets.dataruns.read(name).done(dataruns_ => {
-                self.dataruns(dataruns_);
-                // auto select the first one
-                self.onSelectDatarun(dataruns_[0], 0);
-            });
+            server.datasets.dataruns.read(dataset_.name).done(
+                (dataruns_: Datarun[]) => {
+                    self.dataruns(dataruns_);
+                    // auto select the first one
+                    self.onSelectDatarun(dataruns_[0], 0);
+                }
+            );
+
+            // update dataset information on sidebar
+            pip.sidebar.trigger('dataset', dataset_);
         }
     }
 
-    public onSelectDatarun(datarun_, index: number) {
+    public onSelectDatarun(datarun_: Datarun, index: number) {
         let self = this;
         let oid = self.selected.datarun().id;
 
         if (!self.activeDataruns().has(datarun_.id)) {
-            let html = `<a href="#" class="text">${datarun_.insert_time}</a>`;
+            let createdTime = datarun_.insert_time;
+            createdTime = _.replace(createdTime, 'T', ' ');
+            createdTime = createdTime.substring(0, 19);   // 2019-03-17 13:12:25
+            let html = `<a href="#" class="text">${createdTime}</a>`;
             self.selected.datarun({
-                name: datarun_.insert_time,
+                name: createdTime,
                 id: datarun_.id,
                 index,
                 html
@@ -67,6 +76,12 @@ class Header {
             pip.content.trigger('datarun:select', {
                 dataset: self.selected.dataset().name,
                 datarun: self.selected.datarun()
+            });
+
+            pip.sidebar.trigger('datarun', datarun_);
+
+            server.pipelines.read(datarun_.pipeline).done(pipeline => {
+                pip.sidebar.trigger('pipeline', pipeline);
             });
         }
     }

@@ -1,13 +1,13 @@
 import importlib
+import json
 import logging
 import os
-import sys
-import json
+
 import yaml
 from bson import ObjectId
 
-
 LOGGER = logging.getLogger(__name__)
+
 
 class _JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -15,25 +15,26 @@ class _JSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
+
 json_encoder = _JSONEncoder().encode
 
 
 def read_config(path_to_config):
     """Loads parameters from config.yaml into global object"""
-    if os.path.isfile(path_to_config):    
+    if os.path.isfile(path_to_config):
         pass
     else:
         path_to_config = '../{}'.format(path_to_config)
 
     dictionary = None
-    
+
     try:
         with open(path_to_config, "r") as f:
             dictionary = yaml.load(f.read())
     except Exception:
         LOGGER.exception('Error loading config file {}'.format(path_to_config))
         raise Exception
-    
+
     return dictionary
 
 
@@ -82,6 +83,7 @@ def get_files(dir, level=0):
         pass
         # TODO
 
+
 def walk(document, transform):
     if not isinstance(document, dict):
         return document
@@ -98,11 +100,14 @@ def walk(document, transform):
 
     return new_doc
 
+
 def remove_dots(document):
     return walk(document, lambda key, value: (key.replace('.', '-'), value))
 
+
 def restore_dots(document):
     return walk(document, lambda key, value: (key.replace('-', '.'), value))
+
 
 def setup_logging(verbosity=1, logfile=None, logger_name=None):
     # if logger_name=None, return the root logger
@@ -118,7 +123,8 @@ def setup_logging(verbosity=1, logfile=None, logger_name=None):
     # Logging messages which are less severe than level will be ignored
     log_level = (3 - verbosity) * 10
 
-    fmt = '%(asctime)s - %(process)d - %(levelname)s - %(module)s - %(message)s'
+    fmt = '%(asctime)s - %(process)d - %(levelname)s' + \
+          ' - %(module)s - %(message)s'
     formatter = logging.Formatter(fmt)
     logger.setLevel(log_level)
     logger.propagate = False

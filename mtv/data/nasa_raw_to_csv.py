@@ -1,8 +1,7 @@
 import csv
 import os
-import numpy as np
-from db import MongoDB
 
+import numpy as np
 
 
 def dump_to_csv(X, dest_file_path):
@@ -20,7 +19,7 @@ def dump_to_csv(X, dest_file_path):
         writer.writeheader()
         for i in range(X.shape[0]):
             v = X[i, 0]
-            # faked timestamp starting from 
+            # faked timestamp starting from
             # Wednesday, October 1, 2008 12:00:00 AM （GMT）
             # with interval 21600s, namely 6 hours
             writer.writerow({'timestamp': 1222819200 + i * 21600, 'value': v})
@@ -29,13 +28,14 @@ def dump_to_csv(X, dest_file_path):
 def classify_files(dir):
     classes = {}
     name_set = set([])
-    with open(os.path.join(dir, 'labeled_anomalies.csv'), mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=',')
+    with open(os.path.join(dir, 'labeled_anomalies.csv'), mode='r') as file:
+        csv_reader = csv.DictReader(file, delimiter=',')
         for row in csv_reader:
             if row['spacecraft'] not in name_set:
                 name_set.add(row['spacecraft'])
                 classes[row['spacecraft']] = set()
             classes[row['spacecraft']].add(row['chan_id'])
+
     return classes
 
 
@@ -45,14 +45,14 @@ if __name__ == "__main__":
     # path_to_file = 'data/train/A-1.npy'
     # data = np.load(path_to_file)
     # dump_to_csv(data, dest_folder_path + '/A-1.csv')
-    
+
     # nasa dataset contains two different sub-datasets
     classes = classify_files('raw-data/nasa/')
     for cs in classes:
         if not os.path.isdir('raw-data/nasa/{}'.format(cs)):
             os.mkdir('raw-data/nasa/{}'.format(cs))
 
-    data_dir = 'raw-data/nasa/raw';
+    data_dir = 'raw-data/nasa/raw'
 
     # process every file
     files = []
@@ -72,4 +72,3 @@ if __name__ == "__main__":
                                                name.replace('.npy', '.csv')))
             else:
                 print('error when processing signal {}'.format(name))
-

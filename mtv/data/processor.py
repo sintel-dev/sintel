@@ -1,11 +1,12 @@
 import csv
+import logging
 import os
 import time
-from datetime import datetime, timezone
 from calendar import monthrange
+from datetime import datetime, timezone
 
 import numpy as np
-import logging
+
 from mtv.data.db import MongoDB
 from mtv.utils import get_files
 
@@ -23,7 +24,6 @@ LOGGER = logging.getLogger(__name__)
 # print(datetime(2018, 9, 12))
 
 
-
 def transform_to_db_docs(pid, data, interval=30):
     odocs = []
     od = None
@@ -38,12 +38,12 @@ def transform_to_db_docs(pid, data, interval=30):
     for i in range(24 * 60 // interval):
         day_bins.append([])
 
-    year_start = 9999;
-    year_end = 0;
+    year_start = 9999
+    year_end = 0
 
     for d in data:
-        # nd -> the date of current item 
-        # od -> the date of previous item 
+        # nd -> the date of current item
+        # od -> the date of previous item
         nd = datetime.utcfromtimestamp(d[0])
 
         year_start = nd.year if (nd.year < year_start) else year_start
@@ -61,7 +61,7 @@ def transform_to_db_docs(pid, data, interval=30):
                     else:
                         bins.append(0)
                     counts.append(len(day_bins[i]))
-                
+
                 now = datetime(od.year, od.month, od.day, tzinfo=timezone.utc)
                 odocs.append({
                     'name': pid,
@@ -82,7 +82,7 @@ def transform_to_db_docs(pid, data, interval=30):
 
     # now every doc is a day.
     # aggregate docs from the same month into one doc
-    
+
     docs = []
     for y in range(year_start, year_end + 1):
 
@@ -105,32 +105,30 @@ def transform_to_db_docs(pid, data, interval=30):
 
             docs[-1]['data'][m - 1] = days
 
-
     for doc in odocs:
         ts = doc['timestamp']
         dt = datetime.utcfromtimestamp(ts)
         idx = dt.year - year_start
         docs[idx]['data'][dt.month - 1][dt.day - 1]['means'] = doc['bins']
         docs[idx]['data'][dt.month - 1][dt.day - 1]['counts'] = doc['counts']
-    
+
     return docs
 
 
 def add_raw(conn_config, col, data_folder_path):
     conn = MongoDB(**conn_config)
 
-    if not os.path.exists(data_folder_path):    
+    if not os.path.exists(data_folder_path):
         LOGGER.exception('Data folder path "{}" does not exist'
-                        .format(data_folder_path))
+                         .format(data_folder_path))
         raise
-
 
     files = get_files(data_folder_path)
 
     for file in files:
         file_path = os.path.join(data_folder_path, file)
         print('processing', file)
-        
+
         with open(file_path, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             data = list()
@@ -148,7 +146,7 @@ def add_raw(conn_config, col, data_folder_path):
 
             if docs:
                 conn.writeCollection(docs, col)
-    
+
     conn.createIndex(col, [('dataset', '+')], unique=False)
     conn.createIndex(col, [('dataset', '+'), ('year', '+')])
 

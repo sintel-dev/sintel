@@ -73,6 +73,7 @@ export class RadialAreaChart extends pip.Events {
 
         // append svg to the container
         self.svg = self.svgContainer.append<SVGElement>('svg')
+            .attr('class', 'radial-area-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
 
@@ -218,10 +219,10 @@ export class RadialAreaChart extends pip.Events {
 
             if (o.level !== 'day') {
                 _cell.append('text')
-                .attr('class', 'radial-text-sm')
-                .attr('x', -7)
-                .attr('y', outerRadius)
-                .text(o.name);
+                    .attr('class', 'radial-text-md')
+                    .attr('x', -7)
+                    .attr('y', outerRadius)
+                    .text(o.name);
             }
 
             let missedData = [];

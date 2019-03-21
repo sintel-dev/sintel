@@ -16,16 +16,15 @@ let server: Server = new jqueryExt.RestClient(
 
 // step2: add your resources
 server.add('datasets');
-/**
- * usage:
- *
- * return the db list
- * server.dbs.read()
- * Get  /dbs/
- */
 
+server.add('pipelines');
+
+server.add('events');
+
+server.add('comments');
 
 server.datasets.add('dataruns');
+
 /**
  * usage:
  *
@@ -44,8 +43,6 @@ server.datasets.add('dataruns');
  */
 
 // server.dbs.signals.read('dbName', 'sigName', {'start': timestamp1}, {'end': timestamp2})
-
-
 
 // step3: remember to modify the PipServer interface accordingly
 

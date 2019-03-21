@@ -5,9 +5,9 @@ services:
     container_name: db
     ports:
       - "27017:27017"
-    command: mongod --port 27017 --dbpath /data/db --logpath /data/logs/db.log
+    command: mongod --port 27017 --dbpath /data/mtv --logpath /data/logs/mtv.log
     volumes:
-      - db-data::/data/db
+      - db-data:/data/mtv
       - db-logs:/data/logs
   web:
     build: .
@@ -16,10 +16,7 @@ services:
       - db
     ports:
       - "3000:3000"
-    environment:
-      # - NODE_ENV=development
-      - DB_PORT_27017_TCP_ADDR=db
-    command: python run-server.py
+    command: mtv run --env production
     volumes:
       - .:/mtv
 volumes:

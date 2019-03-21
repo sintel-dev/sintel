@@ -36,12 +36,17 @@ class MongoUtils:
             name = kwargs_copy.pop('name')
             document = cls.find_one(name=name)
             if document:
-                raise ValueError('{} with name="{}" already exists'.format(cls.__name__, name))
+                raise ValueError(
+                    '{} with name="{}" already exists'.format(
+                        cls.__name__, name))
 
         document = cls.find_one(**kwargs)
         if document is not None:
-            fields = ' and '.join('{}={}'.format(k, v) for k, v in kwargs_copy.items())
-            raise ValueError('{} with {} already exists'.format(cls.__name__, fields))
+            fields = ' and '.join('{}={}'.format(k, v)
+                                  for k, v in kwargs_copy.items())
+            raise ValueError(
+                '{} with {} already exists'.format(
+                    cls.__name__, fields))
 
         document = cls(**kwargs)
         document.save()
@@ -139,17 +144,19 @@ class Comment(Document, MongoUtils):
     text = fields.StringField(required=True)
     created_by = fields.StringField()
 
+
 class Raw(Document, MongoUtils):
     dataset = fields.StringField()
     timestamp = fields.FloatField()
     year = fields.IntField()
     data = fields.ListField(fields.ListField())
-    meta = {
-        'indexes': [
-            '$dataset', # text index
-            ('dataset', '+year')
-        ]
-    }
+    # meta = {
+    #     'indexes': [
+    #         '$dataset', # text index
+    #         ('dataset', '+year')
+    #     ]
+    # }
+
 
 class Prediction(Document, MongoUtils):
     dataset = fields.StringField()
@@ -159,6 +166,6 @@ class Prediction(Document, MongoUtils):
     data = fields.ListField(fields.ListField(fields.FloatField()))
     meta = {
         'indexes': [
-            '$dataset' # text index
+            '$dataset'  # text index
         ]
     }

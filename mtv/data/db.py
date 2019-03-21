@@ -6,7 +6,7 @@ from pymongo.errors import BulkWriteError
 
 class MongoDB:
 
-    def __init__(self, address='localhost', port=27017, db='ctscan'):
+    def __init__(self, address='localhost', port=27017, db='mtv'):
         client = MongoClient(address, port)
         self.db = client[db]
         print('connect to {} on {}:{}'.format(db, address, port))

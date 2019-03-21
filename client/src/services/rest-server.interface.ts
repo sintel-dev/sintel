@@ -1,5 +1,51 @@
+/****** define the document format returned by server *****/
+
+export interface Dataset {
+    id: string;
+    insert_time: string;
+    name: string;
+    signal_set: string;
+    start_time: number;
+    stop_time: number;
+    created_by: string;
+}
+
+export interface Datarun {
+    id: string;
+    insert_time: string;
+    start_time: string;
+    end_time: string;
+    status: string;
+    created_by: string;
+    events: number;
+    pipeline: string;
+}
+
+export interface Pipeline {
+    insert_time: string;
+    name: string;
+    mlpipeline: {
+        primitives: any;
+        init_params: any;
+        output_names: any;
+    };
+    created_by: string;
+}
+
+export interface Event {
+    insert_time?: string;
+    dataset?: string;
+    datarun: string;
+    start_time: number;
+    stop_time: number;
+    score: number;
+    id: string;
+}
+
+/****** restful api *****/
+
 interface Response {
-    done(data: any, textStatus?: any, xhrObject?: any): any;
+    done<T>(data: T, textStatus?: any, xhrObject?: any): any;
 }
 
 // textStatus values:
@@ -55,6 +101,9 @@ export interface Server {
     add: AddResource;
     // resource list
     datasets: Datasets;
+    pipelines: Resource;
+    events: Resource;
+    comments: Resource;
 }
 
 

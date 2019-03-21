@@ -2,7 +2,6 @@ import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
-import server from '../services/rest-server';
 import dataProcessor from '../services/data-processor';
 import { LineChart } from './vis/line-chart';
 import { AreaChart } from './vis/area-chart';
@@ -13,6 +12,7 @@ class Content {
 
     public boxs = ko.observableArray([]);
 
+    private lineCharts = {};
     private config = {
         speed: 500   // box animation duration
     };
@@ -46,12 +46,23 @@ class Content {
 
     // the following public methods are triggered by user interactions
 
+    public comment(name) {
+        let self = this;
+        self.lineCharts[name].trigger('comment');
+    }
+
+    public uncomment(name) {
+        let self = this;
+        self.lineCharts[name].trigger('uncomment');
+    }
+
     public onRemoveBox(name) {
         let self = this;
         setTimeout(() => {
             let boxs = self.boxs();
             let idx = _.findIndex(boxs, o => o[0] === name);
             boxs.splice(idx, 1);
+            delete self.lineCharts[name];
             self.boxs(boxs);
             pip.header.trigger('datarun:updateActives', _.map(boxs, b => b[0]));
         }, self.config.speed);
@@ -60,9 +71,13 @@ class Content {
     private async addChart(msg: {dataset: string, datarun: any}) {
         let self = this;
         // let name = `${msg.dataset} : ${msg.datarun.name.split('.')[0]} (${msg.datarun.id})`; // datarun id is unique
+        let title = msg.dataset;
+        if (_.startsWith(msg.dataset, 'pid_')) {
+            title = 'Pid-' + msg.dataset.substring(4);
+        }
         let name = [
             msg.datarun.id,
-            `${msg.dataset} : ${msg.datarun.name.split('.')[0]}`
+            title + ': ' + msg.datarun.name
         ];
         let boxs = self.boxs();
 
@@ -82,37 +97,36 @@ class Content {
 
             // load data for visualization
             let data = await dataProcessor.loadData(msg.dataset, msg.datarun.id) as any;
-            console.log(data);
 
             // declare the element for adding the chart
             let ele;
 
             // add line chart
-            // let anomaly = new alg.Anomaly(_.map(data, d => d.y));
-            // let windows = anomaly.findPeakWidows(5, 2);
             ele = $(`#${name[0]}-line`)[0];
-            new LineChart(ele, data.timeseries, {
-                height: 360,
-                height2: 60,
+            self.lineCharts[name[0]] = new LineChart(ele,
+                data.timeseries, msg.datarun.id, msg.dataset,
+            {
+                height: 280,
+                height2: 120,
                 width: ele.parentElement.getBoundingClientRect().width,
                 width2: ele.parentElement.getBoundingClientRect().width,
                 // smooth: true,
                 windows: data.windows
             });
 
-            // add area chart
-            ele = $(`#${name[0]}-area`)[0];
-            new AreaChart($(`#${name[0]}-area`)[0], data.timeseries, {
-                height: 400,
-                width: ele.parentElement.getBoundingClientRect().width
-            });
+            // // add area chart
+            // ele = $(`#${name[0]}-area`)[0];
+            // new AreaChart($(`#${name[0]}-area`)[0], data.timeseries, {
+            //     height: 400,
+            //     width: ele.parentElement.getBoundingClientRect().width
+            // });
 
-            // // add horizon chart
-            ele = $(`#${name[0]}-horizon`)[0];
-            new HorizonChart($(`#${name[0]}-horizon`)[0], data.timeseries, {
-                width: ele.parentElement.getBoundingClientRect().width
-                // normalized: true
-            });
+            // // // add horizon chart
+            // ele = $(`#${name[0]}-horizon`)[0];
+            // new HorizonChart($(`#${name[0]}-horizon`)[0], data.timeseries, {
+            //     width: ele.parentElement.getBoundingClientRect().width
+            //     // normalized: true
+            // });
 
             // add radial area chart
             // only activated when dataset is SES

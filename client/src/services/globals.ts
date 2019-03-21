@@ -13,3 +13,19 @@ interface Session {
 }
 
 export let gSession: Session = {};
+
+
+export const colorSchemes = {
+    severity5: [
+        '#2c7bb6',  // blue, low
+        '#abd9e9',
+        '#ffffbf',
+        '#fdae61',
+        '#d7191c'   // red, high
+    ],
+    severity3: [
+        '#91bfdb',  // light blue
+        '#ffffbf',
+        '#fc8d59'   // orange
+    ]
+};
