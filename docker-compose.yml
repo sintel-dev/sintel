@@ -18,6 +18,6 @@ services:
       - db
     ports:
       - "3000:3000"
-    command: mtv run --env production
+    command: /usr/local/bin/mtv run --env production
     volumes:
       - .:/mtv
