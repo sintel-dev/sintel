@@ -47,12 +47,12 @@ RUN npm install --quiet -g gulp-cli
 
 # copy our application code
 ADD . /mtv
-WORKDIR /mtv
-
 
 # install application packages for python and node
-RUN make install-theme
-RUN make install-develop
+RUN cd /mtv && make install-theme
+RUN cd /mtv && make install-develop
+
+WORKDIR /mtv
 
 
 # Set system environment variables if any
