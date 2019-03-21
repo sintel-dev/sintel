@@ -6,7 +6,7 @@ services:
     ports:
       - "27018:27017"
     # command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/mtv.log
-    command: bash -c "mongod --port 27017 --dbpath /db/data --logpath /db/log/docker.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
+    command: bash -c "mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
     volumes:
       - ./db-instance/data:/mtv/db-instance/data
       - ./db-instance/log:/mtv/db-instance/log
