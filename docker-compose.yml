@@ -19,5 +19,5 @@ services:
     ports:
       - "3000:3000"
     command: /usr/local/bin/mtv run --env production
-    volumes:
-      - .:/mtv
+    # volumes:
+    #   - .:/mtv
