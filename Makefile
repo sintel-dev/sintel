@@ -177,3 +177,14 @@ clean-client: ## remove build artifacts under ./client
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
+
+
+# ---------------------- session: clean ----------------------- #
+.PHONY: init-db
+init-db:
+	mkdir -p db-instance
+	mkdir -p db-instance/data
+	mkdir -p db-instance/log
+	mkdir -p db-instance/dump
+	# curl -o theme.zip "http://dongyu.name/themes/AdminLTE-2.4.2.zip"
+

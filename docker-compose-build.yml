@@ -5,14 +5,14 @@ services:
     container_name: db
     ports:
       - "27018:27017"
-    # command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork
-    command: bash -c "mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
+    command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork
+    # command: bash -c "mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
     volumes:
       - ./db-instance/data:/mtv/db-instance/data
       - ./db-instance/log:/mtv/db-instance/log
       - ./db-instance/dump:/mtv/db-instance/dump
   web:
-    image: dyuliu/mtv_dai_web
+    build: .
     container_name: mtv
     depends_on:
       - db

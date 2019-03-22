@@ -38,6 +38,7 @@ logs/
 
 # Data
 client/public/data/
+db-instance/
 mtv/data/raw
 
 # PyInstaller

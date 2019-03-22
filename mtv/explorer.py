@@ -69,14 +69,14 @@ class MTVExplorer:
                                 'yellow'))
 
             LOGGER.info(colored('Available on:', 'yellow')
-                        + '  http://127.0.0.1:' + colored(port, 'green'))
+                        + '  http://0.0.0.0:' + colored(port, 'green'))
 
             if env == 'development':
                 debug = import_object('werkzeug.debug.DebuggedApplication')
-                server = WSGIServer(('127.0.0.1', port), debug(app))
+                server = WSGIServer(('0.0.0.0', port), debug(app))
 
             elif env == 'production':
-                server = WSGIServer(('127.0.0.1', port), app, log=None)
+                server = WSGIServer(('0.0.0.0', port), app, log=None)
 
             server.serve_forever()
 
