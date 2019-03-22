@@ -9,7 +9,7 @@
     "build:dev": "gulp build:dev",
     "build:prod": "gulp build:prod",
     "clean": "rm -rf node_modules/ public/libs/ public/dist/ coverage/ .nyc_output/ package-lock.json",
-    "postinstall": "gulp build:dev",
+    "postinstall": "gulp build:prod",
     "reinstall": "npm cache clean && npm run clean && npm install",
     "sort": "sort-package-json",
     "start": "gulp",

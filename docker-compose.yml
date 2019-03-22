@@ -12,7 +12,8 @@ services:
       - ./db-instance/log:/mtv/db-instance/log
       - ./db-instance/dump:/mtv/db-instance/dump
   web:
-    image: dyuliu/mtv_dai_web
+    # image: dyuliu/mtv_dai_web
+    build: .
     container_name: mtv
     depends_on:
       - db
