@@ -33,7 +33,7 @@ help:
 
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
-	pip install .
+	pip install -e .
 	cd client && npm install
 
 .PHONY: install-develop
@@ -132,7 +132,7 @@ publish: dist ## package and upload a release
 
 .PHONY: clean
 clean: clean-build clean-pyc clean-test clean-coverage \
-	   clean-logs clean-docs clean-client ## remove all build, test, coverage, docs and Python artifacts
+	   clean-logs clean-docs clean-client
 
 .PHONY: clean-build
 clean-build: ## remove build artifacts
@@ -172,3 +172,8 @@ clean-docs: ## remove previously built docs
 .PHONY: clean-client
 clean-client: ## remove build artifacts under ./client
 	npm -C client run clean
+
+.PHONY: clean-db
+clean-db:
+	rm -f -r ./db-instance/data/*
+	rm -f -r ./db-instance/log/*
