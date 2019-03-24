@@ -4,21 +4,22 @@ services:
     image: mongo:4.0
     container_name: db
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     # command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork
-    command: bash -c "mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
+    # command: bash -c "mongod --bind_ip_all --port 27017 --logpath /mtv/log/db.log --fork && tail -F xx"
+    command: bash -c "mongod --bind_ip_all --port 27017 --logpath /mtv/log/db.log --fork && mongorestore --db mtv /mtv/dump/mtv/ && tail -F anything"
     volumes:
-      - ./db-instance/data:/mtv/db-instance/data
-      - ./db-instance/log:/mtv/db-instance/log
-      - ./db-instance/dump:/mtv/db-instance/dump
+      - ./db-instance/data:/mtv/data
+      - ./db-instance/log:/mtv/log
+      - ./db-instance/dump:/mtv/dump
   web:
-    # image: dyuliu/mtv_dai_web
-    build: .
+    image: dyuliu/mtv
+    # build: .
     container_name: mtv
     depends_on:
       - db
     ports:
       - "3000:3000"
-    command: mtv run --env production -v
+    command: mtv run --env development -v
     # volumes:
     #   - .:/mtv

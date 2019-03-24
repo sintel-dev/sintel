@@ -1,6 +1,6 @@
 # MongoDB params
 #===================================
-host: 'localhost' # the host name of `mongod` instance to connect to
+host: 'db' # the host name of `mongod` instance to connect to
 port: 27017    # the port that `mongod` instance is running on
 db: 'mtv'    # the name of the database to use
 username:  # username to authenticate with
