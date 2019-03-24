@@ -1,6 +1,7 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
+import * as d3 from 'd3';
 import { Dataset, Datarun, Pipeline } from '../services/rest-server.interface';
 
 class Sidebar {
@@ -20,15 +21,23 @@ class Sidebar {
 
         pip.sidebar.on('dataset', (dataset_: Dataset) => {
             console.log('dataset', dataset_);
-            dataset_.insert_time = dataset_.insert_time.substring(0, 19);
-            self.dataset(dataset_);
+            let datasetCopy = _.cloneDeep(dataset_);
+
+            let dt = new Date(+datasetCopy.start_time * 1000);
+            datasetCopy.start_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` +
+            `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+
+            dt = new Date(+datasetCopy.stop_time * 1000);
+            datasetCopy.stop_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` +
+            `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+
+            self.dataset(datasetCopy);
         });
 
         pip.sidebar.on('datarun', (datarun_: Datarun) => {
-            console.log('datarun', datarun_);
-            datarun_.insert_time = datarun_.insert_time.substring(0, 19);
-            datarun_.start_time = datarun_.insert_time.substring(0, 19);
-            datarun_.end_time = datarun_.insert_time.substring(0, 19);
+            // datarun_.insert_time = datarun_.insert_time.substring(0, 19);
+            // datarun_.start_time = datarun_.insert_time.substring(0, 19);
+            // datarun_.end_time = datarun_.insert_time.substring(0, 19);
             self.datarun(datarun_);
         });
 

@@ -4,7 +4,7 @@ services:
     image: mongo:4.0
     container_name: db
     ports:
-      - "27018:27017"
+      - "27017:27017"
     # command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork
     command: bash -c "mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork && mongorestore --db mtv /mtv/db-instance/dump/mtv/"
     volumes:

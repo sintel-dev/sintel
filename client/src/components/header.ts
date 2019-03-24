@@ -6,11 +6,11 @@ import { Dataset, Datarun } from '../services/rest-server.interface';
 
 class Header {
 
-    public datasets = ko.observableArray([]);
-    public dataruns = ko.observableArray([]);
+    public datasets = ko.observableArray<Dataset>([]);
+    public dataruns = ko.observableArray<Datarun>([]);
     public selected = {
-        dataset: ko.observable({name: '', index: 0, html: ''}),
-        datarun: ko.observable({name: '', id: '', index: 0, html: ''})
+        dataset: ko.observable({index: 0, name: ''}),
+        datarun: ko.observable({index: 0, id: ''})
     };
     public activeDatasets = ko.observable(new Set());
     public activeDataruns = ko.observable(new Set());
@@ -22,7 +22,7 @@ class Header {
         // initialize Knockout Variables
         ko.applyBindings(self, $(eleId)[0]);
 
-        server.datasets.read().done((datasets_: string[]) => {
+        server.datasets.read().done((datasets_: Dataset[]) => {
             self.datasets(datasets_);
         });
     }
@@ -41,12 +41,21 @@ class Header {
         let self = this;
         const oldName = self.selected.dataset().name;
         if (oldName !== dataset_.name) {
-            let html = `<a href="#" class="text">${dataset_.name}</a>`;
-            self.selected.dataset({name: dataset_.name, index, html});
+            self.selected.dataset({index, name: dataset_.name});
 
             server.datasets.dataruns.read(dataset_.name).done(
                 (dataruns_: Datarun[]) => {
+                    // update dararuns' html
+                    _.each(dataruns_, d => {
+                        d.start_time = _.replace(d.start_time.substring(0, 19), 'T', ' ');
+                        d.html = `
+                            <span>▪ &nbsp; ${d.id} </span> <br>
+                            <span>&nbsp; &nbsp; created on ${d.start_time}</span>
+                        `;
+                    });                  
+
                     self.dataruns(dataruns_);
+
                     // auto select the first one
                     self.onSelectDatarun(dataruns_[0], 0);
                 }
@@ -62,20 +71,11 @@ class Header {
         let oid = self.selected.datarun().id;
 
         if (!self.activeDataruns().has(datarun_.id)) {
-            let createdTime = datarun_.insert_time;
-            createdTime = _.replace(createdTime, 'T', ' ');
-            createdTime = createdTime.substring(0, 19);   // 2019-03-17 13:12:25
-            let html = `<a href="#" class="text">${createdTime}</a>`;
-            self.selected.datarun({
-                name: createdTime,
-                id: datarun_.id,
-                index,
-                html
-            });
+            self.selected.datarun({index, id: datarun_.id});
 
             pip.content.trigger('datarun:select', {
                 dataset: self.selected.dataset().name,
-                datarun: self.selected.datarun()
+                datarun: datarun_
             });
 
             pip.sidebar.trigger('datarun', datarun_);
@@ -88,12 +88,13 @@ class Header {
 
     public onLoadAllDataruns() {
         let self = this;
-        if (self.selected.dataset().name !== '') {
-            pip.content.trigger('datarun:loadAll', {
-                dataset: self.selected.dataset().name,
-                dataruns: self.dataruns()
-            });
-        }
+        console.log('loadall');
+        // if (self.selected.dataset().name !== '') {
+        //     pip.content.trigger('datarun:loadAll', {
+        //         dataset: self.selected.dataset().name,
+        //         dataruns: self.dataruns()
+        //     });
+        // }
     }
 }
 

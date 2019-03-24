@@ -7,6 +7,7 @@ import { LineChart } from './vis/line-chart';
 import { AreaChart } from './vis/area-chart';
 import { HorizonChart } from './vis/horizon-chart';
 import { Data as RadialAreaChartData, RadialAreaChart } from './vis/radial-area-chart';
+import { Datarun } from '../services/rest-server.interface';
 
 class Content {
 
@@ -68,7 +69,7 @@ class Content {
         }, self.config.speed);
     }
 
-    private async addChart(msg: {dataset: string, datarun: any}) {
+    private async addChart(msg: {dataset: string, datarun: Datarun}) {
         let self = this;
         // let name = `${msg.dataset} : ${msg.datarun.name.split('.')[0]} (${msg.datarun.id})`; // datarun id is unique
         let title = msg.dataset;
@@ -77,7 +78,11 @@ class Content {
         }
         let name = [
             msg.datarun.id,
-            title + ': ' + msg.datarun.name
+            `<label>Dataset: </label> ${msg.dataset}
+             <label>Datarun: </label> ${msg.datarun.id}
+             <label>created on </label> ${msg.datarun.start_time}
+            `
+            // title + ': ' + msg.datarun.start_time
         ];
         let boxs = self.boxs();
 

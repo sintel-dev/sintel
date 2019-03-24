@@ -19,6 +19,7 @@ export interface Datarun {
     created_by: string;
     events: number;
     pipeline: string;
+    html?: string;
 }
 
 export interface Pipeline {

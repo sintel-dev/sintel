@@ -45,11 +45,12 @@ class DataProcessor {
             server.datasets.dataruns.read(dataset, datarun)
                 .done((data, textStatus) => {
                     if (textStatus === 'success') {
-                        console.log(data);
+                        console.log('data', data);
                         const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
                         const windows = self._toEventWindows(
                             data.events,
-                            _.map(timeseries, d => d[0])
+                            _.map(timeseries, d => d[0]),
+                            (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
                         );
                         resolve({
                             timeseries,
@@ -136,18 +137,18 @@ class DataProcessor {
         // init
     }
 
-    private _toTimeSeriesData(data, attr) {
+    private _toTimeSeriesData(data, attr): TimeSeriesData {
         const valueIdx = data.names.indexOf(attr);
         return _.map(data.data, d => [
-            parseInt(d[0]) * 1000,    // timestamp
+            parseInt(d[0]) * 1000,
             d[valueIdx]
-        ]);
+        ] as [number, number]);
     }
 
-    private _toEventWindows(data, timestamps) {
+    private _toEventWindows(data, timestamps, offset=0) {
         return _.map(data, d => [
-            timestamps.indexOf(parseInt(d.start_time) * 1000),
-            timestamps.indexOf(parseInt(d.stop_time) * 1000),
+            timestamps.indexOf(parseInt(d.start_time) * 1000 + offset),
+            timestamps.indexOf(parseInt(d.stop_time) * 1000 + offset),
             d.score,
             d.id
         ]);
