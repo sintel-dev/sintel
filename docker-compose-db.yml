@@ -1,0 +1,10 @@
+version: "3"
+services:
+  db:
+    image: mongo:4.0
+    container_name: db
+    command: bash -c "mongod --bind_ip_all --port 27017 --logpath /mtv/log/db.log --fork && mongorestore --db mtv /mtv/dump/mtv/"
+    volumes:
+      - ./db-instance/data:/mtv/data
+      - ./db-instance/log:/mtv/log
+      - ./db-instance/dump:/mtv/dump

@@ -20,7 +20,6 @@ class Sidebar {
         let self = this;
 
         pip.sidebar.on('dataset', (dataset_: Dataset) => {
-            console.log('dataset', dataset_);
             let datasetCopy = _.cloneDeep(dataset_);
 
             let dt = new Date(+datasetCopy.start_time * 1000);
@@ -52,7 +51,6 @@ class Sidebar {
             // pipeline_.mlpipeline.primitives = JSON.stringify(pipeline_.mlpipeline.primitives);
             pipeline_.mlpipeline.init_params = JSON.stringify(pipeline_.mlpipeline.init_params);
             pipeline_.mlpipeline.output_names = JSON.stringify(pipeline_.mlpipeline.output_names);
-            console.log('pipeline', pipeline_);
             self.pipeline(pipeline_ as any);
         });
     }

@@ -36,10 +36,19 @@ export interface Pipeline {
 export interface Event {
     insert_time?: string;
     dataset?: string;
+    offset?: number;
     datarun: string;
     start_time: number;
     stop_time: number;
     score: number;
+    id: string;
+}
+
+export interface Comment {
+    insert_time?: string;
+    created_by?: string;
+    text: string;
+    event: string;
     id: string;
 }
 
@@ -90,21 +99,23 @@ interface Verb {
 
 /***************** add your interface here******************/
 
-interface Datasets extends Resource {
-    // sub-resources
-    dataruns: Resource;
+// interface Datasets extends Resource {
+//     // sub-resources
+//     dataruns: Resource;
 
-    // verbs
-    // foo: Verb;
-}
+//     // verbs
+//     // foo: Verb;
+// }
 
 export interface Server {
     add: AddResource;
     // resource list
-    datasets: Datasets;
+    datasets: Resource;
+    dataruns: Resource;
     pipelines: Resource;
     events: Resource;
     comments: Resource;
+    data: Resource;
 }
 
 

@@ -11,7 +11,8 @@ LOGGER = logging.getLogger(__name__)
 
 class Event(Resource):
     """ Shows a single event item and lets you delete or update a event item"""
-    def get(event):
+
+    def get(self, event):
         """  GET /api/v1/events/<string:event>/ """
         document = model.Event.find_one(id=ObjectId(event))
 
@@ -22,8 +23,8 @@ class Event(Resource):
                 'id': str(document.id),
                 })
 
-    def put(event):
-        """  GET /api/v1/events/<string:event>/ """
+    def put(self, event):
+        """  PUT /api/v1/events/<string:event>/ """
         document = model.Event.find_one(id=ObjectId(event))
 
         body = request.json
@@ -42,14 +43,51 @@ class Event(Resource):
         document.save()
         return event
 
-    def delete(event_id):
-        pass
+    def delete(self, event):
+        """  DEL /api/v1/events/<string:event>/ """
+        document = model.Event.find_one(id=ObjectId(event))
+
+        if (document is None):
+            LOGGER.exception('Error deleting %s. The event is not existed!',
+                             event)
+
+        document.delete()
+        return 'delete success'
 
 
-class EventList(Resource):
-    """ Shows a list of events and lets you add a new event item"""
+class Events(Resource):
+    def get(self):
+        """ Return event list of a given datarun. If the datarun is not
+            specified, return all events.
 
-    def post():
+        GET /api/v1/events/?datarun=xxx
+        """
+
+        datarun = request.args.get('datarun', None)
+
+        if (datarun is not None):
+            # Return event list of a given datarun
+            query = {
+                'datarun': ObjectId(datarun)
+            }
+
+        else:
+            # return all
+            query = {}
+
+        documents = model.Event.find(**query).order_by('+start_time')
+        events = list()
+        for document in documents:
+            events.append({
+                'start_time': document.start_time,
+                'stop_time': document.stop_time,
+                'score': document.score,
+                'id': str(document.id),
+            })
+
+        return events
+
+    def post(self):
         body = request.json
         e = {
             "start_time": body.get('start_time', None),
@@ -58,8 +96,8 @@ class EventList(Resource):
             "datarun": body.get('datarun', None)
         }
 
-        if (e['start_time'] is None or e['stop_time'] is None
-                or e['score'] is None or e['datarun'] is None):
+        if (e['start_time'] is None or e['stop_time'] is None or
+                e['score'] is None or e['datarun'] is None):
             LOGGER.exception('incorrect event information creating new event')
             raise ValueError
 

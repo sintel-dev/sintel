@@ -7,7 +7,7 @@ let jqueryExt = $ as JQueryStaticExt;
 let server: Server = new jqueryExt.RestClient(
     'http://127.0.0.1:3000/api/v1/',
     {
-        cache: 120,                 // This will cache requests for 5 seconds
+        cache: 1,                 // This will cache requests for 5 seconds
         cachableMethods: ['GET'],
         stringifyData: true         // true for "Content-Type = application/json"
     }
@@ -17,13 +17,15 @@ let server: Server = new jqueryExt.RestClient(
 // step2: add your resources
 server.add('datasets');
 
+server.add('dataruns');
+
 server.add('pipelines');
 
 server.add('events');
 
 server.add('comments');
 
-server.datasets.add('dataruns');
+server.add('data');
 
 /**
  * usage:

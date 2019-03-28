@@ -43,7 +43,7 @@ class Header {
         if (oldName !== dataset_.name) {
             self.selected.dataset({index, name: dataset_.name});
 
-            server.datasets.dataruns.read(dataset_.name).done(
+            server.dataruns.read({}, {dataset: dataset_.name}).done(
                 (dataruns_: Datarun[]) => {
                     // update dararuns' html
                     _.each(dataruns_, d => {
@@ -52,7 +52,7 @@ class Header {
                             <span>▪ &nbsp; ${d.id} </span> <br>
                             <span>&nbsp; &nbsp; created on ${d.start_time}</span>
                         `;
-                    });                  
+                    });
 
                     self.dataruns(dataruns_);
 

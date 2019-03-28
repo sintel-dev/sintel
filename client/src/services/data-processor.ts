@@ -36,16 +36,15 @@ class DataProcessor {
      *
      * @param {string} [dataset] Dataset name.
      * @param {string} [datarun] Datarun id.
-     * @returns {Dict} {raw: [], prediction: [], events: []}.
+     * @returns {Dict} {raw: [], prediction: [], windows: [], offset}.
      */
     public async loadData(dataset: string, datarun: string) {
         let self = this;
 
         return new Promise((resolve, reject) => {
-            server.datasets.dataruns.read(dataset, datarun)
+            server.data.read({}, {dataset, datarun})
                 .done((data, textStatus) => {
                     if (textStatus === 'success') {
-                        console.log('data', data);
                         const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
                         const windows = self._toEventWindows(
                             data.events,
@@ -55,7 +54,8 @@ class DataProcessor {
                         resolve({
                             timeseries,
                             period: self._toPeriodData(data.raw),
-                            windows
+                            windows,
+                            offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
                         });
                     } else {
                         reject(textStatus);
@@ -63,6 +63,17 @@ class DataProcessor {
                 });
         });
     }
+
+    /* tslint:disable */
+    public async loadEventData(datarun: string, timestamps, offset=0) {
+        let self = this;
+
+        let data = await server.events.read({}, {datarun: datarun});
+
+        return self._toEventWindows(data, timestamps, offset)
+    }
+    /* tslint:enable */
+
 
     public normalizeTimeSeries(data: TimeSeriesData): TimeSeriesData {
         // if (data[0][0] instanceof Array) {  // cd.TimeSeriesData[]
@@ -145,7 +156,7 @@ class DataProcessor {
         ] as [number, number]);
     }
 
-    private _toEventWindows(data, timestamps, offset=0) {
+    private _toEventWindows(data, timestamps, offset= 0) {
         return _.map(data, d => [
             timestamps.indexOf(parseInt(d.start_time) * 1000 + offset),
             timestamps.indexOf(parseInt(d.stop_time) * 1000 + offset),

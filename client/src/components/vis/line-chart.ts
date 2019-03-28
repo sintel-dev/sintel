@@ -2,9 +2,10 @@ import * as _ from 'lodash';
 import * as d3 from 'd3';
 import * as pip from '../../services/pip-client';
 import { TimeSeriesData } from './chart-data.interface';
+import dataProcessor from '../../services/data-processor';
 import { Smooth } from '../../services/algorithms';
 import { colorSchemes } from '../../services/globals';
-
+import { Event } from '../../services/rest-server.interface';
 
 
 export interface LineChartOption {
@@ -26,7 +27,8 @@ export interface LineChartOption {
     tooltip?: boolean;
     smooth?: boolean;
     context?: boolean;
-    windows?: Array<[number, number, number, number]>;  // start_time, stop_time, score, event_id
+    windows?: Array<[number, number, number, string]>;  // start_time, stop_time, score, event_id
+    offset?: number;
 }
 
 export class LineChart extends pip.Events {
@@ -47,8 +49,9 @@ export class LineChart extends pip.Events {
         // functions
         tooltip: false,
         smooth: false,
+        windows: null,
         context: true,
-        windows: null
+        offset: 0
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -157,22 +160,7 @@ export class LineChart extends pip.Events {
             .attr('class', 'axis axis--y')
             .call(yAxis.tickFormat(d3.format('.6')));
 
-        let { brush, enableBrush, disableBrush } = self.addBrush(focus, w, h, x);
-        disableBrush();
-
-        let { zoom, enableZoom, disableZoom } = self.addZoom(w, h);
-        zoom.on('zoom', zoomed);
-        enableZoom();
-
-        let { hLines, hBackground, hBars, hText } = self.addHighlights(h, x, line);
-
-        let smoothedLine = self.addSmoothedLine(x, y, line);
-
         // define context chart
-        let brushContext = d3.brushX()
-            .extent([[0, 0], [w, h2]])
-            .on('brush end', brushed);
-
         let line2 = d3.line<[number, number]>()
             .x(d => x2(d[0]))
             .y(d => y2(d[1]));
@@ -182,42 +170,35 @@ export class LineChart extends pip.Events {
             .attr('transform', `translate(${self.option.margin2.left},${self.option.margin2.top + self.option.height})`);
 
         // highlight windows in context chart
-        if (self.option.context) {
-            context.append('path')
-                .datum(self.data)
-                .attr('class', 'line')
-                .attr('d', line2);
+        context.append('path')
+            .datum(self.data)
+            .attr('class', 'line')
+            .attr('d', line2);
 
-            context.append('g')
-                .attr('class', 'axis axis--x')
-                .attr('transform', `translate(0, ${h2})`)
-                .call(xAxis2);
+        context.append('g')
+            .attr('class', 'axis axis--x')
+            .attr('transform', `translate(0, ${h2})`)
+            .call(xAxis2);
 
-            context.append('g')
-                .attr('class', 'brush')
-                .call(brushContext)
-                .call(brushContext.move, x.range());
+        let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
+        disableBrush();
 
-            // plot anomalies in contextWindows
-            if (self.option.windows !== null) {
-                let contextWindows;
+        let { zoom, enableZoom, disableZoom } = self.addZoom(w, h);
+        zoom.on('zoom', focusZoomed);
+        enableZoom();
 
-                contextWindows = self.svg.selectAll('.context-windows')
-                    .data(self.option.windows)
-                    .enter()
-                    .append('g')
-                    .attr('class', 'context-windows')
-                    .attr('transform', `translate(${self.option.margin2.left},${self.option.margin2.top + self.option.height})`);
+        let hUpdate = self.addHighlights(h, x, line, line2);
 
-                contextWindows.append('path')
-                    .datum(d => {
-                        let part = _.slice(self.data, d[0], d[1]);
-                        return part;
-                    })
-                    .attr('class', 'line-highlight')
-                    .attr('d', line2);
-            }
-        }
+        let smoothedLine = self.addSmoothedLine(x, y, line);
+
+        let brushContext = d3.brushX()
+            .extent([[0, 0], [w, h2]])
+            .on('brush end', contextBrushed);
+
+        context.append('g')
+            .attr('class', 'brush')
+            .call(brushContext)
+            .call(brushContext.move, x.range());
 
         self.on('comment', () => {
             disableZoom();
@@ -229,51 +210,74 @@ export class LineChart extends pip.Events {
             disableBrush();
         });
 
-        function updateFocusWindows() {
-            hLines.attr('d', line);
+        self.on('highlight:update', async () => {
+            let data = await dataProcessor.loadEventData(
+                self.datarun,
+                _.map(self.data, d => d[0]),
+                self.option.offset
+            );
+            enableZoom();
+            disableBrush();
+            self.option.windows = data as Array<[number, number, number, string]>;
+            hUpdate(data);
+        });
 
-            hBars
-                .attr('x', d => x(self.data[d[0]][0]))
-                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10));
+        self.on('highlight:modify', (event: Event) => {
+            const idx = _.findIndex(self.option.windows, d => d[3] === event.id);
+            const x0 = x(self.data[self.option.windows[idx][0]][0]);
+            const x1 = x(self.data[self.option.windows[idx][1]][0]);
+            disableZoom();
+            makeWindowEditable(x0, x1, event);
+        });
 
-            hBackground
-                .attr('x', d => x(self.data[d[0]][0]))
-                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10));
-
-            hText
-                .attr('x', d => x(self.data[d[0]][0]))
-                .text(d => {
-                    const tw = Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 5);
-                    if (tw > 20) {
-                        return d3.format('.4f')(d[2]);
-                    } else {
-                        return '';
-                    }
-                });
-        }
-
-        function zoomed() {
+        function focusZoomed() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return; } // ignore zoom-by-brush
+
             let t = d3.event.transform;
+
             x.domain(t.rescaleX(x2).domain());
+
+            // update normal line
             focusLine.attr('d', line);
+
+            // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }
-            if (self.option.windows !== null && self.option.windows.length > 0) { updateFocusWindows(); }
+
+            // update highlighted windows
+            if (self.option.windows !== null && self.option.windows.length > 0) { hUpdate(self.option.windows); }
+
+            // update x axis
             focusAxis.select('.axis--x').call(xAxis);
-            context.select('.brush').call(brushContext.move, x.range().map(t.invertX, t));
+
+            context.select('.brush').call(
+                brushContext.move,
+                x.range().map(t.invertX, t)
+            );
         }
 
-        function brushed() {
+        function contextBrushed() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
+
+            // compute new x domain for focus chart
             let s = d3.event.selection || x2.range();
             x.domain([x2.invert(s[0]), x2.invert(s[1])]);
+
+            // update normal line
             focusLine.attr('d', line);
+
+            // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }
-            if (self.option.windows !== null && self.option.windows.length > 0) { hLines.attr('d', line); }
+
+            // update highlighted windows
+            if (self.option.windows !== null && self.option.windows.length > 0) { hUpdate(self.option.windows); }
+
+            // update x axis
             focusAxis.select('.axis--x').call(xAxis);
-            self.svg.select('.zoom').call(zoom.transform, d3.zoomIdentity
-                .scale(w / (s[1] - s[0]))
-                .translate(-s[0], 0));
+
+            self.svg.select('.zoom').call(
+                zoom.transform,
+                d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
+            );
         }
     }
 
@@ -281,6 +285,7 @@ export class LineChart extends pip.Events {
         let self = this;
         // add brush
         let s;
+        let modifiedEvent: Event = null;
 
         let brush = d3.brushX()
             .extent([[0, 0], [w, h]])
@@ -313,14 +318,28 @@ export class LineChart extends pip.Events {
                 i += 1;
             }
 
-            pip.modal.trigger('comment:new', {
-                id: 'new',
-                score: 0,
-                start_time: self.data[startIdx][0],
-                stop_time: self.data[stopIdx][0],
-                datarun: self.datarun,
-                dataset: self.dataset
-            });
+            if (_.isNull(modifiedEvent)) {
+                pip.modal.trigger('comment:new', {
+                    id: 'new',
+                    score: 0,
+                    start_time: self.data[startIdx][0],
+                    stop_time: self.data[stopIdx][0],
+                    datarun: self.datarun,
+                    dataset: self.dataset,
+                    offset: self.option.offset
+                });
+            } else {
+                pip.modal.trigger('comment:start', {
+                    id: modifiedEvent.id,
+                    score: modifiedEvent.score,
+                    start_time: self.data[startIdx][0],
+                    stop_time: self.data[stopIdx][0],
+                    datarun: self.datarun,
+                    dataset: self.dataset,
+                    offset: self.option.offset
+                });
+                modifiedEvent = null;
+            }
         });
 
         let enableBrush = () => {
@@ -337,7 +356,15 @@ export class LineChart extends pip.Events {
             brushG.on('.brush', null);
         };
 
-        return { brush, enableBrush, disableBrush };
+        let makeWindowEditable = (x0, x1, event: Event) => {
+            modifiedEvent = event;
+            brushG.select('.overlay').attr('width', w);
+            brushG
+                .call(brush)
+                .call(brush.move, [x0, x1]);
+        };
+
+        return { brush, enableBrush, disableBrush, makeWindowEditable };
 
         function clickcancel() {
             // we want to a distinguish single/double click
@@ -402,12 +429,11 @@ export class LineChart extends pip.Events {
             .extent([[0, 0], [w, h]]);
 
         let zoomRect;
-        zoomRect = self.svg.append('g')
+        zoomRect = self.svg.append('rect')
             .attr('class', 'zoom')
-            .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-            .append('rect')
             .attr('width', w)
             .attr('height', h)
+            .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
             .call(zoom);
 
         let enableZoom = () => {
@@ -423,11 +449,11 @@ export class LineChart extends pip.Events {
         return { zoom, enableZoom, disableZoom };
     }
 
-    private addHighlights(h, x, line) {
+    private addHighlights(h, x, line, line2) {
         let self = this;
-        let g, hLines, hBackground, hBars, hText;
 
         let scoreColor = (v: number) => {
+            if (v === 0) { return '#777'; }
             let level = 0;
             for (let i = 1; i <= 4; i += 1) {
                 if (v > i) { level += 1; }
@@ -435,76 +461,137 @@ export class LineChart extends pip.Events {
             return colorSchemes.severity5[level];
         };
 
-        // plot anomalies in focusWindows
-        if (self.option.windows !== null) {
+        function update(windows) {
+            let u = self.svg
+                .selectAll<SVGAElement, [number, number, number, number]>('.focus-windows')
+                .data(windows, o => o[3]);
 
-            g = self.svg.selectAll('.focus-windows')
-                .data(self.option.windows)
-                .enter()
-                .append('g')
+            u.enter().append('g')
                 .attr('class', 'focus-windows')
                 .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-                .attr('clip-path', 'url(#clip)');
+                .attr('clip-path', 'url(#clip)')
+                .each(function (d, i) {
+                    let g = d3.select(this);
 
-            hLines = g.append('path')
-                .datum(d => _.slice(self.data, d[0], d[1] + 1))
-                .attr('class', 'line-highlight')
-                .attr('d', d => {
-                    let path_ = line(d);
-                    return path_;
+                    let hLine = g.append('path')
+                        .attr('class', 'line-highlight')
+                        .attr('d', line(_.slice(self.data, d[0], d[1] + 1)));
+
+                    // highlight with background
+                    let hBackground = g.append('rect')
+                        .attr('class', 'bg-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .attr('y', 0)
+                        .attr('width', Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10))
+                        .attr('height', h)
+                        .on('click', () => {
+                            pip.modal.trigger('comment:start', {
+                                id: d[3],
+                                score: d[2],
+                                start_time: self.data[d[0]][0],
+                                stop_time: self.data[d[1]][0],
+                                datarun: self.datarun,
+                                dataset: self.dataset,
+                                offset: self.option.offset
+                            });
+                        });
+
+                    hBackground.append('title')
+                        .text(`score: ${d[2]}` + '\n' +
+                            'from ' + new Date(self.data[d[0]][0]).toUTCString() + '\n' +
+                            'to ' + new Date(self.data[d[1]][0]).toUTCString()
+                        );
+
+                    // highlight with bars
+                    let hBar = g.append('rect')
+                        .attr('class', 'bar-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .attr('y', 0)
+                        .attr('width', Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 5))
+                        .attr('height', 14)
+                        .attr('fill', scoreColor(d[2]))
+                        .on('click', () => {
+                            pip.modal.trigger('comment:start', {
+                                id: d[3],
+                                score: d[2],
+                                start_time: self.data[d[0]][0],
+                                stop_time: self.data[d[1]][0],
+                                datarun: self.datarun,
+                                dataset: self.dataset,
+                                offset: self.option.offset
+                            });
+                        });
+
+                    hBar.append('title')
+                        .text(`score: ${d[2]}` + '\n' +
+                            'from ' + new Date(self.data[d[0]][0]).toUTCString() + '\n' +
+                            'to ' + new Date(self.data[d[1]][0]).toUTCString()
+                        );
+
+                    let hText = g.append('text')
+                        .attr('class', 'text-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .attr('y', 10)
+                        .text('');
+                })
+                .merge(u)
+                .each(function (d, i) {
+                    let g = d3.select(this);
+
+                    g.select('.line-highlight')
+                        .attr('d', line(_.slice(self.data, d[0], d[1] + 1)));
+
+                    g.select('.bar-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .attr('width', Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10))
+                        .attr('fill', scoreColor(d[2]));
+
+                    g.select('.bg-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .attr('width', Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10));
+
+                    g.select('.text-highlight')
+                        .attr('x', x(self.data[d[0]][0]))
+                        .text(() => {
+                            const tw = Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 5);
+                            if (tw > 20) {
+                                return d3.format('.4f')(d[2]);
+                            } else {
+                                return '';
+                            }
+                        });
                 });
 
-            // highlight with background
-            hBackground = g.append('rect')
-                .attr('class', 'bg-highlight')
-                .attr('x', d => x(self.data[d[0]][0]))
-                .attr('y', 0)
-                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 10))
-                .attr('height', h)
-                .on('click', d => {
-                    pip.modal.trigger('comment:start', d[3]);
+            u.exit().remove();
+
+            let uc;
+
+            uc = self.svg
+                .selectAll<SVGAElement, [number, number, number, number]>('.context-windows')
+                .data(windows, o => o[3]);
+
+            uc.enter().append('g')
+                .attr('class', 'context-windows')
+                .attr('transform', `translate(${self.option.margin2.left},${self.option.margin2.top + self.option.height})`)
+                .each(function(d, i) {
+                    d3.select(this).append('path')
+                        .attr('class', 'line-highlight');
+                })
+                .merge(uc)
+                .each(function(d, i) {
+                    d3.select(this).select('.line-highlight')
+                        .attr('d', line2(_.slice(self.data, d[0], d[1])));
                 });
 
-            hBackground.append('title')
-                .text(d => {
-                    return `score: ${d[2]}` + '\n' +
-                        'from ' + new Date(self.data[d[0]][0]).toUTCString() + '\n' +
-                        'to ' + new Date(self.data[d[1]][0]).toUTCString();
-                });
-
-            // highlight with bars
-            hBars = g.append('rect')
-                .attr('class', 'bar-highlight')
-                .attr('x', d => x(self.data[d[0]][0]))
-                .attr('y', 0)
-                .attr('width', d => Math.max(x(self.data[d[1]][0]) - x(self.data[d[0]][0]), 5))
-                .attr('height', 14)
-                .attr('fill', d => scoreColor(d[2]))
-                .on('click', d => {
-                    pip.modal.trigger('comment:start', {
-                        id: d[3],
-                        score: d[2],
-                        start_time: self.data[d[0]][0],
-                        stop_time: self.data[d[1]][0],
-                        datarun: self.datarun,
-                        dataset: self.dataset
-                    });
-                });
-
-            hBars.append('title')
-                .text(d => {
-                    return `score: ${d[2]}` + '\n' +
-                        'from ' + new Date(self.data[d[0]][0]).toUTCString() + '\n' +
-                        'to ' + new Date(self.data[d[1]][0]).toUTCString();
-                });
-
-            // score texts
-            hText = g.append('text')
-                .attr('x', d => x(self.data[d[0]][0]))
-                .attr('y', 10)
-                .text('');
+            uc.exit().remove();
         }
-        return { hLines, hBackground, hBars, hText };
+
+        // plot anomalies in focusWindows
+        if (self.option.windows !== null) {
+            update(self.option.windows);
+        }
+
+        return update;
     }
 
     private addSmoothedLine(x, y, line) {

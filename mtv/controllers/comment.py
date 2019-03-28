@@ -13,45 +13,72 @@ class Comment(Resource):
     """ Shows a single comment item and lets you delete or
         update a comment item
     """
-    def get(comment):
+
+    def get(self, comment):
         pass
 
-    def put(comment):
+    def put(self, comment):
+        """PUT /api/v1/comments/<comment:string>/"""
         body = request.json
         event = body.get('event', None)
         text = body.get('text', None)
-        created_by = body.get('created_by', None)
+        created_by = body.get('created_by', 'default')
 
-        if (event is None or text is None or created_by is None):
-            LOGGER.exception('incorrect event information updating an event')
+        if (event is None or text is None):
+            LOGGER.exception('Error updating the comment. '
+                             'Incomplete information')
             raise ValueError
 
-        document = model.Event.find_one(id=ObjectId(event))
+        document = model.Comment.find_one(id=ObjectId(comment))
         document.text = text
         document.created_by = created_by
 
         document.save()
-        return document.id
+        return str(document.id)
 
     def delete(comment):
         pass
 
 
-class CommentList(Resource):
-    """ Shows a list of comments and lets you add a new comment item"""
-    def get():
-        pass
+class Comments(Resource):
+    def get(self):
+        """GET /api/v1/comments/event?=xxx"""
+        event = request.args.get('event', None)
 
-    def post():
+        if (event is None):
+            LOGGER.exception('Error getting comments. Event is not specified!')
+
+        query = {
+            "event": ObjectId(event)
+        }
+
+        document = model.Comment.find_one(**query)
+
+        if (document is None):
+            return {
+                "id": 'new'
+            }
+
+        return {
+            "id": str(document.id),
+            "event": event,
+            "text": document.text,
+            "created_by": document.created_by
+        }
+
+    def post(self):
+        """ Create a comment.
+
+        POST /api/v1/events/
+        """
         body = request.json
         e = {
             "event": body.get('event', None),
-            "text": body.get('stop_time', None),
-            "created_by": body.get('created_by', None)
+            "text": body.get('text', None),
+            "created_by": body.get('created_by', 'default')
         }
 
-        if (e['event'] is None or e['text']
-                is None or e['created_by'] is None):
+        if (e['event'] is None or e['text'] is None):
             LOGGER.exception(
                 'incorrect event information creating new comment')
             raise ValueError

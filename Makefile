@@ -34,12 +34,12 @@ help:
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
 	pip install -e .
-	cd client && npm install
+	cd client && npm install -g gulp && npm install
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	cd client && npm install
+	cd client && npm install -g gulp && npm install
 
 .PHONY: install-theme
 install-theme:

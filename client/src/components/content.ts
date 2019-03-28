@@ -42,6 +42,13 @@ class Content {
         //     }
         //     $('#load-all-dataruns').html(copy);
         // });
+        pip.content.on('linechart:highlight:update', name => {
+            self.lineCharts[name].trigger('highlight:update');
+        });
+
+        pip.content.on('linechart:highlight:modify', msg => {
+            self.lineCharts[msg.datarun].trigger('highlight:modify', msg.event);
+        });
     }
 
 
@@ -116,7 +123,8 @@ class Content {
                 width: ele.parentElement.getBoundingClientRect().width,
                 width2: ele.parentElement.getBoundingClientRect().width,
                 // smooth: true,
-                windows: data.windows
+                windows: data.windows,
+                offset: data.offset
             });
 
             // // add area chart

@@ -1,6 +1,6 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
-import { Event } from '../services/rest-server.interface';
+import { Event, Comment } from '../services/rest-server.interface';
 import server from '../services/rest-server';
 
 
@@ -15,6 +15,8 @@ class Modal {
     public transcript = ko.observable('');
     public comment = '';
 
+    private eventInfo: Event;
+    private commentInfo: Comment;
     private modalEle: any;
     private SpeechRecognition: any;
 
@@ -28,57 +30,39 @@ class Modal {
 
         pip.modal.on('comment:start', (eventInfo: Event) => {
             update(eventInfo);
-            self.modalEle.modal('show');
         });
 
         pip.modal.on('comment:new', (eventInfo: Event) => {
             update(eventInfo);
-            self.modalEle.modal('show');
         });
 
-        function checkLevelFromScore(score: number): string {
-            let level: number | string = 0;
-            for (let i = 0; i <= 4; i += 1) {
-                if (score > i) { level += 1; }
+        async function update(eventInfo: Event) {
+            if (eventInfo.id === 'new') {
+                $('#comment').val('');
+            } else {
+                self.commentInfo = await<any> server.comments.read({}, {
+                    event: eventInfo.id
+                });
+                $('#comment').val(self.commentInfo.text);
             }
-            if (level === 0) { level = 'None'; }
-            $('input[name="level"]').removeAttr('check');
-            $('input[name="level"]').removeClass('active');
-            $(`input[name="level"][value="${level}"]`).attr('check');
-            $(`input[name="level"][value="${level}"]`).addClass('active');
 
-            return String(level);
-        }
+            self.eventInfo = eventInfo;
 
-        function update(eventInfo: Event) {
             self.event(eventInfo.id);
             self.datarun(eventInfo.datarun);
             self.dataset(eventInfo.dataset);
             self.eventFrom(new Date(eventInfo.start_time).toUTCString());
             self.eventTo(new Date(eventInfo.stop_time).toUTCString());
-            self.level(checkLevelFromScore(eventInfo.score));
+            self.level(self.fromLevelToScore(eventInfo.score));
 
-            // save event to server
-            if (eventInfo.id === 'new') {
-                server.events.create().done(eid => {
-                    console.log('create');
-                    server.comments.create();
-                });
-            } else {
-                server.events.update().done(eid => {
-                    console.log('update');
-                    server.comments.create();
-                });
-            }
-
-            // save comment to server
+            self.modalEle.modal('show');
         }
     }
 
     public record() {
         let self = this;
 
-        if ('SpeechRecognition' in window) {
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
             console.log('speech recognition API supported');
         } else {
             console.log('speech recognition API not supported');
@@ -86,9 +70,12 @@ class Modal {
 
         let recognition: SpeechRecognition = new self.SpeechRecognition();
         recognition.interimResults = true;
-        recognition.continuous = true;
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
 
         let oriComment = $('#comment').val();
+        self.transcript('');
+
         recognition.onresult = (event) => {
             const speechToText = event.results[0][0].transcript;
             self.transcript(speechToText);
@@ -96,14 +83,73 @@ class Modal {
         };
 
         recognition.onend = () => {
+            recognition.stop();
             self.transcript('');
         };
 
         recognition.start();
     }
 
+    public remove() {
+        let self = this;
+        server.events.del(self.event()).done(() => {
+            self.modalEle.modal('hide');
+            pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+        });
+    }
+
+    public modify() {
+        let self = this;
+        pip.content.trigger('linechart:highlight:modify', {
+            datarun: self.eventInfo.datarun,
+            event: self.eventInfo
+        });
+        self.modalEle.modal('hide');
+    }
+
     public save() {
-        console.log('save');
+        let self = this;
+
+        if (self.event() === 'new') {
+            // create new
+            server.events.create({
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                self.modalEle.modal('hide');
+                pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                server.comments.create({
+                    event: self.eventInfo.id,
+                    text: $('#comment').val()
+                });
+            });
+        } else {
+            // update existing
+            server.events.update(self.event(), {
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                self.modalEle.modal('hide');
+                pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                if (self.commentInfo.id === 'new') {
+                    server.comments.create({
+                        event: self.eventInfo.id,
+                        text: $('#comment').val()
+                    });
+                } else {
+                    server.comments.update(self.commentInfo.id, {
+                        event: self.eventInfo.id,
+                        text: $('#comment').val()
+                    });
+                }
+            });
+        }
     }
 
     constructor(eleId: string) {
@@ -117,6 +163,28 @@ class Modal {
 
         let window_ = window as any;
         self.SpeechRecognition = window_.webkitSpeechRecognition || window_.SpeechRecognition;
+    }
+
+    private fromLevelToScore(score: number): string {
+        let level: number | string = 0;
+        for (let i = 0; i <= 4; i += 1) {
+            if (score > i) { level += 1; }
+        }
+        if (level === 0) { level = 'None'; }
+        $('input[name="level"]').removeAttr('check');
+        $('input[name="level"]').removeClass('active');
+        $(`input[name="level"][value="${level}"]`).attr('check');
+        $(`input[name="level"][value="${level}"]`).addClass('active');
+
+        return String(level);
+    }
+
+    private fromScoreToLevel(level: string): number {
+        if (level === 'None') {
+            return 0;
+        } else {
+            return +level;
+        }
     }
 }
 
