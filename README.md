@@ -28,9 +28,15 @@ Before you begin we recommend you read about the basic building blocks that asse
 
 Make sure you have installed all of the following prerequisites on your development machine:
 
-- Git - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. If you encounter any problems, you can also use this [GitHub Gist](https://gist.github.com/isaacs/579814) to install Node.js.
-- MongoDB - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
+- **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
+
+- **Node.js (>= 10.0.0)** - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. Make sure to install gulp-cli globally after the installation of Node.js.
+
+  ```
+  $ npm install --quiet -g gulp-cli
+  ```
+
+- **MongoDB** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
 
 
 
@@ -55,7 +61,7 @@ Another way to use the MTV is to download a zip copy from the [master branch on 
 ```bash
 $ wget https://github.com/HDI-Project/MTV/archive/master.zip -O mtv.zip
 $ unzip mtv.zip
-$ rm meanjs.zip
+$ rm mtv.zip
 ```
 
 Don't forget to rename **mtv-master** after your project name.
@@ -134,15 +140,27 @@ to be added
 
 - Install [Compose](https://docs.docker.com/compose/install/)
 
-- Production deployment with Compose
+- Initialize MongoDB folders
 
   ```
-  $ curl mtv.image
-  $ curl db.image
-  $ docker-compose -f docker-compose-production.yml up -d
+  $ make init-db
   ```
 
-- asd
+- Dump MongoDB data (format please refer to [Orion](https://github.com/D3-AI/Orion) Database Introduction) to the folder `db-instance/dump/`
+
+- Restore data to the docker image "mongo:4.0"
+
+  ```
+  $ make restore-db
+  ```
+
+- Running up the application
+
+  ```
+  $ docker-compose up -d
+  ```
+
+
 
 
 
@@ -166,17 +184,13 @@ to be added
   mongo			4.0			30f826ce11fb        2 days ago		408MB
   ```
 
-- Initialize mongodb folders
+- Initialize MongoDB folders
 
   ```
   $ make init-db
-  mkdir -p db-instance
-  mkdir -p db-instance/data
-  mkdir -p db-instance/log
-  mkdir -p db-instance/dump
   ```
 
-- Download mongodb data from a safe server and unzip to the folder `db-instance/dump/`
+- Download MongoDB data from a safe server and unzip to the folder `db-instance/dump/`
 
 - Restore data
 
