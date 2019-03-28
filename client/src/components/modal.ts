@@ -122,7 +122,7 @@ class Modal {
                 pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
                 server.comments.create({
-                    event: self.eventInfo.id,
+                    event: eid,
                     text: $('#comment').val()
                 });
             });
@@ -139,12 +139,12 @@ class Modal {
 
                 if (self.commentInfo.id === 'new') {
                     server.comments.create({
-                        event: self.eventInfo.id,
+                        event: eid,
                         text: $('#comment').val()
                     });
                 } else {
                     server.comments.update(self.commentInfo.id, {
-                        event: self.eventInfo.id,
+                        event: eid,
                         text: $('#comment').val()
                     });
                 }

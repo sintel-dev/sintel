@@ -29,6 +29,8 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
+
+
 # ----------------------- session: install ----------------------- #
 
 .PHONY: install
@@ -47,6 +49,16 @@ install-theme:
 	unzip theme.zip -d "./client/public/themes/"
 	rm -f theme.zip
 
+.PHONY: init-db
+init-db:
+	mkdir -p db-instance
+	mkdir -p db-instance/data
+	mkdir -p db-instance/log
+	mkdir -p db-instance/dump
+
+.PHONY: restore-db
+restore-db:
+	docker-compose -f docker-compose-db.yml up
 
 # ----------------------- session: test ----------------------- #
 
@@ -177,14 +189,3 @@ clean-client: ## remove build artifacts under ./client
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
-
-
-# ---------------------- session: clean ----------------------- #
-.PHONY: init-db
-init-db:
-	mkdir -p db-instance
-	mkdir -p db-instance/data
-	mkdir -p db-instance/log
-	mkdir -p db-instance/dump
-	# curl -o theme.zip "http://dongyu.name/themes/AdminLTE-2.4.2.zip"
-

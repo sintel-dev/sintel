@@ -50572,7 +50572,7 @@ var Modal = (function () {
                 self.modalEle.modal('hide');
                 pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
                 rest_server_1.default.comments.create({
-                    event: self.eventInfo.id,
+                    event: eid,
                     text: $('#comment').val()
                 });
             });
@@ -50588,13 +50588,13 @@ var Modal = (function () {
                 pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
                 if (self.commentInfo.id === 'new') {
                     rest_server_1.default.comments.create({
-                        event: self.eventInfo.id,
+                        event: eid,
                         text: $('#comment').val()
                     });
                 }
                 else {
                     rest_server_1.default.comments.update(self.commentInfo.id, {
-                        event: self.eventInfo.id,
+                        event: eid,
                         text: $('#comment').val()
                     });
                 }
