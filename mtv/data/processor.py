@@ -41,13 +41,15 @@ def transform_to_db_docs(pid, data, interval=30):
     year_start = 9999
     year_end = 0
 
-    for d in data:
+    for (di, d) in enumerate(data):
         # nd -> the date of current item
         # od -> the date of previous item
         nd = datetime.utcfromtimestamp(d[0])
 
-        year_start = nd.year if (nd.year < year_start) else year_start
-        year_end = nd.year if (nd.year > year_end) else year_end
+        # not the last one
+        if not (di + 1) == len(data):
+            year_start = nd.year if (nd.year < year_start) else year_start
+            year_end = nd.year if (nd.year > year_end) else year_end
 
         # when a new day comes
         if ((od is None) or not (nd.year == od.year and nd.month == od.month
@@ -125,17 +127,21 @@ def add_raw(conn_config, col, data_folder_path):
 
     files = get_files(data_folder_path)
 
+    cc = 0
     for file in files:
         file_path = os.path.join(data_folder_path, file)
-        print('processing', file)
+        cc += 1
+        print('{}/{}: processing {}'.format(cc, len(files), file))
 
         with open(file_path, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             data = list()
             time0 = time.time()
             for (i, v) in enumerate(csv_reader):
-                data.append([float(v[2]), float(v[3])])
-
+                ts = float(v[2])
+                # only add items in the range 2010.1.1 to 2017.12.31
+                if (ts >= 1262304000 and ts <= 1514764799):
+                    data.append([float(v[2]), float(v[3])])
             time1 = time.time()
             print('reading over', time1 - time0)
             data.sort(key=(lambda x: x[0]))
