@@ -580,7 +580,7 @@ export class LineChart extends pip.Events {
                 .merge(uc)
                 .each(function(d, i) {
                     d3.select(this).select('.line-highlight')
-                        .attr('d', line2(_.slice(self.data, d[0], d[1])));
+                        .attr('d', line2(_.slice(self.data, d[0], d[1] + 1)));
                 });
 
             uc.exit().remove();
