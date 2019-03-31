@@ -9,7 +9,26 @@ def _run(explorer, args):
 
 
 def _add_rawdata(explorer, args):
-    explorer.add_rawdata(args.col, args.path)
+    explorer.add_rawdata(
+        args.path,
+        args.col,
+        args.start,
+        args.stop,
+        args.timestamp_column,
+        args.value_column,
+        args.header,
+        args.interval
+    )
+
+def _add_datasets(explorer, args):
+    explorer.add_datasets(
+        args.path,
+        args.start,
+        args.stop,
+        args.timestamp_column,
+        args.value_column,
+        args.header
+    )
 
 
 def get_parser():
@@ -45,12 +64,36 @@ def get_parser():
 
     # mtv add rawdata
     add_rawdata = add_model.add_parser('rawdata', parents=[common],
-                                       help='Add raw data to the database')
+                                       help='Add raw data')
     add_rawdata.set_defaults(function=_add_rawdata)
 
-    add_rawdata.add_argument('--col', default='raw', help='Collection name')
-    add_rawdata.add_argument('--path', required=True,
-                             help='Path to the folder storing the raw data')
+    add_rawdata.add_argument('-T', '--timestamp-column', type=int, default=0,
+                             help='Position of the timestamp column in the CSV')
+    add_rawdata.add_argument('-V', '--value-column', type=int, default=1,
+                             help='Position of the value column in the CSV')
+    add_rawdata.add_argument('-I', '--interval', type=int, default=30,
+                             help='Interval (minute) used for data aggregation.')
+    add_rawdata.add_argument('-H', '--header', action='store_true',
+                             help='Whether having header in the CSV')
+    add_rawdata.add_argument('--start', type=int, help='Start time, as an integer unix timestamp')
+    add_rawdata.add_argument('--stop', type=int, help='Stop time, as an integer unix timestamp')
+    add_rawdata.add_argument('--col', type=str, default='raw', help='Collection name')
+    add_rawdata.add_argument('path', nargs='?', help='Path to the csv data directory')
+
+    # mtv add datasets
+    add_datasets = add_model.add_parser('datasets', parents=[common],
+                                       help='Add raw data')
+    add_datasets.set_defaults(function=_add_datasets)
+
+    add_datasets.add_argument('-T', '--timestamp-column', type=int, default=0,
+                             help='Position of the timestamp column in the CSV')
+    add_datasets.add_argument('-V', '--value-column', type=int, default=1,
+                             help='Position of the value column in the CSV')
+    add_datasets.add_argument('-H', '--header', action='store_true',
+                             help='Whether having header in the CSV')
+    add_datasets.add_argument('--start', type=int, help='Start time, as an integer unix timestamp')
+    add_datasets.add_argument('--stop', type=int, help='Stop time, as an integer unix timestamp')
+    add_datasets.add_argument('path', nargs='?', help='Path to the csv data directory')
 
     return parser
 

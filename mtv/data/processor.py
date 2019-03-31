@@ -23,8 +23,28 @@ LOGGER = logging.getLogger(__name__)
 # print("Date =", timestamp2.second)
 # print(datetime(2018, 9, 12))
 
+def load_csv(file_path, start, stop, time_column, value_column, header):
+    data = list()
 
-def transform_to_db_docs(pid, data, interval=30):
+    with open(file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        time0 = time.time()
+
+        if (header):
+            next(csv_reader, None)  # skip the header
+
+        for (i, v) in enumerate(csv_reader):
+            ts = float(v[time_column])
+            # only add items from "start" to "stop" time
+            if (start and ts < start):
+                continue
+            if (stop and ts > stop):
+                continue
+            data.append([float(v[time_column]), float(v[value_column])])
+
+    return data
+
+def to_mongo_raw(name, data, interval=30):
     odocs = []
     od = None
     data.append([datetime.now().timestamp(), 0])
@@ -66,7 +86,7 @@ def transform_to_db_docs(pid, data, interval=30):
 
                 now = datetime(od.year, od.month, od.day, tzinfo=timezone.utc)
                 odocs.append({
-                    'name': pid,
+                    'name': name,
                     'timestamp': now.timestamp(),
                     'date': now.isoformat(),
                     'bins': bins,
@@ -91,7 +111,7 @@ def transform_to_db_docs(pid, data, interval=30):
         dt = datetime(y, 1, 1, tzinfo=timezone.utc)
 
         docs.append({
-            'dataset': pid,
+            'dataset': name,
             'timestamp': dt.timestamp(),
             'year': dt.year,
             'data': [None for i in range(12)]
@@ -115,101 +135,3 @@ def transform_to_db_docs(pid, data, interval=30):
         docs[idx]['data'][dt.month - 1][dt.day - 1]['counts'] = doc['counts']
 
     return docs
-
-
-def add_raw(conn_config, col, data_folder_path):
-    conn = MongoDB(**conn_config)
-
-    if not os.path.exists(data_folder_path):
-        LOGGER.exception('Data folder path "{}" does not exist'
-                         .format(data_folder_path))
-        raise
-
-    files = get_files(data_folder_path)
-
-    cc = 0
-    for file in files:
-        file_path = os.path.join(data_folder_path, file)
-        cc += 1
-        print('{}/{}: processing {}'.format(cc, len(files), file))
-
-        with open(file_path, 'r') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            data = list()
-            time0 = time.time()
-            for (i, v) in enumerate(csv_reader):
-                ts = float(v[2])
-                # only add items in the range 2010.1.1 to 2017.12.31
-                if (ts >= 1262304000 and ts <= 1514764799):
-                    data.append([float(v[2]), float(v[3])])
-            time1 = time.time()
-            print('reading over', time1 - time0)
-            data.sort(key=(lambda x: x[0]))
-            time2 = time.time()
-            print('sorting over', time2 - time1)
-
-            docs = transform_to_db_docs(file[0:-4], data)
-
-            if docs:
-                conn.writeCollection(docs, col)
-
-    conn.createIndex(col, [('dataset', '+')], unique=False)
-    conn.createIndex(col, [('dataset', '+'), ('year', '+')])
-
-    # # NASA MSL
-    # ori_folder_path = './raw-data/nasa/MSL/'
-
-    # pids = get_files(ori_folder_path)
-
-    # for pid in pids:
-    #     path = os.path.join(ori_folder_path, pid)
-    #     print(pid)
-    #     with open(path, 'r') as csv_file:
-    #         csv_reader = csv.reader(csv_file, delimiter=',')
-    #         old_time = None
-    #         data = []
-    #         time0 = time.time()
-    #         next(csv_reader, None)  # skip the headers
-    #         for (i, v) in enumerate(csv_reader):
-    #             data.append([float(v[0]), float(v[1])])
-
-    #         time1 = time.time()
-    #         print('reading over', time1 - time0)
-    #         data.sort(key=(lambda x: x[0]))
-    #         time2 = time.time()
-    #         print('sorting over', time2 - time1)
-
-    #         docs = transform_to_db_docs(pid[0:-4], data)
-
-    #         if (docs is not None):
-    #             conn.writeCollection(docs, 'raw')
-
-    # # NASA SMAP
-    # ori_folder_path = './raw-data/nasa/SMAP/'
-
-    # pids = get_files(ori_folder_path)
-
-    # for pid in pids:
-    #     path = os.path.join(ori_folder_path, pid)
-    #     print(pid)
-    #     with open(path, 'r') as csv_file:
-    #         csv_reader = csv.reader(csv_file, delimiter=',')
-    #         old_time = None
-    #         data = []
-    #         time0 = time.time()
-    #         next(csv_reader, None)  # skip the headers
-    #         for (i, v) in enumerate(csv_reader):
-    #             data.append([float(v[0]), float(v[1])])
-
-    #         time1 = time.time()
-    #         print('reading over', time1 - time0)
-    #         data.sort(key=(lambda x: x[0]))
-    #         time2 = time.time()
-    #         print('sorting over', time2 - time1)
-
-    #         docs = transform_to_db_docs(pid[0:-4], data)
-
-    #         if (docs is not None):
-    #             conn.writeCollection(docs, 'raw')
-
-    # conn.createIndex('raw')

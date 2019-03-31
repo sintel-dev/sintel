@@ -1,19 +1,21 @@
 import logging
 import os
 import sys
+import numpy as np
 
+from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
 from gevent.wsgi import WSGIServer
 from mongoengine import connect
 from termcolor import colored
 
-from mtv.data.processor import add_raw
+from mtv.data.db import MongoDB
+from mtv.data.processor import load_csv, to_mongo_raw
 from mtv.routes import add_routes
-from mtv.utils import import_object
+from mtv.utils import import_object, get_files
 
 LOGGER = logging.getLogger(__name__)
-
 
 class MTVExplorer:
 
@@ -68,8 +70,8 @@ class MTVExplorer:
             LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
                                 'yellow'))
 
-            LOGGER.info(colored('Available on:', 'yellow')
-                        + '  http://0.0.0.0:' + colored(port, 'green'))
+            LOGGER.info(colored('Available on:', 'yellow') +
+                        '  http://0.0.0.0:' + colored(port, 'green'))
 
             if env == 'development':
                 debug = import_object('werkzeug.debug.DebuggedApplication')
@@ -87,9 +89,75 @@ class MTVExplorer:
         elif env == 'production':
             http_server()
 
-    def add_rawdata(self, col, data_folder_path):
-        add_raw({
-            'address': self._cf['host'],
-            'port': self._cf['port'],
-            'db': self._cf['db']
-        }, col, data_folder_path)
+    def add_datasets(self, path, start, stop, time_column, value_column, header):
+        conn = MongoDB(address=self._cf['host'], port=self._cf['port'],
+                       db=self._cf['db'])
+        
+        if not os.path.exists(path):
+            LOGGER.exception('Data folder path "{}" does not exist'
+                            .format(path))
+            raise
+
+        files = get_files(path)
+        docs = []
+        count = 0
+        for file in files:
+            file_path = os.path.join(path, file)
+            count += 1
+            LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
+
+            data = load_csv(file_path, None, None, time_column,
+                            value_column, header)
+
+            dt = np.array(data)
+            time_min = np.amin(dt, axis=0)[0]
+            time_max = np.amax(dt, axis=0)[0]
+
+            docs.append({
+                'insert_time': datetime.utcnow(),
+                'name': file[0:-4],
+                'signal_set': file[0:-4],
+                'start_time': int(start if start else time_min),
+                'stop_time': int(stop if stop else time_max),
+                'data_location': os.path.abspath(file_path),
+                'timestamp_column': time_column,
+                'value_column': value_column,
+                'created_by': 'dy'
+            })
+        
+        conn.writeCollection(docs, 'dataset')
+
+
+    def add_rawdata(self, path, col, start, stop, time_column,
+                    value_column, header, interval):
+        LOGGER.debug("time_column: {}, value_columne: {}, header: {}"
+                     .format(time_column, value_column, header))
+
+        conn = MongoDB(address=self._cf['host'], port=self._cf['port'],
+                       db=self._cf['db'])
+
+        if not os.path.exists(path):
+            LOGGER.exception('Data folder path "{}" does not exist'
+                            .format(path))
+            raise
+
+        files = get_files(path)
+
+        count = 0
+        for file in files:
+            file_path = os.path.join(path, file)
+            count += 1
+            LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
+
+            data = load_csv(file_path, start, stop, time_column,
+                            value_column, header)
+            LOGGER.info('Loading over')
+
+            docs = to_mongo_raw(file[0:-4], data)
+            LOGGER.info('Transforming over')
+
+            if docs:
+                conn.writeCollection(docs, col)
+
+        conn.createIndex(col, [('dataset', '+')], unique=False)
+        conn.createIndex(col, [('dataset', '+'), ('year', '+')])

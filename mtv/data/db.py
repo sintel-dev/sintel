@@ -1,15 +1,17 @@
+import logging
 from pprint import pprint
 
 from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.errors import BulkWriteError
 
+LOGGER = logging.getLogger(__name__)
 
 class MongoDB:
 
     def __init__(self, address='localhost', port=27017, db='mtv'):
         client = MongoClient(address, port)
         self.db = client[db]
-        print('connect to {} on {}:{}'.format(db, address, port))
+        LOGGER.info('connect to {} on {}:{}'.format(db, address, port))
 
     def read(self, col):
         docs = []
