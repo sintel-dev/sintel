@@ -152,9 +152,7 @@ to be added
 
 ## Production deploy with Docker
 
-- Install [Docker](https://docs.docker.com/install/)
-
-- Install [Compose](https://docs.docker.com/compose/install/)
+- Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 
 - Initialize MongoDB folders
 
@@ -162,7 +160,7 @@ to be added
   $ make init-db
   ```
 
-- Restore data to the docker image "mongo:4.0" (here takes NASA data as example)
+- Restore data to the docker image "mongo:4.0" (here takes NASA data as example). 
 
   ```bash
   $ curl -o nasa.zip "http://dongyu.name/data/mtv_nasa_dump.zip"
@@ -171,10 +169,24 @@ to be added
   $ docker-compose -f docker-compose-db.yml up
   ```
 
-- Running up the application
+  If you want to use your personal data, please unzip your data dumped from MongoDB to the folder `db-instance/dump/mtv/` and use the following command to restore data:
+
+  ```bash
+  $ make init-db
+  ```
+
+- Running up the application. Please check the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is **uncommented** and line 17 (`image: dyuliu/mtv`) is **commented**.
 
   ```bash
   $ docker-compose up -d
+  ```
+
+  Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser to start your exploration.
+
+- Stopping the application
+
+  ```bash
+  $ docker-compose down
   ```
 
 
@@ -195,7 +207,7 @@ to be added
   
   $ docker images
   REPOSITORY		TAG			IMAGE ID			CREATED			SIZE
-  dyuliu/mtv		latest		14dfac7458de		18 hours ago	1.52GB
+  dyuliu/mtv		latest		14dfac7458de		18 hours ago	1.2GB
   mongo			4.0			30f826ce11fb        2 days ago		408MB
   ```
 
@@ -213,10 +225,16 @@ to be added
   $ docker-compose -f docker-compose-db.yml up
   ```
 
-- Running up the application
+- Running up the application. Please check the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is **commented** and line 17 (`image: dyuliu/mtv`) is **uncommented**.
 
   ```bash
   $ docker-compose up -d
   ```
 
+  Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser to start your exploration.
 
+- Stopping the application
+
+  ```bash
+  $ docker-compose down
+  ```
