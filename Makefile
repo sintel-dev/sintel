@@ -58,14 +58,10 @@ init-db:
 
 .PHONY: load-db-nasa
 load-db-nasa:
-	rm -f -r db-instance/dump/nasa/*
-	curl -o nasa.zip "http://dongyu.name/data/mtv_nasa_dump.zip"
-	unzip nasa.zip -d "db-instance/dump/nasa/"
-	mongorestore --db mtv ./db-instance/dump/nasa/
-
-.PHONY: restore-db
-restore-db:
-	docker-compose -f docker-compose-db.yml up
+	rm -f -r db-instance/dump/mtv_nasa/
+	curl -o mtv_nasa.tar.bz2 "http://dongyu.name/data/mtv_nasa.tar.bz2"
+	tar -xvf mtv_nasa.tar.bz2 -C ./db-instance/dump/ && rm mtv_nasa.tar.bz2
+	mongorestore --db mtv ./db-instance/dump/mtv_nasa/
 
 # ----------------------- session: test ----------------------- #
 

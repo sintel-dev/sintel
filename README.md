@@ -163,16 +163,16 @@ to be added
 - Restore data to the docker image "mongo:4.0" (here takes NASA data as example). 
 
   ```bash
-  $ curl -o nasa.zip "http://dongyu.name/data/mtv_nasa_dump.zip"
-  $ rm -f -r db-instance/dump/mtv/*
-  $ unzip nasa.zip -d "db-instance/dump/mtv/"
+  $ curl -o mtv_nasa.tar.bz2 "http://dongyu.name/data/mtv_nasa.tar.bz2"
+  $ tar -xvf mtv_nasa.tar.bz2 -C ./db-instance/dump/ && rm mtv_nasa.tar.bz2
+  $ mv ./db-instance/dump/mtv_nasa ./db-instance/dump/mtv
   $ docker-compose -f docker-compose-db.yml up
   ```
 
   If you want to use your personal data, please unzip your data dumped from MongoDB to the folder `db-instance/dump/mtv/` and use the following command to restore data:
 
   ```bash
-  $ make init-db
+  $ docker-compose -f docker-compose-db.yml up
   ```
 
 - Running up the application. Please check the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is **uncommented** and line 17 (`image: dyuliu/mtv`) is **commented**.
@@ -198,9 +198,6 @@ to be added
 - Download required docker images and then load them by running the following commands
 
   ```bash
-  $ docker image ls
-  REPOSITORY		TAG			IMAGE ID			CREATED			SIZE
-  
   $ docker load --input mtv.tar
   Loaded image: dyuliu/mtv:latest
   Loaded image: mongo:4.0
@@ -217,7 +214,7 @@ to be added
   $ make init-db
   ```
 
-- Download MongoDB data from a safe server and unzip to the folder `db-instance/dump/mtv/`
+- Download MongoDB data from a safe server and save it to the folder `db-instance/dump/mtv/`
 
 - Restore data to the docker image "mongo:4.0"
 
