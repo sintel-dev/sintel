@@ -25,7 +25,7 @@ def date_iterator(date_format, start, end, day_interval=1):
         yield current.strftime(date_format)
         current += timedelta(days=day_interval)
  
-if __name__ == '__main__':
+def main():
     # data = fetch_data({'date': '2018-11-27'})
     # print(data)
     time_format = '%Y-%m-%d'
@@ -41,5 +41,5 @@ if __name__ == '__main__':
         if (cc % 30 == 0):
             print(date)
     
-    with open('raw/env/2016.json', 'w') as outfile:  
+    with open('mtv/data/raw/env/2016.json', 'w') as outfile:  
         json.dump(data, outfile, indent=4)

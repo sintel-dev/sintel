@@ -23,6 +23,7 @@ LOGGER = logging.getLogger(__name__)
 # print("Date =", timestamp2.second)
 # print(datetime(2018, 9, 12))
 
+
 def load_csv(file_path, start, stop, time_column, value_column, header):
     data = list()
 

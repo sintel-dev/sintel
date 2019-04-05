@@ -5,8 +5,10 @@ from mtv.utils import read_config, setup_logging
 
 
 def _run(explorer, args):
-    explorer.run_server(args.env, args.port)
-
+    if args.module is None:
+        explorer.run_server(args.env, args.port)
+    else:
+        explorer.run_module(args.module, args.args)
 
 def _add_rawdata(explorer, args):
     explorer.add_rawdata(
@@ -56,6 +58,10 @@ def get_parser():
 
     run.add_argument('-P', '--port', type=int, help='Flask server port')
     run.add_argument('-E', '--env', type=str, help='Flask environment')
+    run.add_argument('-m', '--module', type=str, help='Run a specific module'
+                     'with main() function')
+    run.add_argument('--args', nargs='*', default=[], type=str,
+                     help='The args to the main()')
 
     # mtv add
     add = action.add_parser('add', help='Add an object to the database')

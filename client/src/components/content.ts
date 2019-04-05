@@ -146,6 +146,7 @@ class Content {
             ele = $(`#${name[0]}-radial-area-year`)[0];
             // let ndata = dataProcessor.normalizeTimeSeries(data.timeseries);
             // let tdata = dataProcessor.transformTimeSeriesToPeriodYear(ndata);
+            console.log(data.period);
             let yearChart = new RadialAreaChart($(`#${name[0]}-radial-area-year`)[0],
                 data.period,
                 {

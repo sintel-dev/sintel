@@ -191,8 +191,8 @@ class DataProcessor {
                 let month = {
                     level: 'month',
                     name: monthNames[mm],
-                    bins: new Array(data[yy].data[mm].length).fill(0),
-                    counts: new Array(data[yy].data[mm].length).fill(0),
+                    bins: [],
+                    counts: [],
                     children: [],
                     parent: year
                 };
@@ -238,6 +238,7 @@ class DataProcessor {
                 }
             }
         }
+
 
         // normalized to [0, 1]
         let nm = d3.scaleLinear()

@@ -89,6 +89,16 @@ class MTVExplorer:
         elif env == 'production':
             http_server()
 
+    def run_module(self, module, args):
+        try:
+            func_object = module + '.main'
+            func = import_object(func_object)
+            func(*args)
+        except Exception as e:
+            LOGGER.exception("Error running the module '{}': {}"
+                             .format(module, str(e)))
+    
+
     def add_datasets(self, path, start, stop, time_column, value_column, header):
         conn = MongoDB(address=self._cf['host'], port=self._cf['port'],
                        db=self._cf['db'])

@@ -185,7 +185,7 @@ to be added
 
 - Download required docker images and then load them by running the following commands
 
-  ```
+  ```bash
   $ docker image ls
   REPOSITORY		TAG			IMAGE ID			CREATED			SIZE
   
@@ -201,7 +201,7 @@ to be added
 
 - Initialize MongoDB folders
 
-  ```
+  ```bash
   $ make init-db
   ```
 
@@ -209,13 +209,13 @@ to be added
 
 - Restore data to the docker image "mongo:4.0"
 
-  ```
+  ```bash
   $ docker-compose -f docker-compose-db.yml up
   ```
 
 - Running up the application
 
-  ```
+  ```bash
   $ docker-compose up -d
   ```
 

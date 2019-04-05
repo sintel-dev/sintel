@@ -24,10 +24,8 @@ def date_iterator(date_format, start, end, day_interval=1):
     while current < end:
         yield current.strftime(date_format)
         current += timedelta(days=day_interval)
- 
-if __name__ == '__main__':
-    # data = fetch_data({'date': '2018-11-27'})
-    # print(data)
+
+def main():
     time_format = '%Y-%m-%d'
     start = '2016-01-01'
     end = '2016-12-31'
@@ -41,9 +39,9 @@ if __name__ == '__main__':
         if (cc % 30 == 0):
             print(date)
     
-    with open('raw/air/2016.json', 'w') as outfile:  
+    with open('mtv/data/raw/air/2016.json', 'w') as outfile:
         json.dump(data, outfile, indent=4)
 
-    with open('raw/air/2016.json') as json_file:
+    with open('mtv/data/raw/air/2016.json') as json_file:
         data = json.load(json_file)
         print(data)
