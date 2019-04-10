@@ -64,6 +64,18 @@ class Content {
         self.lineCharts[name].trigger('uncomment');
     }
 
+    public backward(datarun) {
+        if ($(`#${datarun}-radial-area-year`).hasClass('active')) {
+            return;
+        };
+
+        if ($(`#${datarun}-radial-area-month`).hasClass('active')) {
+            ($(`a[href="#${datarun}-radial-area-year"]`) as any).tab('show');
+        } else if ($(`#${datarun}-radial-area-day`).hasClass('active')) {
+            ($(`a[href="#${datarun}-radial-area-month"]`) as any).tab('show');
+        }
+    }
+
     public onRemoveBox(name) {
         let self = this;
         setTimeout(() => {
@@ -85,11 +97,13 @@ class Content {
         }
         let name = [
             msg.datarun.id,
-            `<label>Dataset: </label> ${msg.dataset}
-             <label>Datarun: </label> ${msg.datarun.id}
-             <label>created on </label> ${msg.datarun.start_time}
+            // `<label>Dataset: </label> ${msg.dataset}
+            //  <label>Datarun: </label> ${msg.datarun.id}
+            //  <label>created on </label> ${msg.datarun.start_time}
+            // `
+            `<span>Dataset: </span> <label> ${msg.dataset} </label>
+             <span>Experiment created on </span> <label> ${msg.datarun.start_time.substring(0, 10)} </label>
             `
-            // title + ': ' + msg.datarun.start_time
         ];
         let boxs = self.boxs();
 
@@ -118,8 +132,8 @@ class Content {
             self.lineCharts[name[0]] = new LineChart(ele,
                 data.timeseries, msg.datarun.id, msg.dataset,
             {
-                height: 280,
-                height2: 120,
+                height: 230,
+                height2: 90,
                 width: ele.parentElement.getBoundingClientRect().width,
                 width2: ele.parentElement.getBoundingClientRect().width,
                 // smooth: true,
@@ -146,7 +160,6 @@ class Content {
             ele = $(`#${name[0]}-radial-area-year`)[0];
             // let ndata = dataProcessor.normalizeTimeSeries(data.timeseries);
             // let tdata = dataProcessor.transformTimeSeriesToPeriodYear(ndata);
-            console.log(data.period);
             let yearChart = new RadialAreaChart($(`#${name[0]}-radial-area-year`)[0],
                 data.period,
                 {
@@ -181,6 +194,7 @@ class Content {
             yearChart.on('select', (o: RadialAreaChartData) => {
                 // switch tag
                 ($(`a[href="#${name[0]}-radial-area-month"]`) as any).tab('show');
+                
                 // change tab title
                 $(`#${name[0]}-radial-area-title`)
                     .text(`Period - Year: ${o.name}`);
@@ -190,7 +204,6 @@ class Content {
 
             monthChart.on('select', (o: RadialAreaChartData) => {
                 // switch tag
-                console.log('month selected', name);
                 ($(`a[href="#${name[0]}-radial-area-day"]`) as any).tab('show');
 
                 // change tab title

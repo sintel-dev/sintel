@@ -23,19 +23,19 @@ class Sidebar {
             let datasetCopy = _.cloneDeep(dataset_);
 
             let dt = new Date(+datasetCopy.start_time * 1000);
-            datasetCopy.start_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` +
-            `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+            datasetCopy.start_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` as any;
+            // `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
 
             dt = new Date(+datasetCopy.stop_time * 1000);
-            datasetCopy.stop_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` +
-            `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+            datasetCopy.stop_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()}` as any;
+            // `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
 
             self.dataset(datasetCopy);
         });
 
         pip.sidebar.on('datarun', (datarun_: Datarun) => {
             // datarun_.insert_time = datarun_.insert_time.substring(0, 19);
-            // datarun_.start_time = datarun_.insert_time.substring(0, 19);
+            datarun_.start_time = datarun_.insert_time.substring(0, 10);
             // datarun_.end_time = datarun_.insert_time.substring(0, 19);
             self.datarun(datarun_);
         });

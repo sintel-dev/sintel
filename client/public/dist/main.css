@@ -789,6 +789,25 @@ body {
   color: #333 !important;
   padding-left: 0;
 }
+.content .tab-btn-group {
+  position: absolute;
+  right: 20px;
+}
+.content .tab-btn-group a,
+.content .tab-btn-group a:hover {
+  background: transparent;
+  border-color: transparent;
+}
+.content .tab-btn-group a > i:hover {
+  color: #999;
+}
+.content .nav-tabs-custom-mtv {
+  box-shadow: none;
+  border-right: 1px solid #f5f5f5;
+}
+.content .signal-period {
+  padding-left: 0;
+}
 
 @font-face {
   font-family: 'Source Sans Pro';

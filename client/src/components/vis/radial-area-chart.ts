@@ -27,7 +27,7 @@ export class RadialAreaChart extends pip.Events {
     private option: Option = {
         height: null,
         width: null,
-        margin: { top: 20, right: 10, bottom: 5, left: 10 },
+        margin: { top: 20, right: 10, bottom: 5, left: 30 },
         padding: 4,
         nCol: null,
         cw: 120,
@@ -171,6 +171,17 @@ export class RadialAreaChart extends pip.Events {
              .text(d => names[d]);
         }
 
+        let label1 = self.svg.append('text')
+            .attr('class', 'radial-text-md')
+            .attr('x', 1)
+            .attr('y', 14)
+            .text('');
+        
+        let label2 = self.svg.append('text')
+            .attr('class', 'radial-text-md')
+            .attr('x', 1)
+            .attr('y', 30)
+            .text('');
 
         function featurePlot(o: Data) {
             let _cell = d3.select(this);
@@ -246,8 +257,14 @@ export class RadialAreaChart extends pip.Events {
 
         self.on('update', (o: Data[]) => {
             // calendar layout if in day level
-            console.log('update', o[0].level);
+            if (o[0].level === 'month') {
+                label1.text(o[0].parent.name);
+            }
+
             if (o[0].level === 'day') {
+                label1.text(o[0].parent.name);
+                label2.text(o[0].parent.parent.name);
+
                 let [m, y] = [o[0].parent.name, o[0].parent.parent.name];
                 let offset = new Date(`${m} 1, ${y} 00:00:00`).getDay();
                 let newHeight = ch * Math.ceil((data.length + offset) / nCol)
