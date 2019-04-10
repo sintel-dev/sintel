@@ -208,13 +208,7 @@ to be added
   mongo			4.0			30f826ce11fb        2 days ago		408MB
   ```
 
-- Initialize MongoDB folders
-
-  ```bash
-  $ make init-db
-  ```
-
-- Download MongoDB data from a safe server and save it to the folder `db-instance/dump/mtv/`
+- Download MTV project and enter the project directory
 
 - Restore data to the docker image "mongo:4.0"
 
