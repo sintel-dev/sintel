@@ -7,6 +7,8 @@
 export interface TimeSeriesData extends Array<[number, number]> { }
 
 
+export interface BarChartData extends Array<[string, number]> { }
+
 export interface PeriodData {
     level: string;       // year, month, or day
     name: string;        // if year: 1991, 1992, ...

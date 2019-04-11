@@ -59,8 +59,6 @@ export class LineChart extends pip.Events {
     constructor(
         ele: HTMLElement,
         private data: TimeSeriesData,
-        private data2: TimeSeriesData,
-        private errors: TimeSeriesData,
         private datarun: string,
         private dataset: string,
         option?: LineChartOption
@@ -69,8 +67,6 @@ export class LineChart extends pip.Events {
         let self = this;
         _.extend(self.option, option);
         self.svgContainer = d3.select<HTMLElement, any>(ele);
-
-        console.log(self.data, self.data2, self.errors);
 
         let w = ele.getBoundingClientRect().width;
         self.option.width = self.option.width === null ? w : self.option.width;
@@ -152,11 +148,6 @@ export class LineChart extends pip.Events {
             .attr('class', 'line')
             .attr('d', line);
 
-        let focusLine2 = focus.append('path')
-            .datum(self.data2)
-            .attr('class', 'line2')
-            .attr('d', line);
-
         let focusAxis = self.svg.append('g')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`);
 
@@ -183,11 +174,6 @@ export class LineChart extends pip.Events {
         context.append('path')
             .datum(self.data)
             .attr('class', 'line')
-            .attr('d', line2);
-        
-        context.append('path')
-            .datum(self.data2)
-            .attr('class', 'line2')
             .attr('d', line2);
 
         context.append('g')
@@ -254,7 +240,6 @@ export class LineChart extends pip.Events {
 
             // update normal line
             focusLine.attr('d', line);
-            focusLine2.attr('d', line);
 
             // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }
@@ -280,7 +265,6 @@ export class LineChart extends pip.Events {
 
             // update normal line
             focusLine.attr('d', line);
-            focusLine2.attr('d', line);
 
             // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }

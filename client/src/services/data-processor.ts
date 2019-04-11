@@ -64,6 +64,34 @@ class DataProcessor {
         });
     }
 
+    public async loadData2(dataset: string, datarun: string) {
+        let self = this;
+
+        return new Promise((resolve, reject) => {
+            server.data.read({}, {dataset, datarun})
+                .done((data, textStatus) => {
+                    if (textStatus === 'success') {
+                        const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
+                        const windows = self._toEventWindows(
+                            data.events,
+                            _.map(timeseries, d => d[0]),
+                            (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
+                        );
+                        resolve({
+                            timeseries,
+                            timeseries2: self._toTimeSeriesData(data.prediction, 'y_raw_hat'),
+                            errors: self._toTimeSeriesData(data.prediction, 'es_raw'),
+                            period: self._toPeriodData(data.raw),
+                            windows,
+                            offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
+                        });
+                    } else {
+                        reject(textStatus);
+                    }
+                });
+        });
+    }
+
     /* tslint:disable */
     public async loadEventData(datarun: string, timestamps, offset=0) {
         let self = this;

@@ -1111,6 +1111,42 @@ body {
 }
 
 
+.summary {
+  min-height: 250px;
+  padding: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.bar-chart .bar {
+  fill: steelblue;
+}
+.bar-chart .bar:hover {
+  fill: brown;
+}
+.bar-chart .axis {
+  font: 10px sans-serif;
+}
+.bar-chart .axis path,
+.bar-chart .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.bar-chart .x.axis path {
+  display: none;
+}
+.bar-chart .y.axis text {
+  font-size: 11px;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+}
+.bar-chart .x.axis text {
+  font-size: 11px;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+}
+
 .horizon-controls {
   position: absolute;
   width: 100%;
@@ -1121,6 +1157,18 @@ body {
   float: right;
 }
 
+.line-chart .text-sm {
+  font-size: 13px;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+}
+.line-chart .text-md {
+  font-size: 16px;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+}
+.line-chart .text-lg {
+  font-size: 20px;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+}
 .line-chart .axis {
   font-size: 14px;
 }
@@ -1129,6 +1177,12 @@ body {
   stroke: #637bb6;
   stroke-width: 1px;
   opacity: 0.7;
+}
+.line-chart .line2 {
+  fill: none;
+  stroke: #b9782d;
+  stroke-width: 1px;
+  opacity: 0.6;
 }
 .line-chart .line-highlight {
   fill: none;

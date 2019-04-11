@@ -83,6 +83,7 @@ class Events(Resource):
                 'stop_time': document.stop_time,
                 'score': document.score,
                 'id': str(document.id),
+                'datarun': document.datarun.dataset.name
             })
 
         return events

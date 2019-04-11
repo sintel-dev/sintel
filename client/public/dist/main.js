@@ -50289,14 +50289,14 @@ var Content = (function () {
                             collapseTrigger: "button[name='" + name[0] + "-collapse']",
                             removeTrigger: "button[name='" + name[0] + "-remove']"
                         });
-                        return [4, data_processor_1.default.loadData(msg.dataset, msg.datarun.id)];
+                        return [4, data_processor_1.default.loadData2(msg.dataset, msg.datarun.id)];
                     case 1:
                         data = _a.sent();
                         ele = void 0;
                         ele = $("#" + name[0] + "-line")[0];
-                        self.lineCharts[name[0]] = new line_chart_1.LineChart(ele, data.timeseries, msg.datarun.id, msg.dataset, {
-                            height: 230,
-                            height2: 90,
+                        self.lineCharts[name[0]] = new line_chart_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
+                            height: 400,
+                            height2: 120,
                             width: ele.parentElement.getBoundingClientRect().width,
                             width2: ele.parentElement.getBoundingClientRect().width,
                             windows: data.windows,
@@ -50773,9 +50773,11 @@ var algorithms_1 = __webpack_require__(/*! ../../services/algorithms */ "./src/s
 var globals_1 = __webpack_require__(/*! ../../services/globals */ "./src/services/globals.ts");
 var LineChart = (function (_super) {
     __extends(LineChart, _super);
-    function LineChart(ele, data, datarun, dataset, option) {
+    function LineChart(ele, data, data2, errors, datarun, dataset, option) {
         var _this = _super.call(this) || this;
         _this.data = data;
+        _this.data2 = data2;
+        _this.errors = errors;
         _this.datarun = datarun;
         _this.dataset = dataset;
         _this.option = {
@@ -50797,6 +50799,7 @@ var LineChart = (function (_super) {
         var self = _this;
         _.extend(self.option, option);
         self.svgContainer = d3.select(ele);
+        console.log(self.data, self.data2, self.errors);
         var w = ele.getBoundingClientRect().width;
         self.option.width = self.option.width === null ? w : self.option.width;
         if (self.option.height === null) {
@@ -50860,6 +50863,10 @@ var LineChart = (function (_super) {
             .datum(self.data)
             .attr('class', 'line')
             .attr('d', line);
+        var focusLine2 = focus.append('path')
+            .datum(self.data2)
+            .attr('class', 'line2')
+            .attr('d', line);
         var focusAxis = self.svg.append('g')
             .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")");
         focusAxis.append('g')
@@ -50868,7 +50875,7 @@ var LineChart = (function (_super) {
             .call(xAxis);
         focusAxis.append('g')
             .attr('class', 'axis axis--y')
-            .call(yAxis.tickFormat(d3.format('.6')));
+            .call(yAxis.ticks(5, ",f"));
         var line2 = d3.line()
             .x(function (d) { return x2(d[0]); })
             .y(function (d) { return y2(d[1]); });
@@ -50878,6 +50885,10 @@ var LineChart = (function (_super) {
         context.append('path')
             .datum(self.data)
             .attr('class', 'line')
+            .attr('d', line2);
+        context.append('path')
+            .datum(self.data2)
+            .attr('class', 'line2')
             .attr('d', line2);
         context.append('g')
             .attr('class', 'axis axis--x')
@@ -50934,6 +50945,7 @@ var LineChart = (function (_super) {
             var t = d3.event.transform;
             x.domain(t.rescaleX(x2).domain());
             focusLine.attr('d', line);
+            focusLine2.attr('d', line);
             if (self.option.smooth) {
                 smoothedLine.attr('d', line);
             }
@@ -50950,6 +50962,7 @@ var LineChart = (function (_super) {
             var s = d3.event.selection || x2.range();
             x.domain([x2.invert(s[0]), x2.invert(s[1])]);
             focusLine.attr('d', line);
+            focusLine2.attr('d', line);
             if (self.option.smooth) {
                 smoothedLine.attr('d', line);
             }
@@ -51736,6 +51749,34 @@ var DataProcessor = (function () {
                                 var windows = self._toEventWindows(data.events, _.map(timeseries, function (d) { return d[0]; }), (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset);
                                 resolve({
                                     timeseries: timeseries,
+                                    period: self._toPeriodData(data.raw),
+                                    windows: windows,
+                                    offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
+                                });
+                            }
+                            else {
+                                reject(textStatus);
+                            }
+                        });
+                    })];
+            });
+        });
+    };
+    DataProcessor.prototype.loadData2 = function (dataset, datarun) {
+        return __awaiter(this, void 0, void 0, function () {
+            var self;
+            return __generator(this, function (_a) {
+                self = this;
+                return [2, new Promise(function (resolve, reject) {
+                        rest_server_1.default.data.read({}, { dataset: dataset, datarun: datarun })
+                            .done(function (data, textStatus) {
+                            if (textStatus === 'success') {
+                                var timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
+                                var windows = self._toEventWindows(data.events, _.map(timeseries, function (d) { return d[0]; }), (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset);
+                                resolve({
+                                    timeseries: timeseries,
+                                    timeseries2: self._toTimeSeriesData(data.prediction, 'y_raw_hat'),
+                                    errors: self._toTimeSeriesData(data.prediction, 'es_raw'),
                                     period: self._toPeriodData(data.raw),
                                     windows: windows,
                                     offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset

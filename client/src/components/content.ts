@@ -8,6 +8,7 @@ import { AreaChart } from './vis/area-chart';
 import { HorizonChart } from './vis/horizon-chart';
 import { Data as RadialAreaChartData, RadialAreaChart } from './vis/radial-area-chart';
 import { Datarun } from '../services/rest-server.interface';
+import { TimeSeriesData } from './vis/chart-data.interface';
 
 class Content {
 
@@ -122,7 +123,8 @@ class Content {
             });
 
             // load data for visualization
-            let data = await dataProcessor.loadData(msg.dataset, msg.datarun.id) as any;
+            // let data = await dataProcessor.loadData(msg.dataset, msg.datarun.id) as any;
+            let data = await dataProcessor.loadData2(msg.dataset, msg.datarun.id) as any;
 
             // declare the element for adding the chart
             let ele;
@@ -130,10 +132,10 @@ class Content {
             // add line chart
             ele = $(`#${name[0]}-line`)[0];
             self.lineCharts[name[0]] = new LineChart(ele,
-                data.timeseries, msg.datarun.id, msg.dataset,
+                data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset,
             {
-                height: 230,
-                height2: 90,
+                height: 400,
+                height2: 120,
                 width: ele.parentElement.getBoundingClientRect().width,
                 width2: ele.parentElement.getBoundingClientRect().width,
                 // smooth: true,
