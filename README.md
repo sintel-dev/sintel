@@ -195,20 +195,15 @@ to be added
 
 - Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 
-- Download required docker images and then load them by running the following commands
+- Download MTV project and **enter the project directory**
+
+- Download required docker images and then load them by running the following commands. **If you have installed MTV docker images before**, please firstly run `make clean-docker`.
 
   ```bash
   $ docker load --input mtv.tar
   Loaded image: dyuliu/mtv:latest
   Loaded image: mongo:4.0
-  
-  $ docker images
-  REPOSITORY		TAG			IMAGE ID			CREATED			SIZE
-  dyuliu/mtv		latest		14dfac7458de		18 hours ago	1.2GB
-  mongo			4.0			30f826ce11fb        2 days ago		408MB
   ```
-
-- Download MTV project and enter the project directory
 
 - Restore data to the docker image "mongo:4.0"
 

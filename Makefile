@@ -192,3 +192,10 @@ clean-client: ## remove build artifacts under ./client
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
+
+.PHONY: clean-docker
+clean-docker:
+	docker-compose down -v
+	docker image remove -f dyuliu/mtv
+	docker image remove -f mongo:4.0
+
