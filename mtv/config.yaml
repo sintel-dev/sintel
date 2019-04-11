@@ -1,7 +1,7 @@
 # MongoDB params
 #===================================
-host: 'localhost' # the host name of `mongod` instance to connect to
-# host: 'db'  # only used for Docker deployment
+# host: 'localhost' # the host name of `mongod` instance to connect to
+host: 'db'  # only used for Docker deployment
 port: 27017    # the port that `mongod` instance is running on
 db: 'mtv'    # the name of the database to use
 username:  # username to authenticate with
