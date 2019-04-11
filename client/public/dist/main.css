@@ -705,6 +705,9 @@ body {
   color: #333 !important;
   padding-left: 0;
 }
+.content .fa-size-lg {
+  font-size: 20px;
+}
 .content .tab-btn-group {
   position: absolute;
   right: 20px;
@@ -1187,7 +1190,7 @@ body {
 .line-chart .line-highlight {
   fill: none;
   stroke: #d1655d;
-  stroke-width: 6px;
+  stroke-width: 4px;
 }
 .line-chart .bar-highlight {
   stroke: #b70e13;

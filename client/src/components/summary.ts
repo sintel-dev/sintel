@@ -57,7 +57,6 @@ class Summary {
         let datasets = _.sortBy(datasets_, d => {
             return +d.name.substring(4);
         });
-        console.log(datasets);
         datasets = _.slice(datasets, 0, 5);
 
         let i = 0;

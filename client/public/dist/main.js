@@ -50228,18 +50228,27 @@ var Content = (function () {
         pip.content.on('datarun:select', self.addChart.bind(self));
         pip.content.on('linechart:highlight:update', function (name) {
             self.lineCharts[name].trigger('highlight:update');
+            self.lineCharts[name + '-no-period'].trigger('highlight:update');
         });
         pip.content.on('linechart:highlight:modify', function (msg) {
             self.lineCharts[msg.datarun].trigger('highlight:modify', msg.event);
+            self.lineCharts[msg.datarun + '-no-period'].trigger('highlight:modify', msg.event);
         });
+    };
+    Content.prototype.flipPrediction = function (name) {
+        var self = this;
+        self.lineCharts[name].trigger('prediction');
+        self.lineCharts[name + '-no-period'].trigger('prediction');
     };
     Content.prototype.comment = function (name) {
         var self = this;
         self.lineCharts[name].trigger('comment');
+        self.lineCharts[name + '-no-period'].trigger('comment');
     };
     Content.prototype.uncomment = function (name) {
         var self = this;
         self.lineCharts[name].trigger('uncomment');
+        self.lineCharts[name + '-no-period'].trigger('uncomment');
     };
     Content.prototype.backward = function (datarun) {
         if ($("#" + datarun + "-radial-area-year").hasClass('active')) {
@@ -50260,9 +50269,23 @@ var Content = (function () {
             var idx = _.findIndex(boxs, function (o) { return o[0] === name; });
             boxs.splice(idx, 1);
             delete self.lineCharts[name];
+            delete self.lineCharts[name + '-no-period'];
             self.boxs(boxs);
             pip.header.trigger('datarun:updateActives', _.map(boxs, function (b) { return b[0]; }));
         }, self.config.speed);
+    };
+    Content.prototype.onCollapse = function (name) {
+        var self = this;
+        console.log('name', name);
+        var btn = $("button[name='" + name + "-collapse']");
+        if (btn.find('.fa-angle-double-left').length > 0) {
+            btn.html("<i class=\"fa fa-angle-double-right fa-size-lg\"></i>");
+            $("a[href=\"#" + name + "-no-period\"]").tab('show');
+        }
+        else {
+            btn.html("<i class=\"fa fa-angle-double-left fa-size-lg\"></i>");
+            $("a[href=\"#" + name + "-period\"]").tab('show');
+        }
     };
     Content.prototype.addChart = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
@@ -50281,42 +50304,48 @@ var Content = (function () {
                         ];
                         boxs = self.boxs();
                         if (!(_.findIndex(boxs, function (o) { return o === name; }) < 0)) return [3, 2];
-                        boxs.unshift(name);
+                        boxs = [name];
                         self.boxs(boxs);
                         pip.header.trigger('datarun:updateActives', _.map(boxs, function (b) { return b[0]; }));
-                        $(".box[name='" + name[0] + "']").boxWidget({
-                            animationSpeed: self.config.speed,
-                            collapseTrigger: "button[name='" + name[0] + "-collapse']",
-                            removeTrigger: "button[name='" + name[0] + "-remove']"
-                        });
                         return [4, data_processor_1.default.loadData2(msg.dataset, msg.datarun.id)];
                     case 1:
                         data = _a.sent();
                         ele = void 0;
+                        ele = $("#" + name[0] + "-line-no-period")[0];
+                        self.lineCharts[name[0] + '-no-period'] = new line_chart_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
+                            height: 600,
+                            height2: 180,
+                            width: $('.wd-12').width(),
+                            width2: $('.wd-12').width(),
+                            windows: data.windows,
+                            offset: data.offset,
+                            clipName: 'clip-no-period'
+                        });
                         ele = $("#" + name[0] + "-line")[0];
                         self.lineCharts[name[0]] = new line_chart_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
-                            height: 400,
-                            height2: 120,
-                            width: ele.parentElement.getBoundingClientRect().width,
-                            width2: ele.parentElement.getBoundingClientRect().width,
+                            height: 600,
+                            height2: 180,
+                            width: $('.wd-8').width(),
+                            width2: $('.wd-8').width(),
                             windows: data.windows,
-                            offset: data.offset
+                            offset: data.offset,
+                            clipName: 'clip-period'
                         });
                         ele = $("#" + name[0] + "-radial-area-year")[0];
                         yearChart = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-year")[0], data.period, {
-                            width: ele.parentElement.getBoundingClientRect().width,
-                            nCol: 4
+                            width: $('.wd-4').width(),
+                            nCol: 3
                         });
                         ele = $("#" + name[0] + "-radial-area-month")[0];
                         fakeMonthData = data_processor_1.default.genRadialAreaChartData(12, 30);
                         monthChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-month")[0], fakeMonthData, {
-                            width: ele.parentElement.getBoundingClientRect().width,
-                            nCol: 4
+                            width: $('.wd-4').width(),
+                            nCol: 3
                         });
                         ele = $("#" + name[0] + "-radial-area-day")[0];
                         fakeDayData = data_processor_1.default.genRadialAreaChartData(30, 24, 'day');
                         dayChart_1 = new radial_area_chart_1.RadialAreaChart($("#" + name[0] + "-radial-area-day")[0], fakeDayData, {
-                            width: ele.parentElement.getBoundingClientRect().width,
+                            width: $('.wd-4').width(),
                             nCol: 7
                         });
                         yearChart.on('select', function (o) {
@@ -50780,6 +50809,7 @@ var LineChart = (function (_super) {
         _this.errors = errors;
         _this.datarun = datarun;
         _this.dataset = dataset;
+        _this.prediction = false;
         _this.option = {
             svgHeight: 300,
             height: null,
@@ -50794,12 +50824,12 @@ var LineChart = (function (_super) {
             smooth: false,
             windows: null,
             context: true,
-            offset: 0
+            offset: 0,
+            clipName: 'clip'
         };
         var self = _this;
         _.extend(self.option, option);
         self.svgContainer = d3.select(ele);
-        console.log(self.data, self.data2, self.errors);
         var w = ele.getBoundingClientRect().width;
         self.option.width = self.option.width === null ? w : self.option.width;
         if (self.option.height === null) {
@@ -50849,7 +50879,7 @@ var LineChart = (function (_super) {
             .x(function (d) { return x(d[0]); })
             .y(function (d) { return y(d[1]); });
         var clip = self.svg.append('defs').append('svg:clipPath')
-            .attr('id', 'clip')
+            .attr('id', self.option.clipName)
             .append('svg:rect')
             .attr('width', w)
             .attr('height', h)
@@ -50858,7 +50888,7 @@ var LineChart = (function (_super) {
         var focus = self.svg.append('g')
             .attr('class', 'focus')
             .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
-            .attr('clip-path', 'url(#clip)');
+            .attr('clip-path', "url(#" + self.option.clipName + ")");
         var focusLine = focus.append('path')
             .datum(self.data)
             .attr('class', 'line')
@@ -50866,7 +50896,8 @@ var LineChart = (function (_super) {
         var focusLine2 = focus.append('path')
             .datum(self.data2)
             .attr('class', 'line2')
-            .attr('d', line);
+            .attr('d', line)
+            .style('visibility', 'hidden');
         var focusAxis = self.svg.append('g')
             .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")");
         focusAxis.append('g')
@@ -50886,10 +50917,11 @@ var LineChart = (function (_super) {
             .datum(self.data)
             .attr('class', 'line')
             .attr('d', line2);
-        context.append('path')
+        var contextLine2 = context.append('path')
             .datum(self.data2)
             .attr('class', 'line2')
-            .attr('d', line2);
+            .attr('d', line2)
+            .style('visibility', 'hidden');
         context.append('g')
             .attr('class', 'axis axis--x')
             .attr('transform', "translate(0, " + h2 + ")")
@@ -50915,6 +50947,17 @@ var LineChart = (function (_super) {
         self.on('uncomment', function () {
             enableZoom();
             disableBrush();
+        });
+        self.on('prediction', function () {
+            self.prediction = !self.prediction;
+            if (self.prediction) {
+                focusLine2.style('visibility', 'visible');
+                contextLine2.style('visibility', 'visible');
+            }
+            else {
+                focusLine2.style('visibility', 'hidden');
+                contextLine2.style('visibility', 'hidden');
+            }
         });
         self.on('highlight:update', function () { return __awaiter(_this, void 0, void 0, function () {
             var data;
@@ -51143,7 +51186,7 @@ var LineChart = (function (_super) {
             u.enter().append('g')
                 .attr('class', 'focus-windows')
                 .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
-                .attr('clip-path', 'url(#clip)')
+                .attr('clip-path', "url(#" + self.option.clipName + ")")
                 .each(function (d, i) {
                 var g = d3.select(this);
                 var hLine = g.append('path')
@@ -51253,7 +51296,7 @@ var LineChart = (function (_super) {
             return self.svg.append('g')
                 .attr('class', 'focus')
                 .attr('transform', "translate(" + self.option.margin.left + "," + self.option.margin.top + ")")
-                .attr('clip-path', 'url(#clip)')
+                .attr('clip-path', "url(#" + self.option.clipName + ")")
                 .append('path')
                 .datum(_.range(self.data.length).map(function (i) { return [self.data[i][0], y.invert(ySmoothed[i])]; }))
                 .attr('class', 'line-smooth')

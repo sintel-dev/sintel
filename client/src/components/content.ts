@@ -45,24 +45,34 @@ class Content {
         // });
         pip.content.on('linechart:highlight:update', name => {
             self.lineCharts[name].trigger('highlight:update');
+            self.lineCharts[name + '-no-period'].trigger('highlight:update');
         });
 
         pip.content.on('linechart:highlight:modify', msg => {
             self.lineCharts[msg.datarun].trigger('highlight:modify', msg.event);
+            self.lineCharts[msg.datarun + '-no-period'].trigger('highlight:modify', msg.event);
         });
     }
 
 
     // the following public methods are triggered by user interactions
 
+    public flipPrediction(name) {
+        let self = this;
+        self.lineCharts[name].trigger('prediction');
+        self.lineCharts[name + '-no-period'].trigger('prediction');
+    }
+
     public comment(name) {
         let self = this;
         self.lineCharts[name].trigger('comment');
+        self.lineCharts[name + '-no-period'].trigger('comment');
     }
 
     public uncomment(name) {
         let self = this;
         self.lineCharts[name].trigger('uncomment');
+        self.lineCharts[name + '-no-period'].trigger('uncomment');
     }
 
     public backward(datarun) {
@@ -84,9 +94,27 @@ class Content {
             let idx = _.findIndex(boxs, o => o[0] === name);
             boxs.splice(idx, 1);
             delete self.lineCharts[name];
+            delete self.lineCharts[name + '-no-period'];
             self.boxs(boxs);
             pip.header.trigger('datarun:updateActives', _.map(boxs, b => b[0]));
         }, self.config.speed);
+    }
+
+    public onCollapse(name) {
+        let self = this;
+
+        console.log('name', name);
+
+        let btn = $(`button[name='${name}-collapse']`);
+        if (btn.find('.fa-angle-double-left').length > 0) {
+            // collapse
+            btn.html(`<i class="fa fa-angle-double-right fa-size-lg"></i>`);
+            ($(`a[href="#${name}-no-period"]`) as any).tab('show');
+        } else {
+            // expand
+            btn.html(`<i class="fa fa-angle-double-left fa-size-lg"></i>`);
+            ($(`a[href="#${name}-period"]`) as any).tab('show');
+        }
     }
 
     private async addChart(msg: {dataset: string, datarun: Datarun}) {
@@ -111,16 +139,17 @@ class Content {
         // if new, then add a new box
         if (_.findIndex(boxs, o => o === name) < 0) {
 
-            boxs.unshift(name);    // add to head
+            boxs = [name];
+            // boxs.unshift(name);    // add to head
             self.boxs(boxs);
             pip.header.trigger('datarun:updateActives', _.map(boxs, b => b[0]));
 
             // activate box interaction
-            ($(`.box[name='${name[0]}']`) as any).boxWidget({
-                animationSpeed: self.config.speed,
-                collapseTrigger: `button[name='${name[0]}-collapse']`,
-                removeTrigger: `button[name='${name[0]}-remove']`
-            });
+            // ($(`.box[name='${name[0]}']`) as any).boxWidget({
+            //     animationSpeed: self.config.speed,
+            //     collapseTrigger: `button[name='${name[0]}-collapse']`,
+            //     removeTrigger: `button[name='${name[0]}-remove']`
+            // });
 
             // load data for visualization
             // let data = await dataProcessor.loadData(msg.dataset, msg.datarun.id) as any;
@@ -129,18 +158,38 @@ class Content {
             // declare the element for adding the chart
             let ele;
 
+            // add line chart no period
+            ele = $(`#${name[0]}-line-no-period`)[0];
+            self.lineCharts[name[0] + '-no-period'] = new LineChart(ele,
+                data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset,
+            {
+                height: 600,
+                height2: 180,
+                // width: ele.parentElement.getBoundingClientRect().width,
+                // width2: ele.parentElement.getBoundingClientRect().width,
+                width: $('.wd-12').width(),
+                width2: $('.wd-12').width(),
+                // smooth: true,
+                windows: data.windows,
+                offset: data.offset,
+                clipName: 'clip-no-period'
+            });
+
             // add line chart
             ele = $(`#${name[0]}-line`)[0];
             self.lineCharts[name[0]] = new LineChart(ele,
                 data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset,
             {
-                height: 400,
-                height2: 120,
-                width: ele.parentElement.getBoundingClientRect().width,
-                width2: ele.parentElement.getBoundingClientRect().width,
+                height: 600,
+                height2: 180,
+                // width: ele.parentElement.getBoundingClientRect().width,
+                // width2: ele.parentElement.getBoundingClientRect().width,
+                width: $('.wd-8').width(),
+                width2: $('.wd-8').width(),
                 // smooth: true,
                 windows: data.windows,
-                offset: data.offset
+                offset: data.offset,
+                clipName: 'clip-period'
             });
 
             // // add area chart
@@ -165,8 +214,9 @@ class Content {
             let yearChart = new RadialAreaChart($(`#${name[0]}-radial-area-year`)[0],
                 data.period,
                 {
-                    width: ele.parentElement.getBoundingClientRect().width,
-                    nCol: 4
+                    width: $('.wd-4').width(),
+                    // width: ele.parentElement.getBoundingClientRect().width,
+                    nCol: 3
                 }
             );
 
@@ -175,8 +225,9 @@ class Content {
             let monthChart = new RadialAreaChart($(`#${name[0]}-radial-area-month`)[0],
                 fakeMonthData,
                 {
-                    width: ele.parentElement.getBoundingClientRect().width,
-                    nCol: 4
+                    width: $('.wd-4').width(),
+                    // width: ele.parentElement.getBoundingClientRect().width,
+                    nCol: 3
                 }
             );
 
@@ -185,7 +236,8 @@ class Content {
             let dayChart = new RadialAreaChart($(`#${name[0]}-radial-area-day`)[0],
                 fakeDayData,
                 {
-                    width: ele.parentElement.getBoundingClientRect().width,
+                    width: $('.wd-4').width(),
+                    // width: ele.parentElement.getBoundingClientRect().width,
                     nCol: 7
                     // cw: 60,
                     // ch: 60,

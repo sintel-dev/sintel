@@ -188,6 +188,7 @@ export class RadialAreaChart extends pip.Events {
 
             // Extend the domain slightly to match the range of [0, 2π].
             angle.domain([0, o.bins.length - 0.88]);
+
             radius.domain([0, 1]);
 
             let path = _cell.append('path')
