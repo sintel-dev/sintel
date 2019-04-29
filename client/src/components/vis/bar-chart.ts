@@ -24,7 +24,7 @@ export class BarChart extends pip.Events {
         svgHeight: 300, // default minimum height
         height: null,
         width: null,
-        margin: { top: 30, right: 20, bottom: 70, left: 60 },
+        margin: { top: 30, right: 20, bottom: 80, left: 60 },
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -85,35 +85,35 @@ export class BarChart extends pip.Events {
         let chart = self.svg.append('g')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`);
 
-        chart.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + h + ")")
+        chart.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + h + ')')
             .call(xAxis)
-            .selectAll("text")	
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-65)");
+            .selectAll('text')
+            .style('text-anchor', 'end')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em')
+            .attr('transform', 'rotate(-60)');
 
-        chart.append("g")
-            .attr("class", "y axis")
+        chart.append('g')
+            .attr('class', 'y axis')
             .call(yAxis)
-          .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Count");
-      
+          .append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 6)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+            .text('Count');
+
         console.log(self.data);
-        chart.selectAll(".bar")
+        chart.selectAll('.bar')
             .data(self.data)
-          .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return x(d[0]); })
-            .attr("width", x.bandwidth())
-            .attr("y", function(d) { return y(d[1]); })
-            .attr("height", function(d) { return h - y(d[1]); });
+          .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', function(d) { return x(d[0]); })
+            .attr('width', x.bandwidth())
+            .attr('y', function(d) { return y(d[1]); })
+            .attr('height', function(d) { return h - y(d[1]); });
     }
 }
 

@@ -3,7 +3,7 @@ import * as ko from 'knockout';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import dataProcessor from '../services/data-processor';
-import { LineChart } from './vis/line-chart';
+import { LineChart } from './vis/line-chart_ori_2';
 import { AreaChart } from './vis/area-chart';
 import { HorizonChart } from './vis/horizon-chart';
 import { Data as RadialAreaChartData, RadialAreaChart } from './vis/radial-area-chart';
@@ -78,7 +78,7 @@ class Content {
     public backward(datarun) {
         if ($(`#${datarun}-radial-area-year`).hasClass('active')) {
             return;
-        };
+        }
 
         if ($(`#${datarun}-radial-area-month`).hasClass('active')) {
             ($(`a[href="#${datarun}-radial-area-year"]`) as any).tab('show');
@@ -207,7 +207,6 @@ class Content {
             // });
 
             // add radial area chart
-            // only activated when dataset is SES
             ele = $(`#${name[0]}-radial-area-year`)[0];
             // let ndata = dataProcessor.normalizeTimeSeries(data.timeseries);
             // let tdata = dataProcessor.transformTimeSeriesToPeriodYear(ndata);
@@ -248,7 +247,7 @@ class Content {
             yearChart.on('select', (o: RadialAreaChartData) => {
                 // switch tag
                 ($(`a[href="#${name[0]}-radial-area-month"]`) as any).tab('show');
-                
+
                 // change tab title
                 $(`#${name[0]}-radial-area-title`)
                     .text(`Period - Year: ${o.name}`);

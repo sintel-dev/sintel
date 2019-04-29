@@ -30,6 +30,7 @@ export class App {
         this.content = new Content('#content');
         this.modal = new Modal('#modal-audio');
         // this.summary = new Summary('#summary');
+        
     }
 
     public setupEventHandlers() {

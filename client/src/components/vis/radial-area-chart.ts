@@ -176,7 +176,7 @@ export class RadialAreaChart extends pip.Events {
             .attr('x', 1)
             .attr('y', 14)
             .text('');
-        
+
         let label2 = self.svg.append('text')
             .attr('class', 'radial-text-md')
             .attr('x', 1)

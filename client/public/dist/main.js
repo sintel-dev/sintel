@@ -50211,7 +50211,7 @@ var pip = __webpack_require__(/*! ../services/pip-client */ "./src/services/pip-
 var ko = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.js");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 var data_processor_1 = __webpack_require__(/*! ../services/data-processor */ "./src/services/data-processor.ts");
-var line_chart_1 = __webpack_require__(/*! ./vis/line-chart */ "./src/components/vis/line-chart.ts");
+var line_chart_ori_2_1 = __webpack_require__(/*! ./vis/line-chart_ori_2 */ "./src/components/vis/line-chart_ori_2.ts");
 var radial_area_chart_1 = __webpack_require__(/*! ./vis/radial-area-chart */ "./src/components/vis/radial-area-chart.ts");
 var Content = (function () {
     function Content(eleId) {
@@ -50254,7 +50254,6 @@ var Content = (function () {
         if ($("#" + datarun + "-radial-area-year").hasClass('active')) {
             return;
         }
-        ;
         if ($("#" + datarun + "-radial-area-month").hasClass('active')) {
             $("a[href=\"#" + datarun + "-radial-area-year\"]").tab('show');
         }
@@ -50312,7 +50311,7 @@ var Content = (function () {
                         data = _a.sent();
                         ele = void 0;
                         ele = $("#" + name[0] + "-line-no-period")[0];
-                        self.lineCharts[name[0] + '-no-period'] = new line_chart_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
+                        self.lineCharts[name[0] + '-no-period'] = new line_chart_ori_2_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
                             height: 600,
                             height2: 180,
                             width: $('.wd-12').width(),
@@ -50322,7 +50321,7 @@ var Content = (function () {
                             clipName: 'clip-no-period'
                         });
                         ele = $("#" + name[0] + "-line")[0];
-                        self.lineCharts[name[0]] = new line_chart_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
+                        self.lineCharts[name[0]] = new line_chart_ori_2_1.LineChart(ele, data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset, {
                             height: 600,
                             height2: 180,
                             width: $('.wd-8').width(),
@@ -50736,10 +50735,10 @@ exports.default = Sidebar;
 
 /***/ }),
 
-/***/ "./src/components/vis/line-chart.ts":
-/*!******************************************!*\
-  !*** ./src/components/vis/line-chart.ts ***!
-  \******************************************/
+/***/ "./src/components/vis/line-chart_ori_2.ts":
+/*!************************************************!*\
+  !*** ./src/components/vis/line-chart_ori_2.ts ***!
+  \************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -50906,7 +50905,7 @@ var LineChart = (function (_super) {
             .call(xAxis);
         focusAxis.append('g')
             .attr('class', 'axis axis--y')
-            .call(yAxis.ticks(5, ",f"));
+            .call(yAxis.ticks(5, ',f'));
         var line2 = d3.line()
             .x(function (d) { return x2(d[0]); })
             .y(function (d) { return y2(d[1]); });

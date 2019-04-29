@@ -66,7 +66,7 @@ class Summary {
             // select the first datarun by default
             let datarun = dataruns[0];
             let data: any = await dataProcessor.loadData(dataset.name, datarun.id);
-            
+
             // declare the element for adding the chart
             let ele;
             let xAxis = false;
@@ -77,14 +77,14 @@ class Summary {
                 new LineChart(ele,
                     data.timeseries, datarun.id, dataset.name,
                 {
-                    height: 70,
+                    height: 80,
                     width: 1400,
                     width2: 1400,
                     height2: 0,
                     windows: data.windows,
                     offset: data.offset,
                     xAxis: true,
-                    margin: { top: 5, right: 20, bottom: 25, left: 80 }
+                    margin: { top: 5, right: 20, bottom: 35, left: 80 }
                 });
             } else {
                 new LineChart(ele,
@@ -101,7 +101,7 @@ class Summary {
                 });
             }
 
-            
+
             i += 1;
             if (i < datasets.length) {
                 aa();
@@ -116,7 +116,7 @@ class Summary {
         //     // select the first datarun by default
         //     let datarun = dataruns[0];
         //     let data: any = await dataProcessor.loadData(dataset.name, datarun.id);
-            
+
         //     // declare the element for adding the chart
         //     let ele;
         //     let xAxis = false;
@@ -140,15 +140,15 @@ class Summary {
 
     private async loadEvents() {
         let self = this;
-    
+
         let events: Event[] = await server.events.read() as any;
 
-        let dict: EventDict = {}
+        let dict: EventDict = {};
         let scores = [];
-        
+
         // to dict
         _.each(events, e => {
-            
+
             // add new eid
             if (!_.has(dict, e.datarun)) {
                 dict[e.datarun] = {
@@ -158,7 +158,7 @@ class Summary {
                     min: null,
                     max: null,
                     mean: null
-                }
+                };
             }
 
             // update existing eid
@@ -196,8 +196,8 @@ class Summary {
             return [d[0].substring(4), d[1]];
         });
 
-        barChartData = _.sortBy(barChartData, d => +d[0]);
-        // barChartData = _.sortBy(barChartData, d => -d[1]);
+        // barChartData = _.sortBy(barChartData, d => +d[0]);
+        barChartData = _.sortBy(barChartData, d => -d[1]);
 
         console.log(barChartData);
         let ele = $(`#summaryBarChart`)[0];

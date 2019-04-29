@@ -29,11 +29,13 @@ export interface LineChartOption {
     context?: boolean;
     windows?: Array<[number, number, number, string]>;  // start_time, stop_time, score, event_id
     offset?: number;
+    clipName?: string;
 }
 
 export class LineChart extends pip.Events {
 
     private svg: d3.Selection<any, any, any, any>;
+    private prediction = false;
     private option: LineChartOption = {
         // layout
         svgHeight: 300, // used when height is not defined
@@ -51,7 +53,8 @@ export class LineChart extends pip.Events {
         smooth: false,
         windows: null,
         context: true,
-        offset: 0
+        offset: 0,
+        clipName: 'clip'
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -59,6 +62,8 @@ export class LineChart extends pip.Events {
     constructor(
         ele: HTMLElement,
         private data: TimeSeriesData,
+        private data2: TimeSeriesData,
+        private errors: TimeSeriesData,
         private datarun: string,
         private dataset: string,
         option?: LineChartOption
@@ -131,7 +136,7 @@ export class LineChart extends pip.Events {
 
         // clip content outside the rect
         let clip = self.svg.append('defs').append('svg:clipPath')
-            .attr('id', 'clip')
+            .attr('id', self.option.clipName)
             .append('svg:rect')
             .attr('width', w)
             .attr('height', h)
@@ -141,12 +146,18 @@ export class LineChart extends pip.Events {
         let focus = self.svg.append('g')
             .attr('class', 'focus')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-            .attr('clip-path', 'url(#clip)');
+            .attr('clip-path', `url(#${self.option.clipName})`);
 
         let focusLine = focus.append('path')
             .datum(self.data)
             .attr('class', 'line')
             .attr('d', line);
+
+        let focusLine2 = focus.append('path')
+            .datum(self.data2)
+            .attr('class', 'line2')
+            .attr('d', line)
+            .style('visibility', 'hidden');
 
         let focusAxis = self.svg.append('g')
             .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`);
@@ -175,6 +186,12 @@ export class LineChart extends pip.Events {
             .datum(self.data)
             .attr('class', 'line')
             .attr('d', line2);
+
+        let contextLine2 = context.append('path')
+            .datum(self.data2)
+            .attr('class', 'line2')
+            .attr('d', line2)
+            .style('visibility', 'hidden');
 
         context.append('g')
             .attr('class', 'axis axis--x')
@@ -211,6 +228,17 @@ export class LineChart extends pip.Events {
             disableBrush();
         });
 
+        self.on('prediction', () => {
+            self.prediction = !self.prediction;
+            if (self.prediction) {
+                focusLine2.style('visibility', 'visible');
+                contextLine2.style('visibility', 'visible');
+            } else {
+                focusLine2.style('visibility', 'hidden');
+                contextLine2.style('visibility', 'hidden');
+            }
+        });
+
         self.on('highlight:update', async () => {
             let data = await dataProcessor.loadEventData(
                 self.datarun,
@@ -240,6 +268,7 @@ export class LineChart extends pip.Events {
 
             // update normal line
             focusLine.attr('d', line);
+            focusLine2.attr('d', line);
 
             // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }
@@ -265,6 +294,7 @@ export class LineChart extends pip.Events {
 
             // update normal line
             focusLine.attr('d', line);
+            focusLine2.attr('d', line);
 
             // update smoothed line
             if (self.option.smooth) { smoothedLine.attr('d', line); }
@@ -470,7 +500,7 @@ export class LineChart extends pip.Events {
             u.enter().append('g')
                 .attr('class', 'focus-windows')
                 .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-                .attr('clip-path', 'url(#clip)')
+                .attr('clip-path', `url(#${self.option.clipName})`)
                 .each(function (d, i) {
                     let g = d3.select(this);
 
@@ -606,7 +636,7 @@ export class LineChart extends pip.Events {
             return self.svg.append('g')
                 .attr('class', 'focus')
                 .attr('transform', `translate(${self.option.margin.left},${self.option.margin.top})`)
-                .attr('clip-path', 'url(#clip)')
+                .attr('clip-path', `url(#${self.option.clipName})`)
                 .append('path')
                 .datum(_.range(self.data.length).map(i => [self.data[i][0], y.invert(ySmoothed[i])]))
                 .attr('class', 'line-smooth')

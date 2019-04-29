@@ -1129,9 +1129,6 @@ body {
 .bar-chart .bar:hover {
   fill: brown;
 }
-.bar-chart .axis {
-  font: 10px sans-serif;
-}
 .bar-chart .axis path,
 .bar-chart .axis line {
   fill: none;
@@ -1142,11 +1139,11 @@ body {
   display: none;
 }
 .bar-chart .y.axis text {
-  font-size: 11px;
+  font-size: 16px;
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
 .bar-chart .x.axis text {
-  font-size: 11px;
+  font-size: 16px;
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
 
