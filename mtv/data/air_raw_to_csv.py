@@ -1,117 +1,162 @@
 import json
 import logging
+from mtv.data.air_station_names import name_map, plt_station_name_set
 from datetime import datetime, timedelta
+import csv
 
 LOGGER = logging.getLogger(__name__)
 
-ENV_STATIONS = ['Tung Chung', 'Tuen Mun', 'Tseung Kwan O', 'Mong Kok',
-                'Central/Western', 'Yuen Long', 'Sham Shui Po', 'Kwai Chung',
-                'Causeway Bay', 'Sha Tin', 'Kwun Tong', 'Eastern',
-                'Tsuen Wan', 'Central', 'Tap Mun', 'Tai Po']
-
-STATIONS = ["ChekLapKok", "CheungChau", "HappyValley", "HongKongObser",
-            "HongKongPark", "KaiTakRunw", "KingsPark", "KowloonCi", "KwunTong",
-            "LauFauSh", "SaiKung", "ShaTin", "ShamShuiPo"  "ShauKeiWa",
-            "ShekKong", "TaKwuL", "TaiPo", "TseungKw", "TsingYi",
-            "TsuenWanHoKoon", "TsuenWan", "TuenMun", "WongChukHan",
-            "WongTaiSin", "YuenLongPark"]
-
-DirectionMap = {
-    "North": 0,
-    "Northeast": 1,
-    "East": 2,
-    "Southeast": 3,
-    "South": 4,
-    "Southwest": 5,
-    "West": 6,
-    "Northwest": 7
-}
-
-
-# Low	1-3
-# Moderate 4-6
-# High 7-10
-# Very high > 10
-
-# temperature
-# humidity
-# pressure
-# wind
-# wind_direction
-
-def init_station_info():
+def init_stations():
     station_info = {}
-    for name in STATIONS:
+    for name in plt_station_name_set:
         station_info[name] = {
             'temperature': [],
             'humidity': [],
             'pressure': [],
-            'wind_speed': [],
-            'wind_direction': [],
-            'pollutant': {
-                "NO2": [],
-                "O3": [],
-                "SO2": [],
-                "CO": [],
-                "PM10": [],
-                "PM2.5": [],
-                "AQHI": [],
-                "healthRisk": []
-            }
+            'windSpeed': [],
+            'windDirection': [],
+            "NO2": [],
+            "O3": [],
+            "SO2": [],
+            "CO": [],
+            "PM10": [],
+            "PM2.5": [],
+            "AQHI": [],
+            "healthRisk": []
         }
     return station_info
 
-
-def extend_air_info_by_station(station_info, data):
-    for d in data:
-        temp = d.get('temperature', None)
-        if (temp is not None and temp['errCode'] == '000000'):
-            temp = temp['data']
-            update_time = datetime.strptime(temp['updateTime'],
-                                            '%Y-%m-%d %H:%M:%S')
-            update_time.timestamp()
-
-        humidity = d.get('humidity', None)
-        pressure = d.get('pressure', None)
-        wind = d.get('wind', None)
-
-def extend_env_info(station_info, data):
-    fmt = '%Y-%m-%d %H:%M:%S'
-    station_name_set = set()
-    for dm in data:
-        if (dm is None):
+def add_pollutant_info(stations, plt_data):
+    flat_plt_data = list()
+    for plt_item in plt_data:
+        if not plt_item['monitor']['errCode'] == '000000':
             continue
-        if (not dm['monitor']['errCode'] == '000000'):
-            continue
-        for d in dm['monitor']['data']:
-            dt = datetime.strptime(d['dateTime'], fmt)
-            station_name_set.add(d['stationName'])
-            station_info[d['stationName']]['NO2'].append([dt.timestamp(), d['NO2']])
-            station_info[d['stationName']]['O3'].append([dt.timestamp(), d['O3']])
-            station_info[d['stationName']]['SO2'].append([dt.timestamp(), d['SO2']])
-            station_info[d['stationName']]['CO'].append([dt.timestamp(), d['CO']])
-            station_info[d['stationName']]['PM10'].append([dt.timestamp(), d['PM10']])
-            station_info[d['stationName']]['PM2.5'].append([dt.timestamp(), d['PM2.5']])
-            station_info[d['stationName']]['CO'].append([dt.timestamp(), d['CO']])
-            station_info[d['stationName']]['AQHI'].append([dt.timestamp(), d['AQHI']])
-            station_info[d['stationName']]['healthRisk'].append([dt.timestamp(), d['healthRisk']])
+        flat_plt_data.extend(plt_item['monitor']['data'])
 
-    print(station_name_set)
+    time_format = '%Y-%m-%d %H:%M:%S'
+    for d in flat_plt_data:
+        name = d['stationName']
+        t = datetime.strptime(d['dateTime'], time_format).timestamp()
+        if (not d['NO2'] == -1):
+            stations[name]["NO2"].append([t, d['NO2']])
+        if (not d['O3'] == -1):
+            stations[name]["O3"].append([t, d['O3']])
+        if (not d['SO2'] == -1):
+            stations[name]["SO2"].append([t, d['SO2']])
+        if (not d['CO'] == -1):
+            stations[name]["CO"].append([t, d['CO']])
+        if (not d['PM10'] == -1):
+            stations[name]["PM10"].append([t, d['PM10']])
+        if (not d['PM2.5'] == -1):
+            stations[name]["PM2.5"].append([t, d['PM2.5']])
+        if (not d['AQHI'] == -1):
+            stations[name]["AQHI"].append([t, d['AQHI']])
+        if (not d['healthRisk'] == -1):
+            stations[name]["healthRisk"].append([t, d['healthRisk']])
+
+    # AQHI -- healthRisk
+    # Low	1-3
+    # Moderate 4-6
+    # High 7-10
+    # Very high > 10
+
+def add_weather_info(stations, wth_data):
+    temperature_data = list()
+    humidity_data = list()
+    pressure_data = list()
+    wind_data = list()
+    for wth_item in wth_data:
+        if wth_item['temperature']['errCode'] == '000000':
+            temperature_data.extend(wth_item['temperature']['data'])
+        if wth_item['humidity']['errCode'] == '000000':
+            humidity_data.extend(wth_item['humidity']['data'])
+        if wth_item['pressure']['errCode'] == '000000':
+            pressure_data.extend(wth_item['pressure']['data'])
+        if wth_item['wind']['errCode'] == '000000':
+            wind_data.extend(wth_item['wind']['data'])
+
+    time_format = '%Y-%m-%d %H:%M:%S'
+    
+    # temperature
+    for d in temperature_data:
+        t = datetime.strptime(d['updateTime'], time_format).timestamp()
+        d.pop('updateTime')
+        for k in d:
+            for nm in name_map['temperature'][k]:
+                if not d[k] is None:
+                    stations[nm]['temperature'].append([t, d[k]])
+
+    # humidity
+    for d in humidity_data:
+        t = datetime.strptime(d['updateTime'], time_format).timestamp()
+        for nm in name_map['humidity'][d['place']]:
+            if not d['humidity'] == 0:
+                stations[nm]['humidity'].append([t, d['humidity']])
+    
+    # pressure
+    for d in pressure_data:
+        t = datetime.strptime(d['updateTime'], time_format).timestamp()
+        for nm in name_map['pressure'][d['place']]:
+            if not d['pressure'] == 0:
+                stations[nm]['pressure'].append([t, d['pressure']])
+
+    # wind & wind_direction
+    DIRECTION_MAP = {
+        "N/A": 0,
+        "North": 1,
+        "Northeast": 2,
+        "East": 3,
+        "Southeast": 4,
+        "South": 5,
+        "Southwest": 6,
+        "West": 7,
+        "Northwest": 8,
+        "Calm": 9,
+        "Variable": 10
+    }
+    for d in wind_data:
+        t = datetime.strptime(d['updateTime'], time_format).timestamp()
+        # if not d['direction'] in DIRECTION_MAP:
+        #     print(d)
+        for nm in name_map['wind'][d['place']]:
+            if (not d['speed'] == -1) or (not d['speed'] == 0):
+                stations[nm]['windSpeed'].append([t, d['speed']])
+            if (d['direction'] in DIRECTION_MAP):
+                stations[nm]['windDirection'].append([t, DIRECTION_MAP[d['direction']]])
+
+def dump_to_csv(stations):
+    for name in stations:
+        for idx_name in stations[name]:
+            stations[name][idx_name].sort(key=lambda x: x[0])
+            modified_name = name.replace("/", " ")
+            with open('./mtv/data/raw/hkair/{}_{}.csv'.format(modified_name, idx_name), 'w', newline='') as f:
+                fieldnames = ['timestamp', 'value']
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for d in stations[name][idx_name]:
+                    writer.writerow({'timestamp': d[0], 'value': d[1]})
 
 def main():
-    air_data = list()
-    env_data = list()
+
+    wth_data = list()   # weather data
+    plt_data = list()   # pollutant data
 
     for yr in ['2016', '2017', '2018', '2019']:
 
         with open('mtv/data/raw/air/{}.json'.format(yr)) as air_json_file:
-            air_data.extend(json.load(air_json_file))
+            wth_data.extend(json.load(air_json_file))
 
         with open('mtv/data/raw/env/{}.json'.format(yr)) as env_json_file:
-            env_data.extend(json.load(env_json_file))
+            plt_data.extend(json.load(env_json_file))
 
-    air_data = [d for d in air_data if d is not None]
-    env_data = [d for d in env_data if d is not None]
+    # init stations
+    stations = init_stations()
 
-    station_info = init_station_info()
-    stations = extend_env_info(station_info, env_data)
+    # filter all empty item
+    plt_data = [d for d in plt_data if d is not None]
+    wth_data = [d for d in wth_data if d is not None]
+    
+    add_pollutant_info(stations, plt_data)
+    add_weather_info(stations, wth_data)
+
+    dump_to_csv(stations)
