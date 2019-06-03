@@ -74,6 +74,7 @@ Once you've downloaded the MTV repository and installed all the prerequisites, y
 
 ```bash
 $ make install
+$ make install-theme
 ```
 
 This command will install all the dependencies needed for the application (server-end and client-end) to run. For development, use the following command instead, which will install some additional
@@ -81,6 +82,7 @@ dependencies for code linting and testing
 
 ```bash
 $ make install-develop
+$ make install-theme
 ```
 
 
@@ -90,6 +92,7 @@ $ make install-develop
 ##### Downloading the NASA public data for demo
 
 ```bash
+$ make init-db
 $ make load-db-nasa
 ```
 
@@ -106,7 +109,7 @@ You have to create a database with the name **"mtv"** in MongoDB. For the detail
 Please activate your virtualenv for MTV first, and then use the following command to run the application.
 
 ```bash
-$ mtv run
+$ mtv run -v
 ```
 
 Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser. The following list the optional arguments for `mtv run`
