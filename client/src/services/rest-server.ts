@@ -5,7 +5,7 @@ let jqueryExt = $ as JQueryStaticExt;
 
 // step1: initialize a RESTful client
 let server: Server = new jqueryExt.RestClient(
-    'http://127.0.0.1:3000/api/v1/',
+    'http://127.0.0.1:3001/api/v1/',
     {
         cache: 1,                 // This will cache requests for 5 seconds
         cachableMethods: ['GET'],

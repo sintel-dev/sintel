@@ -129,6 +129,7 @@ class Datarun(Document, MongoUtils):
     events = fields.IntField()
     status = fields.StringField()
     created_by = fields.StringField()
+    experiment = fields.StringField()
 
 
 class Event(Document, MongoUtils):
@@ -169,3 +170,14 @@ class Prediction(Document, MongoUtils):
             '$dataset'  # text index
         ]
     }
+
+class Experiment(Document, MongoUtils):
+    name = fields.StringField(required=True)
+    model_num = fields.IntField(required=True)
+    event_num = fields.IntField(required=True)
+    pipeline = fields.ReferenceField(Pipeline)
+    dataruns = fields.ListField(fields.ReferenceField(Datarun))
+    start_time = fields.DateTimeField(required=True)
+    end_time = fields.DateTimeField()
+    status = fields.StringField()
+    created_by = fields.StringField()

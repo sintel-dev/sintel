@@ -2,16 +2,18 @@ import logging
 import os
 import sys
 import numpy as np
+import pandas as pd
 
 from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
-from gevent.wsgi import WSGIServer
+
+from gevent.pywsgi import WSGIServer
 from mongoengine import connect
 from termcolor import colored
 
 from mtv.data.db import MongoDB
-from mtv.data.processor import load_csv, to_mongo_raw
+from mtv.data.processor import load_csv, to_mongo_raw, to_mongo_raw2
 from mtv.routes import add_routes
 from mtv.utils import import_object, get_files
 
@@ -66,28 +68,18 @@ class MTVExplorer:
 
         app = self._init_flask_app(env)
 
-        def http_server():
-            LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
-                                'yellow'))
+        LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
+                            'yellow'))
 
-            LOGGER.info(colored('Available on:', 'yellow') +
-                        '  http://0.0.0.0:' + colored(port, 'green'))
-
-            if env == 'development':
-                debug = import_object('werkzeug.debug.DebuggedApplication')
-                server = WSGIServer(('0.0.0.0', port), debug(app))
-
-            elif env == 'production':
-                server = WSGIServer(('0.0.0.0', port), app, log=None)
-
-            server.serve_forever()
+        LOGGER.info(colored('Available on:', 'yellow') +
+                    '  http://0.0.0.0:' + colored(port, 'green'))
 
         if env == 'development':
-            reloader = import_object('werkzeug.serving.run_with_reloader')
-            reloader(http_server)
+            app.run(debug = True, port=port)
 
         elif env == 'production':
-            http_server()
+            server = WSGIServer(('0.0.0.0', port), app, log=None)
+            server.serve_forever()
 
     def run_module(self, module, args):
         try:
@@ -159,12 +151,18 @@ class MTVExplorer:
             count += 1
             LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
 
-            data = load_csv(file_path, start, stop, time_column,
-                            value_column, header)
-            LOGGER.info('Loading over')
+            # data = load_csv(file_path, start, stop, time_column,
+            #                 value_column, header)
 
-            docs = to_mongo_raw(file[0:-4], data)
-            LOGGER.info('Transforming over')
+            # timestamp, value
+            data = pd.read_csv(file_path, header='infer')
+            data = data.sort_values('timestamp').set_index('timestamp')
+            if (start is not None):
+                data = data.loc[start:]
+            if (stop is not None):
+                data = data.loc[:stop]
+            # docs = to_mongo_raw1(file[0:-4], data, interval)
+            docs = to_mongo_raw2(file[0:-4], data, interval)
 
             if docs:
                 conn.writeCollection(docs, col)

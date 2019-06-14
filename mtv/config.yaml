@@ -9,7 +9,7 @@ password:  # password to authenticate with
 
 # FLASK ENV
 #===================================
-server_port: 3000   # the port that flask application is running on
+server_port: 3001   # the port that flask application is running on
 ENV: 'production'  # development, production, testing
 DEBUG:  False
 TESTING:  False
