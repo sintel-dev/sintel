@@ -39,7 +39,7 @@ def classify_files(dir):
     return classes
 
 
-if __name__ == "__main__":
+def main():
 
     # test single file
     # path_to_file = 'data/train/A-1.npy'

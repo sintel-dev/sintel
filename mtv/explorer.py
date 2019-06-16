@@ -12,8 +12,8 @@ from gevent.pywsgi import WSGIServer
 from mongoengine import connect
 from termcolor import colored
 
-from mtv.data.db import MongoDB
-from mtv.data.processor import load_csv, to_mongo_raw, to_mongo_raw2
+from mtv.data.mdb import MongoDB
+from mtv.data.processor import to_mongo_docs
 from mtv.routes import add_routes
 from mtv.utils import import_object, get_files
 
@@ -89,48 +89,8 @@ class MTVExplorer:
         except Exception as e:
             LOGGER.exception("Error running the module '{}': {}"
                              .format(module, str(e)))
-    
 
-    def add_datasets(self, path, start, stop, time_column, value_column, header):
-        conn = MongoDB(address=self._cf['host'], port=self._cf['port'],
-                       db=self._cf['db'])
-        
-        if not os.path.exists(path):
-            LOGGER.exception('Data folder path "{}" does not exist'
-                            .format(path))
-            raise
-
-        files = get_files(path)
-        docs = []
-        count = 0
-        for file in files:
-            file_path = os.path.join(path, file)
-            count += 1
-            LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
-
-            data = load_csv(file_path, None, None, time_column,
-                            value_column, header)
-
-            dt = np.array(data)
-            time_min = np.amin(dt, axis=0)[0]
-            time_max = np.amax(dt, axis=0)[0]
-
-            docs.append({
-                'insert_time': datetime.utcnow(),
-                'name': file[0:-4],
-                'signal_set': file[0:-4],
-                'start_time': int(start if start else time_min),
-                'stop_time': int(stop if stop else time_max),
-                'data_location': os.path.abspath(file_path),
-                'timestamp_column': time_column,
-                'value_column': value_column,
-                'created_by': 'dy'
-            })
-        
-        conn.writeCollection(docs, 'dataset')
-
-
-    def add_rawdata(self, path, col, start, stop, time_column,
+    def add_aggdata(self, path, col, start, stop, time_column,
                     value_column, header, interval):
         LOGGER.debug("time_column: {}, value_columne: {}, header: {}"
                      .format(time_column, value_column, header))
@@ -151,9 +111,6 @@ class MTVExplorer:
             count += 1
             LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
 
-            # data = load_csv(file_path, start, stop, time_column,
-            #                 value_column, header)
-
             # timestamp, value
             data = pd.read_csv(file_path, header='infer')
             data = data.sort_values('timestamp').set_index('timestamp')
@@ -161,8 +118,8 @@ class MTVExplorer:
                 data = data.loc[start:]
             if (stop is not None):
                 data = data.loc[:stop]
-            # docs = to_mongo_raw1(file[0:-4], data, interval)
-            docs = to_mongo_raw2(file[0:-4], data, interval)
+            
+            docs = to_mongo_docs(file[0:-4], data, interval)
 
             if docs:
                 conn.writeCollection(docs, col)
