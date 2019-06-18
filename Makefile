@@ -58,10 +58,10 @@ init-db:
 
 .PHONY: load-db-nasa
 load-db-nasa:
-	rm -f -r db-instance/dump/mtv_nasa/
-	curl -o mtv_nasa.tar.bz2 "http://dongyu.name/data/nasa"
-	tar -xvf mtv_nasa.tar.bz2 -C ./db-instance/dump/ && rm mtv_nasa.tar.bz2
-	mongorestore --db mtv ./db-instance/dump/mtv_nasa/
+	rm -f -r db-instance/dump/nasa/
+	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
+	tar -xvf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
+	mongorestore --db mtv ./db-instance/dump/nasa/
 
 # ----------------------- session: test ----------------------- #
 
