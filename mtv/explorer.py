@@ -112,18 +112,19 @@ class MTVExplorer:
             LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
 
             # timestamp, value
-            # data = pd.read_csv(file_path, header='infer')
-            # data = data.sort_values('timestamp').set_index('timestamp')
-
-            data = pd.read_csv(path, header=None)
-            columns = {
-                'timestamp': data[time_column].values,
-                'value': data[value_column].values,
-            }
-            data = pd.DataFrame(columns)[['timestamp', 'value']]
-            data['timestamp'] = data['timestamp'].astype(int)
-            data['value'] = data['value'].astype(float)
-            data = data.sort_values('timestamp').set_index('timestamp')
+            if (header):
+                data = pd.read_csv(file_path, header='infer')
+                data = data.sort_values('timestamp').set_index('timestamp')
+            else:
+                data = pd.read_csv(path, header=None)
+                columns = {
+                    'timestamp': data[time_column].values,
+                    'value': data[value_column].values,
+                }
+                data = pd.DataFrame(columns)[['timestamp', 'value']]
+                data['timestamp'] = data['timestamp'].astype(int)
+                data['value'] = data['value'].astype(float)
+                data = data.sort_values('timestamp').set_index('timestamp')
 
             if (start is not None):
                 data = data.loc[start:]
