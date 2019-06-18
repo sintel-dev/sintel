@@ -3,7 +3,7 @@
 host: 'localhost' # the host name of `mongod` instance to connect to
 # host: 'db'  # only used for Docker deployment
 port: 27017    # the port that `mongod` instance is running on
-db: 'nasa'    # the name of the database to use
+db: 'mtv3'    # the name of the database to use
 username:  # username to authenticate with
 password:  # password to authenticate with
 

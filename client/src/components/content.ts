@@ -30,7 +30,7 @@ class Content {
 
     private config = {
         speed: 500,   // box animation duration,
-        ctxHeight: 410,
+        ctxHeight: 480,
         focusHeight: 540,
         periodHeight: 960
     };

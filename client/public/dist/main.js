@@ -50187,7 +50187,7 @@ var Content = (function () {
         this.periodCharts = {};
         this.config = {
             speed: 500,
-            ctxHeight: 410,
+            ctxHeight: 480,
             focusHeight: 540,
             periodHeight: 960
         };
