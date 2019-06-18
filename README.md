@@ -166,7 +166,7 @@ to be added
 - Restore data to the docker image "mongo:4.0" (here takes NASA data as example). 
 
   ```bash
-  $ curl -o mtv_nasa.tar.bz2 "http://dongyu.name/data/mtv"
+  $ curl -o mtv_nasa.tar.bz2 "http://dongyu.name/data/nasa"
   $ tar -xvf mtv_nasa.tar.bz2 -C ./db-instance/dump/ && rm mtv_nasa.tar.bz2
   $ mv ./db-instance/dump/mtv_nasa ./db-instance/dump/mtv
   $ docker-compose -f docker-compose-db.yml up
