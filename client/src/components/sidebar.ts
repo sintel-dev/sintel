@@ -1,58 +1,77 @@
+import {format} from 'd3';
 import * as pip from '../services/pip-client';
+import * as RSI from '../services/rest-server.interface';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
-import * as d3 from 'd3';
-import { Dataset, Datarun, Pipeline } from '../services/rest-server.interface';
 
 class Sidebar {
 
-    public dataset = ko.observable({});
-    public datarun = ko.observable({});
-    public pipeline = ko.observable({
-        mlpipeline: {
-            primitives: []
-        }
-    });
+    public avgEventNum = ko.observable(null);
+    public exp = ko.observable<RSI.Experiment>(null);
+    public stations = ko.observableArray([]);
+    public blocks = ko.observableArray([]);
 
     private maxLength = 30;
 
     public setupEventHandlers() {
         let self = this;
 
-        pip.sidebar.on('dataset', (dataset_: Dataset) => {
-            let datasetCopy = _.cloneDeep(dataset_);
+        // from header
+        pip.sidebar.on('experiment:change', (exp: RSI.Experiment) => {
+            let _exp = _.cloneDeep(exp);
+            _exp.start_time = exp.start_time.substring(0, 9);
 
-            let dt = new Date(+datasetCopy.start_time * 1000);
-            datasetCopy.start_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()} ` as any;
-            // `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+            let blocks = [];
+            self.avgEventNum(format('.2f')(exp.event_num / exp.model_num));
+            for (let i = 0; i < _exp.pipeline.mlpipeline.primitives.length; i += 1) {
+                let splits = _.split(_exp.pipeline.mlpipeline.primitives[i], '.');
+                if (splits[splits.length - 2] !== 'data_dumper') {
+                    blocks.push({
+                        html: `<span>${_.last(splits)}</span>`,
+                        name: _.last(splits),
+                        fullName: _exp.pipeline.mlpipeline.primitives[i],
+                        params: []
+                    });
+                }
+            }
 
-            dt = new Date(+datasetCopy.stop_time * 1000);
-            datasetCopy.stop_time = `${dt.getUTCFullYear()}-${dt.getUTCMonth()}-${dt.getUTCDate()}` as any;
-            // `${dt.getUTCHours()}:${dt.getUTCMinutes()}:${dt.getUTCSeconds()}` as any;
+            _.each(_exp.pipeline.mlpipeline.init_params, (v, k) => {
+                let idx = 1;
+                let tagIdx = k.indexOf('#');
+                let name = k;
+                if (tagIdx >= 0) {
+                    idx = +k.substring(tagIdx + 1);
+                    name = k.substring(0, tagIdx);
+                }
 
-            self.dataset(datasetCopy);
-        });
+                let currentIdx = 0;
+                for (let i = 0; i < blocks.length; i += 1) {
+                    let splits = _.split(name, '.');
+                    if (_.last(splits) === blocks[i].name) {
+                        currentIdx += 1;
+                    }
+                    if (currentIdx === idx) {
+                        blocks[i].params = _.toPairs(v);
+                        break;
+                    }
+                }
 
-        pip.sidebar.on('datarun', (datarun_: Datarun) => {
-            // datarun_.insert_time = datarun_.insert_time.substring(0, 19);
-            datarun_.start_time = datarun_.insert_time.substring(0, 10);
-            // datarun_.end_time = datarun_.insert_time.substring(0, 19);
-            self.datarun(datarun_);
-        });
-
-        pip.sidebar.on('pipeline', (pipeline_: Pipeline) => {
-            pipeline_.insert_time = pipeline_.insert_time.substring(0, 19);
-            (pipeline_.mlpipeline as any).primitivesAbbr = [];
-            _.each(pipeline_.mlpipeline.primitives, (p, i) => {
-                const sp = p.split('.');
-                const name = _.last(sp);
-                (pipeline_.mlpipeline as any).primitivesAbbr.push(name);
+                let _k = k.replace('#1', '');
+                let blockName = _.last(_.split(_k, '.'));
             });
-            // pipeline_.mlpipeline.primitives = JSON.stringify(pipeline_.mlpipeline.primitives);
-            pipeline_.mlpipeline.init_params = JSON.stringify(pipeline_.mlpipeline.init_params);
-            pipeline_.mlpipeline.output_names = JSON.stringify(pipeline_.mlpipeline.output_names);
-            self.pipeline(pipeline_ as any);
+
+            _.each(blocks, bl => {
+                if (bl.params.length > 0) {
+                    bl.html += `<span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>`;
+                }
+            });
+
+            self.blocks(blocks);
+            self.exp(_exp);
         });
+
     }
 
     constructor(eleId: string) {
@@ -62,10 +81,33 @@ class Sidebar {
         ko.applyBindings(this, $(eleId)[0]);
 
         let menu = $('.sidebar-menu') as any;
-        menu.tree({
-            accordion: false
-        });
+        menu.tree({accordion: false});
+
+        // open the sidebar tree menu
+        $('#sm1').click();
+        $('#sm2').click();
     }
+
 }
 
 export default Sidebar;
+
+
+
+// function RMSE(ts1, ts2) {
+//     let squareSum = 0;
+//     for (let i = 0; i < ts1.length; i++) {
+//         squareSum += (ts1[i][1] - ts2[i][1]) * (ts1[i][1] - ts2[i][1]);
+//     }
+//     return Math.sqrt(squareSum / ts1.length);
+// }
+
+// function MAPE(tsG, tsP) {
+//     let s = 0, c = 0;
+//     for (let i = 0; i < tsG.length; i++) {
+//         if (tsG[i][1] === 0) { continue; }
+//         c += 1;
+//         s += Math.abs((tsP[i][1] - tsG[i][1]) / tsG[i][1]);
+//     }
+//     return s / c;
+// }

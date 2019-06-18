@@ -3,13 +3,13 @@
 host: 'localhost' # the host name of `mongod` instance to connect to
 # host: 'db'  # only used for Docker deployment
 port: 27017    # the port that `mongod` instance is running on
-db: 'mtv'    # the name of the database to use
+db: 'nasa'    # the name of the database to use
 username:  # username to authenticate with
 password:  # password to authenticate with
 
 # FLASK ENV
 #===================================
-server_port: 3001   # the port that flask application is running on
+server_port: 3000   # the port that flask application is running on
 ENV: 'production'  # development, production, testing
 DEBUG:  False
 TESTING:  False

@@ -1,42 +1,45 @@
 @import '../main';
 @import '../theme-variables';
 
-@hd-height: 32px;
-@hd-bg-color: #1f262d;
-@hd-text-color:  #f2f2f2;
+@hd-bg-color: #3c8dbc;
+@hd-bg-logo-color: #367fa9;
 
-
-// header {
-//     height: @hd-height;
-// 	color: @hd-text-color;
-// 	background-color: @hd-bg-color;
-//     font-family: "Helvetica Neue", Helvetica, Arial,  sans-serif;
-
-// 	.logo {
-// 		font-size: 16px;
-// 		margin-right: 8px;
-//     }
-// }
-
-.navbar-nav {
-    .dataset-menu, .datarun-menu {
-        max-height: 500px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        overflow-x: hidden;
-        overflow-y: auto;
-        > li > a {
-          display: block;
-          white-space: nowrap; /* Prevent text from breaking */
-          border-bottom: 1px solid #f4f4f4;
-        }
+.main-header {
+    // color: @hd-text-color;
+    .logo {
+        background-color: @hd-bg-logo-color !important;
     }
 
-    .text {
-        font-size: 14px;
-        color: #333 !important;
-        padding-left: 0;
+    nav {
+        background-color: @hd-bg-color !important;
+        transition: margin-left .3s ease-in-out;
+        margin-bottom: 0;
+        margin-left: 230px;
+        border: none;
+        min-height: 50px;
+        border-radius: 0;
+    }
+
+    .navbar-custom-menu {
+        .project-menu, .experiment-menu {
+            max-height: 500px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            overflow-x: hidden;
+            overflow-y: auto;
+            > li > a {
+              display: block;
+              white-space: nowrap; /* Prevent text from breaking */
+              border-bottom: 1px solid #f4f4f4;
+            }
+        }
+    
+        .text {
+            font-size: 14px;
+            color: #333 !important;
+            padding-left: 0;
+        }
     }
 }
 

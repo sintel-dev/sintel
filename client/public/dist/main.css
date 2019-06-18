@@ -1,6 +1,18 @@
 body {
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
+.scroll-style-1::-webkit-scrollbar {
+  width: 14px;
+  height: 18px;
+}
+.scroll-style-1::-webkit-scrollbar-thumb {
+  height: 6px;
+  border: 4px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+}
 .nav-tabs-custom-mtv {
   margin-bottom: 0 !important;
 }
@@ -345,6 +357,18 @@ body {
 body {
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
+.scroll-style-1::-webkit-scrollbar {
+  width: 14px;
+  height: 18px;
+}
+.scroll-style-1::-webkit-scrollbar-thumb {
+  height: 6px;
+  border: 4px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+}
 .nav-tabs-custom-mtv {
   margin-bottom: 0 !important;
 }
@@ -684,8 +708,20 @@ body {
 .p-50 {
   padding: 50px !important;
 }
-.navbar-nav .dataset-menu,
-.navbar-nav .datarun-menu {
+.main-header .logo {
+  background-color: #367fa9 !important;
+}
+.main-header nav {
+  background-color: #3c8dbc !important;
+  transition: margin-left 0.3s ease-in-out;
+  margin-bottom: 0;
+  margin-left: 230px;
+  border: none;
+  min-height: 50px;
+  border-radius: 0;
+}
+.main-header .navbar-custom-menu .project-menu,
+.main-header .navbar-custom-menu .experiment-menu {
   max-height: 500px;
   margin: 0;
   padding: 0;
@@ -693,32 +729,38 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-.navbar-nav .dataset-menu > li > a,
-.navbar-nav .datarun-menu > li > a {
+.main-header .navbar-custom-menu .project-menu > li > a,
+.main-header .navbar-custom-menu .experiment-menu > li > a {
   display: block;
   white-space: nowrap;
   /* Prevent text from breaking */
   border-bottom: 1px solid #f4f4f4;
 }
-.navbar-nav .text {
+.main-header .navbar-custom-menu .text {
   font-size: 14px;
   color: #333 !important;
   padding-left: 0;
 }
+.content .chart-ctx-container {
+  overflow-y: scroll;
+}
+.content .chart {
+  width: 100%;
+}
+.content .chart .title {
+  cursor: pointer;
+  text-align: center;
+  line-height: 40px;
+  background-color: white;
+  transition: background-color 1s;
+}
 .content .fa-size-lg {
   font-size: 20px;
 }
-.content .tab-btn-group {
+.content .view-btn-group {
   position: absolute;
   right: 20px;
-}
-.content .tab-btn-group a,
-.content .tab-btn-group a:hover {
-  background: transparent;
-  border-color: transparent;
-}
-.content .tab-btn-group a > i:hover {
-  color: #999;
+  font-size: 12px;
 }
 .content .nav-tabs-custom-mtv {
   box-shadow: none;
@@ -731,6 +773,18 @@ body {
 body {
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
+.scroll-style-1::-webkit-scrollbar {
+  width: 14px;
+  height: 18px;
+}
+.scroll-style-1::-webkit-scrollbar-thumb {
+  height: 6px;
+  border: 4px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+}
 .nav-tabs-custom-mtv {
   margin-bottom: 0 !important;
 }
@@ -1070,8 +1124,20 @@ body {
 .p-50 {
   padding: 50px !important;
 }
-.navbar-nav .dataset-menu,
-.navbar-nav .datarun-menu {
+.main-header .logo {
+  background-color: #367fa9 !important;
+}
+.main-header nav {
+  background-color: #3c8dbc !important;
+  transition: margin-left 0.3s ease-in-out;
+  margin-bottom: 0;
+  margin-left: 230px;
+  border: none;
+  min-height: 50px;
+  border-radius: 0;
+}
+.main-header .navbar-custom-menu .project-menu,
+.main-header .navbar-custom-menu .experiment-menu {
   max-height: 500px;
   margin: 0;
   padding: 0;
@@ -1079,14 +1145,14 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-.navbar-nav .dataset-menu > li > a,
-.navbar-nav .datarun-menu > li > a {
+.main-header .navbar-custom-menu .project-menu > li > a,
+.main-header .navbar-custom-menu .experiment-menu > li > a {
   display: block;
   white-space: nowrap;
   /* Prevent text from breaking */
   border-bottom: 1px solid #f4f4f4;
 }
-.navbar-nav .text {
+.main-header .navbar-custom-menu .text {
   font-size: 14px;
   color: #333 !important;
   padding-left: 0;
@@ -1114,82 +1180,58 @@ body {
 }
 
 
-.summary {
-  min-height: 250px;
-  padding: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-.bar-chart .bar {
-  fill: steelblue;
-}
-.bar-chart .bar:hover {
-  fill: brown;
-}
-.bar-chart .axis path,
-.bar-chart .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-.bar-chart .x.axis path {
-  display: none;
-}
-.bar-chart .y.axis text {
-  font-size: 16px;
-  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
-}
-.bar-chart .x.axis text {
-  font-size: 16px;
-  font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
-}
-
-.horizon-controls {
-  position: absolute;
-  width: 100%;
-  padding: 0 50px ;
-  z-index: 1;
-}
-.horizon-bands {
-  float: right;
-}
-
-.line-chart .text-sm {
+.multi-line-chart-focus .text-sm,
+.multi-line-chart-ctx .text-sm {
   font-size: 13px;
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
-.line-chart .text-md {
+.multi-line-chart-focus .text-md,
+.multi-line-chart-ctx .text-md {
   font-size: 16px;
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
-.line-chart .text-lg {
+.multi-line-chart-focus .text-lg,
+.multi-line-chart-ctx .text-lg {
   font-size: 20px;
   font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 }
-.line-chart .axis {
+.multi-line-chart-focus .axis,
+.multi-line-chart-ctx .axis {
   font-size: 14px;
 }
-.line-chart .line {
+.multi-line-chart-focus .line,
+.multi-line-chart-ctx .line {
   fill: none;
-  stroke: #637bb6;
   stroke-width: 1px;
   opacity: 0.7;
 }
-.line-chart .line2 {
+.multi-line-chart-focus .line2,
+.multi-line-chart-ctx .line2 {
   fill: none;
   stroke: #b9782d;
   stroke-width: 1px;
-  opacity: 0.6;
+  opacity: 0.5;
 }
-.line-chart .line-highlight {
+.multi-line-chart-focus .error,
+.multi-line-chart-ctx .error {
+  fill: #b9782d;
+  stroke-width: 0;
+  opacity: 0.5;
+}
+.multi-line-chart-focus .line-highlight,
+.multi-line-chart-ctx .line-highlight {
   fill: none;
   stroke: #d1655d;
-  stroke-width: 4px;
+  stroke-width: 2px;
 }
-.line-chart .bar-highlight {
+.multi-line-chart-focus .area-highlight,
+.multi-line-chart-ctx .area-highlight {
+  fill: #d1655d;
+  stroke: #d1655d;
+  stroke-width: 3px;
+}
+.multi-line-chart-focus .bar-highlight,
+.multi-line-chart-ctx .bar-highlight {
   stroke: #b70e13;
   stroke-opacity: #b70e13;
   stroke-width: 0;
@@ -1197,65 +1239,43 @@ body {
   shape-rendering: crispEdges;
   cursor: pointer;
 }
-.line-chart .bg-highlight {
+.multi-line-chart-focus .bg-highlight,
+.multi-line-chart-ctx .bg-highlight {
   stroke-width: 0;
   fill-opacity: 0.2;
   fill: #777;
   cursor: pointer;
 }
-.line-chart .line-smooth {
+.multi-line-chart-focus .line-smooth,
+.multi-line-chart-ctx .line-smooth {
   fill: none;
   stroke: #a8a3aa;
   stroke-width: 1px;
 }
-.line-chart .zoom {
+.multi-line-chart-focus .zoom,
+.multi-line-chart-ctx .zoom {
   cursor: move;
   fill: none;
   pointer-events: all;
 }
 
-.radial-area-chart .frame {
-  shape-rendering: crispEdges;
-}
-.radial-area-chart .frame {
-  fill: none;
-  stroke: #aaa;
-  stroke-opacity: 0.75;
-}
-.radial-area-chart .feature-cell {
-  opacity: 0.9;
-}
-.radial-area-chart .feature-cell:hover {
-  opacity: 1;
-}
-.radial-area-chart .feature-area {
-  *fill: lightsteelblue;
-  fill-opacity: 0.4;
-  stroke-width: 1;
-}
-.radial-area-chart .feature-line {
-  *stroke: lightsteelblue;
-  stroke-opacity: 1;
-  stroke-width: 1;
-  fill-opacity: 0;
-}
-.radial-area-chart .radial-cursor {
-  cursor: pointer;
-}
-.radial-area-chart .radial-zoom {
+.multi-period-chart .zoom {
   cursor: move;
   fill: none;
   pointer-events: all;
 }
-.radial-area-chart .radial-text-sm {
+.multi-period-chart .radial-cursor {
+  cursor: pointer;
+}
+.multi-period-chart .radial-text-sm {
   font-size: 13px;
   font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-.radial-area-chart .radial-text-md {
+.multi-period-chart .radial-text-md {
   font-size: 16px;
   font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-.radial-area-chart .radial-text-lg {
+.multi-period-chart .radial-text-lg {
   font-size: 20px;
   font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }

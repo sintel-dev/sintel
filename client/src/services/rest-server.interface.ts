@@ -15,6 +15,7 @@ export interface Datarun {
     insert_time: string;
     start_time: string;
     end_time: string;
+    dataset: string;
     status: string;
     created_by: string;
     events: number;
@@ -52,9 +53,42 @@ export interface Comment {
     id: string;
 }
 
+export interface Station {
+    name: string;
+    Lat: number;
+    Lng: number;
+}
+
+export interface Experiment {
+    id: string;
+    name: string;
+    model_num: number;
+    event_num: number;
+    project: string;
+    pipeline: Pipeline;
+    start_time: string;
+    end_time: string;
+    created_by: string;
+}
+
+export interface Data {
+    datasets: Dataset[];
+    dataruns: Datarun[];
+    events: Array<Event[]>;
+    predictions: Array<{
+        names: string[],
+        data: Array<number[]>,
+        offset: number
+    }>;
+    raws: Array<{
+        year: number,
+        data: Array<Array<{means: number[], counts: number[]}>>
+    }>;
+}
+
 /****** restful api *****/
 
-interface Response {
+export interface Response {
     done<T>(data: T, textStatus?: any, xhrObject?: any): any;
 }
 
@@ -87,10 +121,10 @@ interface AddVerb {
 interface Resource {
     add: AddResource;
     addVerb: AddVerb;
-    read(id1?: any, ...rest: any[]): Response;     // GET
-    create(id1?: any, ...rest: any[]): Response;   // POST
-    update(id1?: any, ...rest: any[]): Response;   // UPDATE
-    del(id1?: any, ...rest: any[]): Response;      // DEL
+    read<T>(id1?: any, ...rest: any[]): T;     // GET
+    create<T>(id1?: any, ...rest: any[]): T;   // POST
+    update<T>(id1?: any, ...rest: any[]): T;   // UPDATE
+    del<T>(id1?: any, ...rest: any[]): T;      // DEL
 }
 
 interface Verb {
@@ -116,6 +150,8 @@ export interface Server {
     events: Resource;
     comments: Resource;
     data: Resource;
+    stations: Resource;
+    experiments: Resource;
 }
 
 

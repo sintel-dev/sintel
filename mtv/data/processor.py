@@ -14,7 +14,7 @@ from mtv.utils import get_files
 LOGGER = logging.getLogger(__name__)
 
 
-def to_mongo_docs(name, data, interval=30, utc=False):
+def to_mongo_docs(name, data, interval=30, utc=True):
     # check
     if (not (60 % interval == 0 or interval % 60 == 0) ):
         print('60 should be divisible by interval.')

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Calculator as C } from '../src/services/calc';
+import { Calculator as C } from '../src/services/helpers';
 
 describe('calculate', function() {
   it('add', function() {

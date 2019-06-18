@@ -176,6 +176,7 @@ class Experiment(Document, MongoUtils):
     model_num = fields.IntField(required=True)
     event_num = fields.IntField(required=True)
     pipeline = fields.ReferenceField(Pipeline)
+    project = fields.StringField()
     dataruns = fields.ListField(fields.ReferenceField(Datarun))
     start_time = fields.DateTimeField(required=True)
     end_time = fields.DateTimeField()

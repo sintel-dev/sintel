@@ -3,18 +3,19 @@ import {Server, JQueryStaticExt} from './rest-server.interface';
 
 let jqueryExt = $ as JQueryStaticExt;
 
-// step1: initialize a RESTful client
 let server: Server = new jqueryExt.RestClient(
-    'http://127.0.0.1:3001/api/v1/',
+    'http://127.0.0.1:3000/api/v1/',
     {
-        cache: 1,                 // This will cache requests for 5 seconds
+        cache: 5,                 // This will cache requests for 5 seconds
         cachableMethods: ['GET'],
-        stringifyData: true         // true for "Content-Type = application/json"
+        stringifyData: true,      // true for "Content-Type = application/json"
+        request: function(resource, options) {
+            // customize your request here
+            return $.ajax(options);
+        }
     }
 );
 
-
-// step2: add your resources
 server.add('datasets');
 
 server.add('dataruns');
@@ -26,6 +27,9 @@ server.add('events');
 server.add('comments');
 
 server.add('data');
+
+server.add('experiments');
+
 
 /**
  * usage:

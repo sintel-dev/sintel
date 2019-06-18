@@ -1,20 +1,20 @@
-import * as pip from '../services/pip-client';
-import * as ko from 'knockout';
-import * as _ from 'lodash';
 import server from '../services/rest-server';
-import { Dataset, Datarun } from '../services/rest-server.interface';
+import {headerConfig} from '../services/globals';
+import * as _ from 'lodash';
+import * as pip from '../services/pip-client';
+import * as RSI from '../services/rest-server.interface';
+import * as ko from 'knockout';
 
 class Header {
 
-    public datasets = ko.observableArray<Dataset>([]);
-    public dataruns = ko.observableArray<Datarun>([]);
+    public projects = ko.observableArray<string>([]);
+    public experiments = ko.observableArray<RSI.Experiment>([]);
     public selected = {
-        dataset: ko.observable({index: 0, name: ''}),
-        datarun: ko.observable({index: 0, id: ''})
+        project: ko.observable<{index: number, name: string}>(null),
+        experiment: ko.observable<{index: number, name: string}>(null)
     };
-    public activeDatasets = ko.observable(new Set());
-    public activeDataruns = ko.observable(new Set());
 
+    private expList;
 
     constructor(eleId: string) {
         let self = this;
@@ -22,80 +22,43 @@ class Header {
         // initialize Knockout Variables
         ko.applyBindings(self, $(eleId)[0]);
 
-        server.datasets.read().done((datasets_: Dataset[]) => {
-            self.datasets(datasets_);
+        server.experiments.read<RSI.Response>().done( (data: RSI.Experiment[]) => {
+            self.expList = data;
+
+            let projects = _.chain(data).map(d => d.project).uniq().value();
+            self.projects(projects);
+            self.onSelectProject(projects[0], 0);
+
+            let experiments = _.filter(data, d => d.project === projects[0]);
+            self.experiments(experiments);
+            self.selected.experiment({index: -1, name: ''});    // select nothing
+            // self.onSelectExperiment(experiments[0], 0);
         });
     }
 
     // handle events coming from other components
     public setupEventHandlers() {
-        let self = this;
-        pip.header.on('datarun:updateActives', (dataruns_: string[]) => {
-            self.activeDataruns(new Set(dataruns_));
-        });
+        // no events currently
     }
 
-    // the following public methods are triggered by user interactions
-
-    public onSelectDataset(dataset_: Dataset, index: number) {
+    // the following public methods are triggered by user interactions on header
+    public onSelectProject(proj: string, index: number) {
         let self = this;
-        const oldName = self.selected.dataset().name;
-        if (oldName !== dataset_.name) {
-            self.selected.dataset({index, name: dataset_.name});
+        this.selected.project({index, name: proj});
+        headerConfig.project = proj;
 
-            server.dataruns.read({}, {dataset: dataset_.name}).done(
-                (dataruns_: Datarun[]) => {
-                    // update dararuns' html
-                    _.each(dataruns_, d => {
-                        d.start_time = _.replace(d.start_time.substring(0, 19), 'T', ' ');
-                        d.html = `
-                            <span>▪ &nbsp; ${d.id} </span> <br>
-                            <span>&nbsp; &nbsp; created on ${d.start_time}</span>
-                        `;
-                    });
-
-                    self.dataruns(dataruns_);
-
-                    // auto select the first one
-                    self.onSelectDatarun(dataruns_[0], 0);
-                }
-            );
-
-            // update dataset information on sidebar
-            pip.sidebar.trigger('dataset', dataset_);
-        }
+        let experiments = _.filter(self.expList, d => d.project === proj);
+        self.experiments(experiments);
+        self.selected.experiment({index: -1, name: ''});    // select nothing
     }
 
-    public onSelectDatarun(datarun_: Datarun, index: number) {
-        let self = this;
-        let oid = self.selected.datarun().id;
-
-        if (!self.activeDataruns().has(datarun_.id)) {
-            self.selected.datarun({index, id: datarun_.id});
-
-            pip.content.trigger('datarun:select', {
-                dataset: self.selected.dataset().name,
-                datarun: datarun_
-            });
-
-            pip.sidebar.trigger('datarun', datarun_);
-
-            server.pipelines.read(datarun_.pipeline).done(pipeline => {
-                pip.sidebar.trigger('pipeline', pipeline);
-            });
-        }
+    public onSelectExperiment(exp: RSI.Experiment, index: number) {
+        this.selected.experiment({index, name: exp.name});
+        headerConfig.experiment = exp;
+        pip.sidebar.trigger('experiment:change', exp);
+        pip.content.trigger('experiment:change', exp);
     }
 
-    public onLoadAllDataruns() {
-        let self = this;
-        console.log('loadall');
-        // if (self.selected.dataset().name !== '') {
-        //     pip.content.trigger('datarun:loadAll', {
-        //         dataset: self.selected.dataset().name,
-        //         dataruns: self.dataruns()
-        //     });
-        // }
-    }
 }
 
 export default Header;

@@ -10,7 +10,10 @@ LOGGER = logging.getLogger(__name__)
 
 class Experiment(Resource):
     def get(self, experiment):
-        """  GET /api/v1/experiments/<string:experiment>/ """
+        """ Return the specified experiment info 
+        
+        GET /api/v1/experiments/<string:experiment>/
+        """
 
         query = {
             'name': experiment
@@ -18,13 +21,16 @@ class Experiment(Resource):
 
         document = model.Experiment.find_one(**query)
 
+        # todo: throw error to front
         if document is None:
             return False
 
         return {
+            'id': str(document.id),
             'name': document.name,
             'model_num': document.model_num,
             'event_num': document.event_num,
+            'project': document.project,
             'pipeline': {
                 'name': document.pipeline.name,
                 'mlpipeline': document.pipeline.mlpipeline
@@ -48,9 +54,11 @@ class Experiments(Resource):
         docs = list()
         for document in documents:
             docs.append({
+                'id': str(document.id),
                 'name': document.name,
                 'model_num': document.model_num,
                 'event_num': document.event_num,
+                'project': document.project,
                 'pipeline': {
                     'name': document.pipeline.name,
                     'mlpipeline': document.pipeline.mlpipeline

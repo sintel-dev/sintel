@@ -1,22 +1,38 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
-import * as d3 from 'd3';
 import * as _ from 'lodash';
+import * as RSI from '../services/rest-server.interface';
 import dataProcessor from '../services/data-processor';
-import { LineChart } from './vis/line-chart_ori_2';
-import { AreaChart } from './vis/area-chart';
-import { HorizonChart } from './vis/horizon-chart';
-import { Data as RadialAreaChartData, RadialAreaChart } from './vis/radial-area-chart';
-import { Datarun } from '../services/rest-server.interface';
-import { TimeSeriesData } from './vis/chart-data.interface';
+import { LineChartDataEle } from './vis/data.interface';
+import { LineChartCtx } from './vis/linechart-ctx';
+import { LineChartFocus } from './vis/linechart-focus';
+import { PeriodChart} from './vis/period-chart';
+
+
+interface CtxCharts {
+    [index: string]: LineChartCtx;
+}
+
+interface PeriodCharts {
+    [index: string]: PeriodChart;
+}
 
 class Content {
 
-    public boxs = ko.observableArray([]);
+    public ctxs = ko.observableArray<string>([]);
+    public focus = ko.observable<string>('');
 
-    private lineCharts = {};
+    private data: LineChartDataEle[];
+
+    private focusChart: LineChartFocus;
+    private ctxCharts: CtxCharts = {};
+    private periodCharts: PeriodCharts = {};
+
     private config = {
-        speed: 500   // box animation duration
+        speed: 500,   // box animation duration,
+        ctxHeight: 410,
+        focusHeight: 540,
+        periodHeight: 960
     };
 
     constructor(eleId: string) {
@@ -24,248 +40,274 @@ class Content {
 
         // initialize Knockout Variables
         ko.applyBindings(self, $(eleId)[0]);
+
+        // default select 0
+        $('.chart-focus-container').height(self.config.focusHeight);
+        $('.chart-ctx-container').height(self.config.ctxHeight);
+        $('.pchart').height(self.config.periodHeight);
     }
 
     // handle events coming from other components
     public setupEventHandlers() {
         let self = this;
 
-        pip.content.on('datarun:select', self.addChart.bind(self));
-
-        // pip.content.on('datarun:loadAll', async (msg: { db: string, signalList: string[] }) => {
-        //     let copy = $('#load-all-dataruns').html();
-        //     $('#load-all-dataruns').html(`<i class="fa fa-refresh fa-spin"></i>`);
-        //     for (let i = 0; i < msg.signalList.length; i++) {
-        //         await self.addChart({
-        //             db: msg.db,
-        //             signal: msg.signalList[i]
-        //         });
-        //     }
-        //     $('#load-all-dataruns').html(copy);
-        // });
-        pip.content.on('linechart:highlight:update', name => {
-            self.lineCharts[name].trigger('highlight:update');
-            self.lineCharts[name + '-no-period'].trigger('highlight:update');
+        pip.content.on('experiment:change', (exp: RSI.Experiment) => {
+            self._ToggleLoadingOverlay();
+            dataProcessor.loadData(exp).then((data: LineChartDataEle[]) => {
+                self.data = data;
+                self._ToggleLoadingOverlay();
+                self.ctxs(_.map(data, d => d.dataset.name));
+                if (self.focus() === '') {
+                    self.focus(data[0].dataset.name);
+                    $($(`.chart-context .title`)[0]).css('background-color', 'bisque');
+                } else {
+                    $($(`.chart-context [name=title-${self.focus()}]`)).css('background-color', 'bisque');
+                }
+                self._visualize();
+            });
         });
 
-        pip.content.on('linechart:highlight:modify', msg => {
-            self.lineCharts[msg.datarun].trigger('highlight:modify', msg.event);
-            self.lineCharts[msg.datarun + '-no-period'].trigger('highlight:modify', msg.event);
+        pip.content.on('ctx:brush', msg => {
+            self.focusChart.trigger('brush:update', msg);
+            _.each(self.ctxCharts, ct => {
+                ct.trigger('brush:update', msg.xMove);
+            });
+        });
+
+        pip.content.on('focus:zoom', xMove => {
+            _.each(self.ctxCharts, ct => {
+                ct.trigger('brush:update', xMove);
+            });
+        });
+
+        pip.content.on('event:update', () => {
+            self.focusChart.trigger('event:update');
+            _.each(self.ctxCharts, ct => {
+                ct.trigger('event:update');
+            });
+        });
+        pip.content.on('event:modify', (evt) => {
+            self.focusChart.trigger('event:modify', evt);
         });
     }
 
 
     // the following public methods are triggered by user interactions
 
-    public flipPrediction(name) {
+    public selectCtx(name) {
         let self = this;
-        self.lineCharts[name].trigger('prediction');
-        self.lineCharts[name + '-no-period'].trigger('prediction');
+        self.focus(name);
+        let d = _.find(self.data, o => o.dataset.name === name);
+
+        // update focus
+        self.focusChart.trigger('data:update', [d]);
+        ($(`a[href="#year"]`) as any).tab('show');
+
+        // update period
+        self.periodCharts['year'].trigger(
+            'update',
+            [{
+                name: d.dataset.name,
+                info: d.period
+            }]
+        );
+        $(`.chart-context .title`).css('background-color', 'white');
+        // console.log($(`.chart-context [name=title-${name}]`));
+        $(`.chart-context [name=title-${name}]`).css('background-color', 'bisque');
     }
 
-    public comment(name) {
+    public showMissing() {
         let self = this;
-        self.lineCharts[name].trigger('comment');
-        self.lineCharts[name + '-no-period'].trigger('comment');
+        _.each(self.periodCharts, ct => {
+            ct.option.missing = !ct.option.missing;
+            let _duration = ct.option.duration;
+            ct.option.duration = 0;
+            ct.trigger('update', null);
+            ct.option.duration = _duration;
+
+        });
     }
 
-    public uncomment(name) {
-        let self = this;
-        self.lineCharts[name].trigger('uncomment');
-        self.lineCharts[name + '-no-period'].trigger('uncomment');
-    }
-
-    public backward(datarun) {
-        if ($(`#${datarun}-radial-area-year`).hasClass('active')) {
+    public backward() {
+        if ($('#year').hasClass('active')) {
             return;
-        }
-
-        if ($(`#${datarun}-radial-area-month`).hasClass('active')) {
-            ($(`a[href="#${datarun}-radial-area-year"]`) as any).tab('show');
-        } else if ($(`#${datarun}-radial-area-day`).hasClass('active')) {
-            ($(`a[href="#${datarun}-radial-area-month"]`) as any).tab('show');
+        } else if ($('#month').hasClass('active')) {
+            ($(`a[href="#year"]`) as any).tab('show');
+        } else if ($(`#day`).hasClass('active')) {
+            ($(`a[href="#month"]`) as any).tab('show');
         }
     }
 
-    public onRemoveBox(name) {
-        let self = this;
-        setTimeout(() => {
-            let boxs = self.boxs();
-            let idx = _.findIndex(boxs, o => o[0] === name);
-            boxs.splice(idx, 1);
-            delete self.lineCharts[name];
-            delete self.lineCharts[name + '-no-period'];
-            self.boxs(boxs);
-            pip.header.trigger('datarun:updateActives', _.map(boxs, b => b[0]));
-        }, self.config.speed);
+    public showPrediction() {
+        this.focusChart.trigger('showPrediction');
     }
 
-    public onCollapse(name) {
-        let self = this;
-
-        console.log('name', name);
-
-        let btn = $(`button[name='${name}-collapse']`);
-        if (btn.find('.fa-angle-double-left').length > 0) {
-            // collapse
-            btn.html(`<i class="fa fa-angle-double-right fa-size-lg"></i>`);
-            ($(`a[href="#${name}-no-period"]`) as any).tab('show');
-        } else {
-            // expand
-            btn.html(`<i class="fa fa-angle-double-left fa-size-lg"></i>`);
-            ($(`a[href="#${name}-period"]`) as any).tab('show');
-        }
+    public addEventMode() {
+        this.focusChart.trigger('addEventMode');
     }
 
-    private async addChart(msg: {dataset: string, datarun: Datarun}) {
+    public zoomPanMode() {
+        this.focusChart.trigger('zoomPanMode');
+    }
+
+    private _visualize() {
         let self = this;
-        // let name = `${msg.dataset} : ${msg.datarun.name.split('.')[0]} (${msg.datarun.id})`; // datarun id is unique
-        let title = msg.dataset;
-        if (_.startsWith(msg.dataset, 'pid_')) {
-            title = 'Pid-' + msg.dataset.substring(4);
-        }
-        let name = [
-            msg.datarun.id,
-            // `<label>Dataset: </label> ${msg.dataset}
-            //  <label>Datarun: </label> ${msg.datarun.id}
-            //  <label>created on </label> ${msg.datarun.start_time}
-            // `
-            `<span>Dataset: </span> <label> ${msg.dataset} </label>
-             <span>Experiment created on </span> <label> ${msg.datarun.start_time.substring(0, 10)} </label>
-            `
-        ];
-        let boxs = self.boxs();
+        let data = self.data;
 
-        // if new, then add a new box
-        if (_.findIndex(boxs, o => o === name) < 0) {
+        // get common x domain
+        let mmin = Number.MAX_SAFE_INTEGER;
+        let mmax = Number.MIN_SAFE_INTEGER;
+        _.each(data, d => {
+            let st = _.first(d.timeseries)[0];
+            let ed = _.last(d.timeseries)[0];
+            mmin = mmin > st ? st : mmin;
+            mmax = mmax < ed ? ed : mmax;
+        });
+        let xDomain: [number, number] = [mmin, mmax];
 
-            boxs = [name];
-            // boxs.unshift(name);    // add to head
-            self.boxs(boxs);
-            pip.header.trigger('datarun:updateActives', _.map(boxs, b => b[0]));
+        if (_.isUndefined(self.focusChart)) {
+            // plot context chart
+            for (let i = 0; i < data.length; i++) {
+                let dName = data[i].dataset.name;
+                self.ctxCharts[dName] = new LineChartCtx(
+                    $(`.chart-context [name="${dName}"]`)[0],
+                    [data[i]],
+                    {
+                        height: 40,
+                        offset: 0,
+                        xAxis: false,
+                        yAxis: false,
+                        margin: { top: 5, right: 35, bottom: 5, left: 40 },
+                        xDomain: xDomain
+                    }
+                );
+            }
 
-            // activate box interaction
-            // ($(`.box[name='${name[0]}']`) as any).boxWidget({
-            //     animationSpeed: self.config.speed,
-            //     collapseTrigger: `button[name='${name[0]}-collapse']`,
-            //     removeTrigger: `button[name='${name[0]}-remove']`
-            // });
-
-            // load data for visualization
-            // let data = await dataProcessor.loadData(msg.dataset, msg.datarun.id) as any;
-            let data = await dataProcessor.loadData2(msg.dataset, msg.datarun.id) as any;
-
-            // declare the element for adding the chart
-            let ele;
-
-            // add line chart no period
-            ele = $(`#${name[0]}-line-no-period`)[0];
-            self.lineCharts[name[0] + '-no-period'] = new LineChart(ele,
-                data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset,
-            {
-                height: 600,
-                height2: 180,
-                // width: ele.parentElement.getBoundingClientRect().width,
-                // width2: ele.parentElement.getBoundingClientRect().width,
-                width: $('.wd-12').width(),
-                width2: $('.wd-12').width(),
-                // smooth: true,
-                windows: data.windows,
-                offset: data.offset,
-                clipName: 'clip-no-period'
-            });
-
-            // add line chart
-            ele = $(`#${name[0]}-line`)[0];
-            self.lineCharts[name[0]] = new LineChart(ele,
-                data.timeseries, data.timeseries2, data.errors, msg.datarun.id, msg.dataset,
-            {
-                height: 600,
-                height2: 180,
-                // width: ele.parentElement.getBoundingClientRect().width,
-                // width2: ele.parentElement.getBoundingClientRect().width,
-                width: $('.wd-8').width(),
-                width2: $('.wd-8').width(),
-                // smooth: true,
-                windows: data.windows,
-                offset: data.offset,
-                clipName: 'clip-period'
-            });
-
-            // // add area chart
-            // ele = $(`#${name[0]}-area`)[0];
-            // new AreaChart($(`#${name[0]}-area`)[0], data.timeseries, {
-            //     height: 400,
-            //     width: ele.parentElement.getBoundingClientRect().width
-            // });
-
-            // // // add horizon chart
-            // ele = $(`#${name[0]}-horizon`)[0];
-            // new HorizonChart($(`#${name[0]}-horizon`)[0], data.timeseries, {
-            //     width: ele.parentElement.getBoundingClientRect().width
-            //     // normalized: true
-            // });
-
-            // add radial area chart
-            ele = $(`#${name[0]}-radial-area-year`)[0];
-            // let ndata = dataProcessor.normalizeTimeSeries(data.timeseries);
-            // let tdata = dataProcessor.transformTimeSeriesToPeriodYear(ndata);
-            let yearChart = new RadialAreaChart($(`#${name[0]}-radial-area-year`)[0],
-                data.period,
+            // plot focused chart
+            self.focusChart = new LineChartFocus(
+                $('.chart-focus')[0],
+                [data[0]],   // By default, plot the first one
                 {
-                    width: $('.wd-4').width(),
-                    // width: ele.parentElement.getBoundingClientRect().width,
-                    nCol: 3
+                    height: 480,
+                    offset: 0,
+                    xAxis: true,
+                    yAxis: true,
+                    margin: { top: 5, right: 35, bottom: 30, left: 40 },
+                    xDomain: xDomain
                 }
             );
 
-            ele = $(`#${name[0]}-radial-area-month`)[0];
-            let fakeMonthData = dataProcessor.genRadialAreaChartData(12, 30);
-            let monthChart = new RadialAreaChart($(`#${name[0]}-radial-area-month`)[0],
-                fakeMonthData,
+            // plot year period chart
+            self.periodCharts['year'] = new PeriodChart(
+                $('#year')[0],
+                [{
+                    name: data[0].dataset.name,
+                    info: data[0].period
+                }],
                 {
-                    width: $('.wd-4').width(),
-                    // width: ele.parentElement.getBoundingClientRect().width,
-                    nCol: 3
+                    width: $('.pchart').width() - 60,
+                    nCol: 2
                 }
             );
 
-            ele = $(`#${name[0]}-radial-area-day`)[0];
-            let fakeDayData = dataProcessor.genRadialAreaChartData(30, 24, 'day');
-            let dayChart = new RadialAreaChart($(`#${name[0]}-radial-area-day`)[0],
-                fakeDayData,
+            // plot month period chart
+            self.periodCharts['month'] = new PeriodChart(
+                $('#month')[0],
+                [{
+                    name: data[0].dataset.name,
+                    info: data[0].period[0].children
+                }],
                 {
-                    width: $('.wd-4').width(),
-                    // width: ele.parentElement.getBoundingClientRect().width,
+                    width: $('.pchart').width() - 60,
+                    nCol: 4
+                }
+            );
+
+            // plot day period chart
+            self.periodCharts['day'] = new PeriodChart(
+                $('#day')[0],
+                [{
+                    name: data[0].dataset.name,
+                    info: data[0].period[0].children[0].children
+                }],
+                {
+                    width: $('.pchart').width(),
                     nCol: 7
-                    // cw: 60,
-                    // ch: 60,
-                    // size: 70
                 }
             );
+        } else {
+            let d = _.find(self.data, o => o.dataset.name === self.focus());
 
-            yearChart.on('select', (o: RadialAreaChartData) => {
-                // switch tag
-                ($(`a[href="#${name[0]}-radial-area-month"]`) as any).tab('show');
+            // update focus
+            self.focusChart.option.xDomain = xDomain;
+            self.focusChart.trigger('data:update', [d]);
 
-                // change tab title
-                $(`#${name[0]}-radial-area-title`)
-                    .text(`Period - Year: ${o.name}`);
+            // update context
+            for (let i = 0; i < data.length; i++) {
+                let dName = data[i].dataset.name;
+                self.ctxCharts[dName].trigger('data:update', [d]);
+            }
 
-                monthChart.trigger('update', o.children);
-            });
+            // update period-chart
+            ($(`a[href="#year"]`) as any).tab('show');
+            self.periodCharts['year'].trigger(
+                'update',
+                [{
+                    name: d.dataset.name,
+                    info: d.period
+                }]
+            );
+        }
 
-            monthChart.on('select', (o: RadialAreaChartData) => {
-                // switch tag
-                ($(`a[href="#${name[0]}-radial-area-day"]`) as any).tab('show');
+        // ******* handle chart events *********
+        self.periodCharts['year'].on('select', (o) => {
+            let newData = [];
+            let d = _.find(data, dd => dd.dataset.name === self.focus());
+            for (let i = 0; i < d.period.length; i++) {
+                if (d.period[i].name !== o.name) { continue; }
+                newData.push({
+                    name: d.dataset.name,
+                    info: d.period[i].children
+                });
+            }
+            console.log(newData);
+            // switch tab
+            ($('a[href="#month"]') as any).tab('show');
 
-                // change tab title
-                $(`#${name[0]}-radial-area-title`)
-                    .text(`Period - Year: ${o.parent.name}, Month: ${o.name}`);
+            // update
+            self.periodCharts['month'].trigger('update', newData);
+        });
 
-                dayChart.trigger('update', o.children);
-            });
+        self.periodCharts['month'].on('select', (o) => {
+            let newData = [];
+            let d = _.find(self.data, dd => dd.dataset.name === self.focus());
+            for (let i = 0; i < d.period.length; i++) {
+                if (d.period[i].name !== o.parent.name) { continue; }
+                for (let j = 0; j < d.period[i].children.length; j++) {
+                    if (d.period[i].children[j].name !== o.name) { continue; }
+                    newData.push({
+                        name: d.dataset.name,
+                        info: d.period[i].children[j].children
+                    });
+                }
+            }
+            // switch tab
+            ($('a[href="#day"]') as any).tab('show');
 
+            // update
+            self.periodCharts['day'].trigger('update', newData);
+        });
+    }
+
+    private _ToggleLoadingOverlay() {
+        if ($('.timeseries-overview>.overlay').hasClass('hidden')) {
+            $('.timeseries-overview>.overlay').removeClass('hidden');
+            $('.timeseries-detail>.overlay').removeClass('hidden');
+            $('.period-view>.overlay').removeClass('hidden');
+        } else {
+            $('.timeseries-overview>.overlay').addClass('hidden');
+            $('.timeseries-detail>.overlay').addClass('hidden');
+            $('.period-view>.overlay').addClass('hidden');
         }
     }
 }

@@ -4,22 +4,37 @@
 
 .content {
 
+    .chart-ctx-container {
+        overflow-y: scroll;
+    }
+
+    .chart {
+        width: 100%;
+        .title {
+            cursor: pointer;
+            text-align: center;
+            line-height: 40px;
+            background-color: white;
+            transition: background-color 1s;
+        }
+    }
+
     .fa-size-lg {
         font-size: 20px;
     }
 
-    .tab-btn-group {
+    .view-btn-group {
         position: absolute;
         right: 20px;
-
-        a, a:hover {
-            background: transparent;
-            border-color: transparent;
-        }
+        font-size: 12px;
+        // a, a:hover {
+        //     background: transparent;
+        //     border-color: transparent;
+        // }
     
-        a>i:hover {
-            color: #999;
-        }
+        // a>i:hover {
+        //     color: #999;
+        // }
     }
 
     .nav-tabs-custom-mtv {

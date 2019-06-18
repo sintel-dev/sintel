@@ -1,174 +1,59 @@
-import {TimeSeriesData, PeriodData} from '../components/vis/chart-data.interface';
-import * as d3 from 'd3';
+import {TimeSeriesData, LineChartDataEleInfoEle} from '../components/vis/data.interface';
 import * as _ from 'lodash';
+import * as G from './globals';
+import * as RSI from './rest-server.interface';
 import server from './rest-server';
-
-// let dt = new Date(1548257576796);
-// console.log(dt.toTimeString());
-// console.log(dt.toUTCString());
 
 
 class DataProcessor {
 
-    public async loadCsv(fileName: string) {
-        let self = this;
-
-        let content = await d3.text(fileName);
-        let data = d3.csvParseRows(content);
-        data.splice(0, 1);
-        let transformedData: TimeSeriesData = [];
-
-        // not using timestamp
-        let scale = +data[0][0] === 0 ? 1 : 1000;
-
-        _.each(data, d => {
-            if (d[1] !== '') {
-                transformedData.push([+d[0] * scale, +d[1]]);
-            }
-        });
-
-        return transformedData;
-    }
-
-
     /**
      * Load data from server
      *
-     * @param {string} [dataset] Dataset name.
-     * @param {string} [datarun] Datarun id.
+     * @param {RSI.Experiment} [Experiment] A selected experiment.
      * @returns {Dict} {raw: [], prediction: [], windows: [], offset}.
      */
-    public async loadData(dataset: string, datarun: string) {
+    public async loadData(exp: RSI.Experiment) {
         let self = this;
 
-        return new Promise((resolve, reject) => {
-            server.data.read({}, {dataset, datarun})
-                .done((data, textStatus) => {
-                    if (textStatus === 'success') {
-                        const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
-                        const windows = self._toEventWindows(
-                            data.events,
-                            _.map(timeseries, d => d[0]),
-                            (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
-                        );
-                        resolve({
-                            timeseries,
-                            period: self._toPeriodData(data.raw),
-                            windows,
-                            offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
-                        });
-                    } else {
-                        reject(textStatus);
-                    }
-                });
+        let data = await server.data.read<RSI.Data>({}, {
+            eid: G.headerConfig.experiment.id
         });
+
+        let res = [];
+        for (let i = 0; i < data.datasets.length; i++) {
+            let timeseries = self._toTimeSeriesData(data.predictions[i], 'y_raw');
+            let timeseriesPred = self._toTimeSeriesData(data.predictions[i], 'y_raw_hat');
+            let timeseriesErr = self._toTimeSeriesData(data.predictions[i], 'es_raw');
+            let windows = self._toEventWindows(
+                data.events[i],
+                _.map(timeseries, o => o[0]),
+                0
+            );
+            res.push({
+                dataset: data.datasets[i],
+                datarun: data.dataruns[i],
+                timeseries,
+                timeseriesPred,
+                timeseriesErr,
+                windows,
+                period: self._toPeriodData(data.raws[i]),
+                offset: 0
+            });
+        }
+
+        console.log('data-processor res:', res);
+
+        return res;
     }
 
-    public async loadData2(dataset: string, datarun: string) {
-        let self = this;
 
-        return new Promise((resolve, reject) => {
-            server.data.read({}, {dataset, datarun})
-                .done((data, textStatus) => {
-                    if (textStatus === 'success') {
-                        const timeseries = self._toTimeSeriesData(data.prediction, 'y_raw');
-                        const windows = self._toEventWindows(
-                            data.events,
-                            _.map(timeseries, d => d[0]),
-                            (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
-                        );
-                        resolve({
-                            timeseries,
-                            timeseries2: self._toTimeSeriesData(data.prediction, 'y_raw_hat'),
-                            errors: self._toTimeSeriesData(data.prediction, 'es_raw'),
-                            period: self._toPeriodData(data.raw),
-                            windows,
-                            offset: (timeseries[1][0] - timeseries[0][0]) * data.prediction.offset
-                        });
-                    } else {
-                        reject(textStatus);
-                    }
-                });
-        });
-    }
-
-    /* tslint:disable */
-    public async loadEventData(datarun: string, timestamps, offset=0) {
+    public async loadEventData(datarun: string, timestamps, offset= 0) {
         let self = this;
 
         let data = await server.events.read({}, {datarun: datarun});
 
-        return self._toEventWindows(data, timestamps, offset)
-    }
-    /* tslint:enable */
-
-
-    public normalizeTimeSeries(data: TimeSeriesData): TimeSeriesData {
-        // if (data[0][0] instanceof Array) {  // cd.TimeSeriesData[]
-
-        // } else {  // TimeSeriesData
-
-        // }
-        let nm = d3.scaleLinear()
-            .domain(d3.extent(data, d => d[1]))
-            .range([0, 1]);
-
-        let normalizedData = _.map(data, o => [o[0], nm(o[1])] as [number, number] );
-        return normalizedData;
-    }
-
-    /* tslint:disable */
-    public genTimeSeriesData(timesteps) {
-        // seeded-random.js ////////////////////////////////
-        // A seeded random number generators adapted from:
-        // http://stackoverflow.com/questions/521295/javascript-random-seeds
-        function seededRandom(s) {
-            let m_w = 987654321 + s;
-            let m_z = 987654321 - s;
-            let mask = 0xffffffff;
-
-            return function () {
-                m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
-                m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
-
-                let result = ((m_z << 16) + m_w) & mask;
-                result /= 4294967296;
-
-                return result + 0.5;
-            };
-        }
-        // END seeded-random.js ////////////////////////////////
-
-
-        let seed = 1, t = 0;
-        function random() {
-            let rand = seededRandom(seed);
-            let data = [];
-            for (let i = -t, variance = 0; i < timesteps; i++) {
-                variance += (rand() - 0.5) / 10;
-                // Pre-roll the random number generator's results to match where they should be at this `t`.
-                if (i > 0) {
-                    data.push([i, Math.cos((i + t) / 100) + variance]);
-                }
-            }
-            return data;
-        }
-
-        return random();
-    }
-    /* tslint:enable */
-
-
-    public genRadialAreaChartData(nFeatures, mBins, level= 'fake'): PeriodData[] {
-        return _.range(nFeatures).map(function (i) {
-            return {
-                'level': level,
-                'name': 'feature' + i,
-                'bins': _.range(mBins).map(function (j) {
-                    return Math.random();
-                })
-            };
-        });
+        return self._toEventWindows(data, timestamps, offset);
     }
 
     // TODO: other smoothing method
@@ -194,13 +79,10 @@ class DataProcessor {
     }
 
     private _toPeriodData(data) {
-        let years: PeriodData[] = [];
+        let years: LineChartDataEleInfoEle[] = [];
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
                            'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        let max = Number.MIN_SAFE_INTEGER;
-        let min = Number.MAX_SAFE_INTEGER;
 
         // iterate year
         for (let yy = 0; yy < data.length; yy++) {
@@ -239,17 +121,21 @@ class DataProcessor {
                     month.children.push(day);
 
                     // daily aggregated value
-                    let i = 0, sum = 0, d = data[yy].data[mm][dd];
-                    while (i < d.means.length) {
-                        if (d.counts[i] > 0) {
-                            min = min > d.means[i] ? d.means[i] : min;
-                            max = max < d.means[i] ? d.means[i] : max;
-                        }
-                        sum += d.means[i] * d.counts[i];
-                        i += 1;
-                    }
+                    // let i = 0, sum = 0, d = data[yy].data[mm][dd];
+                    // while (i < d.means.length) {
+                    //     if (d.counts[i] > 0) {
+                    //         min = min > d.means[i] ? d.means[i] : min;
+                    //         max = max < d.means[i] ? d.means[i] : max;
+                    //     }
+                    //     sum += d.means[i] * d.counts[i];
+                    //     i += 1;
+                    // }
+                    // const count = _.sum(d.counts);
+                    // const mean = count === 0 ? 0 : sum / count;
+
+                    let d = data[yy].data[mm][dd];
                     const count = _.sum(d.counts);
-                    const mean = count === 0 ? 0 : sum / count;
+                    const mean = _.sum(d.means) / d.means.length;
 
                     // update year bins
                     year.bins.push(mean);
@@ -259,35 +145,37 @@ class DataProcessor {
                     month.bins.push(mean);
                     month.counts.push(count);
 
-                    if (count > 0) {
-                        min = min > mean ? mean : min;
-                        max = max < mean ? mean : max;
+                }
+                // year.bins.push(_.sum(month.bins) / month.bins.length);
+                // year.counts.push(_.sum(month.counts));
+            }
+
+            // 7 days as one bin
+            let i = 0, nbins = [], ncounts = [];
+            while (i < year.bins.length) {
+                let s = 0, c = 0, v = 0;
+                for (let j = 0; j < 7; j++) {
+                    s += year.bins[i + j];
+                    c += year.counts[i + j];
+                }
+                i += 7;
+                v = s / 7;
+                if (i === 364) {
+                    s += year.bins[364];
+                    c += year.counts[364];
+                    v = s / 8;
+                    if (year.bins.length === 366) {
+                        s += year.bins[365];
+                        c += year.counts[365];
+                        v = s / 9;
                     }
+                    i = 367;
                 }
+                if (c === 0) { nbins.push(0); } else { nbins.push(v); }
+                ncounts.push(c);
             }
-        }
-
-
-        // normalized to [0, 1]
-        let nm = d3.scaleLinear()
-            .domain([min, max])
-            .range([0, 1]);
-
-        let nmm = (node) => {
-            return _.map(node.bins, (d, i) => {
-                if (node.counts[i] === 0) { return 0; }
-                return nm(d);
-            });
-        };
-
-        for (let i = 0; i < years.length; i += 1) {
-            years[i].bins = nmm(years[i]);
-            for (let j = 0; j < years[i].children.length; j += 1) {
-                years[i].children[j].bins = nmm(years[i].children[j]);
-                for (let k = 0; k < years[i].children[j].children.length; k += 1) {
-                    years[i].children[j].children[k].bins = nmm(years[i].children[j].children[k]);
-                }
-            }
+            year.bins = nbins;
+            year.counts = ncounts;
         }
 
         return years;

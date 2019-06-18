@@ -1,6 +1,6 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
-import { Event, Comment } from '../services/rest-server.interface';
+import * as RSI from '../services/rest-server.interface';
 import server from '../services/rest-server';
 
 
@@ -15,8 +15,8 @@ class Modal {
     public transcript = ko.observable('');
     public comment = '';
 
-    private eventInfo: Event;
-    private commentInfo: Comment;
+    private eventInfo: RSI.Event;
+    private commentInfo: RSI.Comment;
     private modalEle: any;
     private SpeechRecognition: any;
 
@@ -28,15 +28,15 @@ class Modal {
             self.level(val);
         });
 
-        pip.modal.on('comment:start', (eventInfo: Event) => {
+        pip.modal.on('comment:start', (eventInfo: RSI.Event) => {
             update(eventInfo);
         });
 
-        pip.modal.on('comment:new', (eventInfo: Event) => {
+        pip.modal.on('comment:new', (eventInfo: RSI.Event) => {
             update(eventInfo);
         });
 
-        async function update(eventInfo: Event) {
+        async function update(eventInfo: RSI.Event) {
             if (eventInfo.id === 'new') {
                 $('#comment').val('');
             } else {
@@ -92,18 +92,20 @@ class Modal {
 
     public remove() {
         let self = this;
-        server.events.del(self.event()).done(() => {
+        server.events.del<RSI.Response>(self.event()).done(() => {
             self.modalEle.modal('hide');
-            pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+            pip.content.trigger('event:update');
+            // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
         });
     }
 
     public modify() {
         let self = this;
-        pip.content.trigger('linechart:highlight:modify', {
-            datarun: self.eventInfo.datarun,
-            event: self.eventInfo
-        });
+        pip.content.trigger('event:modify', self.eventInfo);
+        // pip.content.trigger('linechart:highlight:modify', {
+        //     datarun: self.eventInfo.datarun,
+        //     event: self.eventInfo
+        // });
         self.modalEle.modal('hide');
     }
 
@@ -112,14 +114,15 @@ class Modal {
 
         if (self.event() === 'new') {
             // create new
-            server.events.create({
+            server.events.create<RSI.Response>({
                 start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
                 stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
                 score: self.fromScoreToLevel(self.level()),
                 datarun: self.eventInfo.datarun
             }).done(eid => {
                 self.modalEle.modal('hide');
-                pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
                 server.comments.create({
                     event: eid,
@@ -128,14 +131,15 @@ class Modal {
             });
         } else {
             // update existing
-            server.events.update(self.event(), {
+            server.events.update<RSI.Response>(self.event(), {
                 start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
                 stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
                 score: self.fromScoreToLevel(self.level()),
                 datarun: self.eventInfo.datarun
             }).done(eid => {
                 self.modalEle.modal('hide');
-                pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
                 if (self.commentInfo.id === 'new') {
                     server.comments.create({

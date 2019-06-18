@@ -66,10 +66,10 @@ def get_parser():
                              help='Position of the timestamp column in the CSV')
     add_aggdata.add_argument('-V', '--value-column', type=int, default=1,
                              help='Position of the value column in the CSV')
-    add_aggdata.add_argument('-I', '--interval', type=int, default=30,
-                             help='Interval (minute) used for data aggregation.')
     add_aggdata.add_argument('-H', '--header', action='store_true',
                              help='Whether having header in the CSV')
+    add_aggdata.add_argument('-I', '--interval', type=int, default=30,
+                             help='Interval (minute) used for data aggregation.')
     add_aggdata.add_argument('--start', type=int, help='Start time, as an integer unix timestamp')
     add_aggdata.add_argument('--stop', type=int, help='Stop time, as an integer unix timestamp')
     add_aggdata.add_argument('--col', type=str, default='raw', help='Collection name')
