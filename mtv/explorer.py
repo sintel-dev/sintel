@@ -116,7 +116,7 @@ class MTVExplorer:
                 data = pd.read_csv(file_path, header='infer')
                 data = data.sort_values('timestamp').set_index('timestamp')
             else:
-                data = pd.read_csv(path, header=None)
+                data = pd.read_csv(file_path, header=None)
                 columns = {
                     'timestamp': data[time_column].values,
                     'value': data[value_column].values,
