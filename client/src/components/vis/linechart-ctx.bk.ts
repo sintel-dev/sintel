@@ -32,14 +32,13 @@ export interface Option {
 export class LineChartCtx extends pip.Events {
 
     private container: d3.Selection<HTMLElement, any, any, any>;
-    private svg: d3.Selection<SVGElement, any, any, any>;
     private canvas: d3.Selection<any, any, any, any>;
-
+    private svg: d3.Selection<any, any, any, any>;
     private defaultHeight = 300;
 
     private option: Option = {
         // layout
-        height: 40,
+        height: null,
         width: null,
         margin: { top: 5, right: 5, bottom: 5, left: 35 },
         // animation
@@ -79,6 +78,8 @@ export class LineChartCtx extends pip.Events {
             // .classed('scroll-style-0', true)
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
+            // .style('width', `${self.option.width}px`)
+            // .style('height', `${self.option.height}px`);
 
         self.plot();
     }
@@ -90,6 +91,7 @@ export class LineChartCtx extends pip.Events {
             option.width - option.margin.left - option.margin.right,
             option.height - option.margin.top - option.margin.bottom,
         ];
+
         // define axis scale
         let {x, y} = self.getScale(w, h);
 
@@ -111,10 +113,10 @@ export class LineChartCtx extends pip.Events {
         context.beginPath();
         lineCanvas(self.data[0].timeseries);
         context.lineWidth = 1;
-        // context.strokeStyle = colorSchemes.getColorCode('dname');
-        context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        context.strokeStyle = colorSchemes.getColorCode('dname');
         context.stroke();
 
+        // // append svg to <div>
         // self.svg = self.container.append<SVGElement>('svg')
         //     .style('position', 'absolute')
         //     .style('left', 0)
@@ -123,44 +125,36 @@ export class LineChartCtx extends pip.Events {
         //     .attr('width', self.option.width)
         //     .attr('height', self.option.height);
 
-        self.svg = self.container.append<SVGElement>('svg')
-            .style('position', 'absolute')
-            .style('left', 0)
-            .style('top', 0)
-            .attr('class', 'multi-line-chart-ctx')
-            .attr('width', self.option.width)
-            .attr('height', self.option.height);
+        //     let chart = self.svg.append<SVGGElement>('g')
+        //     .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
 
-        let chart = self.svg.append<SVGGElement>('g')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+        // // plot axis
+        // let xAxis = d3.axisBottom(x);
+        // let yAxis = d3.axisLeft(y);
 
-        // plot axis
-        let xAxis = d3.axisBottom(x);
-        let yAxis = d3.axisLeft(y);
+        // if (option.xAxis) {
+        //     chart.append('g')
+        //         .attr('class', 'axis axis--x')
+        //         .attr('transform', `translate(0, ${h})`)
+        //         .call(xAxis);
+        // }
 
-        if (option.xAxis) {
-            chart.append('g')
-                .attr('class', 'axis axis--x')
-                .attr('transform', `translate(0, ${h})`)
-                .call(xAxis);
-        }
+        // if (option.yAxis) {
+        //     chart.append('g')
+        //         .attr('class', 'axis axis--y')
+        //         .call(yAxis.ticks(0, ',f'));
+        // }
 
-        if (option.yAxis) {
-            chart.append('g')
-                .attr('class', 'axis axis--y')
-                .call(yAxis.ticks(0, ',f'));
-        }
+        // // function used to plot area
+        // let area = d3.area<[number, number]>()
+        //     .x(function(d) { return x(d[0]); })
+        //     .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
+        //     .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
 
-        // function used to plot area
-        let area = d3.area<[number, number]>()
-            .x(function(d) { return x(d[0]); })
-            .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
-            .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
-
-        // function used to plot line
-        let line = d3.line<[number, number]>()
-            .x(d => x(d[0]))
-            .y(d => y(d[1]));
+        // // function used to plot line
+        // let line = d3.line<[number, number]>()
+        //     .x(d => x(d[0]))
+        //     .y(d => y(d[1]));
 
         // let lineG = chart.append('g').selectAll('.line')
         //     .data(self.data)
@@ -179,87 +173,88 @@ export class LineChartCtx extends pip.Events {
         //     .attr('d', d => area(d.timeseries))
         //     .attr('fill', d => colorSchemes.getColorCode('dname'));
 
-        let highlightUpdate = self.addHighlights(h, x, line, area);
 
-        let {brush, bUpdate} = self.addBrush(chart, w, h, x);
-        brush.on('brush end', brushHandler);
+        // let highlightUpdate = self.addHighlights(h, x, line, area);
 
-        // events
-        self.on('brush:update', xMove => {
-            brush.on('brush end', null);
-            bUpdate(xMove);
-            brush.on('brush end', brushHandler);
-        });
+        // let {brush, bUpdate} = self.addBrush(chart, w, h, x);
+        // brush.on('brush end', brushHandler);
 
-        self.on('data:update', dataUpdateHandler);
+        // // events
+        // self.on('brush:update', xMove => {
+        //     brush.on('brush end', null);
+        //     bUpdate(xMove);
+        //     brush.on('brush end', brushHandler);
+        // });
 
-        self.on('event:update', eventUpdateHandler);
+        // self.on('data:update', dataUpdateHandler);
 
-        // event handlers
-        function brushHandler() {
-            if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
-            let s = d3.event.selection || x.range();
-            pip.content.trigger('ctx:brush', {
-                xMove: [s[0], s[1]],
-                xDomain: [x.invert(s[0]), x.invert(s[1])],
-                transform: d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
-            });
-        }
+        // self.on('event:update', eventUpdateHandler);
 
-        function dataUpdateHandler(newData: LineChartDataEle[]) {
-            self.data = newData;
-            let sc = self.getScale(w, h);
-            [x, y] = [sc.x, sc.y];
+        // // event handlers
+        // function brushHandler() {
+        //     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
+        //     let s = d3.event.selection || x.range();
+        //     pip.content.trigger('ctx:brush', {
+        //         xMove: [s[0], s[1]],
+        //         xDomain: [x.invert(s[0]), x.invert(s[1])],
+        //         transform: d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
+        //     });
+        // }
 
-            let t = d3.transition()
-                .duration(option.duration)
-                .ease(d3.easeLinear);
+        // function dataUpdateHandler(newData: LineChartDataEle[]) {
+        //     self.data = newData;
+        //     let sc = self.getScale(w, h);
+        //     [x, y] = [sc.x, sc.y];
 
-            let uc = chart.selectAll<any, LineChartDataEle>('.line')
-                          .data(self.data);
-            uc.enter().append('path')
-                .attr('class', 'line')
-                .merge(uc)
-                .style('stroke', d => colorSchemes.getColorCode('dname'))
-                .style('opacity', 0.5)
-                .transition(t)
-                .attr('d', d => line(d.timeseries));
+        //     let t = d3.transition()
+        //         .duration(option.duration)
+        //         .ease(d3.easeLinear);
 
-            // let uc = chart.selectAll<any, LineChartDataEle>('.area')
-            //     .data(self.data);
-            // uc.enter().append('path')
-            //     .attr('class', 'area')
-            //     .merge(uc)
-            //     .style('fill', d => colorSchemes.getColorCode('dname'))
-            //     .style('opacity', 0.5)
-            //     .transition(t)
-            //     .attr('d', d => area(d.timeseries));
+        //     let uc = chart.selectAll<any, LineChartDataEle>('.line')
+        //                   .data(self.data);
+        //     uc.enter().append('path')
+        //         .attr('class', 'line')
+        //         .merge(uc)
+        //         .style('stroke', d => colorSchemes.getColorCode('dname'))
+        //         .style('opacity', 0.5)
+        //         .transition(t)
+        //         .attr('d', d => line(d.timeseries));
 
-            // clean all original windows
-            self.svg.selectAll('.window').remove();
-            _.each(self.data, d => {
-                highlightUpdate(d.windows, d.timeseries, 'dname');
-            });
+        //     // let uc = chart.selectAll<any, LineChartDataEle>('.area')
+        //     //     .data(self.data);
+        //     // uc.enter().append('path')
+        //     //     .attr('class', 'area')
+        //     //     .merge(uc)
+        //     //     .style('fill', d => colorSchemes.getColorCode('dname'))
+        //     //     .style('opacity', 0.5)
+        //     //     .transition(t)
+        //     //     .attr('d', d => area(d.timeseries));
 
-            uc.exit().remove();
-        }
+        //     // clean all original windows
+        //     self.svg.selectAll('.window').remove();
+        //     _.each(self.data, d => {
+        //         highlightUpdate(d.windows, d.timeseries, 'dname');
+        //     });
 
-        async function eventUpdateHandler() {
-            if (self.data.length > 1) { return; }
-            // only execute when there is only one timeseries
-            let newWindows = await dataProcessor.loadEventData(
-                self.data[0].datarun.id,
-                _.map(self.data[0].timeseries, d => d[0]),
-                self.option.offset
-                // self.data[0].offset
-            );
+        //     uc.exit().remove();
+        // }
 
-            self.data[0].windows = newWindows as any;
-            self.svg.selectAll('.window').remove();
-            _.each(self.data, (d, i) => {
-                highlightUpdate(d.windows, d.timeseries, 'dname');
-            });
-        }
+        // async function eventUpdateHandler() {
+        //     if (self.data.length > 1) { return; }
+        //     // only execute when there is only one timeseries
+        //     let newWindows = await dataProcessor.loadEventData(
+        //         self.data[0].datarun.id,
+        //         _.map(self.data[0].timeseries, d => d[0]),
+        //         self.option.offset
+        //         // self.data[0].offset
+        //     );
+
+        //     self.data[0].windows = newWindows as any;
+        //     self.svg.selectAll('.window').remove();
+        //     _.each(self.data, (d, i) => {
+        //         highlightUpdate(d.windows, d.timeseries, 'dname');
+        //     });
+        // }
     }
 
     private addBrush(chart, w, h, x) {

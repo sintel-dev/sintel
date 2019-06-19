@@ -30,9 +30,9 @@ class Content {
 
     private config = {
         speed: 500,   // box animation duration,
-        ctxHeight: 480,
-        focusHeight: 540,
-        periodHeight: 960
+        ctxHeight: 450,
+        focusHeight: 525,
+        periodHeight: 980
     };
 
     constructor(eleId: string) {
@@ -43,6 +43,7 @@ class Content {
 
         // default select 0
         $('.chart-focus-container').height(self.config.focusHeight);
+        $('.chart-focus .plot').height(self.config.focusHeight - 45);
         $('.chart-ctx-container').height(self.config.ctxHeight);
         $('.pchart').height(self.config.periodHeight);
     }
@@ -59,9 +60,9 @@ class Content {
                 self.ctxs(_.map(data, d => d.dataset.name));
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(`.chart-context .title`)[0]).css('background-color', 'bisque');
+                    $($(`.chart-ctx .title`)[0]).css('background-color', 'bisque');
                 } else {
-                    $($(`.chart-context [name=title-${self.focus()}]`)).css('background-color', 'bisque');
+                    $($(`.chart-ctx [name=title-${self.focus()}]`)).css('background-color', 'bisque');
                 }
                 self._visualize();
             });
@@ -111,9 +112,9 @@ class Content {
                 info: d.period
             }]
         );
-        $(`.chart-context .title`).css('background-color', 'white');
-        // console.log($(`.chart-context [name=title-${name}]`));
-        $(`.chart-context [name=title-${name}]`).css('background-color', 'bisque');
+        $(`.chart-ctx .title`).css('background-color', 'white');
+        // console.log($(`.chart-ctx [name=title-${name}]`));
+        $(`.chart-ctx [name=title-${name}]`).css('background-color', 'bisque');
     }
 
     public showMissing() {
@@ -170,14 +171,13 @@ class Content {
             for (let i = 0; i < data.length; i++) {
                 let dName = data[i].dataset.name;
                 self.ctxCharts[dName] = new LineChartCtx(
-                    $(`.chart-context [name="${dName}"]`)[0],
+                    $(`.chart-ctx [name="${dName}"]`)[0],
                     [data[i]],
                     {
-                        height: 40,
                         offset: 0,
                         xAxis: false,
                         yAxis: false,
-                        margin: { top: 5, right: 35, bottom: 5, left: 40 },
+                        margin: { top: 5, right: 5, bottom: 5, left: 40 },
                         xDomain: xDomain
                     }
                 );
@@ -185,14 +185,14 @@ class Content {
 
             // plot focused chart
             self.focusChart = new LineChartFocus(
-                $('.chart-focus')[0],
+                $('.chart-focus .plot')[0],
                 [data[0]],   // By default, plot the first one
                 {
-                    height: 480,
+                    height: self.config.focusHeight - 45,
                     offset: 0,
                     xAxis: true,
                     yAxis: true,
-                    margin: { top: 5, right: 35, bottom: 30, left: 40 },
+                    margin: { top: 5, right: 20, bottom: 30, left: 40 },
                     xDomain: xDomain
                 }
             );

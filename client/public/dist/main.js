@@ -50187,13 +50187,14 @@ var Content = (function () {
         this.periodCharts = {};
         this.config = {
             speed: 500,
-            ctxHeight: 480,
-            focusHeight: 540,
-            periodHeight: 960
+            ctxHeight: 450,
+            focusHeight: 525,
+            periodHeight: 980
         };
         var self = this;
         ko.applyBindings(self, $(eleId)[0]);
         $('.chart-focus-container').height(self.config.focusHeight);
+        $('.chart-focus .plot').height(self.config.focusHeight - 45);
         $('.chart-ctx-container').height(self.config.ctxHeight);
         $('.pchart').height(self.config.periodHeight);
     }
@@ -50207,10 +50208,10 @@ var Content = (function () {
                 self.ctxs(_.map(data, function (d) { return d.dataset.name; }));
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(".chart-context .title")[0]).css('background-color', 'bisque');
+                    $($(".chart-ctx .title")[0]).css('background-color', 'bisque');
                 }
                 else {
-                    $($(".chart-context [name=title-" + self.focus() + "]")).css('background-color', 'bisque');
+                    $($(".chart-ctx [name=title-" + self.focus() + "]")).css('background-color', 'bisque');
                 }
                 self._visualize();
             });
@@ -50246,8 +50247,8 @@ var Content = (function () {
                 name: d.dataset.name,
                 info: d.period
             }]);
-        $(".chart-context .title").css('background-color', 'white');
-        $(".chart-context [name=title-" + name + "]").css('background-color', 'bisque');
+        $(".chart-ctx .title").css('background-color', 'white');
+        $(".chart-ctx [name=title-" + name + "]").css('background-color', 'bisque');
     };
     Content.prototype.showMissing = function () {
         var self = this;
@@ -50294,21 +50295,20 @@ var Content = (function () {
         if (_.isUndefined(self.focusChart)) {
             for (var i = 0; i < data.length; i++) {
                 var dName = data[i].dataset.name;
-                self.ctxCharts[dName] = new linechart_ctx_1.LineChartCtx($(".chart-context [name=\"" + dName + "\"]")[0], [data[i]], {
-                    height: 40,
+                self.ctxCharts[dName] = new linechart_ctx_1.LineChartCtx($(".chart-ctx [name=\"" + dName + "\"]")[0], [data[i]], {
                     offset: 0,
                     xAxis: false,
                     yAxis: false,
-                    margin: { top: 5, right: 35, bottom: 5, left: 40 },
+                    margin: { top: 5, right: 5, bottom: 5, left: 40 },
                     xDomain: xDomain
                 });
             }
-            self.focusChart = new linechart_focus_1.LineChartFocus($('.chart-focus')[0], [data[0]], {
-                height: 480,
+            self.focusChart = new linechart_focus_1.LineChartFocus($('.chart-focus .plot')[0], [data[0]], {
+                height: self.config.focusHeight - 45,
                 offset: 0,
                 xAxis: true,
                 yAxis: true,
-                margin: { top: 5, right: 35, bottom: 30, left: 40 },
+                margin: { top: 5, right: 20, bottom: 30, left: 40 },
                 xDomain: xDomain
             });
             self.periodCharts['year'] = new period_chart_1.PeriodChart($('#year')[0], [{
@@ -50833,7 +50833,7 @@ var LineChartCtx = (function (_super) {
         _this.data = data;
         _this.defaultHeight = 300;
         _this.option = {
-            height: null,
+            height: 40,
             width: null,
             margin: { top: 5, right: 5, bottom: 5, left: 35 },
             duration: 750,
@@ -50850,52 +50850,17 @@ var LineChartCtx = (function (_super) {
         };
         var self = _this;
         _.extend(self.option, option);
-        self.svgContainer = d3.select(ele);
+        self.container = d3.select(ele);
         self.option.width = self.option.width === null ?
             $(ele).innerWidth() : self.option.width;
         self.option.height = self.option.height === null ?
             self.option.svgHeight : self.option.height;
-        self.svgContainer
+        self.container
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
-        self.svg = self.svgContainer.append('svg')
-            .attr('class', 'multi-line-chart-ctx')
-            .attr('width', self.option.width)
-            .attr('height', self.option.height);
         self.plot();
         return _this;
     }
-    LineChartCtx.prototype.getScale = function (w, h) {
-        var self = this;
-        var x, y;
-        x = d3.scaleTime().range([0, w]);
-        if (self.option.xDomain) {
-            x.domain(self.option.xDomain);
-        }
-        else {
-            var mmin_1 = Number.MAX_SAFE_INTEGER, mmax_1 = Number.MIN_SAFE_INTEGER;
-            _.each(self.data, function (d) {
-                var _a = d3.extent(d.timeseries, function (o) { return o[0]; }), mm = _a[0], ma = _a[1];
-                mmin_1 = mmin_1 > mm ? mm : mmin_1;
-                mmax_1 = mmax_1 < ma ? ma : mmax_1;
-            });
-            x.domain([new Date(mmin_1), new Date(mmax_1)]);
-        }
-        y = d3.scaleLinear().range([h, 0]);
-        if (self.option.yDomain) {
-            y.domain(self.option.yDomain);
-        }
-        else {
-            var mmin_2 = Number.MAX_SAFE_INTEGER, mmax_2 = Number.MIN_SAFE_INTEGER;
-            _.each(self.data, function (d) {
-                var _a = d3.extent(d.timeseries, function (o) { return o[1]; }), mm = _a[0], ma = _a[1];
-                mmin_2 = mmin_2 > mm ? mm : mmin_2;
-                mmax_2 = mmax_2 < ma ? ma : mmax_2;
-            });
-            y.domain([mmin_2, mmax_2]);
-        }
-        return { x: x, y: y };
-    };
     LineChartCtx.prototype.plot = function () {
         var self = this;
         var option = self.option;
@@ -50904,6 +50869,30 @@ var LineChartCtx = (function (_super) {
             option.height - option.margin.top - option.margin.bottom,
         ], w = _a[0], h = _a[1];
         var _b = self.getScale(w, h), x = _b.x, y = _b.y;
+        self.canvas = self.container.append('canvas')
+            .style('position', 'absolute')
+            .style('left', option.margin.left + "px")
+            .style('top', option.margin.top + "px")
+            .attr('width', w)
+            .attr('height', h);
+        var context = self.canvas.node().getContext('2d');
+        var lineCanvas = d3.line()
+            .x(function (d) { return x(d[0]); })
+            .y(function (d) { return y(d[1]); })
+            .context(context);
+        ;
+        context.beginPath();
+        lineCanvas(self.data[0].timeseries);
+        context.lineWidth = 1;
+        context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        context.stroke();
+        self.svg = self.container.append('svg')
+            .style('position', 'absolute')
+            .style('left', 0)
+            .style('top', 0)
+            .attr('class', 'multi-line-chart-ctx')
+            .attr('width', self.option.width)
+            .attr('height', self.option.height);
         var chart = self.svg.append('g')
             .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
         var xAxis = d3.axisBottom(x);
@@ -50926,13 +50915,6 @@ var LineChartCtx = (function (_super) {
         var line = d3.line()
             .x(function (d) { return x(d[0]); })
             .y(function (d) { return y(d[1]); });
-        var lineG = chart.append('g').selectAll('.line')
-            .data(self.data)
-            .enter()
-            .append('path')
-            .attr('class', 'line')
-            .style('stroke', function (d) { return globals_1.colorSchemes.getColorCode('dname'); })
-            .attr('d', function (d) { return line(d.timeseries); });
         var highlightUpdate = self.addHighlights(h, x, line, area);
         var _c = self.addBrush(chart, w, h, x), brush = _c.brush, bUpdate = _c.bUpdate;
         brush.on('brush end', brushHandler);
@@ -51054,6 +51036,37 @@ var LineChartCtx = (function (_super) {
             update(d.windows, d.timeseries, 'dname');
         });
         return update;
+    };
+    LineChartCtx.prototype.getScale = function (w, h) {
+        var self = this;
+        var x, y;
+        x = d3.scaleTime().range([0, w]);
+        if (self.option.xDomain) {
+            x.domain(self.option.xDomain);
+        }
+        else {
+            var mmin_1 = Number.MAX_SAFE_INTEGER, mmax_1 = Number.MIN_SAFE_INTEGER;
+            _.each(self.data, function (d) {
+                var _a = d3.extent(d.timeseries, function (o) { return o[0]; }), mm = _a[0], ma = _a[1];
+                mmin_1 = mmin_1 > mm ? mm : mmin_1;
+                mmax_1 = mmax_1 < ma ? ma : mmax_1;
+            });
+            x.domain([new Date(mmin_1), new Date(mmax_1)]);
+        }
+        y = d3.scaleLinear().range([h, 0]);
+        if (self.option.yDomain) {
+            y.domain(self.option.yDomain);
+        }
+        else {
+            var mmin_2 = Number.MAX_SAFE_INTEGER, mmax_2 = Number.MIN_SAFE_INTEGER;
+            _.each(self.data, function (d) {
+                var _a = d3.extent(d.timeseries, function (o) { return o[1]; }), mm = _a[0], ma = _a[1];
+                mmin_2 = mmin_2 > mm ? mm : mmin_2;
+                mmax_2 = mmax_2 < ma ? ma : mmax_2;
+            });
+            y.domain([mmin_2, mmax_2]);
+        }
+        return { x: x, y: y };
     };
     return LineChartCtx;
 }(pip.Events));

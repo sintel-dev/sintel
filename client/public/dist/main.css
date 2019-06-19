@@ -744,23 +744,51 @@ body {
 .content .chart-ctx-container {
   overflow-y: scroll;
 }
-.content .chart {
+.content .chart-ctx {
+  position: relative;
   width: 100%;
+  height: 40px;
 }
-.content .chart .title {
+.content .chart-ctx .title {
+  position: absolute;
+  width: 100px;
   cursor: pointer;
   text-align: center;
   line-height: 40px;
   background-color: white;
   transition: background-color 1s;
 }
-.content .fa-size-lg {
-  font-size: 20px;
+.content .chart-ctx .plot {
+  position: absolute;
+  left: 101px;
+  width: calc(100% - 101px);
+  height: 40px;
 }
-.content .view-btn-group {
+.content .chart-focus-container .view-btn-group {
   position: absolute;
   right: 20px;
   font-size: 12px;
+}
+.content .chart-focus {
+  position: absolute;
+  top: 45px;
+  width: 100%;
+}
+.content .chart-focus .title {
+  position: absolute;
+  width: 100px;
+  cursor: pointer;
+  background-color: bisque;
+  text-align: center;
+  line-height: 40px;
+}
+.content .chart-focus .plot {
+  position: absolute;
+  left: 101px;
+  width: calc(100% - 101px);
+}
+.content .fa-size-lg {
+  font-size: 20px;
 }
 .content .nav-tabs-custom-mtv {
   box-shadow: none;
