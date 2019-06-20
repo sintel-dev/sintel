@@ -111,8 +111,6 @@ class MTVExplorer:
             count += 1
             LOGGER.info('{}/{}: Processing {}'.format(count, len(files), file))
 
-            if file == 'pid_10233.csv':
-                continue
             # timestamp, value
             if (header):
                 data = pd.read_csv(file_path, header='infer')
