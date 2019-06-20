@@ -2,6 +2,7 @@ import csv
 import logging
 import os
 import time
+from bson.int64 import Int64
 from calendar import monthrange
 from datetime import datetime, timezone
 
@@ -61,7 +62,7 @@ def to_mongo_docs(name, data, interval=30, utc=True):
                     if (count == 0):
                         mean = 0
                     days[-1]['means'].append(float(mean))
-                    days[-1]['counts'].append(int(count))
+                    days[-1]['counts'].append(Int64(count))
 
             docs[-1]['data'][m - 1] = days
 
