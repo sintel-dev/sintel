@@ -60,7 +60,7 @@ def to_mongo_docs(name, data, interval=30, utc=True):
                     count = data.value.loc[st:ed].count()
                     if (count == 0):
                         mean = 0
-                    days[-1]['means'].append(int(mean))
+                    days[-1]['means'].append(float(mean))
                     days[-1]['counts'].append(int(count))
 
             docs[-1]['data'][m - 1] = days

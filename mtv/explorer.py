@@ -122,9 +122,10 @@ class MTVExplorer:
                     'value': data[value_column].values,
                 }
                 data = pd.DataFrame(columns)[['timestamp', 'value']]
-                data['timestamp'] = data['timestamp'].astype(int)
-                data['value'] = data['value'].astype(float)
-                data = data.sort_values('timestamp').set_index('timestamp')
+            
+            data['timestamp'] = data['timestamp'].astype(int)
+            data['value'] = data['value'].astype(float)
+            data = data.sort_values('timestamp').set_index('timestamp')
 
             if (start is not None):
                 data = data.loc[start:]
