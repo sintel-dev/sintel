@@ -1,3 +1,12 @@
+<p align="left">
+<img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt=“DAI-Lab” />
+<i>An open source project from Data to AI Lab at MIT.</i>
+</p>
+
+
+
+
+
 [![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv)
 [![Travis CI Shield](https://travis-ci.org/liudy1991/mtv.svg?branch=master)](https://travis-ci.org/liudy1991/mtv)
 
