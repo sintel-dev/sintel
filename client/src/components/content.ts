@@ -54,15 +54,19 @@ class Content {
 
         pip.content.on('experiment:change', (exp: RSI.Experiment) => {
             self._ToggleLoadingOverlay();
+
             dataProcessor.loadData(exp).then((data: LineChartDataEle[]) => {
                 self.data = data;
                 self._ToggleLoadingOverlay();
                 self.ctxs(_.map(data, d => d.dataset.name));
+
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(`.chart-ctx .title`)[0]).css('background-color', 'bisque');
+                    $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active')
+                    // $($(`.chart-ctx .title`)[0]).css('background-color', 'bisque');
                 } else {
-                    $($(`.chart-ctx [name=title-${self.focus()}]`)).css('background-color', 'bisque');
+                    $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
+                    // $($(`.chart-ctx [name=title-${self.focus()}]`)).css('background-color', 'bisque');
                 }
                 self._visualize();
             });
@@ -112,9 +116,10 @@ class Content {
                 info: d.period
             }]
         );
-        $(`.chart-ctx .title`).css('background-color', 'white');
+        $(`.chart-ctx .title`).parent().removeClass('ctx-active');
         // console.log($(`.chart-ctx [name=title-${name}]`));
-        $(`.chart-ctx [name=title-${name}]`).css('background-color', 'bisque');
+        $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active')
+        // $(`.chart-ctx [name=title-${name}]`).css('background-color', 'bisque');
     }
 
     public showMissing() {
@@ -177,7 +182,7 @@ class Content {
                         offset: 0,
                         xAxis: false,
                         yAxis: false,
-                        margin: { top: 5, right: 5, bottom: 5, left: 40 },
+                        margin: { top: 8, right: 5, bottom: 5, left: 40 },
                         xDomain: xDomain
                     }
                 );
@@ -192,7 +197,7 @@ class Content {
                     offset: 0,
                     xAxis: true,
                     yAxis: true,
-                    margin: { top: 5, right: 20, bottom: 30, left: 40 },
+                    margin: { top: 8, right: 20, bottom: 30, left: 40 },
                     xDomain: xDomain
                 }
             );

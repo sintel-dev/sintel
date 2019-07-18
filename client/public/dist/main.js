@@ -5102,9 +5102,9 @@ Object(_define__WEBPACK_IMPORTED_MODULE_0__["default"])(Rgb, rgb, Object(_define
     return this;
   },
   displayable: function() {
-    return (0 <= this.r && this.r <= 255)
-        && (0 <= this.g && this.g <= 255)
-        && (0 <= this.b && this.b <= 255)
+    return (-0.5 <= this.r && this.r < 255.5)
+        && (-0.5 <= this.g && this.g < 255.5)
+        && (-0.5 <= this.b && this.b < 255.5)
         && (0 <= this.opacity && this.opacity <= 1);
   },
   hex: function() {
@@ -5369,7 +5369,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// https://beta.observablehq.com/@mbostock/lab-and-rgb
+// https://observablehq.com/@mbostock/lab-and-rgb
 var K = 18,
     Xn = 0.96422,
     Yn = 1,
@@ -5381,11 +5381,7 @@ var K = 18,
 
 function labConvert(o) {
   if (o instanceof Lab) return new Lab(o.l, o.a, o.b, o.opacity);
-  if (o instanceof Hcl) {
-    if (isNaN(o.h)) return new Lab(o.l, 0, 0, o.opacity);
-    var h = o.h * _math__WEBPACK_IMPORTED_MODULE_2__["deg2rad"];
-    return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
-  }
+  if (o instanceof Hcl) return hcl2lab(o);
   if (!(o instanceof _color__WEBPACK_IMPORTED_MODULE_1__["Rgb"])) o = Object(_color__WEBPACK_IMPORTED_MODULE_1__["rgbConvert"])(o);
   var r = rgb2lrgb(o.r),
       g = rgb2lrgb(o.g),
@@ -5455,7 +5451,7 @@ function rgb2lrgb(x) {
 function hclConvert(o) {
   if (o instanceof Hcl) return new Hcl(o.h, o.c, o.l, o.opacity);
   if (!(o instanceof Lab)) o = labConvert(o);
-  if (o.a === 0 && o.b === 0) return new Hcl(NaN, 0, o.l, o.opacity);
+  if (o.a === 0 && o.b === 0) return new Hcl(NaN, 0 < o.l && o.l < 100 ? 0 : NaN, o.l, o.opacity);
   var h = Math.atan2(o.b, o.a) * _math__WEBPACK_IMPORTED_MODULE_2__["rad2deg"];
   return new Hcl(h < 0 ? h + 360 : h, Math.sqrt(o.a * o.a + o.b * o.b), o.l, o.opacity);
 }
@@ -5475,6 +5471,12 @@ function Hcl(h, c, l, opacity) {
   this.opacity = +opacity;
 }
 
+function hcl2lab(o) {
+  if (isNaN(o.h)) return new Lab(o.l, 0, 0, o.opacity);
+  var h = o.h * _math__WEBPACK_IMPORTED_MODULE_2__["deg2rad"];
+  return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
+}
+
 Object(_define__WEBPACK_IMPORTED_MODULE_0__["default"])(Hcl, hcl, Object(_define__WEBPACK_IMPORTED_MODULE_0__["extend"])(_color__WEBPACK_IMPORTED_MODULE_1__["Color"], {
   brighter: function(k) {
     return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
@@ -5483,7 +5485,7 @@ Object(_define__WEBPACK_IMPORTED_MODULE_0__["default"])(Hcl, hcl, Object(_define
     return new Hcl(this.h, this.c, this.l - K * (k == null ? 1 : k), this.opacity);
   },
   rgb: function() {
-    return labConvert(this).rgb();
+    return hcl2lab(this).rgb();
   }
 }));
 
@@ -9152,6 +9154,9 @@ var boundsStream = {
     else if (deltaSum > _math__WEBPACK_IMPORTED_MODULE_3__["epsilon"]) phi1 = 90;
     else if (deltaSum < -_math__WEBPACK_IMPORTED_MODULE_3__["epsilon"]) phi0 = -90;
     range[0] = lambda0, range[1] = lambda1;
+  },
+  sphere: function() {
+    lambda0 = -(lambda1 = 180), phi0 = -(phi1 = 90);
   }
 };
 
@@ -10616,10 +10621,23 @@ function containsPoint(coordinates, point) {
 }
 
 function containsLine(coordinates, point) {
-  var ab = Object(_distance__WEBPACK_IMPORTED_MODULE_1__["default"])(coordinates[0], coordinates[1]),
-      ao = Object(_distance__WEBPACK_IMPORTED_MODULE_1__["default"])(coordinates[0], point),
-      ob = Object(_distance__WEBPACK_IMPORTED_MODULE_1__["default"])(point, coordinates[1]);
-  return ao + ob <= ab + _math__WEBPACK_IMPORTED_MODULE_2__["epsilon"];
+  var ao, bo, ab;
+  for (var i = 0, n = coordinates.length; i < n; i++) {
+    bo = Object(_distance__WEBPACK_IMPORTED_MODULE_1__["default"])(coordinates[i], point);
+    if (bo === 0) return true;
+    if (i > 0) {
+      ab = Object(_distance__WEBPACK_IMPORTED_MODULE_1__["default"])(coordinates[i], coordinates[i - 1]);
+      if (
+        ab > 0 &&
+        ao <= ab &&
+        bo <= ab &&
+        (ao + bo - ab) * (1 - Math.pow((ao - bo) / ab, 2)) < _math__WEBPACK_IMPORTED_MODULE_2__["epsilon2"] * ab
+      )
+        return true;
+    }
+    ao = bo;
+  }
+  return false;
 }
 
 function containsPolygon(coordinates, point) {
@@ -11727,8 +11745,15 @@ __webpack_require__.r(__webpack_exports__);
 
 var sum = Object(_adder__WEBPACK_IMPORTED_MODULE_0__["default"])();
 
+function longitude(point) {
+  if (Object(_math__WEBPACK_IMPORTED_MODULE_2__["abs"])(point[0]) <= _math__WEBPACK_IMPORTED_MODULE_2__["pi"])
+    return point[0];
+  else
+    return Object(_math__WEBPACK_IMPORTED_MODULE_2__["sign"])(point[0]) * ((Object(_math__WEBPACK_IMPORTED_MODULE_2__["abs"])(point[0]) + _math__WEBPACK_IMPORTED_MODULE_2__["pi"]) % _math__WEBPACK_IMPORTED_MODULE_2__["tau"] - _math__WEBPACK_IMPORTED_MODULE_2__["pi"]);
+}
+
 /* harmony default export */ __webpack_exports__["default"] = (function(polygon, point) {
-  var lambda = point[0],
+  var lambda = longitude(point),
       phi = point[1],
       sinPhi = Object(_math__WEBPACK_IMPORTED_MODULE_2__["sin"])(phi),
       normal = [Object(_math__WEBPACK_IMPORTED_MODULE_2__["sin"])(lambda), -Object(_math__WEBPACK_IMPORTED_MODULE_2__["cos"])(lambda), 0],
@@ -11745,14 +11770,14 @@ var sum = Object(_adder__WEBPACK_IMPORTED_MODULE_0__["default"])();
     var ring,
         m,
         point0 = ring[m - 1],
-        lambda0 = point0[0],
+        lambda0 = longitude(point0),
         phi0 = point0[1] / 2 + _math__WEBPACK_IMPORTED_MODULE_2__["quarterPi"],
         sinPhi0 = Object(_math__WEBPACK_IMPORTED_MODULE_2__["sin"])(phi0),
         cosPhi0 = Object(_math__WEBPACK_IMPORTED_MODULE_2__["cos"])(phi0);
 
     for (var j = 0; j < m; ++j, lambda0 = lambda1, sinPhi0 = sinPhi1, cosPhi0 = cosPhi1, point0 = point1) {
       var point1 = ring[j],
-          lambda1 = point1[0],
+          lambda1 = longitude(point1),
           phi1 = point1[1] / 2 + _math__WEBPACK_IMPORTED_MODULE_2__["quarterPi"],
           sinPhi1 = Object(_math__WEBPACK_IMPORTED_MODULE_2__["sin"])(phi1),
           cosPhi1 = Object(_math__WEBPACK_IMPORTED_MODULE_2__["cos"])(phi1),
@@ -30053,7 +30078,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "devDependencies", function() { return devDependencies; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dependencies", function() { return dependencies; });
 var name = "d3";
-var version = "5.9.2";
+var version = "5.9.7";
 var description = "Data-Driven Documents";
 var keywords = ["dom","visualization","svg","animation","canvas"];
 var homepage = "https://d3js.org";
@@ -31292,7 +31317,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -31303,7 +31328,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.14';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -33962,16 +33987,10 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -34895,8 +34914,8 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -36713,7 +36732,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -37896,7 +37915,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -37904,6 +37923,10 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -41704,6 +41727,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -46090,9 +46114,12 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
+      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -46125,7 +46152,9 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      // Like with sourceURL, we take care to not check the option's prototype,
+      // as this configuration is a code injection vector.
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -48330,10 +48359,11 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -50208,10 +50238,10 @@ var Content = (function () {
                 self.ctxs(_.map(data, function (d) { return d.dataset.name; }));
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(".chart-ctx .title")[0]).css('background-color', 'bisque');
+                    $($(".chart-ctx .title")[0]).parent().addClass('ctx-active');
                 }
                 else {
-                    $($(".chart-ctx [name=title-" + self.focus() + "]")).css('background-color', 'bisque');
+                    $($(".chart-ctx [name=title-" + self.focus() + "]")).parent().addClass('ctx-active');
                 }
                 self._visualize();
             });
@@ -50247,8 +50277,8 @@ var Content = (function () {
                 name: d.dataset.name,
                 info: d.period
             }]);
-        $(".chart-ctx .title").css('background-color', 'white');
-        $(".chart-ctx [name=title-" + name + "]").css('background-color', 'bisque');
+        $(".chart-ctx .title").parent().removeClass('ctx-active');
+        $(".chart-ctx [name=title-" + name + "]").parent().addClass('ctx-active');
     };
     Content.prototype.showMissing = function () {
         var self = this;
@@ -50299,7 +50329,7 @@ var Content = (function () {
                     offset: 0,
                     xAxis: false,
                     yAxis: false,
-                    margin: { top: 5, right: 5, bottom: 5, left: 40 },
+                    margin: { top: 8, right: 5, bottom: 5, left: 40 },
                     xDomain: xDomain
                 });
             }
@@ -50308,7 +50338,7 @@ var Content = (function () {
                 offset: 0,
                 xAxis: true,
                 yAxis: true,
-                margin: { top: 5, right: 20, bottom: 30, left: 40 },
+                margin: { top: 8, right: 20, bottom: 30, left: 40 },
                 xDomain: xDomain
             });
             self.periodCharts['year'] = new period_chart_1.PeriodChart($('#year')[0], [{
@@ -50426,6 +50456,7 @@ var Header = (function () {
             project: ko.observable(null),
             experiment: ko.observable(null)
         };
+        this.empDetails = ko.observable(null);
         var self = this;
         ko.applyBindings(self, $(eleId)[0]);
         rest_server_1.default.experiments.read().done(function (data) {
@@ -50833,9 +50864,14 @@ var LineChartCtx = (function (_super) {
         _this.data = data;
         _this.defaultHeight = 300;
         _this.option = {
-            height: 40,
+            height: 60,
             width: null,
-            margin: { top: 5, right: 5, bottom: 5, left: 35 },
+            margin: {
+                top: 8,
+                right: 5,
+                bottom: 5,
+                left: 35
+            },
             duration: 750,
             delay: 50,
             xDomain: null,
@@ -50851,10 +50887,8 @@ var LineChartCtx = (function (_super) {
         var self = _this;
         _.extend(self.option, option);
         self.container = d3.select(ele);
-        self.option.width = self.option.width === null ?
-            $(ele).innerWidth() : self.option.width;
-        self.option.height = self.option.height === null ?
-            self.option.svgHeight : self.option.height;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+        self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
         self.container
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
@@ -50869,6 +50903,7 @@ var LineChartCtx = (function (_super) {
             option.height - option.margin.top - option.margin.bottom,
         ], w = _a[0], h = _a[1];
         var _b = self.getScale(w, h), x = _b.x, y = _b.y;
+        debugger;
         self.canvas = self.container.append('canvas')
             .style('position', 'absolute')
             .style('left', option.margin.left + "px")
@@ -50880,11 +50915,10 @@ var LineChartCtx = (function (_super) {
             .x(function (d) { return x(d[0]); })
             .y(function (d) { return y(d[1]); })
             .context(context);
-        ;
         context.beginPath();
         lineCanvas(self.data[0].timeseries);
         context.lineWidth = 1;
-        context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
         context.stroke();
         self.svg = self.container.append('svg')
             .style('position', 'absolute')
@@ -50908,6 +50942,7 @@ var LineChartCtx = (function (_super) {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
+        debugger;
         var area = d3.area()
             .x(function (d) { return x(d[0]); })
             .y0(function (d) { return -(h - y(d[1])) / 2 + h / 2; })
@@ -50930,6 +50965,7 @@ var LineChartCtx = (function (_super) {
                 return;
             }
             var s = d3.event.selection || x.range();
+            debugger;
             pip.content.trigger('ctx:brush', {
                 xMove: [s[0], s[1]],
                 xDomain: [x.invert(s[0]), x.invert(s[1])],
@@ -50989,6 +51025,8 @@ var LineChartCtx = (function (_super) {
             .attr('class', 'brush')
             .call(brush)
             .call(brush.move, x.range());
+        console.log(brushG);
+        debugger;
         var update = function (range) {
             brushG.call(brush.move, range);
         };
@@ -51012,6 +51050,7 @@ var LineChartCtx = (function (_super) {
             }
             return globals_1.colorSchemes.severity5[level];
         };
+        debugger;
         var highlightG = self.svg.append('g')
             .attr('class', 'highlights')
             .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
@@ -51164,10 +51203,8 @@ var LineChartFocus = (function (_super) {
         var self = _this;
         _.extend(self.option, option);
         self.svgContainer = d3.select(ele);
-        self.option.width = self.option.width === null ?
-            $(ele).innerWidth() : self.option.width;
-        self.option.height = self.option.height === null ?
-            self.defaultHeight : self.option.height;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+        self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
         self.svgContainer
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');

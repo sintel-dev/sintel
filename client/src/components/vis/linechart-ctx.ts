@@ -39,9 +39,14 @@ export class LineChartCtx extends pip.Events {
 
     private option: Option = {
         // layout
-        height: 40,
+        height: 60,
         width: null,
-        margin: { top: 5, right: 5, bottom: 5, left: 35 },
+        margin: {
+            top: 8,
+            right: 5,
+            bottom: 5,
+            left: 35
+        },
         // animation
         duration: 750,
         delay: 50,
@@ -69,17 +74,14 @@ export class LineChartCtx extends pip.Events {
         _.extend(self.option, option);
         self.container = d3.select<HTMLElement, any>(ele);
 
-        self.option.width = self.option.width === null ?
-                            $(ele).innerWidth() : self.option.width;
-        self.option.height = self.option.height === null ?
-                            self.option.svgHeight : self.option.height;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+        self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
 
         // scroll style inside <div> container
         self.container
             // .classed('scroll-style-0', true)
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
-
         self.plot();
     }
 
@@ -92,7 +94,7 @@ export class LineChartCtx extends pip.Events {
         ];
         // define axis scale
         let {x, y} = self.getScale(w, h);
-
+        debugger;
         self.canvas = self.container.append<any>('canvas')
             .style('position', 'absolute')
             .style('left', `${option.margin.left}px`)
@@ -112,7 +114,8 @@ export class LineChartCtx extends pip.Events {
         lineCanvas(self.data[0].timeseries);
         context.lineWidth = 1;
         // context.strokeStyle = colorSchemes.getColorCode('dname');
-        context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        // context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
         context.stroke();
 
         // self.svg = self.container.append<SVGElement>('svg')
@@ -133,6 +136,7 @@ export class LineChartCtx extends pip.Events {
 
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+            // debugger;
 
         // plot axis
         let xAxis = d3.axisBottom(x);
@@ -150,6 +154,7 @@ export class LineChartCtx extends pip.Events {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
+        debugger;
 
         // function used to plot area
         let area = d3.area<[number, number]>()
@@ -199,6 +204,8 @@ export class LineChartCtx extends pip.Events {
         function brushHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
             let s = d3.event.selection || x.range();
+            debugger;
+
             pip.content.trigger('ctx:brush', {
                 xMove: [s[0], s[1]],
                 xDomain: [x.invert(s[0]), x.invert(s[1])],
@@ -263,6 +270,7 @@ export class LineChartCtx extends pip.Events {
     }
 
     private addBrush(chart, w, h, x) {
+
         let brush = d3.brushX()
             .extent([[0, 0], [w, h]]);
 
@@ -270,10 +278,13 @@ export class LineChartCtx extends pip.Events {
             .attr('class', 'brush')
             .call(brush)
             .call(brush.move, x.range());
+            console.log(brushG);
+            debugger;
 
         let update = function(range) {
             brushG.call(brush.move, range);
         };
+
 
         return {
             brush,
@@ -293,6 +304,7 @@ export class LineChartCtx extends pip.Events {
             }
             return colorSchemes.severity5[level];
         };
+        debugger;
 
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')

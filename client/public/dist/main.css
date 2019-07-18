@@ -352,6 +352,87 @@ body {
 .p-50 {
   padding: 50px !important;
 }
+.mtv-skin .main-header .navbar,
+.mtv-skin .main-header .logo {
+  background: #2c2f34ff;
+}
+.mtv-skin .content-wrapper {
+  background-color: #24242cff;
+}
+.mtv-skin .content .nav-tabs-custom-mtv,
+.mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
+  border: none;
+  background: none;
+}
+.mtv-skin .content .chart-ctx {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx .title {
+  background: none;
+  color: #fff;
+  line-height: 60px;
+}
+.mtv-skin .content .chart-ctx .plot {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx.ctx-active {
+  background: #24242cff;
+  box-shadow: 0 0 8px 5px #000 inset;
+}
+.mtv-skin .content .chart-ctx rect {
+  stroke: none;
+}
+.mtv-skin .content .chart-ctx rect.handle {
+  fill: #b2bdd3ff;
+}
+.mtv-skin .box {
+  background-color: #2c2f34ff;
+  border: none;
+}
+.mtv-skin .box hr {
+  border-top: 1px solid #000;
+}
+
+.mtv-skin .main-header .navbar,
+.mtv-skin .main-header .logo {
+  background: #2c2f34ff;
+}
+.mtv-skin .content-wrapper {
+  background-color: #24242cff;
+}
+.mtv-skin .content .nav-tabs-custom-mtv,
+.mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
+  border: none;
+  background: none;
+}
+.mtv-skin .content .chart-ctx {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx .title {
+  background: none;
+  color: #fff;
+  line-height: 60px;
+}
+.mtv-skin .content .chart-ctx .plot {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx.ctx-active {
+  background: #24242cff;
+  box-shadow: 0 0 8px 5px #000 inset;
+}
+.mtv-skin .content .chart-ctx rect {
+  stroke: none;
+}
+.mtv-skin .content .chart-ctx rect.handle {
+  fill: #b2bdd3ff;
+}
+.mtv-skin .box {
+  background-color: #2c2f34ff;
+  border: none;
+}
+.mtv-skin .box hr {
+  border-top: 1px solid #000;
+}
 
 
 body {
@@ -708,11 +789,47 @@ body {
 .p-50 {
   padding: 50px !important;
 }
-.main-header .logo {
-  background-color: #367fa9 !important;
+.mtv-skin .main-header .navbar,
+.mtv-skin .main-header .logo {
+  background: #2c2f34ff;
+}
+.mtv-skin .content-wrapper {
+  background-color: #24242cff;
+}
+.mtv-skin .content .nav-tabs-custom-mtv,
+.mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
+  border: none;
+  background: none;
+}
+.mtv-skin .content .chart-ctx {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx .title {
+  background: none;
+  color: #fff;
+  line-height: 60px;
+}
+.mtv-skin .content .chart-ctx .plot {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx.ctx-active {
+  background: #24242cff;
+  box-shadow: 0 0 8px 5px #000 inset;
+}
+.mtv-skin .content .chart-ctx rect {
+  stroke: none;
+}
+.mtv-skin .content .chart-ctx rect.handle {
+  fill: #b2bdd3ff;
+}
+.mtv-skin .box {
+  background-color: #2c2f34ff;
+  border: none;
+}
+.mtv-skin .box hr {
+  border-top: 1px solid #000;
 }
 .main-header nav {
-  background-color: #3c8dbc !important;
   transition: margin-left 0.3s ease-in-out;
   margin-bottom: 0;
   margin-left: 230px;
@@ -738,7 +855,6 @@ body {
 }
 .main-header .navbar-custom-menu .text {
   font-size: 14px;
-  color: #333 !important;
   padding-left: 0;
 }
 .content .chart-ctx-container {
@@ -1152,11 +1268,47 @@ body {
 .p-50 {
   padding: 50px !important;
 }
-.main-header .logo {
-  background-color: #367fa9 !important;
+.mtv-skin .main-header .navbar,
+.mtv-skin .main-header .logo {
+  background: #2c2f34ff;
+}
+.mtv-skin .content-wrapper {
+  background-color: #24242cff;
+}
+.mtv-skin .content .nav-tabs-custom-mtv,
+.mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
+  border: none;
+  background: none;
+}
+.mtv-skin .content .chart-ctx {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx .title {
+  background: none;
+  color: #fff;
+  line-height: 60px;
+}
+.mtv-skin .content .chart-ctx .plot {
+  height: 60px;
+}
+.mtv-skin .content .chart-ctx.ctx-active {
+  background: #24242cff;
+  box-shadow: 0 0 8px 5px #000 inset;
+}
+.mtv-skin .content .chart-ctx rect {
+  stroke: none;
+}
+.mtv-skin .content .chart-ctx rect.handle {
+  fill: #b2bdd3ff;
+}
+.mtv-skin .box {
+  background-color: #2c2f34ff;
+  border: none;
+}
+.mtv-skin .box hr {
+  border-top: 1px solid #000;
 }
 .main-header nav {
-  background-color: #3c8dbc !important;
   transition: margin-left 0.3s ease-in-out;
   margin-bottom: 0;
   margin-left: 230px;
@@ -1182,7 +1334,6 @@ body {
 }
 .main-header .navbar-custom-menu .text {
   font-size: 14px;
-  color: #333 !important;
   padding-left: 0;
 }
 

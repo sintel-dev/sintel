@@ -1,0 +1,53 @@
+.mtv-skin{
+    @main-color: #2c2f34ff;
+    @second-color: #24242cff;
+
+    .main-header {
+        .navbar, .logo{
+            background: @main-color;
+        }
+    }
+    .content-wrapper{
+        background-color: @second-color;
+    }
+
+    .content{
+        .nav-tabs-custom-mtv, .nav-tabs-custom-mtv>.tab-content {
+            border: none;
+            background: none;
+        }
+
+        .chart-ctx{
+            height: 60px;
+            .title{
+                background: none;
+                color: #fff;
+                line-height: 60px;
+            }
+
+            .plot{
+                height: 60px;
+            }
+
+            &.ctx-active{
+                background: @second-color;
+                box-shadow: 0 0 8px 5px #000 inset;
+            }
+
+            rect{
+                stroke: none;
+                &.handle{
+                    fill: #b2bdd3ff;
+                }
+            }
+        }
+    }
+
+    .box{
+        background-color: @main-color;
+        border: none;
+        hr{
+            border-top: 1px solid #000;
+        }
+    }
+}

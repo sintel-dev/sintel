@@ -13,7 +13,7 @@ with open('HISTORY.md') as history_file:
 
 requirements = [
     'Click>=6.0',
-   
+
     # General
     'termcolor==1.1.0',
     'PyYAML==3.12',
@@ -23,7 +23,7 @@ requirements = [
     'pandas>=0.23.4,<0.25',
 
     # Flask
-    'Flask>=1.0.2',
+    'Flask==1.0.2',
     'Flask-Cors>=3.0.7',
     'Flask-RESTful>=0.3.7',
     'Werkzeug==0.14.1',
