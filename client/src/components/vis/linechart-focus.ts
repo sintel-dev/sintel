@@ -171,15 +171,14 @@ export class LineChartFocus extends pip.Events {
         self.on('brush:update', brushUpdateHandler);
 
         self.on('zoomPanMode', (zoomMode = false) => {
-            debugger;
             zoomMode && enableZoom();
-            !zoomMode && disableEditor();
+            !zoomMode && disableZoom();
         });
 
         self.on('addEventMode', (eventMode = false) => {
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
-            disableZoom();
+
             eventMode && enableEditor();
             !eventMode && disableEditor();
         });
@@ -222,7 +221,6 @@ export class LineChartFocus extends pip.Events {
 
             // update prediction curve
             if (zoomMode) {
-                debugger;
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }
@@ -263,17 +261,15 @@ export class LineChartFocus extends pip.Events {
 
             uf.exit().remove();
 
-            if (assessMode) {
-                focus.select('.line2')
-                    .datum(self.data[0].timeseriesPred)
-                    .transition(t)
-                    .attr('d', line);
+            focus.select('.line2')
+                .datum(self.data[0].timeseriesPred)
+                .transition(t)
+                .attr('d', line);
 
-                focus.select('.error')
-                    .datum(self.data[0].timeseriesErr)
-                    .transition(t)
-                    .attr('d', area);
-            }
+            focus.select('.error')
+                .datum(self.data[0].timeseriesErr)
+                .transition(t)
+                .attr('d', area);
 
             // clean all original windows
             self.svg.selectAll('.window').remove();

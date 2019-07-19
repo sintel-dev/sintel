@@ -91,4 +91,39 @@
         }
     }
 
+    //input controls
+    .linechart-controls{
+        color: #fff;
+        div{
+            display: inline-block;
+            margin-right: 10px;
+            &:last-child{
+                margin-right: 0;
+            }
+
+            .switch {
+                position: relative;
+                padding-left: 50px;
+                display: inline-block;
+                width: 40px;
+                height: 15px;
+                background: #000;
+                border-radius: 15px;
+
+                &:before{
+                    position: absolute;
+                    content: '';
+                    left:0;
+                    top: 0;
+
+                    transition: all .2s ease-in-out;
+                }
+            }
+        }
+
+        input:checked + .slider {
+            background-color: #00e04aff;
+        }
+    }
+
 }

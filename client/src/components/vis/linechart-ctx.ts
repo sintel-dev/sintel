@@ -101,9 +101,6 @@ export class LineChartCtx extends pip.Events {
             .attr('width', w)
             .attr('height', h);
 
-        // debugger;
-
-
         let context: CanvasRenderingContext2D = self.canvas.node().getContext('2d');
 
         // function used to plot line
@@ -115,18 +112,8 @@ export class LineChartCtx extends pip.Events {
         context.beginPath();
         lineCanvas(self.data[0].timeseries);
         context.lineWidth = 1;
-        // context.strokeStyle = colorSchemes.getColorCode('dname');
-        // context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
         context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
         context.stroke();
-
-        // self.svg = self.container.append<SVGElement>('svg')
-        //     .style('position', 'absolute')
-        //     .style('left', 0)
-        //     .style('top', 0)
-        //     .attr('class', 'multi-line-chart-ctx')
-        //     .attr('width', self.option.width)
-        //     .attr('height', self.option.height);
 
         self.svg = self.container.append<SVGElement>('svg')
             .style('position', 'absolute')
@@ -136,9 +123,21 @@ export class LineChartCtx extends pip.Events {
             .attr('width', self.option.width)
             .attr('height', self.option.height);
 
+        // function used to plot area
+        let area = d3.area<[number, number]>()
+        .x(function(d) { return x(d[0]); })
+        .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
+        .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
+
+        // function used to plot line
+        let line = d3.line<[number, number]>()
+            .x(d => x(d[0]))
+            .y(d => y(d[1]));
+
+        let highlightUpdate = self.addHighlights(h, x, line, area);
+
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
-            //
 
         // plot axis
         let xAxis = d3.axisBottom(x);
@@ -156,37 +155,6 @@ export class LineChartCtx extends pip.Events {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
-
-
-        // function used to plot area
-        let area = d3.area<[number, number]>()
-            .x(function(d) { return x(d[0]); })
-            .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
-            .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
-
-        // function used to plot line
-        let line = d3.line<[number, number]>()
-            .x(d => x(d[0]))
-            .y(d => y(d[1]));
-
-        // let lineG = chart.append('g').selectAll('.line')
-        //     .data(self.data)
-        //     .enter()
-        //     .append('path')
-        //     .attr('class', 'line')
-        //     .style('stroke', d => colorSchemes.getColorCode('dname'))
-        //     .attr('d', d => line(d.timeseries));
-
-        // let areaG = chart.append('g')
-        //     .selectAll('.area')
-        //     .data(self.data)
-        //     .enter()
-        //     .append('path')
-        //     .attr('class', 'area')
-        //     .attr('d', d => area(d.timeseries))
-        //     .attr('fill', d => colorSchemes.getColorCode('dname'));
-
-        let highlightUpdate = self.addHighlights(h, x, line, area);
 
         let {brush, bUpdate} = self.addBrush(chart, w, h, x);
         brush.on('brush end', brushHandler);

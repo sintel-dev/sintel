@@ -148,42 +148,43 @@ class Content {
     public addEventMode(content, event) {
         let self = this;
         const isChecked = event.target.checked;
-
+        this.modes([]);
         if(isChecked) {
             self.modes.push('eventMode');
-        } else {
-            self.modes.remove(val => val === 'eventMode');
         }
 
 
         this.focusChart.trigger('addEventMode', isChecked);
+        this.focusChart.trigger('showPrediction', false);
+        this.focusChart.trigger('zoomPanMode', false);
         return true;
     }
     public showPrediction(content, event) {
         let self = this;
         const isChecked = event.target.checked;
-        debugger;
 
+        this.modes([]);
         if(isChecked) {
             self.modes.push('accessMode');
-        } else {
-            self.modes.remove(val => val === 'accessMode');
         }
 
-
+        this.focusChart.trigger('addEventMode', false);
         this.focusChart.trigger('showPrediction', isChecked);
+        this.focusChart.trigger('zoomPanMode', false);
         return true;
         // console.log(this.focusChart.trigger('showPrediction'))
     }
 
     public zoomPanMode(content, event) {
         const isChecked = event.target.checked;
+
+        this.modes([]);
         if(isChecked) {
             this.modes.push('zoomMode');
-        } else {
-            this.modes.remove(val => val === 'zoomMode');
         }
 
+        this.focusChart.trigger('addEventMode', false);
+        this.focusChart.trigger('showPrediction', false);
         this.focusChart.trigger('zoomPanMode', isChecked);
 
         return true;
