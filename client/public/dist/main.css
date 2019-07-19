@@ -376,6 +376,7 @@ body {
   height: 60px;
 }
 .mtv-skin .content .chart-ctx.ctx-active {
+  transition: all 0.2s ease-in-out;
   background: #24242cff;
   box-shadow: 0 0 8px 5px #000 inset;
 }
@@ -388,6 +389,8 @@ body {
 .mtv-skin .box {
   background-color: #2c2f34ff;
   border: none;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .mtv-skin .box hr {
   border-top: 1px solid #000;
@@ -417,6 +420,7 @@ body {
   height: 60px;
 }
 .mtv-skin .content .chart-ctx.ctx-active {
+  transition: all 0.2s ease-in-out;
   background: #24242cff;
   box-shadow: 0 0 8px 5px #000 inset;
 }
@@ -429,6 +433,8 @@ body {
 .mtv-skin .box {
   background-color: #2c2f34ff;
   border: none;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .mtv-skin .box hr {
   border-top: 1px solid #000;
@@ -813,6 +819,7 @@ body {
   height: 60px;
 }
 .mtv-skin .content .chart-ctx.ctx-active {
+  transition: all 0.2s ease-in-out;
   background: #24242cff;
   box-shadow: 0 0 8px 5px #000 inset;
 }
@@ -825,6 +832,8 @@ body {
 .mtv-skin .box {
   background-color: #2c2f34ff;
   border: none;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .mtv-skin .box hr {
   border-top: 1px solid #000;
@@ -1292,6 +1301,7 @@ body {
   height: 60px;
 }
 .mtv-skin .content .chart-ctx.ctx-active {
+  transition: all 0.2s ease-in-out;
   background: #24242cff;
   box-shadow: 0 0 8px 5px #000 inset;
 }
@@ -1304,6 +1314,8 @@ body {
 .mtv-skin .box {
   background-color: #2c2f34ff;
   border: none;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .mtv-skin .box hr {
   border-top: 1px solid #000;

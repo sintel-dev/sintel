@@ -132,7 +132,7 @@ export class LineChartCtx extends pip.Events {
             .style('top', 0)
             .attr('class', 'multi-line-chart-ctx')
             .attr('width', self.option.width)
-            .attr('height', self.option.height);
+            .attr('height', self.option.height + 20);
 
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);

@@ -30,6 +30,7 @@
             }
 
             &.ctx-active{
+                transition: all .2s ease-in-out;
                 background: @second-color;
                 box-shadow: 0 0 8px 5px #000 inset;
             }
@@ -46,6 +47,8 @@
     .box{
         background-color: @main-color;
         border: none;
+        border-radius: 10px;
+        overflow: hidden;
         hr{
             border-top: 1px solid #000;
         }

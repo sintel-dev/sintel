@@ -31328,7 +31328,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.14';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -50926,7 +50926,7 @@ var LineChartCtx = (function (_super) {
             .style('top', 0)
             .attr('class', 'multi-line-chart-ctx')
             .attr('width', self.option.width)
-            .attr('height', self.option.height);
+            .attr('height', self.option.height + 20);
         var chart = self.svg.append('g')
             .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
         var xAxis = d3.axisBottom(x);
