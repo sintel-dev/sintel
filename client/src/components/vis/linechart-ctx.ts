@@ -39,7 +39,7 @@ export class LineChartCtx extends pip.Events {
 
     private option: Option = {
         // layout
-        height: 60,
+        height: 50,
         width: null,
         margin: {
             top: 8,
@@ -94,13 +94,15 @@ export class LineChartCtx extends pip.Events {
         ];
         // define axis scale
         let {x, y} = self.getScale(w, h);
-        debugger;
         self.canvas = self.container.append<any>('canvas')
             .style('position', 'absolute')
             .style('left', `${option.margin.left}px`)
             .style('top', `${option.margin.top}px`)
             .attr('width', w)
             .attr('height', h);
+
+        // debugger;
+
 
         let context: CanvasRenderingContext2D = self.canvas.node().getContext('2d');
 
@@ -132,11 +134,11 @@ export class LineChartCtx extends pip.Events {
             .style('top', 0)
             .attr('class', 'multi-line-chart-ctx')
             .attr('width', self.option.width)
-            .attr('height', self.option.height + 20);
+            .attr('height', self.option.height);
 
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
-            // debugger;
+            //
 
         // plot axis
         let xAxis = d3.axisBottom(x);
@@ -154,7 +156,7 @@ export class LineChartCtx extends pip.Events {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
-        debugger;
+
 
         // function used to plot area
         let area = d3.area<[number, number]>()
@@ -204,7 +206,7 @@ export class LineChartCtx extends pip.Events {
         function brushHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
             let s = d3.event.selection || x.range();
-            debugger;
+
 
             pip.content.trigger('ctx:brush', {
                 xMove: [s[0], s[1]],
@@ -278,13 +280,10 @@ export class LineChartCtx extends pip.Events {
             .attr('class', 'brush')
             .call(brush)
             .call(brush.move, x.range());
-            console.log(brushG);
-            debugger;
 
         let update = function(range) {
             brushG.call(brush.move, range);
         };
-
 
         return {
             brush,
@@ -304,7 +303,7 @@ export class LineChartCtx extends pip.Events {
             }
             return colorSchemes.severity5[level];
         };
-        debugger;
+
 
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')

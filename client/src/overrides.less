@@ -3,10 +3,20 @@
     @second-color: #24242cff;
 
     .main-header {
+        box-shadow: 0 0 14px #000;
         .navbar, .logo{
             background: @main-color;
         }
     }
+
+    .main-sidebar{
+        background-color: @main-color;
+    }
+
+    .sidebar-menu>li>.treeview-menu {
+        background: @main-color;
+    }
+
     .content-wrapper{
         background-color: @second-color;
     }
@@ -16,6 +26,7 @@
             border: none;
             background: none;
         }
+
 
         .chart-ctx{
             height: 60px;
@@ -49,8 +60,35 @@
         border: none;
         border-radius: 10px;
         overflow: hidden;
+
+        &.timeseries-overview{
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            position: relative;
+
+            &:after{
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 19%;
+                bottom: 0;
+                background-image: linear-gradient(to top, rgba(36,36,44, 0.9), rgba(36,36,44,0));
+            }
+            // background-image: linear-gradient(transparent, rgba(36,36,44, 1));
+        }
         hr{
             border-top: 1px solid #000;
         }
     }
+
+    //SVG overridings
+    .axis{
+        .domain, line{
+            stroke: #b6b9beff;
+        }
+        text{
+            fill: #b6b9beff;
+        }
+    }
+
 }

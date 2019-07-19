@@ -31328,7 +31328,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.15';
+  var VERSION = '4.17.14';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -50213,6 +50213,7 @@ var Content = (function () {
     function Content(eleId) {
         this.ctxs = ko.observableArray([]);
         this.focus = ko.observable('');
+        this.modes = ko.observableArray([]);
         this.ctxCharts = {};
         this.periodCharts = {};
         this.config = {
@@ -50301,14 +50302,41 @@ var Content = (function () {
             $("a[href=\"#month\"]").tab('show');
         }
     };
-    Content.prototype.showPrediction = function () {
-        this.focusChart.trigger('showPrediction');
+    Content.prototype.addEventMode = function (content, event) {
+        var self = this;
+        var isChecked = event.target.checked;
+        if (isChecked) {
+            self.modes.push('eventMode');
+        }
+        else {
+            self.modes.remove(function (val) { return val === 'eventMode'; });
+        }
+        this.focusChart.trigger('addEventMode', isChecked);
+        return true;
     };
-    Content.prototype.addEventMode = function () {
-        this.focusChart.trigger('addEventMode');
+    Content.prototype.showPrediction = function (content, event) {
+        var self = this;
+        var isChecked = event.target.checked;
+        debugger;
+        if (isChecked) {
+            self.modes.push('accessMode');
+        }
+        else {
+            self.modes.remove(function (val) { return val === 'accessMode'; });
+        }
+        this.focusChart.trigger('showPrediction', isChecked);
+        return true;
     };
-    Content.prototype.zoomPanMode = function () {
-        this.focusChart.trigger('zoomPanMode');
+    Content.prototype.zoomPanMode = function (content, event) {
+        var isChecked = event.target.checked;
+        if (isChecked) {
+            this.modes.push('zoomMode');
+        }
+        else {
+            this.modes.remove(function (val) { return val === 'zoomMode'; });
+        }
+        this.focusChart.trigger('zoomPanMode', isChecked);
+        return true;
     };
     Content.prototype._visualize = function () {
         var self = this;
@@ -50864,7 +50892,7 @@ var LineChartCtx = (function (_super) {
         _this.data = data;
         _this.defaultHeight = 300;
         _this.option = {
-            height: 60,
+            height: 50,
             width: null,
             margin: {
                 top: 8,
@@ -50903,7 +50931,6 @@ var LineChartCtx = (function (_super) {
             option.height - option.margin.top - option.margin.bottom,
         ], w = _a[0], h = _a[1];
         var _b = self.getScale(w, h), x = _b.x, y = _b.y;
-        debugger;
         self.canvas = self.container.append('canvas')
             .style('position', 'absolute')
             .style('left', option.margin.left + "px")
@@ -50926,7 +50953,7 @@ var LineChartCtx = (function (_super) {
             .style('top', 0)
             .attr('class', 'multi-line-chart-ctx')
             .attr('width', self.option.width)
-            .attr('height', self.option.height + 20);
+            .attr('height', self.option.height);
         var chart = self.svg.append('g')
             .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
         var xAxis = d3.axisBottom(x);
@@ -50942,7 +50969,6 @@ var LineChartCtx = (function (_super) {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
-        debugger;
         var area = d3.area()
             .x(function (d) { return x(d[0]); })
             .y0(function (d) { return -(h - y(d[1])) / 2 + h / 2; })
@@ -50965,7 +50991,6 @@ var LineChartCtx = (function (_super) {
                 return;
             }
             var s = d3.event.selection || x.range();
-            debugger;
             pip.content.trigger('ctx:brush', {
                 xMove: [s[0], s[1]],
                 xDomain: [x.invert(s[0]), x.invert(s[1])],
@@ -51025,8 +51050,6 @@ var LineChartCtx = (function (_super) {
             .attr('class', 'brush')
             .call(brush)
             .call(brush.move, x.range());
-        console.log(brushG);
-        debugger;
         var update = function (range) {
             brushG.call(brush.move, range);
         };
@@ -51050,7 +51073,6 @@ var LineChartCtx = (function (_super) {
             }
             return globals_1.colorSchemes.severity5[level];
         };
-        debugger;
         var highlightG = self.svg.append('g')
             .attr('class', 'highlights')
             .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
@@ -51262,7 +51284,6 @@ var LineChartFocus = (function (_super) {
             .data(self.data)
             .enter().append('path')
             .attr('class', 'line')
-            .style('stroke', function (d) { return globals_1.colorSchemes.getColorCode('dname'); })
             .attr('d', function (d) { return line(d.timeseries); });
         var area = d3.area()
             .x(function (d) { return x(d[0]); })
@@ -51277,23 +51298,26 @@ var LineChartFocus = (function (_super) {
         var savedZoom = d3.zoomIdentity;
         self.on('data:update', dataUpdateHandler);
         self.on('brush:update', brushUpdateHandler);
-        self.on('zoomPanMode', function () {
-            enableZoom();
-            disableEditor();
+        self.on('zoomPanMode', function (zoomMode) {
+            if (zoomMode === void 0) { zoomMode = false; }
+            debugger;
+            zoomMode && enableZoom();
+            !zoomMode && disableEditor();
         });
-        self.on('addEventMode', function () {
+        self.on('addEventMode', function (eventMode) {
+            if (eventMode === void 0) { eventMode = false; }
             if (self.data.length > 1) {
                 return;
             }
             disableZoom();
-            enableEditor();
+            eventMode && enableEditor();
+            !eventMode && disableEditor();
         });
-        var assessMode = false;
-        self.on('showPrediction', function () {
+        self.on('showPrediction', function (assessMode) {
+            if (assessMode === void 0) { assessMode = false; }
             if (self.data.length > 1) {
                 return;
             }
-            assessMode = !assessMode;
             if (assessMode) {
                 focus.append('path')
                     .datum(self.data[0].timeseriesPred)
@@ -51311,7 +51335,7 @@ var LineChartFocus = (function (_super) {
         });
         self.on('event:update', eventUpdateHandler);
         self.on('event:modify', eventModifyHandler);
-        function zoomHandler() {
+        function zoomHandler(zoomMode) {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
                 return;
             }
@@ -51320,7 +51344,8 @@ var LineChartFocus = (function (_super) {
             x.domain(t.rescaleX(copyX).domain());
             focus.selectAll('.line')
                 .attr('d', function (d) { return line(d.timeseries); });
-            if (assessMode) {
+            if (zoomMode) {
+                debugger;
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }

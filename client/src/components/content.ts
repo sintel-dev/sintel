@@ -21,6 +21,8 @@ class Content {
 
     public ctxs = ko.observableArray<string>([]);
     public focus = ko.observable<string>('');
+    public modes = ko.observableArray<string>([]);
+    // public empDetails = ko.observable<string>('ceva');
 
     private data: LineChartDataEle[];
 
@@ -143,17 +145,48 @@ class Content {
             ($(`a[href="#month"]`) as any).tab('show');
         }
     }
+    public addEventMode(content, event) {
+        let self = this;
+        const isChecked = event.target.checked;
 
-    public showPrediction() {
-        this.focusChart.trigger('showPrediction');
+        if(isChecked) {
+            self.modes.push('eventMode');
+        } else {
+            self.modes.remove(val => val === 'eventMode');
+        }
+
+
+        this.focusChart.trigger('addEventMode', isChecked);
+        return true;
+    }
+    public showPrediction(content, event) {
+        let self = this;
+        const isChecked = event.target.checked;
+        debugger;
+
+        if(isChecked) {
+            self.modes.push('accessMode');
+        } else {
+            self.modes.remove(val => val === 'accessMode');
+        }
+
+
+        this.focusChart.trigger('showPrediction', isChecked);
+        return true;
+        // console.log(this.focusChart.trigger('showPrediction'))
     }
 
-    public addEventMode() {
-        this.focusChart.trigger('addEventMode');
-    }
+    public zoomPanMode(content, event) {
+        const isChecked = event.target.checked;
+        if(isChecked) {
+            this.modes.push('zoomMode');
+        } else {
+            this.modes.remove(val => val === 'zoomMode');
+        }
 
-    public zoomPanMode() {
-        this.focusChart.trigger('zoomPanMode');
+        this.focusChart.trigger('zoomPanMode', isChecked);
+
+        return true;
     }
 
     private _visualize() {

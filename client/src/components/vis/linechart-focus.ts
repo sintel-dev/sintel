@@ -122,6 +122,7 @@ export class LineChartFocus extends pip.Events {
             .x(d => x(d[0]))
             .y(d => y(d[1]));
 
+
         let clip = chart.append('defs')
             .append('clipPath')
             .attr('id', 'focusClip')
@@ -142,7 +143,7 @@ export class LineChartFocus extends pip.Events {
             .data(self.data)
             .enter().append('path')
             .attr('class', 'line')
-            .style('stroke', d => colorSchemes.getColorCode('dname'))
+            // .style('stroke', d => colorSchemes.getColorCode('dname'))
             .attr('d', d => line(d.timeseries));
 
         let area = d3.area<[number, number]>()
@@ -150,12 +151,12 @@ export class LineChartFocus extends pip.Events {
             .y0(function(d) { return -ye(d[1]) / 2 - option.errorHeight / 2; })
             .y1(function(d) { return ye(d[1]) / 2 - option.errorHeight / 2; });
 
-        let {editor, updateX, enableEditor,
-             disableEditor, makeEditable} = self.addEventEditor(focus, w, h , x);
+        let {editor, updateX, enableEditor, disableEditor, makeEditable} = self.addEventEditor(focus, w, h , x);
         disableEditor();
 
         let { zoom, enableZoom, disableZoom, resetZoom } = self.addZoom(w, h);
         zoom.on('zoom', zoomHandler);
+
         enableZoom();
 
         // let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
@@ -169,23 +170,23 @@ export class LineChartFocus extends pip.Events {
 
         self.on('brush:update', brushUpdateHandler);
 
-        self.on('zoomPanMode', () => {
-            enableZoom();
-            disableEditor();
+        self.on('zoomPanMode', (zoomMode = false) => {
+            debugger;
+            zoomMode && enableZoom();
+            !zoomMode && disableEditor();
         });
 
-        self.on('addEventMode', () => {
+        self.on('addEventMode', (eventMode = false) => {
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
             disableZoom();
-            enableEditor();
+            eventMode && enableEditor();
+            !eventMode && disableEditor();
         });
 
-        let assessMode = false;
-        self.on('showPrediction', () => {
+        self.on('showPrediction', (assessMode = false) => {
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
-            assessMode = !assessMode;
             if (assessMode) {
                 focus.append('path')
                     .datum(self.data[0].timeseriesPred)
@@ -207,7 +208,7 @@ export class LineChartFocus extends pip.Events {
         self.on('event:modify', eventModifyHandler);
 
         // ************  event handlers  ************
-        function zoomHandler() {
+        function zoomHandler(zoomMode) {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return; } // ignore zoom-by-brush
 
             let t = d3.event.transform;
@@ -220,7 +221,8 @@ export class LineChartFocus extends pip.Events {
                 .attr('d', d => line(d.timeseries));
 
             // update prediction curve
-            if (assessMode) {
+            if (zoomMode) {
+                debugger;
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }
