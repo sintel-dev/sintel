@@ -91,6 +91,10 @@
         }
     }
 
+    .multi-line-chart-ctx .line-highlight{
+        stroke: yellow;
+    }
+
     //input controls
     .linechart-controls{
         color: #fff;
@@ -101,6 +105,20 @@
                 margin-right: 0;
             }
 
+            input[type="checkbox"]{
+                display: none;
+            }
+
+            input[type="checkbox"]:checked + .switch {
+                background: #00e04aff;
+
+                &:before{
+                    -webkit-transform: translateX(35px);
+                    -ms-transform: translateX(35px);
+                    transform: translateX(35px);
+                }
+            }
+
             .switch {
                 position: relative;
                 padding-left: 50px;
@@ -109,20 +127,20 @@
                 height: 15px;
                 background: #000;
                 border-radius: 15px;
+                transition: all .4s ease-in-out;
 
                 &:before{
-                    position: absolute;
                     content: '';
+                    position: absolute;
                     left:0;
                     top: 0;
-
-                    transition: all .2s ease-in-out;
+                    width: 15px;
+                    height: 15px;
+                    border-radius: 100%;
+                    background: #fff;
+                    transition: all .4s ease-in-out;
                 }
             }
-        }
-
-        input:checked + .slider {
-            background-color: #00e04aff;
         }
     }
 

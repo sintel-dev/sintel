@@ -39,7 +39,7 @@ export class LineChartCtx extends pip.Events {
 
     private option: Option = {
         // layout
-        height: 50,
+        height: 61,
         width: null,
         margin: {
             top: 8,
@@ -76,6 +76,7 @@ export class LineChartCtx extends pip.Events {
 
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
         self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
+        debugger;
 
         // scroll style inside <div> container
         self.container
@@ -137,7 +138,7 @@ export class LineChartCtx extends pip.Events {
         let highlightUpdate = self.addHighlights(h, x, line, area);
 
         let chart = self.svg.append<SVGGElement>('g')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+            .attr('transform', `translate(${option.margin.left},${option.margin.top - 6})`);
 
         // plot axis
         let xAxis = d3.axisBottom(x);
@@ -156,7 +157,7 @@ export class LineChartCtx extends pip.Events {
                 .call(yAxis.ticks(0, ',f'));
         }
 
-        let {brush, bUpdate} = self.addBrush(chart, w, h, x);
+        let {brush, bUpdate} = self.addBrush(chart, w, h + 10, x);
         brush.on('brush end', brushHandler);
 
         // events

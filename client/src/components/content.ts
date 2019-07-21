@@ -216,7 +216,7 @@ class Content {
                         offset: 0,
                         xAxis: false,
                         yAxis: false,
-                        margin: { top: 8, right: 5, bottom: 5, left: 40 },
+                        margin: { top: 8, right: 5, bottom: 8, left: 40 },
                         xDomain: xDomain
                     }
                 );

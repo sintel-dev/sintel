@@ -424,6 +424,9 @@ body {
 .mtv-skin .axis text {
   fill: #b6b9beff;
 }
+.mtv-skin .multi-line-chart-ctx .line-highlight {
+  stroke: yellow;
+}
 .mtv-skin .linechart-controls {
   color: #fff;
 }
@@ -434,6 +437,15 @@ body {
 .mtv-skin .linechart-controls div:last-child {
   margin-right: 0;
 }
+.mtv-skin .linechart-controls div input[type="checkbox"] {
+  display: none;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+  background: #00e04aff;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+  transform: translateX(35px);
+}
 .mtv-skin .linechart-controls div .switch {
   position: relative;
   padding-left: 50px;
@@ -442,16 +454,18 @@ body {
   height: 15px;
   background: #000;
   border-radius: 15px;
+  transition: all 0.4s ease-in-out;
 }
 .mtv-skin .linechart-controls div .switch:before {
-  position: absolute;
   content: '';
+  position: absolute;
   left: 0;
   top: 0;
-  transition: all 0.2s ease-in-out;
-}
-.mtv-skin .linechart-controls input:checked + .slider {
-  background-color: #00e04aff;
+  width: 15px;
+  height: 15px;
+  border-radius: 100%;
+  background: #fff;
+  transition: all 0.4s ease-in-out;
 }
 
 .mtv-skin .main-header {
@@ -526,6 +540,9 @@ body {
 .mtv-skin .axis text {
   fill: #b6b9beff;
 }
+.mtv-skin .multi-line-chart-ctx .line-highlight {
+  stroke: yellow;
+}
 .mtv-skin .linechart-controls {
   color: #fff;
 }
@@ -536,6 +553,15 @@ body {
 .mtv-skin .linechart-controls div:last-child {
   margin-right: 0;
 }
+.mtv-skin .linechart-controls div input[type="checkbox"] {
+  display: none;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+  background: #00e04aff;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+  transform: translateX(35px);
+}
 .mtv-skin .linechart-controls div .switch {
   position: relative;
   padding-left: 50px;
@@ -544,16 +570,18 @@ body {
   height: 15px;
   background: #000;
   border-radius: 15px;
+  transition: all 0.4s ease-in-out;
 }
 .mtv-skin .linechart-controls div .switch:before {
-  position: absolute;
   content: '';
+  position: absolute;
   left: 0;
   top: 0;
-  transition: all 0.2s ease-in-out;
-}
-.mtv-skin .linechart-controls input:checked + .slider {
-  background-color: #00e04aff;
+  width: 15px;
+  height: 15px;
+  border-radius: 100%;
+  background: #fff;
+  transition: all 0.4s ease-in-out;
 }
 
 
@@ -983,6 +1011,9 @@ body {
 .mtv-skin .axis text {
   fill: #b6b9beff;
 }
+.mtv-skin .multi-line-chart-ctx .line-highlight {
+  stroke: yellow;
+}
 .mtv-skin .linechart-controls {
   color: #fff;
 }
@@ -993,6 +1024,15 @@ body {
 .mtv-skin .linechart-controls div:last-child {
   margin-right: 0;
 }
+.mtv-skin .linechart-controls div input[type="checkbox"] {
+  display: none;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+  background: #00e04aff;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+  transform: translateX(35px);
+}
 .mtv-skin .linechart-controls div .switch {
   position: relative;
   padding-left: 50px;
@@ -1001,16 +1041,18 @@ body {
   height: 15px;
   background: #000;
   border-radius: 15px;
+  transition: all 0.4s ease-in-out;
 }
 .mtv-skin .linechart-controls div .switch:before {
-  position: absolute;
   content: '';
+  position: absolute;
   left: 0;
   top: 0;
-  transition: all 0.2s ease-in-out;
-}
-.mtv-skin .linechart-controls input:checked + .slider {
-  background-color: #00e04aff;
+  width: 15px;
+  height: 15px;
+  border-radius: 100%;
+  background: #fff;
+  transition: all 0.4s ease-in-out;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -1529,6 +1571,9 @@ body {
 .mtv-skin .axis text {
   fill: #b6b9beff;
 }
+.mtv-skin .multi-line-chart-ctx .line-highlight {
+  stroke: yellow;
+}
 .mtv-skin .linechart-controls {
   color: #fff;
 }
@@ -1539,6 +1584,15 @@ body {
 .mtv-skin .linechart-controls div:last-child {
   margin-right: 0;
 }
+.mtv-skin .linechart-controls div input[type="checkbox"] {
+  display: none;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+  background: #00e04aff;
+}
+.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+  transform: translateX(35px);
+}
 .mtv-skin .linechart-controls div .switch {
   position: relative;
   padding-left: 50px;
@@ -1547,16 +1601,18 @@ body {
   height: 15px;
   background: #000;
   border-radius: 15px;
+  transition: all 0.4s ease-in-out;
 }
 .mtv-skin .linechart-controls div .switch:before {
-  position: absolute;
   content: '';
+  position: absolute;
   left: 0;
   top: 0;
-  transition: all 0.2s ease-in-out;
-}
-.mtv-skin .linechart-controls input:checked + .slider {
-  background-color: #00e04aff;
+  width: 15px;
+  height: 15px;
+  border-radius: 100%;
+  background: #fff;
+  transition: all 0.4s ease-in-out;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;

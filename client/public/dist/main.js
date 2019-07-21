@@ -31328,7 +31328,7 @@ v.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.14';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -50356,7 +50356,7 @@ var Content = (function () {
                     offset: 0,
                     xAxis: false,
                     yAxis: false,
-                    margin: { top: 8, right: 5, bottom: 5, left: 40 },
+                    margin: { top: 8, right: 5, bottom: 8, left: 40 },
                     xDomain: xDomain
                 });
             }
@@ -50891,7 +50891,7 @@ var LineChartCtx = (function (_super) {
         _this.data = data;
         _this.defaultHeight = 300;
         _this.option = {
-            height: 50,
+            height: 61,
             width: null,
             margin: {
                 top: 8,
@@ -50916,6 +50916,7 @@ var LineChartCtx = (function (_super) {
         self.container = d3.select(ele);
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
         self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
+        debugger;
         self.container
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
@@ -50962,7 +50963,7 @@ var LineChartCtx = (function (_super) {
             .y(function (d) { return y(d[1]); });
         var highlightUpdate = self.addHighlights(h, x, line, area);
         var chart = self.svg.append('g')
-            .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
+            .attr('transform', "translate(" + option.margin.left + "," + (option.margin.top - 6) + ")");
         var xAxis = d3.axisBottom(x);
         var yAxis = d3.axisLeft(y);
         if (option.xAxis) {
@@ -50976,7 +50977,7 @@ var LineChartCtx = (function (_super) {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
-        var _c = self.addBrush(chart, w, h, x), brush = _c.brush, bUpdate = _c.bUpdate;
+        var _c = self.addBrush(chart, w, h + 10, x), brush = _c.brush, bUpdate = _c.bUpdate;
         brush.on('brush end', brushHandler);
         self.on('brush:update', function (xMove) {
             brush.on('brush end', null);
