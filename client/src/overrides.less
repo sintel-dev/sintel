@@ -1,6 +1,9 @@
 .mtv-skin{
-    @main-color: #2c2f34ff;
-    @second-color: #24242cff;
+    @main-color: #2c2f34;
+    @second-color: #24242c;
+    @yellow-color: #fdcd00;
+    @green-color: #00e04a;
+    @blue-color: #256fe6;
 
     .main-header {
         box-shadow: 0 0 14px #000;
@@ -91,9 +94,21 @@
         }
     }
 
-    .multi-line-chart-ctx .line-highlight{
-        stroke: yellow;
+    .multi-line-chart-ctx {
+        .line-highlight   {
+            stroke: @yellow-color;
+        }
     }
+
+    .chart-focus-container{
+        .line-group{
+            .line{
+                stroke: @blue-color !important;
+            }
+        }
+    }
+
+
 
     //input controls
     .linechart-controls{
@@ -110,7 +125,7 @@
             }
 
             input[type="checkbox"]:checked + .switch {
-                background: #00e04aff;
+                background: @green-color;
 
                 &:before{
                     -webkit-transform: translateX(35px);
