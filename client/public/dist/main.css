@@ -357,16 +357,16 @@ body {
 }
 .mtv-skin .main-header .navbar,
 .mtv-skin .main-header .logo {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .main-sidebar {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
 }
 .mtv-skin .sidebar-menu > li > .treeview-menu {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .content-wrapper {
-  background-color: #24242cff;
+  background-color: #24242c;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -386,7 +386,7 @@ body {
 }
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
-  background: #24242cff;
+  background: #24242c;
   box-shadow: 0 0 8px 5px #000 inset;
 }
 .mtv-skin .content .chart-ctx rect {
@@ -395,8 +395,14 @@ body {
 .mtv-skin .content .chart-ctx rect.handle {
   fill: #b2bdd3ff;
 }
+.mtv-skin .content .chart-focus {
+  top: 0;
+}
+.mtv-skin .content .chart-focus .plot {
+  left: 0;
+}
 .mtv-skin .box {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
   border: none;
   border-radius: 10px;
   overflow: hidden;
@@ -425,7 +431,10 @@ body {
   fill: #b6b9beff;
 }
 .mtv-skin .multi-line-chart-ctx .line-highlight {
-  stroke: yellow;
+  stroke: #fdcd00;
+}
+.mtv-skin .chart-focus-container .line-group .line {
+  stroke: #256fe6 !important;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -441,7 +450,7 @@ body {
   display: none;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
-  background: #00e04aff;
+  background: #00e04a;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(35px);
@@ -473,16 +482,16 @@ body {
 }
 .mtv-skin .main-header .navbar,
 .mtv-skin .main-header .logo {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .main-sidebar {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
 }
 .mtv-skin .sidebar-menu > li > .treeview-menu {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .content-wrapper {
-  background-color: #24242cff;
+  background-color: #24242c;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -502,7 +511,7 @@ body {
 }
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
-  background: #24242cff;
+  background: #24242c;
   box-shadow: 0 0 8px 5px #000 inset;
 }
 .mtv-skin .content .chart-ctx rect {
@@ -511,8 +520,14 @@ body {
 .mtv-skin .content .chart-ctx rect.handle {
   fill: #b2bdd3ff;
 }
+.mtv-skin .content .chart-focus {
+  top: 0;
+}
+.mtv-skin .content .chart-focus .plot {
+  left: 0;
+}
 .mtv-skin .box {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
   border: none;
   border-radius: 10px;
   overflow: hidden;
@@ -541,7 +556,10 @@ body {
   fill: #b6b9beff;
 }
 .mtv-skin .multi-line-chart-ctx .line-highlight {
-  stroke: yellow;
+  stroke: #fdcd00;
+}
+.mtv-skin .chart-focus-container .line-group .line {
+  stroke: #256fe6 !important;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -557,7 +575,7 @@ body {
   display: none;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
-  background: #00e04aff;
+  background: #00e04a;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(35px);
@@ -944,16 +962,16 @@ body {
 }
 .mtv-skin .main-header .navbar,
 .mtv-skin .main-header .logo {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .main-sidebar {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
 }
 .mtv-skin .sidebar-menu > li > .treeview-menu {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .content-wrapper {
-  background-color: #24242cff;
+  background-color: #24242c;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -973,7 +991,7 @@ body {
 }
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
-  background: #24242cff;
+  background: #24242c;
   box-shadow: 0 0 8px 5px #000 inset;
 }
 .mtv-skin .content .chart-ctx rect {
@@ -982,8 +1000,14 @@ body {
 .mtv-skin .content .chart-ctx rect.handle {
   fill: #b2bdd3ff;
 }
+.mtv-skin .content .chart-focus {
+  top: 0;
+}
+.mtv-skin .content .chart-focus .plot {
+  left: 0;
+}
 .mtv-skin .box {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
   border: none;
   border-radius: 10px;
   overflow: hidden;
@@ -1012,7 +1036,10 @@ body {
   fill: #b6b9beff;
 }
 .mtv-skin .multi-line-chart-ctx .line-highlight {
-  stroke: yellow;
+  stroke: #fdcd00;
+}
+.mtv-skin .chart-focus-container .line-group .line {
+  stroke: #256fe6 !important;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -1028,7 +1055,7 @@ body {
   display: none;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
-  background: #00e04aff;
+  background: #00e04a;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(35px);
@@ -1504,16 +1531,16 @@ body {
 }
 .mtv-skin .main-header .navbar,
 .mtv-skin .main-header .logo {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .main-sidebar {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
 }
 .mtv-skin .sidebar-menu > li > .treeview-menu {
-  background: #2c2f34ff;
+  background: #2c2f34;
 }
 .mtv-skin .content-wrapper {
-  background-color: #24242cff;
+  background-color: #24242c;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -1533,7 +1560,7 @@ body {
 }
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
-  background: #24242cff;
+  background: #24242c;
   box-shadow: 0 0 8px 5px #000 inset;
 }
 .mtv-skin .content .chart-ctx rect {
@@ -1542,8 +1569,14 @@ body {
 .mtv-skin .content .chart-ctx rect.handle {
   fill: #b2bdd3ff;
 }
+.mtv-skin .content .chart-focus {
+  top: 0;
+}
+.mtv-skin .content .chart-focus .plot {
+  left: 0;
+}
 .mtv-skin .box {
-  background-color: #2c2f34ff;
+  background-color: #2c2f34;
   border: none;
   border-radius: 10px;
   overflow: hidden;
@@ -1572,7 +1605,10 @@ body {
   fill: #b6b9beff;
 }
 .mtv-skin .multi-line-chart-ctx .line-highlight {
-  stroke: yellow;
+  stroke: #fdcd00;
+}
+.mtv-skin .chart-focus-container .line-group .line {
+  stroke: #256fe6 !important;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -1588,7 +1624,7 @@ body {
   display: none;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
-  background: #00e04aff;
+  background: #00e04a;
 }
 .mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(35px);

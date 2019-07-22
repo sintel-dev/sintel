@@ -76,7 +76,6 @@ export class LineChartCtx extends pip.Events {
 
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
         self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
-        debugger;
 
         // scroll style inside <div> container
         self.container

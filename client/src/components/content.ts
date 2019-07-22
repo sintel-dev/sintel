@@ -145,48 +145,35 @@ class Content {
             ($(`a[href="#month"]`) as any).tab('show');
         }
     }
-    public addEventMode(content, event) {
-        let self = this;
-        const isChecked = event.target.checked;
-        this.modes([]);
-        if(isChecked) {
-            self.modes.push('eventMode');
-        }
 
+    public addEventMode(content, event) {
+        const isChecked = event.target.checked;
+        const zoomModeInput = <HTMLInputElement>document.querySelector('#zoomMode');
+
+        if(isChecked){
+            zoomModeInput.checked = false;
+            this.focusChart.trigger('zoomPanMode', false);
+        }
 
         this.focusChart.trigger('addEventMode', isChecked);
-        this.focusChart.trigger('showPrediction', false);
-        this.focusChart.trigger('zoomPanMode', false);
         return true;
     }
+
     public showPrediction(content, event) {
-        let self = this;
         const isChecked = event.target.checked;
-
-        this.modes([]);
-        if(isChecked) {
-            self.modes.push('accessMode');
-        }
-
-        this.focusChart.trigger('addEventMode', false);
         this.focusChart.trigger('showPrediction', isChecked);
-        this.focusChart.trigger('zoomPanMode', false);
         return true;
-        // console.log(this.focusChart.trigger('showPrediction'))
     }
 
     public zoomPanMode(content, event) {
         const isChecked = event.target.checked;
-
-        this.modes([]);
-        if(isChecked) {
-            this.modes.push('zoomMode');
+        const eventModeInput = <HTMLInputElement>document.querySelector('#eventMode');
+        if(isChecked){
+            eventModeInput.checked = false;
+            this.focusChart.trigger('addEventMode', false);
         }
 
-        this.focusChart.trigger('addEventMode', false);
-        this.focusChart.trigger('showPrediction', false);
         this.focusChart.trigger('zoomPanMode', isChecked);
-
         return true;
     }
 

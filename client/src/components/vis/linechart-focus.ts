@@ -27,6 +27,8 @@ export interface Option {
     offset?: number;
     xAxis?: boolean;
     yAxis?: boolean;
+    flags?: { accessMode: boolean, zoomMode: boolean, eventMode: boolean };
+    // flags
 }
 
 export class LineChartFocus extends pip.Events {
@@ -50,7 +52,12 @@ export class LineChartFocus extends pip.Events {
         context: false,
         xAxis: true,
         yAxis: true,
-        offset: 0
+        offset: 0,
+        flags: {
+            accessMode: false,
+            zoomMode: false,
+            eventMode: false
+        }
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -65,6 +72,9 @@ export class LineChartFocus extends pip.Events {
         super();
         let self = this;
         _.extend(self.option, option);
+
+        // add flags to remember modes;
+
         self.svgContainer = d3.select<HTMLElement, any>(ele);
 
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
@@ -171,22 +181,28 @@ export class LineChartFocus extends pip.Events {
         self.on('brush:update', brushUpdateHandler);
 
         self.on('zoomPanMode', (zoomMode = false) => {
+            self.option.flags.zoomMode = zoomMode;
             zoomMode && enableZoom();
             !zoomMode && disableZoom();
         });
 
         self.on('addEventMode', (eventMode = false) => {
+            self.option.flags.eventMode = eventMode;
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
-
             eventMode && enableEditor();
             !eventMode && disableEditor();
         });
 
+
+
         self.on('showPrediction', (assessMode = false) => {
+            self.option.flags.accessMode = assessMode;
+
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
             if (assessMode) {
+                generateWawes();
                 focus.append('path')
                     .datum(self.data[0].timeseriesPred)
                     .attr('class', 'line2')
@@ -199,6 +215,8 @@ export class LineChartFocus extends pip.Events {
             } else {
                 focus.select('.line2').remove();
                 focus.select('.error').remove();
+                self.svg.select('.waweBg').remove();
+                self.svg.select('.wawes').remove();
             }
         });
 
@@ -206,8 +224,42 @@ export class LineChartFocus extends pip.Events {
 
         self.on('event:modify', eventModifyHandler);
 
+        function generateWawes(){
+            const defs = self.svg.append('g')
+                .attr('class', 'wawes')
+                .append('defs')
+
+            const gradient = defs.append('linearGradient')
+                .attr('id', 'waweGradient')
+                .attr('x1', '0%')
+                .attr('x2', '100%')
+                .attr('y1', '0%')
+                .attr('y2', '0')
+
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0.7);
+
+            gradient.append('stop')
+                .attr('offset', '50%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0);
+
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0.7);
+
+            self.svg.append('rect')
+                .attr('class', 'waweBg')
+                .attr('width', '100%')
+                .attr('height', '90')
+                .attr('fill', 'url(#waweGradient)');
+        }
+
         // ************  event handlers  ************
-        function zoomHandler(zoomMode) {
+        function zoomHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return; } // ignore zoom-by-brush
 
             let t = d3.event.transform;
@@ -220,7 +272,7 @@ export class LineChartFocus extends pip.Events {
                 .attr('d', d => line(d.timeseries));
 
             // update prediction curve
-            if (zoomMode) {
+            if (self.option.flags.accessMode) {
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }

@@ -50303,37 +50303,27 @@ var Content = (function () {
         }
     };
     Content.prototype.addEventMode = function (content, event) {
-        var self = this;
         var isChecked = event.target.checked;
-        this.modes([]);
+        var zoomModeInput = document.querySelector('#zoomMode');
         if (isChecked) {
-            self.modes.push('eventMode');
+            zoomModeInput.checked = false;
+            this.focusChart.trigger('zoomPanMode', false);
         }
         this.focusChart.trigger('addEventMode', isChecked);
-        this.focusChart.trigger('showPrediction', false);
-        this.focusChart.trigger('zoomPanMode', false);
         return true;
     };
     Content.prototype.showPrediction = function (content, event) {
-        var self = this;
         var isChecked = event.target.checked;
-        this.modes([]);
-        if (isChecked) {
-            self.modes.push('accessMode');
-        }
-        this.focusChart.trigger('addEventMode', false);
         this.focusChart.trigger('showPrediction', isChecked);
-        this.focusChart.trigger('zoomPanMode', false);
         return true;
     };
     Content.prototype.zoomPanMode = function (content, event) {
         var isChecked = event.target.checked;
-        this.modes([]);
+        var eventModeInput = document.querySelector('#eventMode');
         if (isChecked) {
-            this.modes.push('zoomMode');
+            eventModeInput.checked = false;
+            this.focusChart.trigger('addEventMode', false);
         }
-        this.focusChart.trigger('addEventMode', false);
-        this.focusChart.trigger('showPrediction', false);
         this.focusChart.trigger('zoomPanMode', isChecked);
         return true;
     };
@@ -50916,7 +50906,6 @@ var LineChartCtx = (function (_super) {
         self.container = d3.select(ele);
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
         self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
-        debugger;
         self.container
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
@@ -51219,7 +51208,12 @@ var LineChartFocus = (function (_super) {
             context: false,
             xAxis: true,
             yAxis: true,
-            offset: 0
+            offset: 0,
+            flags: {
+                accessMode: false,
+                zoomMode: false,
+                eventMode: false
+            }
         };
         _this.defaultHeight = 300;
         var self = _this;
@@ -51300,11 +51294,13 @@ var LineChartFocus = (function (_super) {
         self.on('brush:update', brushUpdateHandler);
         self.on('zoomPanMode', function (zoomMode) {
             if (zoomMode === void 0) { zoomMode = false; }
+            self.option.flags.zoomMode = zoomMode;
             zoomMode && enableZoom();
             !zoomMode && disableZoom();
         });
         self.on('addEventMode', function (eventMode) {
             if (eventMode === void 0) { eventMode = false; }
+            self.option.flags.eventMode = eventMode;
             if (self.data.length > 1) {
                 return;
             }
@@ -51313,10 +51309,12 @@ var LineChartFocus = (function (_super) {
         });
         self.on('showPrediction', function (assessMode) {
             if (assessMode === void 0) { assessMode = false; }
+            self.option.flags.accessMode = assessMode;
             if (self.data.length > 1) {
                 return;
             }
             if (assessMode) {
+                generateWawes();
                 focus.append('path')
                     .datum(self.data[0].timeseriesPred)
                     .attr('class', 'line2')
@@ -51329,11 +51327,41 @@ var LineChartFocus = (function (_super) {
             else {
                 focus.select('.line2').remove();
                 focus.select('.error').remove();
+                self.svg.select('.waweBg').remove();
+                self.svg.select('.wawes').remove();
             }
         });
         self.on('event:update', eventUpdateHandler);
         self.on('event:modify', eventModifyHandler);
-        function zoomHandler(zoomMode) {
+        function generateWawes() {
+            var defs = self.svg.append('g')
+                .attr('class', 'wawes')
+                .append('defs');
+            var gradient = defs.append('linearGradient')
+                .attr('id', 'waweGradient')
+                .attr('x1', '0%')
+                .attr('x2', '100%')
+                .attr('y1', '0%')
+                .attr('y2', '0');
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0.7);
+            gradient.append('stop')
+                .attr('offset', '50%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0);
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-opacity', 0.7);
+            self.svg.append('rect')
+                .attr('class', 'waweBg')
+                .attr('width', '100%')
+                .attr('height', '90')
+                .attr('fill', 'url(#waweGradient)');
+        }
+        function zoomHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
                 return;
             }
@@ -51342,7 +51370,7 @@ var LineChartFocus = (function (_super) {
             x.domain(t.rescaleX(copyX).domain());
             focus.selectAll('.line')
                 .attr('d', function (d) { return line(d.timeseries); });
-            if (zoomMode) {
+            if (self.option.flags.accessMode) {
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }
