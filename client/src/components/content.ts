@@ -45,7 +45,7 @@ class Content {
 
         // default select 0
         $('.chart-focus-container').height(self.config.focusHeight);
-        $('.chart-focus .plot').height(self.config.focusHeight - 45);
+        $('.chart-focus .plot').height(self.config.focusHeight); // - 45);
         $('.chart-ctx-container').height(self.config.ctxHeight);
         $('.pchart').height(self.config.periodHeight);
     }
@@ -95,6 +95,10 @@ class Content {
         });
         pip.content.on('event:modify', (evt) => {
             self.focusChart.trigger('event:modify', evt);
+        });
+
+        pip.content.on('comment:start', (eventInfo: RSI.Event) => {
+            console.log(eventInfo)
         });
     }
 
@@ -203,7 +207,7 @@ class Content {
                         offset: 0,
                         xAxis: false,
                         yAxis: false,
-                        margin: { top: 8, right: 5, bottom: 8, left: 40 },
+                        margin: { top: 9, right: 5, bottom: 9, left: 3 },
                         xDomain: xDomain
                     }
                 );
@@ -214,11 +218,11 @@ class Content {
                 $('.chart-focus .plot')[0],
                 [data[0]],   // By default, plot the first one
                 {
-                    height: self.config.focusHeight - 45,
+                    height: self.config.focusHeight, // - 45,
                     offset: 0,
                     xAxis: true,
                     yAxis: true,
-                    margin: { top: 8, right: 20, bottom: 30, left: 40 },
+                    margin: { top: 20, right: 20, bottom: 40, left: 40 },
                     xDomain: xDomain
                 }
             );

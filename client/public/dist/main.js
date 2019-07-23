@@ -50225,7 +50225,7 @@ var Content = (function () {
         var self = this;
         ko.applyBindings(self, $(eleId)[0]);
         $('.chart-focus-container').height(self.config.focusHeight);
-        $('.chart-focus .plot').height(self.config.focusHeight - 45);
+        $('.chart-focus .plot').height(self.config.focusHeight);
         $('.chart-ctx-container').height(self.config.ctxHeight);
         $('.pchart').height(self.config.periodHeight);
     }
@@ -50266,6 +50266,9 @@ var Content = (function () {
         });
         pip.content.on('event:modify', function (evt) {
             self.focusChart.trigger('event:modify', evt);
+        });
+        pip.content.on('comment:start', function (eventInfo) {
+            console.log(eventInfo);
         });
     };
     Content.prototype.selectCtx = function (name) {
@@ -50346,16 +50349,16 @@ var Content = (function () {
                     offset: 0,
                     xAxis: false,
                     yAxis: false,
-                    margin: { top: 8, right: 5, bottom: 8, left: 40 },
+                    margin: { top: 9, right: 5, bottom: 9, left: 3 },
                     xDomain: xDomain
                 });
             }
             self.focusChart = new linechart_focus_1.LineChartFocus($('.chart-focus .plot')[0], [data[0]], {
-                height: self.config.focusHeight - 45,
+                height: self.config.focusHeight,
                 offset: 0,
                 xAxis: true,
                 yAxis: true,
-                margin: { top: 8, right: 20, bottom: 30, left: 40 },
+                margin: { top: 20, right: 20, bottom: 40, left: 40 },
                 xDomain: xDomain
             });
             self.periodCharts['year'] = new period_chart_1.PeriodChart($('#year')[0], [{
@@ -50881,7 +50884,7 @@ var LineChartCtx = (function (_super) {
         _this.data = data;
         _this.defaultHeight = 300;
         _this.option = {
-            height: 61,
+            height: 60,
             width: null,
             margin: {
                 top: 8,
@@ -50899,7 +50902,8 @@ var LineChartCtx = (function (_super) {
             context: false,
             xAxis: true,
             yAxis: true,
-            offset: 0
+            offset: 0,
+            buffer: 10
         };
         var self = _this;
         _.extend(self.option, option);
@@ -50917,13 +50921,14 @@ var LineChartCtx = (function (_super) {
         var option = self.option;
         var _a = [
             option.width - option.margin.left - option.margin.right,
-            option.height - option.margin.top - option.margin.bottom,
-        ], w = _a[0], h = _a[1];
+            option.height - option.margin.top - option.margin.bottom - option.buffer,
+            option.margin.top + option.buffer / 2
+        ], w = _a[0], h = _a[1], top = _a[2];
         var _b = self.getScale(w, h), x = _b.x, y = _b.y;
         self.canvas = self.container.append('canvas')
             .style('position', 'absolute')
             .style('left', option.margin.left + "px")
-            .style('top', option.margin.top + "px")
+            .style('top', top + "px")
             .attr('width', w)
             .attr('height', h);
         var context = self.canvas.node().getContext('2d');
@@ -50952,7 +50957,7 @@ var LineChartCtx = (function (_super) {
             .y(function (d) { return y(d[1]); });
         var highlightUpdate = self.addHighlights(h, x, line, area);
         var chart = self.svg.append('g')
-            .attr('transform', "translate(" + option.margin.left + "," + (option.margin.top - 6) + ")");
+            .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
         var xAxis = d3.axisBottom(x);
         var yAxis = d3.axisLeft(y);
         if (option.xAxis) {
@@ -50966,7 +50971,7 @@ var LineChartCtx = (function (_super) {
                 .attr('class', 'axis axis--y')
                 .call(yAxis.ticks(0, ',f'));
         }
-        var _c = self.addBrush(chart, w, h + 10, x), brush = _c.brush, bUpdate = _c.bUpdate;
+        var _c = self.addBrush(chart, w, h + option.buffer, x), brush = _c.brush, bUpdate = _c.bUpdate;
         brush.on('brush end', brushHandler);
         self.on('brush:update', function (xMove) {
             brush.on('brush end', null);
@@ -51064,7 +51069,7 @@ var LineChartCtx = (function (_super) {
         };
         var highlightG = self.svg.append('g')
             .attr('class', 'highlights')
-            .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
+            .attr('transform', "translate(" + option.margin.left + "," + (option.margin.top + option.buffer / 2) + ")");
         var update = function (windows, lineData, name) {
             var u = highlightG
                 .selectAll(".window-" + name)
@@ -51209,6 +51214,7 @@ var LineChartFocus = (function (_super) {
             xAxis: true,
             yAxis: true,
             offset: 0,
+            buffer: 15,
             flags: {
                 accessMode: false,
                 zoomMode: false,
@@ -51228,6 +51234,11 @@ var LineChartFocus = (function (_super) {
             .attr('class', 'multi-line-chart-focus')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+        var wavesContainer = self.svg.append('g')
+            .attr('class', 'wawesContainer');
+        wavesContainer.append('rect')
+            .attr('width', '100%')
+            .attr('height', '90');
         self.plot();
         return _this;
     }
@@ -51267,7 +51278,7 @@ var LineChartFocus = (function (_super) {
             .attr('width', w)
             .attr('height', h + option.errorHeight)
             .attr('x', 0)
-            .attr('y', -option.errorHeight);
+            .attr('y', -(option.errorHeight + option.buffer));
         var focus = chart.append('g')
             .attr('class', 'focus')
             .attr('transform', "translate(0, " + option.errorHeight + ")")
@@ -51322,18 +51333,20 @@ var LineChartFocus = (function (_super) {
                 focus.append('path')
                     .datum(self.data[0].timeseriesErr)
                     .attr('class', 'error')
+                    .attr('transform', "translate(0, -" + option.buffer + ")")
                     .attr('d', area);
             }
             else {
                 focus.select('.line2').remove();
                 focus.select('.error').remove();
-                self.svg.select('.waweBg').remove();
-                self.svg.select('.wawes').remove();
+                removeWawes();
             }
         });
         self.on('event:update', eventUpdateHandler);
         self.on('event:modify', eventModifyHandler);
         function generateWawes() {
+            self.svg.select('.wawesContainer')
+                .attr('class', 'wawesContainer active');
             var defs = self.svg.append('g')
                 .attr('class', 'wawes')
                 .append('defs');
@@ -51345,21 +51358,27 @@ var LineChartFocus = (function (_super) {
                 .attr('y2', '0');
             gradient.append('stop')
                 .attr('offset', '0%')
-                .attr('stop-color', '#1a1b20ff')
-                .attr('stop-opacity', 0.7);
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
             gradient.append('stop')
                 .attr('offset', '50%')
-                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-color', '#1A1B20')
                 .attr('stop-opacity', 0);
             gradient.append('stop')
                 .attr('offset', '100%')
-                .attr('stop-color', '#1a1b20ff')
-                .attr('stop-opacity', 0.7);
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
             self.svg.append('rect')
                 .attr('class', 'waweBg')
                 .attr('width', '100%')
                 .attr('height', '90')
                 .attr('fill', 'url(#waweGradient)');
+        }
+        function removeWawes() {
+            self.svg.select('.waweBg').remove();
+            self.svg.select('.wawes').remove();
+            self.svg.select('.wawesContainer.active')
+                .attr('class', 'wawesContainer');
         }
         function zoomHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {

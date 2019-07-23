@@ -1,9 +1,10 @@
 .mtv-skin{
-    @main-color: #2c2f34;
-    @second-color: #24242c;
-    @yellow-color: #fdcd00;
-    @green-color: #00e04a;
-    @blue-color: #256fe6;
+    @main-color: #2C3034;
+    @second-color: #23242B;
+    @yellow-color: #FFCD00;
+    @green-color: #00E04B;
+    @blue-color: #2474F4;
+    @gray-color: #5A627C;
 
     .main-header {
         box-shadow: 0 0 14px #000;
@@ -37,10 +38,16 @@
                 background: none;
                 color: #fff;
                 line-height: 60px;
+                font-size: 11px;
+                color: #8A9097;
+                width: 70px;
             }
 
             .plot{
                 height: 60px;
+                left: auto;
+                right: 0;
+                width: calc(100% - 70px);
             }
 
             &.ctx-active{
@@ -51,15 +58,35 @@
 
             rect{
                 stroke: none;
+                &.selection{
+                    fill: rgba(@gray-color, 0.8);
+                }
                 &.handle{
-                    fill: #b2bdd3ff;
+                    fill: #B3BBD3;
                 }
             }
         }
+
         .chart-focus{
             top: 0;
             .plot{
                 left: 0;
+                .wawesContainer{
+                    opacity: 0;
+                    transition: all .2s ease-in-out;
+
+                    &.active{
+                        opacity: 1;
+                    }
+
+                    rect{
+                        fill: #1A1B20
+                    }
+                }
+            }
+
+            .error{
+                fill: #fff;
             }
         }
     }
@@ -74,6 +101,7 @@
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
             position: relative;
+            margin-bottom: 28px;
 
             &:after{
                 content: "";
@@ -114,14 +142,21 @@
         }
     }
 
+    .multi-line-chart-focus {
+        .line-highlight {
+            stroke: @yellow-color;
+        }
+    }
+
 
 
     //input controls
     .linechart-controls{
         color: #fff;
+        margin-bottom: 15px;
         div{
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 25px;
             &:last-child{
                 margin-right: 0;
             }
@@ -134,9 +169,9 @@
                 background: @green-color;
 
                 &:before{
-                    -webkit-transform: translateX(35px);
-                    -ms-transform: translateX(35px);
-                    transform: translateX(35px);
+                    -webkit-transform: translateX(30px);
+                    -ms-transform: translateX(30px);
+                    transform: translateX(30px);
                 }
             }
 
@@ -145,23 +180,53 @@
                 padding-left: 50px;
                 display: inline-block;
                 width: 40px;
-                height: 15px;
+                height: 20px;
                 background: #000;
                 border-radius: 15px;
+                margin-right: 13px;
                 transition: all .4s ease-in-out;
+                vertical-align: middle;
 
                 &:before{
                     content: '';
                     position: absolute;
+                    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.5);
                     left:0;
                     top: 0;
-                    width: 15px;
-                    height: 15px;
+                    width: 20px;
+                    height: 20px;
                     border-radius: 100%;
                     background: #fff;
                     transition: all .4s ease-in-out;
                 }
             }
+        }
+    }
+
+    //dataset details within the chart
+    .dataset-description{
+        width: 326px;
+        height: calc(100% - 90px);
+        position: absolute;
+        right: 0px;
+        top: 90px;
+        color: #fff;
+        padding: 12px 12px 12px 25px;
+        box-sizing: border-box;
+        transform: translateX(100%);
+        transition: all .2s ease-in-out;
+
+        &.active{
+            transform: translateX(0%);
+        }
+
+        label, span{
+            display: block;
+            margin-bottom: 9px;
+        }
+
+        span{
+            color: #B5B5B5;
         }
     }
 

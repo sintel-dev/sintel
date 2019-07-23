@@ -27,6 +27,7 @@ export interface Option {
     offset?: number;
     xAxis?: boolean;
     yAxis?: boolean;
+    buffer?: number;
     flags?: { accessMode: boolean, zoomMode: boolean, eventMode: boolean };
     // flags
 }
@@ -53,6 +54,7 @@ export class LineChartFocus extends pip.Events {
         xAxis: true,
         yAxis: true,
         offset: 0,
+        buffer: 15,
         flags: {
             accessMode: false,
             zoomMode: false,
@@ -89,6 +91,13 @@ export class LineChartFocus extends pip.Events {
             .attr('class', 'multi-line-chart-focus')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+
+        const wavesContainer = self.svg.append('g')
+            .attr('class', 'wawesContainer');
+
+        wavesContainer.append('rect')
+            .attr('width', '100%')
+            .attr('height', '90');
 
         self.plot();
     }
@@ -140,7 +149,7 @@ export class LineChartFocus extends pip.Events {
             .attr('width', w)
             .attr('height', h + option.errorHeight)
             .attr('x', 0)
-            .attr('y', -option.errorHeight);
+            .attr('y', -(option.errorHeight + option.buffer));
 
         let focus = chart.append('g')
             .attr('class', 'focus')
@@ -211,12 +220,12 @@ export class LineChartFocus extends pip.Events {
                 focus.append('path')
                     .datum(self.data[0].timeseriesErr)
                     .attr('class', 'error')
+                    .attr('transform', `translate(0, -${option.buffer})`)
                     .attr('d', area);
             } else {
                 focus.select('.line2').remove();
                 focus.select('.error').remove();
-                self.svg.select('.waweBg').remove();
-                self.svg.select('.wawes').remove();
+                removeWawes();
             }
         });
 
@@ -224,10 +233,13 @@ export class LineChartFocus extends pip.Events {
 
         self.on('event:modify', eventModifyHandler);
 
-        function generateWawes(){
+        function generateWawes() {
+            self.svg.select('.wawesContainer')
+                .attr('class', 'wawesContainer active');
+
             const defs = self.svg.append('g')
                 .attr('class', 'wawes')
-                .append('defs')
+                .append('defs');
 
             const gradient = defs.append('linearGradient')
                 .attr('id', 'waweGradient')
@@ -238,24 +250,32 @@ export class LineChartFocus extends pip.Events {
 
             gradient.append('stop')
                 .attr('offset', '0%')
-                .attr('stop-color', '#1a1b20ff')
-                .attr('stop-opacity', 0.7);
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
 
             gradient.append('stop')
                 .attr('offset', '50%')
-                .attr('stop-color', '#1a1b20ff')
+                .attr('stop-color', '#1A1B20')
                 .attr('stop-opacity', 0);
 
             gradient.append('stop')
                 .attr('offset', '100%')
-                .attr('stop-color', '#1a1b20ff')
-                .attr('stop-opacity', 0.7);
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
 
             self.svg.append('rect')
                 .attr('class', 'waweBg')
                 .attr('width', '100%')
                 .attr('height', '90')
                 .attr('fill', 'url(#waweGradient)');
+        }
+
+        function removeWawes(){
+            self.svg.select('.waweBg').remove();
+            self.svg.select('.wawes').remove();
+
+            self.svg.select('.wawesContainer.active')
+                .attr('class', 'wawesContainer');
         }
 
         // ************  event handlers  ************

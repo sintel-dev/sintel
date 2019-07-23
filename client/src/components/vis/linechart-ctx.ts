@@ -27,6 +27,7 @@ export interface Option {
     offset?: number;
     xAxis?: boolean;
     yAxis?: boolean;
+    buffer?: number;
 }
 
 export class LineChartCtx extends pip.Events {
@@ -39,7 +40,7 @@ export class LineChartCtx extends pip.Events {
 
     private option: Option = {
         // layout
-        height: 61,
+        height: 60,
         width: null,
         margin: {
             top: 8,
@@ -60,7 +61,8 @@ export class LineChartCtx extends pip.Events {
         context: false,
         xAxis: true,
         yAxis: true,
-        offset: 0
+        offset: 0,
+        buffer: 10
     };
 
 
@@ -88,16 +90,17 @@ export class LineChartCtx extends pip.Events {
     private plot() {
         let self = this;
         const option = self.option;
-        const [w, h] = [
+        const [w, h, top] = [
             option.width - option.margin.left - option.margin.right,
-            option.height - option.margin.top - option.margin.bottom,
+            option.height - option.margin.top - option.margin.bottom - option.buffer,
+            option.margin.top + option.buffer / 2
         ];
         // define axis scale
         let {x, y} = self.getScale(w, h);
         self.canvas = self.container.append<any>('canvas')
             .style('position', 'absolute')
             .style('left', `${option.margin.left}px`)
-            .style('top', `${option.margin.top}px`)
+            .style('top', `${top}px`)
             .attr('width', w)
             .attr('height', h);
 
@@ -137,7 +140,7 @@ export class LineChartCtx extends pip.Events {
         let highlightUpdate = self.addHighlights(h, x, line, area);
 
         let chart = self.svg.append<SVGGElement>('g')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top - 6})`);
+            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
 
         // plot axis
         let xAxis = d3.axisBottom(x);
@@ -156,7 +159,7 @@ export class LineChartCtx extends pip.Events {
                 .call(yAxis.ticks(0, ',f'));
         }
 
-        let {brush, bUpdate} = self.addBrush(chart, w, h + 10, x);
+        let {brush, bUpdate} = self.addBrush(chart, w, h + option.buffer, x);
         brush.on('brush end', brushHandler);
 
         // events
@@ -275,7 +278,7 @@ export class LineChartCtx extends pip.Events {
 
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+            .attr('transform', `translate(${option.margin.left},${option.margin.top + option.buffer / 2})`);
 
         let update = function(windows, lineData, name) {
             let u = highlightG
