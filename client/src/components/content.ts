@@ -8,6 +8,7 @@ import { LineChartCtx } from './vis/linechart-ctx';
 import { LineChartFocus } from './vis/linechart-focus';
 import { PeriodChart} from './vis/period-chart';
 
+import server from '../services/rest-server';
 
 interface CtxCharts {
     [index: string]: LineChartCtx;
@@ -29,6 +30,18 @@ class Content {
     private focusChart: LineChartFocus;
     private ctxCharts: CtxCharts = {};
     private periodCharts: PeriodCharts = {};
+
+    private eventInfo: RSI.Event;
+    private commentInfo: RSI.Comment;
+    public event = ko.observable('');
+
+    public datarun = ko.observable('');
+    public dataset = ko.observable('');
+    public eventFrom = ko.observable('');
+    public eventTo = ko.observable('');
+    public level = ko.observable('None');
+    public transcript = ko.observable('');
+    public comment = '';
 
     private config = {
         speed: 500,   // box animation duration,
@@ -93,15 +106,139 @@ class Content {
                 ct.trigger('event:update');
             });
         });
+
         pip.content.on('event:modify', (evt) => {
             self.focusChart.trigger('event:modify', evt);
         });
 
+        $('input[name="level"]').change(function() {
+            let val = this.getAttribute('value');
+            self.level(val);
+        });
+
+        pip.content.on('comment:new', (eventInfo: RSI.Event) => {
+            this.update(eventInfo);
+        });
+
         pip.content.on('comment:start', (eventInfo: RSI.Event) => {
-            console.log(eventInfo)
+            this.update(eventInfo)
         });
     }
 
+    private showDatasetInfo(visible){
+        debugger;
+        visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+    }
+
+    private async update(eventInfo: RSI.Event) {
+        if (eventInfo.id === 'new') {
+            $('#comment').val('');
+        } else {
+            this.commentInfo = await<any> server.comments.read({}, {
+                event: eventInfo.id
+            });
+            $('#comment').val(this.commentInfo.text);
+        }
+
+        this.eventInfo = eventInfo;
+
+        this.event(eventInfo.id);
+        this.datarun(eventInfo.datarun);
+        this.dataset(eventInfo.dataset);
+        this.eventFrom(new Date(eventInfo.start_time).toUTCString());
+        this.eventTo(new Date(eventInfo.stop_time).toUTCString());
+        this.level(this.fromLevelToScore(eventInfo.score));
+
+        this.showDatasetInfo(true);
+    }
+
+    private fromLevelToScore(score: number): string {
+        let level: number | string = 0;
+        for (let i = 0; i <= 4; i += 1) {
+            if (score > i) { level += 1; }
+        }
+        if (level === 0) { level = 'None'; }
+        $('input[name="level"]').removeAttr('check');
+        $('input[name="level"]').removeClass('active');
+        $(`input[name="level"][value="${level}"]`).attr('check');
+        $(`input[name="level"][value="${level}"]`).addClass('active');
+
+        return String(level);
+    }
+
+    private fromScoreToLevel(level: string): number {
+        if (level === 'None') {
+            return 0;
+        } else {
+            return +level;
+        }
+    }
+
+    public remove() {
+        let self = this;
+        server.events.del<RSI.Response>(self.event()).done(() => {
+            this.showDatasetInfo(false);
+            pip.content.trigger('event:update');
+            // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+        });
+    }
+
+    public modify() {
+        let self = this;
+        pip.content.trigger('event:modify', self.eventInfo);
+        // pip.content.trigger('linechart:highlight:modify', {
+        //     datarun: self.eventInfo.datarun,
+        //     event: self.eventInfo
+        // });
+        $('#datasetDescription').removeClass('active');
+    }
+
+    public save() {
+        let self = this;
+
+        if (self.event() === 'new') {
+            // create new
+            server.events.create<RSI.Response>({
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                this.showDatasetInfo(false)
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                server.comments.create({
+                    event: eid,
+                    text: $('#comment').val()
+                });
+            });
+        } else {
+            // update existing
+            server.events.update<RSI.Response>(self.event(), {
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                this.showDatasetInfo(false);
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                if (self.commentInfo.id === 'new') {
+                    server.comments.create({
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                } else {
+                    server.comments.update(self.commentInfo.id, {
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                }
+            });
+        }
+    }
 
     // the following public methods are triggered by user interactions
 

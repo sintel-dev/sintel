@@ -464,7 +464,7 @@ export class LineChartFocus extends pip.Events {
             }
 
             if (_.isNull(modifiedEvent)) {
-                pip.modal.trigger('comment:new', {
+                pip.content.trigger('comment:new', {
                     id: 'new',
                     score: 0,
                     start_time: data[startIdx][0],
@@ -474,7 +474,7 @@ export class LineChartFocus extends pip.Events {
                     offset: self.option.offset
                 });
             } else {
-                pip.modal.trigger('comment:start', {
+                pip.content.trigger('comment:start', {
                     id: modifiedEvent.id,
                     score: modifiedEvent.score,
                     start_time: data[startIdx][0],
@@ -597,6 +597,7 @@ export class LineChartFocus extends pip.Events {
 
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')
+            // .attr('filter', 'url(#blurMe)')
             .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
         _.each(self.data, (d, i) => {
@@ -627,7 +628,7 @@ export class LineChartFocus extends pip.Events {
                         .attr('y', 0)
                         .attr('height', h)
                         .on('click', () => {
-                            pip.modal.trigger('comment:start', {
+                            pip.content.trigger('comment:start', {
                                 id: d[3],
                                 score: d[2],
                                 start_time: lineData[d[0]][0],
@@ -650,7 +651,7 @@ export class LineChartFocus extends pip.Events {
                         .attr('y', hz * idx)
                         .attr('height', hz - hzp)
                         .on('click', () => {
-                            pip.modal.trigger('comment:start', {
+                            pip.content.trigger('comment:start', {
                                 id: d[3],
                                 score: d[2],
                                 start_time: lineData[d[0]][0],

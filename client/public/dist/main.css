@@ -365,6 +365,18 @@ body {
 .mtv-skin .sidebar-menu > li > .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu > li a {
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu {
+  background: #2C3034;
+}
+.mtv-skin .sidebar-menu .treeview-menu li {
+  padding: 5px 5px 5px 15px;
+}
+.mtv-skin .sidebar-menu .treeview-menu li a {
+  padding: 0;
+}
 .mtv-skin .content-wrapper {
   background-color: #23242B;
 }
@@ -420,8 +432,8 @@ body {
 .mtv-skin .content .chart-focus .plot .wawesContainer rect {
   fill: #1A1B20;
 }
-.mtv-skin .content .chart-focus .error {
-  fill: #fff;
+.mtv-skin .content .chart-focus path.error {
+  fill: #767E8B;
 }
 .mtv-skin .box {
   background-color: #2C3034;
@@ -458,6 +470,27 @@ body {
 }
 .mtv-skin .chart-focus-container .line-group .line {
   stroke: #2474F4 !important;
+}
+.mtv-skin .chart-focus-container .chart-controls {
+  position: absolute;
+  right: 35px;
+  bottom: 50px;
+}
+.mtv-skin .chart-focus-container .chart-controls li {
+  display: inline-block;
+}
+.mtv-skin .chart-focus-container .chart-controls li:first-child {
+  margin-bottom: 7px;
+  text-align: right;
+  display: block;
+}
+.mtv-skin .chart-focus-container .chart-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: none;
+  border: 1px solid #979797;
+  color: #fff;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -513,21 +546,88 @@ body {
   right: 0px;
   top: 90px;
   color: #fff;
-  padding: 12px 12px 12px 25px;
+  padding: 12px 12px 12px 15px;
   box-sizing: border-box;
   transform: translateX(100%);
   transition: all 0.2s ease-in-out;
+  background: rgba(35, 36, 43, 0.9);
+}
+.mtv-skin .dataset-description .line {
+  margin-bottom: 0px;
+}
+.mtv-skin .dataset-description .line:last-child {
+  margin-bottom: 0;
+}
+.mtv-skin .dataset-description .line.data-control ul {
+  margin: 0;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control li {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0 16px 0 0 ;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-danger {
+  background: #F64242;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-primary {
+  background: #2474F4;
+}
+.mtv-skin .dataset-description .line label.btn {
+  color: #000;
 }
 .mtv-skin .dataset-description.active {
   transform: translateX(0%);
 }
 .mtv-skin .dataset-description label,
 .mtv-skin .dataset-description span {
-  display: block;
   margin-bottom: 9px;
 }
 .mtv-skin .dataset-description span {
   color: #B5B5B5;
+  font-size: 13px;
+}
+.mtv-skin .dataset-description textarea {
+  width: 270px;
+  height: 95px;
+  border: 1px solid #979797;
+  background: transparent;
+  border-radius: 4px;
+  color: #fff;
+}
+.mtv-skin .dataset-description a.close {
+  background: none;
+  font-size: 15px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  opacity: 1;
+  text-shadow: none;
+  outline: none;
+}
+.mtv-skin .dataset-description .btn-L1 {
+  background-color: #2c7bb6;
+  border-color: #2c7bb6;
+}
+.mtv-skin .dataset-description .btn-L2 {
+  background-color: #abd9e9;
+  border-color: #abd9e9;
+}
+.mtv-skin .dataset-description .btn-L3 {
+  background-color: #ffffbf;
+  border-color: #ffffbf;
+}
+.mtv-skin .dataset-description .btn-L4 {
+  background-color: #fdae61;
+  border-color: #fdae61;
+}
+.mtv-skin .dataset-description .btn-L5 {
+  background-color: #d7191c;
+  border-color: #d7191c;
 }
 
 .mtv-skin .main-header {
@@ -543,6 +643,18 @@ body {
 .mtv-skin .sidebar-menu > li > .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu > li a {
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu {
+  background: #2C3034;
+}
+.mtv-skin .sidebar-menu .treeview-menu li {
+  padding: 5px 5px 5px 15px;
+}
+.mtv-skin .sidebar-menu .treeview-menu li a {
+  padding: 0;
+}
 .mtv-skin .content-wrapper {
   background-color: #23242B;
 }
@@ -598,8 +710,8 @@ body {
 .mtv-skin .content .chart-focus .plot .wawesContainer rect {
   fill: #1A1B20;
 }
-.mtv-skin .content .chart-focus .error {
-  fill: #fff;
+.mtv-skin .content .chart-focus path.error {
+  fill: #767E8B;
 }
 .mtv-skin .box {
   background-color: #2C3034;
@@ -636,6 +748,27 @@ body {
 }
 .mtv-skin .chart-focus-container .line-group .line {
   stroke: #2474F4 !important;
+}
+.mtv-skin .chart-focus-container .chart-controls {
+  position: absolute;
+  right: 35px;
+  bottom: 50px;
+}
+.mtv-skin .chart-focus-container .chart-controls li {
+  display: inline-block;
+}
+.mtv-skin .chart-focus-container .chart-controls li:first-child {
+  margin-bottom: 7px;
+  text-align: right;
+  display: block;
+}
+.mtv-skin .chart-focus-container .chart-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: none;
+  border: 1px solid #979797;
+  color: #fff;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -691,21 +824,88 @@ body {
   right: 0px;
   top: 90px;
   color: #fff;
-  padding: 12px 12px 12px 25px;
+  padding: 12px 12px 12px 15px;
   box-sizing: border-box;
   transform: translateX(100%);
   transition: all 0.2s ease-in-out;
+  background: rgba(35, 36, 43, 0.9);
+}
+.mtv-skin .dataset-description .line {
+  margin-bottom: 0px;
+}
+.mtv-skin .dataset-description .line:last-child {
+  margin-bottom: 0;
+}
+.mtv-skin .dataset-description .line.data-control ul {
+  margin: 0;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control li {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0 16px 0 0 ;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-danger {
+  background: #F64242;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-primary {
+  background: #2474F4;
+}
+.mtv-skin .dataset-description .line label.btn {
+  color: #000;
 }
 .mtv-skin .dataset-description.active {
   transform: translateX(0%);
 }
 .mtv-skin .dataset-description label,
 .mtv-skin .dataset-description span {
-  display: block;
   margin-bottom: 9px;
 }
 .mtv-skin .dataset-description span {
   color: #B5B5B5;
+  font-size: 13px;
+}
+.mtv-skin .dataset-description textarea {
+  width: 270px;
+  height: 95px;
+  border: 1px solid #979797;
+  background: transparent;
+  border-radius: 4px;
+  color: #fff;
+}
+.mtv-skin .dataset-description a.close {
+  background: none;
+  font-size: 15px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  opacity: 1;
+  text-shadow: none;
+  outline: none;
+}
+.mtv-skin .dataset-description .btn-L1 {
+  background-color: #2c7bb6;
+  border-color: #2c7bb6;
+}
+.mtv-skin .dataset-description .btn-L2 {
+  background-color: #abd9e9;
+  border-color: #abd9e9;
+}
+.mtv-skin .dataset-description .btn-L3 {
+  background-color: #ffffbf;
+  border-color: #ffffbf;
+}
+.mtv-skin .dataset-description .btn-L4 {
+  background-color: #fdae61;
+  border-color: #fdae61;
+}
+.mtv-skin .dataset-description .btn-L5 {
+  background-color: #d7191c;
+  border-color: #d7191c;
 }
 
 
@@ -1076,6 +1276,18 @@ body {
 .mtv-skin .sidebar-menu > li > .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu > li a {
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu {
+  background: #2C3034;
+}
+.mtv-skin .sidebar-menu .treeview-menu li {
+  padding: 5px 5px 5px 15px;
+}
+.mtv-skin .sidebar-menu .treeview-menu li a {
+  padding: 0;
+}
 .mtv-skin .content-wrapper {
   background-color: #23242B;
 }
@@ -1131,8 +1343,8 @@ body {
 .mtv-skin .content .chart-focus .plot .wawesContainer rect {
   fill: #1A1B20;
 }
-.mtv-skin .content .chart-focus .error {
-  fill: #fff;
+.mtv-skin .content .chart-focus path.error {
+  fill: #767E8B;
 }
 .mtv-skin .box {
   background-color: #2C3034;
@@ -1169,6 +1381,27 @@ body {
 }
 .mtv-skin .chart-focus-container .line-group .line {
   stroke: #2474F4 !important;
+}
+.mtv-skin .chart-focus-container .chart-controls {
+  position: absolute;
+  right: 35px;
+  bottom: 50px;
+}
+.mtv-skin .chart-focus-container .chart-controls li {
+  display: inline-block;
+}
+.mtv-skin .chart-focus-container .chart-controls li:first-child {
+  margin-bottom: 7px;
+  text-align: right;
+  display: block;
+}
+.mtv-skin .chart-focus-container .chart-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: none;
+  border: 1px solid #979797;
+  color: #fff;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -1224,21 +1457,88 @@ body {
   right: 0px;
   top: 90px;
   color: #fff;
-  padding: 12px 12px 12px 25px;
+  padding: 12px 12px 12px 15px;
   box-sizing: border-box;
   transform: translateX(100%);
   transition: all 0.2s ease-in-out;
+  background: rgba(35, 36, 43, 0.9);
+}
+.mtv-skin .dataset-description .line {
+  margin-bottom: 0px;
+}
+.mtv-skin .dataset-description .line:last-child {
+  margin-bottom: 0;
+}
+.mtv-skin .dataset-description .line.data-control ul {
+  margin: 0;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control li {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0 16px 0 0 ;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-danger {
+  background: #F64242;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-primary {
+  background: #2474F4;
+}
+.mtv-skin .dataset-description .line label.btn {
+  color: #000;
 }
 .mtv-skin .dataset-description.active {
   transform: translateX(0%);
 }
 .mtv-skin .dataset-description label,
 .mtv-skin .dataset-description span {
-  display: block;
   margin-bottom: 9px;
 }
 .mtv-skin .dataset-description span {
   color: #B5B5B5;
+  font-size: 13px;
+}
+.mtv-skin .dataset-description textarea {
+  width: 270px;
+  height: 95px;
+  border: 1px solid #979797;
+  background: transparent;
+  border-radius: 4px;
+  color: #fff;
+}
+.mtv-skin .dataset-description a.close {
+  background: none;
+  font-size: 15px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  opacity: 1;
+  text-shadow: none;
+  outline: none;
+}
+.mtv-skin .dataset-description .btn-L1 {
+  background-color: #2c7bb6;
+  border-color: #2c7bb6;
+}
+.mtv-skin .dataset-description .btn-L2 {
+  background-color: #abd9e9;
+  border-color: #abd9e9;
+}
+.mtv-skin .dataset-description .btn-L3 {
+  background-color: #ffffbf;
+  border-color: #ffffbf;
+}
+.mtv-skin .dataset-description .btn-L4 {
+  background-color: #fdae61;
+  border-color: #fdae61;
+}
+.mtv-skin .dataset-description .btn-L5 {
+  background-color: #d7191c;
+  border-color: #d7191c;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -1695,6 +1995,18 @@ body {
 .mtv-skin .sidebar-menu > li > .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu > li a {
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu {
+  background: #2C3034;
+}
+.mtv-skin .sidebar-menu .treeview-menu li {
+  padding: 5px 5px 5px 15px;
+}
+.mtv-skin .sidebar-menu .treeview-menu li a {
+  padding: 0;
+}
 .mtv-skin .content-wrapper {
   background-color: #23242B;
 }
@@ -1750,8 +2062,8 @@ body {
 .mtv-skin .content .chart-focus .plot .wawesContainer rect {
   fill: #1A1B20;
 }
-.mtv-skin .content .chart-focus .error {
-  fill: #fff;
+.mtv-skin .content .chart-focus path.error {
+  fill: #767E8B;
 }
 .mtv-skin .box {
   background-color: #2C3034;
@@ -1788,6 +2100,27 @@ body {
 }
 .mtv-skin .chart-focus-container .line-group .line {
   stroke: #2474F4 !important;
+}
+.mtv-skin .chart-focus-container .chart-controls {
+  position: absolute;
+  right: 35px;
+  bottom: 50px;
+}
+.mtv-skin .chart-focus-container .chart-controls li {
+  display: inline-block;
+}
+.mtv-skin .chart-focus-container .chart-controls li:first-child {
+  margin-bottom: 7px;
+  text-align: right;
+  display: block;
+}
+.mtv-skin .chart-focus-container .chart-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: none;
+  border: 1px solid #979797;
+  color: #fff;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -1843,21 +2176,88 @@ body {
   right: 0px;
   top: 90px;
   color: #fff;
-  padding: 12px 12px 12px 25px;
+  padding: 12px 12px 12px 15px;
   box-sizing: border-box;
   transform: translateX(100%);
   transition: all 0.2s ease-in-out;
+  background: rgba(35, 36, 43, 0.9);
+}
+.mtv-skin .dataset-description .line {
+  margin-bottom: 0px;
+}
+.mtv-skin .dataset-description .line:last-child {
+  margin-bottom: 0;
+}
+.mtv-skin .dataset-description .line.data-control ul {
+  margin: 0;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control li {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0 16px 0 0 ;
+  padding: 0;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-danger {
+  background: #F64242;
+}
+.mtv-skin .dataset-description .line.data-control button.btn-primary {
+  background: #2474F4;
+}
+.mtv-skin .dataset-description .line label.btn {
+  color: #000;
 }
 .mtv-skin .dataset-description.active {
   transform: translateX(0%);
 }
 .mtv-skin .dataset-description label,
 .mtv-skin .dataset-description span {
-  display: block;
   margin-bottom: 9px;
 }
 .mtv-skin .dataset-description span {
   color: #B5B5B5;
+  font-size: 13px;
+}
+.mtv-skin .dataset-description textarea {
+  width: 270px;
+  height: 95px;
+  border: 1px solid #979797;
+  background: transparent;
+  border-radius: 4px;
+  color: #fff;
+}
+.mtv-skin .dataset-description a.close {
+  background: none;
+  font-size: 15px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  opacity: 1;
+  text-shadow: none;
+  outline: none;
+}
+.mtv-skin .dataset-description .btn-L1 {
+  background-color: #2c7bb6;
+  border-color: #2c7bb6;
+}
+.mtv-skin .dataset-description .btn-L2 {
+  background-color: #abd9e9;
+  border-color: #abd9e9;
+}
+.mtv-skin .dataset-description .btn-L3 {
+  background-color: #ffffbf;
+  border-color: #ffffbf;
+}
+.mtv-skin .dataset-description .btn-L4 {
+  background-color: #fdae61;
+  border-color: #fdae61;
+}
+.mtv-skin .dataset-description .btn-L5 {
+  background-color: #d7191c;
+  border-color: #d7191c;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;

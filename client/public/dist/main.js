@@ -50201,6 +50201,41 @@ module.exports = function(module) {
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var pip = __webpack_require__(/*! ../services/pip-client */ "./src/services/pip-client.ts");
 var ko = __webpack_require__(/*! knockout */ "./node_modules/knockout/build/output/knockout-latest.js");
@@ -50209,6 +50244,7 @@ var data_processor_1 = __webpack_require__(/*! ../services/data-processor */ "./
 var linechart_ctx_1 = __webpack_require__(/*! ./vis/linechart-ctx */ "./src/components/vis/linechart-ctx.ts");
 var linechart_focus_1 = __webpack_require__(/*! ./vis/linechart-focus */ "./src/components/vis/linechart-focus.ts");
 var period_chart_1 = __webpack_require__(/*! ./vis/period-chart */ "./src/components/vis/period-chart.ts");
+var rest_server_1 = __webpack_require__(/*! ../services/rest-server */ "./src/services/rest-server.ts");
 var Content = (function () {
     function Content(eleId) {
         this.ctxs = ko.observableArray([]);
@@ -50216,6 +50252,14 @@ var Content = (function () {
         this.modes = ko.observableArray([]);
         this.ctxCharts = {};
         this.periodCharts = {};
+        this.event = ko.observable('');
+        this.datarun = ko.observable('');
+        this.dataset = ko.observable('');
+        this.eventFrom = ko.observable('');
+        this.eventTo = ko.observable('');
+        this.level = ko.observable('None');
+        this.transcript = ko.observable('');
+        this.comment = '';
         this.config = {
             speed: 500,
             ctxHeight: 450,
@@ -50230,6 +50274,7 @@ var Content = (function () {
         $('.pchart').height(self.config.periodHeight);
     }
     Content.prototype.setupEventHandlers = function () {
+        var _this = this;
         var self = this;
         pip.content.on('experiment:change', function (exp) {
             self._ToggleLoadingOverlay();
@@ -50267,9 +50312,131 @@ var Content = (function () {
         pip.content.on('event:modify', function (evt) {
             self.focusChart.trigger('event:modify', evt);
         });
-        pip.content.on('comment:start', function (eventInfo) {
-            console.log(eventInfo);
+        $('input[name="level"]').change(function () {
+            var val = this.getAttribute('value');
+            self.level(val);
         });
+        pip.content.on('comment:new', function (eventInfo) {
+            _this.update(eventInfo);
+        });
+        pip.content.on('comment:start', function (eventInfo) {
+            _this.update(eventInfo);
+        });
+    };
+    Content.prototype.showDatasetInfo = function (visible) {
+        debugger;
+        visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+    };
+    Content.prototype.update = function (eventInfo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!(eventInfo.id === 'new')) return [3, 1];
+                        $('#comment').val('');
+                        return [3, 3];
+                    case 1:
+                        _a = this;
+                        return [4, rest_server_1.default.comments.read({}, {
+                                event: eventInfo.id
+                            })];
+                    case 2:
+                        _a.commentInfo = _b.sent();
+                        $('#comment').val(this.commentInfo.text);
+                        _b.label = 3;
+                    case 3:
+                        this.eventInfo = eventInfo;
+                        this.event(eventInfo.id);
+                        this.datarun(eventInfo.datarun);
+                        this.dataset(eventInfo.dataset);
+                        this.eventFrom(new Date(eventInfo.start_time).toUTCString());
+                        this.eventTo(new Date(eventInfo.stop_time).toUTCString());
+                        this.level(this.fromLevelToScore(eventInfo.score));
+                        this.showDatasetInfo(true);
+                        return [2];
+                }
+            });
+        });
+    };
+    Content.prototype.fromLevelToScore = function (score) {
+        var level = 0;
+        for (var i = 0; i <= 4; i += 1) {
+            if (score > i) {
+                level += 1;
+            }
+        }
+        if (level === 0) {
+            level = 'None';
+        }
+        $('input[name="level"]').removeAttr('check');
+        $('input[name="level"]').removeClass('active');
+        $("input[name=\"level\"][value=\"" + level + "\"]").attr('check');
+        $("input[name=\"level\"][value=\"" + level + "\"]").addClass('active');
+        return String(level);
+    };
+    Content.prototype.fromScoreToLevel = function (level) {
+        if (level === 'None') {
+            return 0;
+        }
+        else {
+            return +level;
+        }
+    };
+    Content.prototype.remove = function () {
+        var _this = this;
+        var self = this;
+        rest_server_1.default.events.del(self.event()).done(function () {
+            _this.showDatasetInfo(false);
+            pip.content.trigger('event:update');
+        });
+    };
+    Content.prototype.modify = function () {
+        var self = this;
+        pip.content.trigger('event:modify', self.eventInfo);
+        $('#datasetDescription').removeClass('active');
+    };
+    Content.prototype.save = function () {
+        var _this = this;
+        var self = this;
+        if (self.event() === 'new') {
+            rest_server_1.default.events.create({
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(function (eid) {
+                _this.showDatasetInfo(false);
+                pip.content.trigger('event:update');
+                rest_server_1.default.comments.create({
+                    event: eid,
+                    text: $('#comment').val()
+                });
+            });
+        }
+        else {
+            rest_server_1.default.events.update(self.event(), {
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(function (eid) {
+                _this.showDatasetInfo(false);
+                pip.content.trigger('event:update');
+                if (self.commentInfo.id === 'new') {
+                    rest_server_1.default.comments.create({
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                }
+                else {
+                    rest_server_1.default.comments.update(self.commentInfo.id, {
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                }
+            });
+        }
     };
     Content.prototype.selectCtx = function (name) {
         var self = this;
@@ -51533,7 +51700,7 @@ var LineChartFocus = (function (_super) {
                 i += 1;
             }
             if (_.isNull(modifiedEvent)) {
-                pip.modal.trigger('comment:new', {
+                pip.content.trigger('comment:new', {
                     id: 'new',
                     score: 0,
                     start_time: data[startIdx][0],
@@ -51544,7 +51711,7 @@ var LineChartFocus = (function (_super) {
                 });
             }
             else {
-                pip.modal.trigger('comment:start', {
+                pip.content.trigger('comment:start', {
                     id: modifiedEvent.id,
                     score: modifiedEvent.score,
                     start_time: data[startIdx][0],
@@ -51681,7 +51848,7 @@ var LineChartFocus = (function (_super) {
                     .attr('y', 0)
                     .attr('height', h)
                     .on('click', function () {
-                    pip.modal.trigger('comment:start', {
+                    pip.content.trigger('comment:start', {
                         id: d[3],
                         score: d[2],
                         start_time: lineData[d[0]][0],
@@ -51700,7 +51867,7 @@ var LineChartFocus = (function (_super) {
                     .attr('y', hz * idx)
                     .attr('height', hz - hzp)
                     .on('click', function () {
-                    pip.modal.trigger('comment:start', {
+                    pip.content.trigger('comment:start', {
                         id: d[3],
                         score: d[2],
                         start_time: lineData[d[0]][0],
