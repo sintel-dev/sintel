@@ -126,7 +126,6 @@ class Content {
     }
 
     private showDatasetInfo(visible){
-        debugger;
         visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
     }
 

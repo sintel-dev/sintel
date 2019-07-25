@@ -50324,7 +50324,6 @@ var Content = (function () {
         });
     };
     Content.prototype.showDatasetInfo = function (visible) {
-        debugger;
         visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
     };
     Content.prototype.update = function (eventInfo) {

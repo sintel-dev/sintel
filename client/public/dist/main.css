@@ -355,9 +355,34 @@ body {
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
+.mtv-skin .main-header a {
+  transition: all 0.2s ease-in-out;
+}
 .mtv-skin .main-header .navbar,
-.mtv-skin .main-header .logo {
+.mtv-skin .main-header .logo,
+.mtv-skin .main-header .logo:hover {
   background: #2C3034;
+}
+.mtv-skin .main-header .navbar .sidebar-toggle:hover {
+  background: transparent;
+}
+.mtv-skin .main-header .navbar-custom-menu .text {
+  padding: 15px;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a {
+  background-color: #2C3034;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a:hover {
+  background-color: #23242B;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a {
+  background: #2C3034;
+  color: #fff;
+  border-radius: 0;
+  border: none;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a:hover {
+  background: #23242B;
 }
 .mtv-skin .main-sidebar {
   background-color: #2C3034;
@@ -371,11 +396,34 @@ body {
 .mtv-skin .sidebar-menu .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu .treeview-menu .treeview-menu {
+  padding-left: 16px;
+}
+.mtv-skin .sidebar-menu .treeview-menu input {
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 4px;
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu input:focus {
+  outline: none;
+}
 .mtv-skin .sidebar-menu .treeview-menu li {
   padding: 5px 5px 5px 15px;
 }
 .mtv-skin .sidebar-menu .treeview-menu li a {
   padding: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li {
+  padding-left: 0;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li a {
+  color: #B5B5B5;
+  padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
   background-color: #23242B;
@@ -405,7 +453,7 @@ body {
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
   background: #23242B;
-  box-shadow: 0 0 8px 5px #000 inset;
+  box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 .mtv-skin .content .chart-ctx rect {
   stroke: none;
@@ -633,9 +681,34 @@ body {
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
+.mtv-skin .main-header a {
+  transition: all 0.2s ease-in-out;
+}
 .mtv-skin .main-header .navbar,
-.mtv-skin .main-header .logo {
+.mtv-skin .main-header .logo,
+.mtv-skin .main-header .logo:hover {
   background: #2C3034;
+}
+.mtv-skin .main-header .navbar .sidebar-toggle:hover {
+  background: transparent;
+}
+.mtv-skin .main-header .navbar-custom-menu .text {
+  padding: 15px;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a {
+  background-color: #2C3034;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a:hover {
+  background-color: #23242B;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a {
+  background: #2C3034;
+  color: #fff;
+  border-radius: 0;
+  border: none;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a:hover {
+  background: #23242B;
 }
 .mtv-skin .main-sidebar {
   background-color: #2C3034;
@@ -649,11 +722,34 @@ body {
 .mtv-skin .sidebar-menu .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu .treeview-menu .treeview-menu {
+  padding-left: 16px;
+}
+.mtv-skin .sidebar-menu .treeview-menu input {
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 4px;
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu input:focus {
+  outline: none;
+}
 .mtv-skin .sidebar-menu .treeview-menu li {
   padding: 5px 5px 5px 15px;
 }
 .mtv-skin .sidebar-menu .treeview-menu li a {
   padding: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li {
+  padding-left: 0;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li a {
+  color: #B5B5B5;
+  padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
   background-color: #23242B;
@@ -683,7 +779,7 @@ body {
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
   background: #23242B;
-  box-shadow: 0 0 8px 5px #000 inset;
+  box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 .mtv-skin .content .chart-ctx rect {
   stroke: none;
@@ -1266,9 +1362,34 @@ body {
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
+.mtv-skin .main-header a {
+  transition: all 0.2s ease-in-out;
+}
 .mtv-skin .main-header .navbar,
-.mtv-skin .main-header .logo {
+.mtv-skin .main-header .logo,
+.mtv-skin .main-header .logo:hover {
   background: #2C3034;
+}
+.mtv-skin .main-header .navbar .sidebar-toggle:hover {
+  background: transparent;
+}
+.mtv-skin .main-header .navbar-custom-menu .text {
+  padding: 15px;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a {
+  background-color: #2C3034;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a:hover {
+  background-color: #23242B;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a {
+  background: #2C3034;
+  color: #fff;
+  border-radius: 0;
+  border: none;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a:hover {
+  background: #23242B;
 }
 .mtv-skin .main-sidebar {
   background-color: #2C3034;
@@ -1282,11 +1403,34 @@ body {
 .mtv-skin .sidebar-menu .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu .treeview-menu .treeview-menu {
+  padding-left: 16px;
+}
+.mtv-skin .sidebar-menu .treeview-menu input {
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 4px;
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu input:focus {
+  outline: none;
+}
 .mtv-skin .sidebar-menu .treeview-menu li {
   padding: 5px 5px 5px 15px;
 }
 .mtv-skin .sidebar-menu .treeview-menu li a {
   padding: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li {
+  padding-left: 0;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li a {
+  color: #B5B5B5;
+  padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
   background-color: #23242B;
@@ -1316,7 +1460,7 @@ body {
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
   background: #23242B;
-  box-shadow: 0 0 8px 5px #000 inset;
+  box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 .mtv-skin .content .chart-ctx rect {
   stroke: none;
@@ -1985,9 +2129,34 @@ body {
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
+.mtv-skin .main-header a {
+  transition: all 0.2s ease-in-out;
+}
 .mtv-skin .main-header .navbar,
-.mtv-skin .main-header .logo {
+.mtv-skin .main-header .logo,
+.mtv-skin .main-header .logo:hover {
   background: #2C3034;
+}
+.mtv-skin .main-header .navbar .sidebar-toggle:hover {
+  background: transparent;
+}
+.mtv-skin .main-header .navbar-custom-menu .text {
+  padding: 15px;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a {
+  background-color: #2C3034;
+}
+.mtv-skin .main-header .navbar-custom-menu .project-menu > li > a:hover {
+  background-color: #23242B;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a {
+  background: #2C3034;
+  color: #fff;
+  border-radius: 0;
+  border: none;
+}
+.mtv-skin .main-header .navbar-custom-menu .experiment-menu > li > a:hover {
+  background: #23242B;
 }
 .mtv-skin .main-sidebar {
   background-color: #2C3034;
@@ -2001,11 +2170,34 @@ body {
 .mtv-skin .sidebar-menu .treeview-menu {
   background: #2C3034;
 }
+.mtv-skin .sidebar-menu .treeview-menu .treeview-menu {
+  padding-left: 16px;
+}
+.mtv-skin .sidebar-menu .treeview-menu input {
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 4px;
+  color: #fff;
+}
+.mtv-skin .sidebar-menu .treeview-menu input:focus {
+  outline: none;
+}
 .mtv-skin .sidebar-menu .treeview-menu li {
   padding: 5px 5px 5px 15px;
 }
 .mtv-skin .sidebar-menu .treeview-menu li a {
   padding: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li {
+  padding-left: 0;
+}
+.mtv-skin .sidebar-menu .treeview-menu li li a {
+  color: #B5B5B5;
+  padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
   background-color: #23242B;
@@ -2035,7 +2227,7 @@ body {
 .mtv-skin .content .chart-ctx.ctx-active {
   transition: all 0.2s ease-in-out;
   background: #23242B;
-  box-shadow: 0 0 8px 5px #000 inset;
+  box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 .mtv-skin .content .chart-ctx rect {
   stroke: none;
