@@ -51964,7 +51964,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var pip = __webpack_require__(/*! ../../services/pip-client */ "./src/services/pip-client.ts");
-var globals_1 = __webpack_require__(/*! ../../services/globals */ "./src/services/globals.ts");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 var PeriodChart = (function (_super) {
@@ -52009,6 +52008,15 @@ var PeriodChart = (function (_super) {
             .attr('class', 'multi-period-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+        var radialGradient = self.svg.append('defs')
+            .append('radialGradient')
+            .attr('id', 'blueGradient');
+        radialGradient.append('stop')
+            .attr('offset', '30%')
+            .attr('stop-color', '#B2C1FF');
+        radialGradient.append('stop')
+            .attr('offset', '90%')
+            .attr('stop-color', 'rgba(216,216,216,0)');
         self.plot();
         return _this;
     }
@@ -52089,8 +52097,8 @@ var PeriodChart = (function (_super) {
                     .merge(_g)
                     .attr('class', "feature-cell feature-cell-" + data.name)
                     .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                        ," + (d.row * size + size / 2) + ")"; })
-                    .each(function (d) {
-                    featurePlot(d3.select(this), d, data.name);
+                    .each(function (d, count) {
+                    featurePlot(d3.select(this), d, data.name, count);
                 });
                 _g.exit().remove();
             });
@@ -52194,44 +52202,47 @@ var PeriodChart = (function (_super) {
     PeriodChart.prototype.addGlyphs = function (g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         var self = this;
         var option = self.option;
-        _.each(self.data, function (data, i) {
+        _.each(self.data, function (data, count) {
             var cell = g
                 .selectAll(".feature-cell-" + data.name)
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', "feature-cell feature-cell-" + data.name)
                 .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                    ," + (d.row * size + size / 2) + ")"; })
-                .each(function (d) {
-                featurePlot(d3.select(this), d, data.name);
+                .each(function (d, count) {
+                featurePlot(d3.select(this), d, data.name, count);
             });
         });
         return { featurePlot: featurePlot };
-        function featurePlot(_cell, o, stationName) {
+        function featurePlot(_cell, o, stationName, count) {
+            if (count === void 0) { count = 0; }
             angle.domain([0, o.bins.length - 0.05]);
             radius.domain([0, 1]);
             var path = _cell.append('path')
                 .datum(o.bins)
                 .attr('class', 'feature-area radial-cursor')
-                .attr('stroke', function () {
-                return globals_1.colorSchemes.getColorCode(stationName);
-            })
-                .attr('stroke-width', 1)
-                .attr('stroke-opacity', 0.7)
-                .attr('fill', function () {
-                return globals_1.colorSchemes.getColorCode(stationName);
-            })
-                .attr('fill-opacity', 0.3)
+                .attr('id', "path_" + count)
                 .attr('d', area0)
                 .on('click', function (d) {
                 if (o.children) {
                     self.trigger('select', o);
                 }
             });
+            var clipPath = _cell.append('clipPath');
+            clipPath
+                .attr('id', "clip_" + count)
+                .append('use')
+                .attr('xlink:href', "#path_" + count);
             path.transition()
                 .duration(option.duration)
                 .attr('d', area);
             path.append('title')
                 .text(o.name);
+            _cell.append('circle')
+                .attr('clip-path', "url(#clip_" + count + ")")
+                .attr('class', 'wrapper')
+                .attr('r', 90)
+                .attr('fill', 'url(#blueGradient)');
             _cell.append('circle')
                 .attr('class', 'radial-cursor')
                 .attr('cx', 0)

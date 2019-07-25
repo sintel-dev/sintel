@@ -543,6 +543,11 @@ body {
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
 }
+.mtv-skin path.feature-area {
+  fill: none;
+  stroke: #687ba3;
+  stroke-width: 1;
+}
 .mtv-skin .linechart-controls {
   color: #fff;
   margin-bottom: 15px;
@@ -868,6 +873,11 @@ body {
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
+}
+.mtv-skin path.feature-area {
+  fill: none;
+  stroke: #687ba3;
+  stroke-width: 1;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -1549,6 +1559,11 @@ body {
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
+}
+.mtv-skin path.feature-area {
+  fill: none;
+  stroke: #687ba3;
+  stroke-width: 1;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
@@ -2316,6 +2331,11 @@ body {
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
+}
+.mtv-skin path.feature-area {
+  fill: none;
+  stroke: #687ba3;
+  stroke-width: 1;
 }
 .mtv-skin .linechart-controls {
   color: #fff;
