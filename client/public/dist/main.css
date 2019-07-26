@@ -405,6 +405,7 @@ body {
   border-radius: 4px;
   padding: 4px;
   color: #fff;
+  width: 95%;
 }
 .mtv-skin .sidebar-menu .treeview-menu input:focus {
   outline: none;
@@ -539,6 +540,7 @@ body {
   background: none;
   border: 1px solid #979797;
   color: #fff;
+  text-align: center;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -683,13 +685,13 @@ body {
   border-color: #d7191c;
 }
 .mtv-skin .target circle {
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
   stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
   stroke-width: 1;
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
@@ -749,6 +751,7 @@ body {
   border-radius: 4px;
   padding: 4px;
   color: #fff;
+  width: 95%;
 }
 .mtv-skin .sidebar-menu .treeview-menu input:focus {
   outline: none;
@@ -883,6 +886,7 @@ body {
   background: none;
   border: 1px solid #979797;
   color: #fff;
+  text-align: center;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -1027,13 +1031,13 @@ body {
   border-color: #d7191c;
 }
 .mtv-skin .target circle {
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
   stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
   stroke-width: 1;
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
@@ -1448,6 +1452,7 @@ body {
   border-radius: 4px;
   padding: 4px;
   color: #fff;
+  width: 95%;
 }
 .mtv-skin .sidebar-menu .treeview-menu input:focus {
   outline: none;
@@ -1582,6 +1587,7 @@ body {
   background: none;
   border: 1px solid #979797;
   color: #fff;
+  text-align: center;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -1726,13 +1732,13 @@ body {
   border-color: #d7191c;
 }
 .mtv-skin .target circle {
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
   stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
   stroke-width: 1;
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
@@ -2233,6 +2239,7 @@ body {
   border-radius: 4px;
   padding: 4px;
   color: #fff;
+  width: 95%;
 }
 .mtv-skin .sidebar-menu .treeview-menu input:focus {
   outline: none;
@@ -2367,6 +2374,7 @@ body {
   background: none;
   border: 1px solid #979797;
   color: #fff;
+  text-align: center;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -2511,13 +2519,13 @@ body {
   border-color: #d7191c;
 }
 .mtv-skin .target circle {
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
   stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
   stroke-width: 1;
-  stroke: #DAE3F5;
+  stroke: rgba(218, 227, 245, 0.3);
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;

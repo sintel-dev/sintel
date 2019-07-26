@@ -198,10 +198,7 @@ export class PeriodChart extends pip.Events {
                 _g.enter().append('g')
                     .merge(_g as any)
                     .attr('class', `feature-cell feature-cell-${data.name}`)
-                    .attr('transform', d => {
-                        debugger;
-                        return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`
-                    })
+                    .attr('transform', d => `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
                     .each(function(d, count) {
                         const randomID = self.generateRandomID();
                         featurePlot(d3.select(this), d, data.name, randomID);
@@ -327,7 +324,6 @@ export class PeriodChart extends pip.Events {
         let self = this;
         let option = self.option;
 
-
         // plot data on each station
         _.each(self.data, (data, count) => {
             let cell = g
@@ -335,9 +331,7 @@ export class PeriodChart extends pip.Events {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', `feature-cell feature-cell-${data.name}`)
-                .attr('transform', d => {
-                    return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`
-                })
+                .attr('transform', d =>`translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
                 .each(function(d) {
                     const randomID = self.generateRandomID();
                     featurePlot(d3.select(this), d, data.name, randomID);

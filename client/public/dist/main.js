@@ -52086,10 +52086,7 @@ var PeriodChart = (function (_super) {
                 _g.enter().append('g')
                     .merge(_g)
                     .attr('class', "feature-cell feature-cell-" + data.name)
-                    .attr('transform', function (d) {
-                    debugger;
-                    return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")";
-                })
+                    .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")"; })
                     .each(function (d, count) {
                     var randomID = self.generateRandomID();
                     featurePlot(d3.select(this), d, data.name, randomID);
@@ -52205,9 +52202,7 @@ var PeriodChart = (function (_super) {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', "feature-cell feature-cell-" + data.name)
-                .attr('transform', function (d) {
-                return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")";
-            })
+                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")"; })
                 .each(function (d) {
                 var randomID = self.generateRandomID();
                 featurePlot(d3.select(this), d, data.name, randomID);
