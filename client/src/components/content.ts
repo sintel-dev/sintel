@@ -385,7 +385,8 @@ class Content {
                 }],
                 {
                     width: $('.pchart').width() - 60,
-                    nCol: 3
+                    nCol: 4,
+                    padding: 30
                 }
             );
 

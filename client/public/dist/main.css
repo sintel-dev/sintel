@@ -691,6 +691,10 @@ body {
   stroke-width: 1;
   stroke: #DAE3F5;
 }
+.mtv-skin .multi-period-chart .radial-text-md {
+  fill: #8A9097;
+  font-size: 13px;
+}
 
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
@@ -1030,6 +1034,10 @@ body {
 .mtv-skin .target line {
   stroke-width: 1;
   stroke: #DAE3F5;
+}
+.mtv-skin .multi-period-chart .radial-text-md {
+  fill: #8A9097;
+  font-size: 13px;
 }
 
 
@@ -1725,6 +1733,10 @@ body {
 .mtv-skin .target line {
   stroke-width: 1;
   stroke: #DAE3F5;
+}
+.mtv-skin .multi-period-chart .radial-text-md {
+  fill: #8A9097;
+  font-size: 13px;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -2506,6 +2518,10 @@ body {
 .mtv-skin .target line {
   stroke-width: 1;
   stroke: #DAE3F5;
+}
+.mtv-skin .multi-period-chart .radial-text-md {
+  fill: #8A9097;
+  font-size: 13px;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
