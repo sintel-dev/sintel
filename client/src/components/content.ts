@@ -372,7 +372,7 @@ class Content {
                 }],
                 {
                     width: $('.pchart').width() - 100,
-                    nCol: 2
+                    nCol: 3
                 }
             );
 
@@ -385,7 +385,7 @@ class Content {
                 }],
                 {
                     width: $('.pchart').width() - 60,
-                    nCol: 4
+                    nCol: 3
                 }
             );
 

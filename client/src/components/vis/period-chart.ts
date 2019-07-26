@@ -77,20 +77,20 @@ export class PeriodChart extends pip.Events {
             .attr('class', 'multi-period-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
-            
-
-        let radialGradient = self.svg.append('defs')
-            .append('radialGradient')
-            .attr('id', 'blueGradient');
 
 
-        radialGradient.append('stop')
-            .attr('offset', '30%')
-            .attr('stop-color', '#B2C1FF' );
+        // let radialGradient = self.svg.append('defs')
+        //     .append('radialGradient')
+        //     .attr('id', 'blueGradient');
 
-        radialGradient.append('stop')
-            .attr('offset', '90%')
-            .attr('stop-color', 'rgba(216,216,216,0)' )
+
+        // radialGradient.append('stop')
+        //     .attr('offset', '30%')
+        //     .attr('stop-color', '#B2C1FF' );
+
+        // radialGradient.append('stop')
+        //     .attr('offset', '90%')
+        //     .attr('stop-color', 'rgba(216,216,216,0)' )
 
 
         self.plot();
@@ -194,12 +194,15 @@ export class PeriodChart extends pip.Events {
             g.selectAll(`.feature-cell`).remove();
             _.each(self.data, (data, i) => {
                 let _g = g.selectAll(`.feature-cell-${data.name}`).data(data.info);
+                const randomID = Math.random().toString(36).substr(2, 9);
+
                 _g.enter().append('g')
                     .merge(_g as any)
                     .attr('class', `feature-cell feature-cell-${data.name}`)
                     .attr('transform', d => `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
                     .each(function(d, count) {
-                        featurePlot(d3.select(this), d, data.name, count);
+                        const randomID = self.generateRandomID();
+                        featurePlot(d3.select(this), d, data.name, randomID);
                     });
                 _g.exit().remove();
             });
@@ -314,10 +317,15 @@ export class PeriodChart extends pip.Events {
         return {label1, label2};
     }
 
+    private generateRandomID(){
+        return Math.random().toString(36).substr(2, 9)
+    }
+
     private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         let self = this;
         let option = self.option;
-        
+
+
         // plot data on each station
         _.each(self.data, (data, count) => {
             let cell = g
@@ -325,9 +333,10 @@ export class PeriodChart extends pip.Events {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', `feature-cell feature-cell-${data.name}`)
-                .attr('transform', d => `translate(${d.col * size + size / 3}, ${d.row * size + size / 2})`)
+                .attr('transform', d => `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
                 .each(function(d, count) {
-                    featurePlot(d3.select(this), d, data.name, count);
+                    const randomID = self.generateRandomID();
+                    featurePlot(d3.select(this), d, data.name, randomID);
                 });
 
         });
@@ -335,8 +344,8 @@ export class PeriodChart extends pip.Events {
 
         return {featurePlot};
 
-        function featurePlot(_cell, o: LineChartDataEleInfoEle, stationName: string, count: number = 0) {
-
+        function featurePlot(_cell, o: LineChartDataEleInfoEle, stationName: string, id: any) {
+            // console.log(id)
 
             // Extend the domain slightly to match the range of [0, 2π].
             angle.domain([0, o.bins.length - 0.05]);
@@ -348,7 +357,7 @@ export class PeriodChart extends pip.Events {
             let path = _cell.append('path')
                 .datum(o.bins)
                 .attr('class', 'feature-area radial-cursor')
-                .attr('id', `path_${count}`)
+                .attr('id', `path_${id}`)
                 // .attr('stroke', function () {
                 //     return colorSchemes.getColorCode(stationName);
                 // })
@@ -367,9 +376,9 @@ export class PeriodChart extends pip.Events {
 
             let clipPath = _cell.append('clipPath');
             clipPath
-                .attr('id', `clip_${count}`)
+                .attr('id', `clip_${id}`)
                 .append('use')
-                .attr('xlink:href', `#path_${count}`)
+                .attr('xlink:href', `#path_${id}`)
 
             path.transition()
                 .duration(option.duration)
@@ -386,7 +395,7 @@ export class PeriodChart extends pip.Events {
 
             target.append('circle')
                 .attr('r', outerRadius - 20);
-            
+
             target.append('circle')
                 .attr('r', outerRadius - 40);
 
@@ -405,7 +414,7 @@ export class PeriodChart extends pip.Events {
 
 
             _cell.append('circle')
-                .attr('clip-path', `url(#clip_${count})`)
+                .attr('clip-path', `url(#clip_${id})`)
                 .attr('class', 'wrapper')
                 .attr('r', outerRadius)
                 .attr('fill', 'url(#blueGradient)')

@@ -50532,14 +50532,14 @@ var Content = (function () {
                     info: data[0].period
                 }], {
                 width: $('.pchart').width() - 100,
-                nCol: 2
+                nCol: 3
             });
             self.periodCharts['month'] = new period_chart_1.PeriodChart($('#month')[0], [{
                     name: data[0].dataset.name,
                     info: data[0].period[0].children
                 }], {
                 width: $('.pchart').width() - 60,
-                nCol: 4
+                nCol: 3
             });
             self.periodCharts['day'] = new period_chart_1.PeriodChart($('#day')[0], [{
                     name: data[0].dataset.name,
@@ -52008,15 +52008,6 @@ var PeriodChart = (function (_super) {
             .attr('class', 'multi-period-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
-        var radialGradient = self.svg.append('defs')
-            .append('radialGradient')
-            .attr('id', 'blueGradient');
-        radialGradient.append('stop')
-            .attr('offset', '30%')
-            .attr('stop-color', '#B2C1FF');
-        radialGradient.append('stop')
-            .attr('offset', '90%')
-            .attr('stop-color', 'rgba(216,216,216,0)');
         self.plot();
         return _this;
     }
@@ -52093,12 +52084,14 @@ var PeriodChart = (function (_super) {
             g.selectAll(".feature-cell").remove();
             _.each(self.data, function (data, i) {
                 var _g = g.selectAll(".feature-cell-" + data.name).data(data.info);
+                var randomID = Math.random().toString(36).substr(2, 9);
                 _g.enter().append('g')
                     .merge(_g)
                     .attr('class', "feature-cell feature-cell-" + data.name)
                     .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")"; })
                     .each(function (d, count) {
-                    featurePlot(d3.select(this), d, data.name, count);
+                    var randomID = self.generateRandomID();
+                    featurePlot(d3.select(this), d, data.name, randomID);
                 });
                 _g.exit().remove();
             });
@@ -52199,6 +52192,9 @@ var PeriodChart = (function (_super) {
             .text('');
         return { label1: label1, label2: label2 };
     };
+    PeriodChart.prototype.generateRandomID = function () {
+        return Math.random().toString(36).substr(2, 9);
+    };
     PeriodChart.prototype.addGlyphs = function (g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         var self = this;
         var option = self.option;
@@ -52208,20 +52204,20 @@ var PeriodChart = (function (_super) {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', "feature-cell feature-cell-" + data.name)
-                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 3) + ", " + (d.row * size + size / 2) + ")"; })
+                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")"; })
                 .each(function (d, count) {
-                featurePlot(d3.select(this), d, data.name, count);
+                var randomID = self.generateRandomID();
+                featurePlot(d3.select(this), d, data.name, randomID);
             });
         });
         return { featurePlot: featurePlot };
-        function featurePlot(_cell, o, stationName, count) {
-            if (count === void 0) { count = 0; }
+        function featurePlot(_cell, o, stationName, id) {
             angle.domain([0, o.bins.length - 0.05]);
             radius.domain([0, 1]);
             var path = _cell.append('path')
                 .datum(o.bins)
                 .attr('class', 'feature-area radial-cursor')
-                .attr('id', "path_" + count)
+                .attr('id', "path_" + id)
                 .attr('d', area0)
                 .on('click', function (d) {
                 if (o.children) {
@@ -52230,9 +52226,9 @@ var PeriodChart = (function (_super) {
             });
             var clipPath = _cell.append('clipPath');
             clipPath
-                .attr('id', "clip_" + count)
+                .attr('id', "clip_" + id)
                 .append('use')
-                .attr('xlink:href', "#path_" + count);
+                .attr('xlink:href', "#path_" + id);
             path.transition()
                 .duration(option.duration)
                 .attr('d', area);
@@ -52257,7 +52253,7 @@ var PeriodChart = (function (_super) {
                 .attr('y1', -(outerRadius + 2))
                 .attr('y2', outerRadius + 2);
             _cell.append('circle')
-                .attr('clip-path', "url(#clip_" + count + ")")
+                .attr('clip-path', "url(#clip_" + id + ")")
                 .attr('class', 'wrapper')
                 .attr('r', outerRadius)
                 .attr('fill', 'url(#blueGradient)');
