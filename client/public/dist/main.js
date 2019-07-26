@@ -50531,7 +50531,7 @@ var Content = (function () {
                     name: data[0].dataset.name,
                     info: data[0].period
                 }], {
-                width: $('.pchart').width() - 60,
+                width: $('.pchart').width() - 100,
                 nCol: 2
             });
             self.periodCharts['month'] = new period_chart_1.PeriodChart($('#month')[0], [{
@@ -52096,7 +52096,7 @@ var PeriodChart = (function (_super) {
                 _g.enter().append('g')
                     .merge(_g)
                     .attr('class', "feature-cell feature-cell-" + data.name)
-                    .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                        ," + (d.row * size + size / 2) + ")"; })
+                    .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2) + ")"; })
                     .each(function (d, count) {
                     featurePlot(d3.select(this), d, data.name, count);
                 });
@@ -52208,7 +52208,7 @@ var PeriodChart = (function (_super) {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', "feature-cell feature-cell-" + data.name)
-                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                    ," + (d.row * size + size / 2) + ")"; })
+                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 3) + ", " + (d.row * size + size / 2) + ")"; })
                 .each(function (d, count) {
                 featurePlot(d3.select(this), d, data.name, count);
             });
@@ -52238,10 +52238,28 @@ var PeriodChart = (function (_super) {
                 .attr('d', area);
             path.append('title')
                 .text(o.name);
+            var target = _cell.append('g')
+                .attr('class', 'target');
+            target.append('circle')
+                .attr('r', outerRadius + 3);
+            target.append('circle')
+                .attr('r', outerRadius - 20);
+            target.append('circle')
+                .attr('r', outerRadius - 40);
+            target.append('line')
+                .attr('x1', -(outerRadius + 3))
+                .attr('x2', outerRadius + 2)
+                .attr('y1', 0)
+                .attr('y2', 0);
+            target.append('line')
+                .attr('x1', 0)
+                .attr('x2', 0)
+                .attr('y1', -(outerRadius + 2))
+                .attr('y2', outerRadius + 2);
             _cell.append('circle')
                 .attr('clip-path', "url(#clip_" + count + ")")
                 .attr('class', 'wrapper')
-                .attr('r', 90)
+                .attr('r', outerRadius)
                 .attr('fill', 'url(#blueGradient)');
             _cell.append('circle')
                 .attr('class', 'radial-cursor')

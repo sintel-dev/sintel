@@ -371,7 +371,7 @@ class Content {
                     info: data[0].period
                 }],
                 {
-                    width: $('.pchart').width() - 60,
+                    width: $('.pchart').width() - 100,
                     nCol: 2
                 }
             );

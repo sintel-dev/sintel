@@ -42,3 +42,11 @@ rect.gradient{
     width: 200px;
     height: 200px; */
 }
+.target line{
+    stroke-width: 1;
+    stroke: #DAE3F5
+}
+
+.target circle{
+    stroke: #DAE3F5
+}

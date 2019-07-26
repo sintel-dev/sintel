@@ -77,6 +77,7 @@ export class PeriodChart extends pip.Events {
             .attr('class', 'multi-period-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+            
 
         let radialGradient = self.svg.append('defs')
             .append('radialGradient')
@@ -196,8 +197,7 @@ export class PeriodChart extends pip.Events {
                 _g.enter().append('g')
                     .merge(_g as any)
                     .attr('class', `feature-cell feature-cell-${data.name}`)
-                    .attr('transform', d => `translate(${d.col * size + size / 2}
-                        ,${d.row * size + size / 2})`)
+                    .attr('transform', d => `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
                     .each(function(d, count) {
                         featurePlot(d3.select(this), d, data.name, count);
                     });
@@ -317,6 +317,7 @@ export class PeriodChart extends pip.Events {
     private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         let self = this;
         let option = self.option;
+        
         // plot data on each station
         _.each(self.data, (data, count) => {
             let cell = g
@@ -324,8 +325,7 @@ export class PeriodChart extends pip.Events {
                 .data(data.info)
                 .enter().append('g')
                 .attr('class', `feature-cell feature-cell-${data.name}`)
-                .attr('transform', d => `translate(${d.col * size + size / 2}
-                    ,${d.row * size + size / 2})`)
+                .attr('transform', d => `translate(${d.col * size + size / 3}, ${d.row * size + size / 2})`)
                 .each(function(d, count) {
                     featurePlot(d3.select(this), d, data.name, count);
                 });
@@ -378,11 +378,36 @@ export class PeriodChart extends pip.Events {
             path.append('title')
                 .text(o.name);
 
+            let target = _cell.append('g')
+                .attr('class', 'target')
+
+            target.append('circle')
+                .attr('r', outerRadius + 3);
+
+            target.append('circle')
+                .attr('r', outerRadius - 20);
+            
+            target.append('circle')
+                .attr('r', outerRadius - 40);
+
+            target.append('line')
+                .attr('x1', -(outerRadius+3))
+                .attr('x2', outerRadius + 2)
+                .attr('y1', 0)
+                .attr('y2',0)
+
+            target.append('line')
+                .attr('x1', 0)
+                .attr('x2', 0)
+                .attr('y1', -(outerRadius + 2))
+                .attr('y2',outerRadius + 2)
+
+
 
             _cell.append('circle')
                 .attr('clip-path', `url(#clip_${count})`)
                 .attr('class', 'wrapper')
-                .attr('r', 90)
+                .attr('r', outerRadius)
                 .attr('fill', 'url(#blueGradient)')
             _cell.append('circle')
                 .attr('class', 'radial-cursor')

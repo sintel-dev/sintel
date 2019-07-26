@@ -682,6 +682,15 @@ body {
   background-color: #d7191c;
   border-color: #d7191c;
 }
+.mtv-skin .target circle {
+  stroke: #DAE3F5;
+  stroke-width: 1;
+  fill: transparent;
+}
+.mtv-skin .target line {
+  stroke-width: 1;
+  stroke: #DAE3F5;
+}
 
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
@@ -1012,6 +1021,15 @@ body {
 .mtv-skin .dataset-description .btn-L5 {
   background-color: #d7191c;
   border-color: #d7191c;
+}
+.mtv-skin .target circle {
+  stroke: #DAE3F5;
+  stroke-width: 1;
+  fill: transparent;
+}
+.mtv-skin .target line {
+  stroke-width: 1;
+  stroke: #DAE3F5;
 }
 
 
@@ -1698,6 +1716,15 @@ body {
 .mtv-skin .dataset-description .btn-L5 {
   background-color: #d7191c;
   border-color: #d7191c;
+}
+.mtv-skin .target circle {
+  stroke: #DAE3F5;
+  stroke-width: 1;
+  fill: transparent;
+}
+.mtv-skin .target line {
+  stroke-width: 1;
+  stroke: #DAE3F5;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -2470,6 +2497,15 @@ body {
 .mtv-skin .dataset-description .btn-L5 {
   background-color: #d7191c;
   border-color: #d7191c;
+}
+.mtv-skin .target circle {
+  stroke: #DAE3F5;
+  stroke-width: 1;
+  fill: transparent;
+}
+.mtv-skin .target line {
+  stroke-width: 1;
+  stroke: #DAE3F5;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
