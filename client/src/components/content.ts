@@ -60,7 +60,7 @@ class Content {
         $('.chart-focus-container').height(self.config.focusHeight);
         $('.chart-focus .plot').height(self.config.focusHeight); // - 45);
         $('.chart-ctx-container').height(self.config.ctxHeight);
-        $('.pchart').height(self.config.periodHeight);
+        $('.pchart').height($('.connectedSortable').height() + 'px');
     }
 
     // handle events coming from other components
@@ -77,11 +77,9 @@ class Content {
 
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active')
-                    // $($(`.chart-ctx .title`)[0]).css('background-color', 'bisque');
+                    $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active');
                 } else {
                     $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
-                    // $($(`.chart-ctx [name=title-${self.focus()}]`)).css('background-color', 'bisque');
                 }
                 self._visualize();
             });
@@ -121,11 +119,11 @@ class Content {
         });
 
         pip.content.on('comment:start', (eventInfo: RSI.Event) => {
-            this.update(eventInfo)
+            this.update(eventInfo);
         });
     }
 
-    private showDatasetInfo(visible){
+    private showDatasetInfo(visible) {
         visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
     }
 
@@ -203,7 +201,7 @@ class Content {
                 score: self.fromScoreToLevel(self.level()),
                 datarun: self.eventInfo.datarun
             }).done(eid => {
-                this.showDatasetInfo(false)
+                this.showDatasetInfo(false);
                 pip.content.trigger('event:update');
                 // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
@@ -259,21 +257,35 @@ class Content {
             }]
         );
         $(`.chart-ctx .title`).parent().removeClass('ctx-active');
-        // console.log($(`.chart-ctx [name=title-${name}]`));
-        $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active')
-        // $(`.chart-ctx [name=title-${name}]`).css('background-color', 'bisque');
+        $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active');
     }
 
-    public showMissing() {
+    public showMissing(content, event) {
         let self = this;
-        _.each(self.periodCharts, ct => {
-            ct.option.missing = !ct.option.missing;
-            let _duration = ct.option.duration;
-            ct.option.duration = 0;
-            ct.trigger('update', null);
-            ct.option.duration = _duration;
+        const isChecked = event.target.checked;
 
+        _.each(self.periodCharts, periodChartInstance => {
+
+            // ovveride the missing visual flag for this chart instance.
+            periodChartInstance.option.missing = isChecked;
+
+            // this is required to prevent the update animation from easing in.
+            // we want the chart data paths to remain static, but at the same time,
+            // we want to rerender the chart.
+            let _duration = periodChartInstance.option.duration;
+            periodChartInstance.option.duration = 0;
+
+            // rerender each updated chart, to show the missing period ranges.
+            periodChartInstance.trigger('update', null);
+
+            periodChartInstance.option.duration = _duration;
         });
+
+        return true;
+    }
+
+    public eventsHandler(content, event) {
+        return true;
     }
 
     public backward() {
@@ -290,7 +302,7 @@ class Content {
         const isChecked = event.target.checked;
         const zoomModeInput = <HTMLInputElement>document.querySelector('#zoomMode');
 
-        if(isChecked){
+        if (isChecked) {
             zoomModeInput.checked = false;
             this.focusChart.trigger('zoomPanMode', false);
         }
@@ -308,7 +320,7 @@ class Content {
     public zoomPanMode(content, event) {
         const isChecked = event.target.checked;
         const eventModeInput = <HTMLInputElement>document.querySelector('#eventMode');
-        if(isChecked){
+        if (isChecked) {
             eventModeInput.checked = false;
             this.focusChart.trigger('addEventMode', false);
         }
@@ -368,11 +380,11 @@ class Content {
                 $('#year')[0],
                 [{
                     name: data[0].dataset.name,
-                    info: data[0].period
+                    info: data[0].period,
                 }],
                 {
-                    width: $('.pchart').width() - 60,
-                    nCol: 2
+                    width: $('.pchart').width(),
+                    nCol: 3
                 }
             );
 
@@ -384,7 +396,7 @@ class Content {
                     info: data[0].period[0].children
                 }],
                 {
-                    width: $('.pchart').width() - 60,
+                    width: $('.pchart').width(),
                     nCol: 4
                 }
             );

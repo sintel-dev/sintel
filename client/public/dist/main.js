@@ -50271,7 +50271,7 @@ var Content = (function () {
         $('.chart-focus-container').height(self.config.focusHeight);
         $('.chart-focus .plot').height(self.config.focusHeight);
         $('.chart-ctx-container').height(self.config.ctxHeight);
-        $('.pchart').height(self.config.periodHeight);
+        $('.pchart').height($('.connectedSortable').height() + 'px');
     }
     Content.prototype.setupEventHandlers = function () {
         var _this = this;
@@ -50450,15 +50450,20 @@ var Content = (function () {
         $(".chart-ctx .title").parent().removeClass('ctx-active');
         $(".chart-ctx [name=title-" + name + "]").parent().addClass('ctx-active');
     };
-    Content.prototype.showMissing = function () {
+    Content.prototype.showMissing = function (content, event) {
         var self = this;
-        _.each(self.periodCharts, function (ct) {
-            ct.option.missing = !ct.option.missing;
-            var _duration = ct.option.duration;
-            ct.option.duration = 0;
-            ct.trigger('update', null);
-            ct.option.duration = _duration;
+        var isChecked = event.target.checked;
+        _.each(self.periodCharts, function (periodChartInstance) {
+            periodChartInstance.option.missing = isChecked;
+            var _duration = periodChartInstance.option.duration;
+            periodChartInstance.option.duration = 0;
+            periodChartInstance.trigger('update', null);
+            periodChartInstance.option.duration = _duration;
         });
+        return true;
+    };
+    Content.prototype.eventsHandler = function (content, event) {
+        return true;
     };
     Content.prototype.backward = function () {
         if ($('#year').hasClass('active')) {
@@ -50529,16 +50534,16 @@ var Content = (function () {
             });
             self.periodCharts['year'] = new period_chart_1.PeriodChart($('#year')[0], [{
                     name: data[0].dataset.name,
-                    info: data[0].period
+                    info: data[0].period,
                 }], {
-                width: $('.pchart').width() - 60,
-                nCol: 2
+                width: $('.pchart').width(),
+                nCol: 3
             });
             self.periodCharts['month'] = new period_chart_1.PeriodChart($('#month')[0], [{
                     name: data[0].dataset.name,
                     info: data[0].period[0].children
                 }], {
-                width: $('.pchart').width() - 60,
+                width: $('.pchart').width(),
                 nCol: 4
             });
             self.periodCharts['day'] = new period_chart_1.PeriodChart($('#day')[0], [{
@@ -51964,7 +51969,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var pip = __webpack_require__(/*! ../../services/pip-client */ "./src/services/pip-client.ts");
-var globals_1 = __webpack_require__(/*! ../../services/globals */ "./src/services/globals.ts");
 var _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 var d3 = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 var PeriodChart = (function (_super) {
@@ -51975,32 +51979,33 @@ var PeriodChart = (function (_super) {
         _this.option = {
             height: null,
             width: null,
-            margin: { top: 30, right: 10, bottom: 5, left: 30 },
+            margin: { top: 0, right: 0, bottom: 10, left: 0 },
             duration: 750,
             delay: 50,
             nCol: null,
-            padding: 8,
+            padding: 18,
             size: 100,
-            minSize: 12,
-            missing: false
+            minSize: 6,
+            missing: false,
+            circleStroke: 1,
+            scaleFactor: 0.9,
+            marginRatio: 0,
+            dayLevelTranslate: 40
         };
         _this.defaultHeight = 300;
         var self = _this;
         _.extend(self.option, option);
         self.svgContainer = d3.select(ele);
-        self.option.width = self.option.width === null ?
-            $(ele).innerWidth() : self.option.width;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
         var _a = self.option, nCol = _a.nCol, width = _a.width, padding = _a.padding, margin = _a.margin;
         if (nCol !== null) {
-            self.option.size = Math.floor((width - margin.left - margin.right)
-                / nCol);
+            self.option.size = Math.floor((width - margin.left - margin.right) / nCol);
         }
-        self.option.nCol = Math.floor((width - margin.left - margin.right)
-            / (self.option.size));
+        self.option.nCol = Math.floor((width - margin.left - margin.right) / (self.option.size));
+        self.option.marginRatio = self.option.size / 15 * self.option.scaleFactor;
         if (self.option.height === null) {
-            self.option.height = self.option.size
-                * Math.ceil(data[0].info.length / self.option.nCol)
-                + margin.top + margin.bottom;
+            var rowsCount = Math.ceil(data[0].info.length / self.option.nCol);
+            self.option.height = self.option.size * rowsCount + (rowsCount - 1) * self.option.marginRatio + margin.top + margin.bottom;
         }
         else {
             self.option.height = self.defaultHeight;
@@ -52020,7 +52025,8 @@ var PeriodChart = (function (_super) {
             width - margin.left - margin.right,
             height - margin.top - margin.bottom,
         ], w = _b[0], h = _b[1];
-        var outerRadius = size / 2 - padding / 2, innerRadius = Math.max(outerRadius / 6, option.minSize);
+        var outerRadius = (size / 2) - (padding / 2);
+        var innerRadius = Math.max(outerRadius / 8, option.minSize);
         _.each(self.data, function (d) {
             _.each(d.info, function (dd, i) {
                 dd.col = i % nCol;
@@ -52032,7 +52038,7 @@ var PeriodChart = (function (_super) {
         zoom.on('zoom', zoomHandler);
         var zoomG = self.svg.append('g');
         var g = zoomG.append('g')
-            .attr('transform', "translate(" + option.margin.left + "," + option.margin.top + ")");
+            .attr('transform', "translate(" + option.margin.left + ", " + option.margin.top + ")");
         self.normalize();
         var featurePlot = self.addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius).featurePlot;
         var _e = self.addLabels(g, size), label1 = _e.label1, label2 = _e.label2;
@@ -52045,12 +52051,18 @@ var PeriodChart = (function (_super) {
                 o = self.data;
             }
             self.normalize();
+            if (o[0].info[0].level === 'year') {
+                var newHeight = size
+                    * Math.ceil((o[0].info.length) / nCol)
+                    + margin.top + margin.bottom + self.option.marginRatio;
+                self.svg.attr('height', newHeight);
+                zoomRect.attr('height', newHeight).call(zoom);
+            }
             if (o[0].info[0].level === 'month') {
                 label1.text(o[0].info[0].parent.name);
             }
             if (o[0].info[0].level === 'day') {
-                label1.text(o[0].info[0].parent.name);
-                label2.text(o[0].info[0].parent.parent.name);
+                label1.text(o[0].info[0].parent.name + " " + (o[0].info[0].parent.parent.name));
                 var _a = [
                     o[0].info[0].parent.name,
                     o[0].info[0].parent.parent.name
@@ -52058,13 +52070,11 @@ var PeriodChart = (function (_super) {
                 var offset_1 = new Date(mm_1 + " 1, " + yy_1 + " 00:00:00").getDay();
                 var newHeight = size
                     * Math.ceil((o[0].info.length + offset_1) / nCol)
-                    + margin.top + margin.bottom;
-                self.svg.attr('height', newHeight);
-                var nh = newHeight - margin.top - margin.bottom;
-                zoom.translateExtent([[0, 0], [w, nh]])
-                    .extent([[0, 0], [w, nh]]);
-                zoomRect.attr('height', nh)
-                    .call(zoom);
+                    + margin.top + margin.bottom + self.option.marginRatio + self.option.dayLevelTranslate;
+                var nh = newHeight + margin.top + margin.bottom + self.option.marginRatio;
+                self.svg.attr('height', nh);
+                zoom.translateExtent([[0, 0], [w, nh]]).extent([[0, 0], [w, nh]]);
+                zoomRect.attr('height', nh).call(zoom);
                 _.each(self.data, function (d) {
                     _.each(d.info, function (dd, i) {
                         var dt = new Date(mm_1 + " " + (i + 1) + ", " + yy_1 + " 00:00:00");
@@ -52088,9 +52098,15 @@ var PeriodChart = (function (_super) {
                 _g.enter().append('g')
                     .merge(_g)
                     .attr('class', "feature-cell feature-cell-" + data.name)
-                    .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                        ," + (d.row * size + size / 2) + ")"; })
-                    .each(function (d) {
-                    featurePlot(d3.select(this), d, data.name);
+                    .attr('transform', function (d) {
+                    if (d.level === 'day') {
+                        return "\n                                translate(\n                                    " + (d.col * size + size / 2) + ",\n                                    " + (d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row) + "),\n                                scale(" + self.option.scaleFactor + ")";
+                    }
+                    return "\n                            translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2 + self.option.marginRatio * d.row) + "),\n                            scale(" + self.option.scaleFactor + ")";
+                })
+                    .each(function (d, count) {
+                    var randomID = self.generateRandomID();
+                    featurePlot(d3.select(this), d, data.name, randomID);
                 });
                 _g.exit().remove();
             });
@@ -52170,13 +52186,14 @@ var PeriodChart = (function (_super) {
             var names_1 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             g.append('g')
                 .attr('class', 'weekdays')
+                .attr('transform', 'translate(0, 35)')
                 .selectAll('.weekday-text')
                 .data(_.range(7))
                 .enter()
                 .append('text')
                 .attr('class', 'radial-text-md weekday-text')
                 .attr('x', function (d) { return d * size + size / 2; })
-                .attr('y', -7)
+                .attr('y', 0)
                 .text(function (d) { return names_1[d]; });
         }
         var label1 = self.svg.append('text')
@@ -52191,47 +52208,86 @@ var PeriodChart = (function (_super) {
             .text('');
         return { label1: label1, label2: label2 };
     };
+    PeriodChart.prototype.generateRandomID = function () {
+        return Math.random().toString(36).substr(2, 9);
+    };
     PeriodChart.prototype.addGlyphs = function (g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         var self = this;
         var option = self.option;
-        _.each(self.data, function (data, i) {
+        _.each(self.data, function (data, count) {
             var cell = g
                 .selectAll(".feature-cell-" + data.name)
                 .data(data.info)
-                .enter().append('g')
+                .enter()
+                .append('g')
                 .attr('class', "feature-cell feature-cell-" + data.name)
-                .attr('transform', function (d) { return "translate(" + (d.col * size + size / 2) + "\n                    ," + (d.row * size + size / 2) + ")"; })
+                .attr('transform', function (d) {
+                if (d.level === 'day') {
+                    return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row) + "), scale(" + self.option.scaleFactor + ")";
+                }
+                return "translate(" + (d.col * size + size / 2) + ", " + (d.row * size + size / 2 + self.option.marginRatio * d.row) + "), scale(" + self.option.scaleFactor + ")";
+            })
                 .each(function (d) {
-                featurePlot(d3.select(this), d, data.name);
+                var randomID = self.generateRandomID();
+                featurePlot(d3.select(this), d, data.name, randomID);
             });
         });
         return { featurePlot: featurePlot };
-        function featurePlot(_cell, o, stationName) {
+        function featurePlot(_cell, o, stationName, id) {
+            var circleStroke = self.option.circleStroke;
             angle.domain([0, o.bins.length - 0.05]);
             radius.domain([0, 1]);
             var path = _cell.append('path')
                 .datum(o.bins)
                 .attr('class', 'feature-area radial-cursor')
-                .attr('stroke', function () {
-                return globals_1.colorSchemes.getColorCode(stationName);
-            })
-                .attr('stroke-width', 1)
-                .attr('stroke-opacity', 0.7)
-                .attr('fill', function () {
-                return globals_1.colorSchemes.getColorCode(stationName);
-            })
-                .attr('fill-opacity', 0.3)
+                .attr('id', "path_" + id)
                 .attr('d', area0)
                 .on('click', function (d) {
                 if (o.children) {
                     self.trigger('select', o);
                 }
             });
+            var clipPath = _cell.append('clipPath');
+            clipPath
+                .attr('id', "clip_" + id)
+                .append('use')
+                .attr('xlink:href', "#path_" + id);
             path.transition()
                 .duration(option.duration)
                 .attr('d', area);
             path.append('title')
                 .text(o.name);
+            var target = _cell.append('g')
+                .attr('class', 'target');
+            var ratio = size / 3 - circleStroke / 2;
+            var targetRadius = size / 2 - circleStroke / 2;
+            var strokeWidth = size / 2;
+            target.append('circle')
+                .attr('r', targetRadius)
+                .attr('stroke-width', circleStroke);
+            target.append('circle')
+                .attr('r', targetRadius - ratio / 2)
+                .attr('stroke-width', circleStroke);
+            target.append('circle')
+                .attr('r', targetRadius - ratio)
+                .attr('stroke-width', circleStroke);
+            target.append('line')
+                .attr('x1', -(strokeWidth))
+                .attr('x2', strokeWidth)
+                .attr('stroke-width', circleStroke)
+                .attr('y1', 0)
+                .attr('y2', 0);
+            target.append('line')
+                .attr('x1', 0)
+                .attr('x2', 0)
+                .attr('stroke-width', circleStroke)
+                .attr('y1', -(strokeWidth))
+                .attr('y2', strokeWidth);
+            _cell.append('circle')
+                .attr('clip-path', "url(#clip_" + id + ")")
+                .attr('class', 'wrapper')
+                .attr('r', strokeWidth)
+                .attr('fill', 'url(#blueGradient)');
             _cell.append('circle')
                 .attr('class', 'radial-cursor')
                 .attr('cx', 0)
@@ -52247,9 +52303,12 @@ var PeriodChart = (function (_super) {
             if (o.level !== 'day') {
                 _cell.append('text')
                     .attr('class', 'radial-text-md')
-                    .attr('x', -7)
-                    .attr('y', outerRadius)
-                    .text(o.name);
+                    .attr('x', -14)
+                    .text(o.name)
+                    .attr('y', function (data, arg, svgEls) {
+                    var textOffset = svgEls[0].getBBox().height;
+                    return size / 2 + textOffset;
+                });
             }
             if (option.missing) {
                 var missedData_1 = [];
