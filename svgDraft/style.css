@@ -50,3 +50,10 @@ rect.gradient{
 .target circle{
     stroke: #DAE3F5
 }
+circle{
+    fill: transparent;
+}
+
+/* .weekdays text{
+    fill: #fff;
+} */

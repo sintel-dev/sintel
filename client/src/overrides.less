@@ -10,6 +10,10 @@
     @gray-text-color: #B5B5B5;
 
 
+    .wrapper{
+        background-color: @second-color;
+    }
+
     .main-header {
         box-shadow: 0 0 14px #000;
         a{
@@ -101,10 +105,20 @@
     }
 
     .content-wrapper{
-        background-color: @second-color;
+        background-color: transparent;
+    }
+
+    .content-wrapper{
+        padding-top: 50px;
     }
 
     .content{
+        padding-top: 0;
+
+        .timeseries-overview{
+            margin-top: 20px;
+        }
+
         .nav-tabs-custom-mtv, .nav-tabs-custom-mtv>.tab-content {
             border: none;
             background: none;
@@ -175,6 +189,12 @@
         border: none;
         border-radius: 10px;
         overflow: hidden;
+        margin-bottom: 0;
+
+        &.period-view{
+            border-radius: 0;
+            padding: 30px 10px 10px 10px;
+        }
 
         &.timeseries-overview{
             border-bottom-left-radius: 0;
@@ -190,7 +210,6 @@
                 bottom: 0;
                 background-image: linear-gradient(to top, rgba(36,36,44, 0.9), rgba(36,36,44,0));
             }
-            // background-image: linear-gradient(transparent, rgba(36,36,44, 1));
         }
         hr{
             border-top: 1px solid #000;
@@ -256,12 +275,7 @@
         stroke-width:1
     }
 
-
-
-    //input controls
-    .linechart-controls{
-        color: #fff;
-        margin-bottom: 15px;
+    .switch-control{
         div{
             display: inline-block;
             margin-right: 25px;
@@ -309,6 +323,13 @@
                 }
             }
         }
+    }
+
+    //input controls
+    .linechart-controls{
+        color: #fff;
+        margin-bottom: 15px;
+
     }
 
     //dataset details within the chart
@@ -359,10 +380,8 @@
             transform: translateX(0%);
         }
 
-
-
         label, span{
-            // display: block;
+            // dislay: block;
             margin-bottom: 9px;
         }
 
@@ -422,22 +441,81 @@
     .target{
         circle{
             stroke: rgba(218, 227, 245, 0.3);
-            stroke-width: 1;
             fill: transparent;
         }
 
         line{
-            stroke-width: 1;
             stroke: rgba(218, 227, 245, 0.3);
         }
     }
 
-    //
     .multi-period-chart {
+        width: 100% !important;
         .radial-text-md{
             fill: #8A9097;
             font-size: 13px;
         }
     }
 
+    .period-view{
+        background: @main-color;
+        padding-top: 35px;
+
+        .nav-tabs-custom{
+            >.nav-tabs {
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+                border-color: #484E53;
+                >li{
+                    margin-right: -1px;
+                    margin: 0;
+                    border: none;
+                    transition: all .2s ease-in-out;
+
+                    &:last-child {
+                        &, a{
+                            border-top-left-radius: 3px;
+                            border-bottom-left-radius: 3px;
+                        }
+                    }
+                    &:first-child{
+                        &, a{
+                            border-top-right-radius: 3px;
+                            border-bottom-right-radius: 3px;
+                        }
+                    }
+                    &.active{
+                        border-top: none;
+                        background-color: #2569D6;
+                        a{
+                            color: #fff;
+                        }
+                    }
+
+                    > a{
+                        color: rgba(255,255,255,0.5);
+                        background-color: rgba(0,0,0,0.4);
+                        border-width: 0;
+                    }
+
+                    &, a{
+                        transition: all .2s ease-in-out;
+                    }
+                }
+            }
+        }
+
+        .calendar-controls{
+            color: #fff;
+        }
+    }
 }
+
+// .tab-content>.tab-pane{
+//     display: block !important;
+// }
+
+
+// .pchart{
+//     height: 3464px !important;
+// }

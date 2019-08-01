@@ -19,6 +19,10 @@ export interface Option {
     size?: number;
     minSize?: number;
     missing?: boolean;   // whether highlight missing data
+    circleStroke?: number; // used to calculate circle target stroke
+    scaleFactor?: number;
+    marginRatio?: number;
+    dayLevelTranslate?: number
 }
 
 export class PeriodChart extends pip.Events {
@@ -27,7 +31,7 @@ export class PeriodChart extends pip.Events {
         // svg layout
         height: null,
         width: null,
-        margin: { top: 30, right: 10, bottom: 5, left: 30 },
+        margin: { top: 0, right: 0, bottom: 10, left: 0 },
         // animation
         duration: 750,
         delay: 50,
@@ -36,7 +40,11 @@ export class PeriodChart extends pip.Events {
         padding: 18,
         size: 100,      // width = height = size (include padding)
         minSize: 6,
-        missing: false
+        missing: false,
+        circleStroke: 1,
+        scaleFactor: 0.9,
+        marginRatio: 0,
+        dayLevelTranslate: 40
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -55,7 +63,7 @@ export class PeriodChart extends pip.Events {
 
         self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
 
-        let { nCol, width, padding, margin } = self.option;
+        let { nCol, width, padding, margin} = self.option;
 
         if (nCol !== null) {
             self.option.size = Math.floor((width - margin.left - margin.right) / nCol);
@@ -63,10 +71,11 @@ export class PeriodChart extends pip.Events {
 
         self.option.nCol = Math.floor((width - margin.left - margin.right) / (self.option.size));
 
+        self.option.marginRatio = self.option.size / 15 * self.option.scaleFactor; // each cell bottom margin
+
         if (self.option.height === null) {
-            self.option.height = self.option.size
-            * Math.ceil(data[0].info.length / self.option.nCol)
-            + margin.top + margin.bottom + 20; //adding text offset height
+            const rowsCount =  Math.ceil(data[0].info.length / self.option.nCol)
+            self.option.height = self.option.size * rowsCount + (rowsCount - 1) * self.option.marginRatio + margin.top + margin.bottom; // adding text offset height
         } else {
             self.option.height = self.defaultHeight;
         }
@@ -76,39 +85,21 @@ export class PeriodChart extends pip.Events {
             .attr('class', 'multi-period-chart')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
-
-
-        // let radialGradient = self.svg.append('defs')
-        //     .append('radialGradient')
-        //     .attr('id', 'blueGradient');
-
-
-        // radialGradient.append('stop')
-        //     .attr('offset', '30%')
-        //     .attr('stop-color', '#B2C1FF' );
-
-        // radialGradient.append('stop')
-        //     .attr('offset', '90%')
-        //     .attr('stop-color', 'rgba(216,216,216,0)' )
-
-
         self.plot();
     }
 
     private plot() {
         let self = this;
         const option = self.option;
-
-        let { width, height, margin, padding, size, nCol } = self.option;
+        const { width, height, margin, padding, size, nCol} = self.option;
 
         const [w, h] = [
             width - margin.left - margin.right,
             height - margin.top - margin.bottom,
         ];
 
-        let outerRadius = size / 2 - padding / 2,
-            // innerRadius = option.minSize;
-            innerRadius = Math.max(outerRadius / 6, option.minSize);
+        let outerRadius = (size / 2) - (padding / 2);
+        let innerRadius = Math.max(outerRadius / 8, option.minSize);
 
         // layout setting
         _.each(self.data, d => {
@@ -127,7 +118,7 @@ export class PeriodChart extends pip.Events {
         let zoomG = self.svg.append('g');
 
         let g = zoomG.append('g')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+            .attr('transform', `translate(${option.margin.left}, ${option.margin.top})`);
 
         self.normalize();
         // add glyphs
@@ -148,14 +139,21 @@ export class PeriodChart extends pip.Events {
             }
             self.normalize();
 
+            if (o[0].info[0].level === 'year') {
+                let newHeight = size
+                    * Math.ceil((o[0].info.length) / nCol)
+                    + margin.top + margin.bottom + self.option.marginRatio;
+
+                self.svg.attr('height', newHeight);
+                zoomRect.attr('height', newHeight).call(zoom);
+            }
+
             if (o[0].info[0].level === 'month') {
                 label1.text(o[0].info[0].parent.name);
             }
 
             if (o[0].info[0].level === 'day') {
-                label1.text(o[0].info[0].parent.name);
-                label2.text(o[0].info[0].parent.parent.name);
-
+                label1.text(`${o[0].info[0].parent.name} ${(o[0].info[0].parent.parent.name)}`);
                 let [mm, yy] = [
                     o[0].info[0].parent.name,
                     o[0].info[0].parent.parent.name
@@ -163,16 +161,13 @@ export class PeriodChart extends pip.Events {
                 let offset = new Date(`${mm} 1, ${yy} 00:00:00`).getDay();
                 let newHeight = size
                                 * Math.ceil((o[0].info.length + offset) / nCol)
-                                + margin.top + margin.bottom;
+                                + margin.top + margin.bottom + self.option.marginRatio + self.option.dayLevelTranslate;
 
-                self.svg.attr('height', newHeight);
-                let nh = newHeight - margin.top - margin.bottom;
-                zoom.translateExtent([[0, 0], [w, nh]])
-                    .extent([[0, 0], [w, nh]]);
+                let nh = newHeight + margin.top + margin.bottom + self.option.marginRatio;
+                self.svg.attr('height', nh);
 
-                zoomRect.attr('height', nh)
-                    .call(zoom);
-
+                zoom.translateExtent([[0, 0], [w, nh]]).extent([[0, 0], [w, nh]]);
+                zoomRect.attr('height', nh).call(zoom);
                 _.each(self.data, d => {
                     _.each(d.info, (dd, i) => {
                         let dt = new Date(`${mm} ${i + 1}, ${yy} 00:00:00`);
@@ -192,13 +187,24 @@ export class PeriodChart extends pip.Events {
 
             g.selectAll(`.feature-cell`).remove();
             _.each(self.data, (data, i) => {
-                console.log(size);
                 let _g = g.selectAll(`.feature-cell-${data.name}`).data(data.info);
-                //append month
+
+                // append month
                 _g.enter().append('g')
                     .merge(_g as any)
                     .attr('class', `feature-cell feature-cell-${data.name}`)
-                    .attr('transform', d => `translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
+                    .attr('transform', d => {
+                        if(d.level === 'day') {
+                            return `
+                                translate(
+                                    ${d.col * size + size / 2},
+                                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio*d.row}),
+                                scale(${self.option.scaleFactor})`;
+                        }
+                        return `
+                            translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}),
+                            scale(${self.option.scaleFactor})`;
+                    })
                     .each(function(d, count) {
                         const randomID = self.generateRandomID();
                         featurePlot(d3.select(this), d, data.name, randomID);
@@ -291,13 +297,14 @@ export class PeriodChart extends pip.Events {
             let names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             g.append('g')
                 .attr('class', 'weekdays')
+                .attr('transform', 'translate(0, 35)')
                 .selectAll('.weekday-text')
                 .data(_.range(7))
                 .enter()
                 .append('text')
                 .attr('class', 'radial-text-md weekday-text')
                 .attr('x', d => d * size + size / 2)
-                .attr('y', -7)
+                .attr('y', 0)
                 .text(d => names[d]);
         }
 
@@ -316,22 +323,29 @@ export class PeriodChart extends pip.Events {
         return {label1, label2};
     }
 
-    private generateRandomID(){
-        return Math.random().toString(36).substr(2, 9)
+    private generateRandomID() {
+        return Math.random().toString(36).substr(2, 9);
     }
 
     private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
         let self = this;
         let option = self.option;
 
+        // let cell = g.append('g').attr('class', `${self.data[0].info[0].level }_level`);
         // plot data on each station
         _.each(self.data, (data, count) => {
             let cell = g
                 .selectAll(`.feature-cell-${data.name}`)
                 .data(data.info)
-                .enter().append('g')
+                .enter()
+                .append('g')
                 .attr('class', `feature-cell feature-cell-${data.name}`)
-                .attr('transform', d =>`translate(${d.col * size + size / 2}, ${d.row * size + size / 2})`)
+                .attr('transform', d => {
+                    if(d.level === 'day') {
+                        return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio*d.row}), scale(${self.option.scaleFactor})`;
+                    }
+                    return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}), scale(${self.option.scaleFactor})`;
+                })
                 .each(function(d) {
                     const randomID = self.generateRandomID();
                     featurePlot(d3.select(this), d, data.name, randomID);
@@ -339,11 +353,10 @@ export class PeriodChart extends pip.Events {
 
         });
 
-
         return {featurePlot};
 
         function featurePlot(_cell, o: LineChartDataEleInfoEle, stationName: string, id: any) {
-            // console.log(id)
+            const {circleStroke} = self.option;
 
             // Extend the domain slightly to match the range of [0, 2π].
             angle.domain([0, o.bins.length - 0.05]);
@@ -356,15 +369,6 @@ export class PeriodChart extends pip.Events {
                 .datum(o.bins)
                 .attr('class', 'feature-area radial-cursor')
                 .attr('id', `path_${id}`)
-                // .attr('stroke', function () {
-                //     return colorSchemes.getColorCode(stationName);
-                // })
-                // .attr('stroke-width', 1)
-                // .attr('stroke-opacity', 0.7)
-                // .attr('fill', function () {
-                //     return colorSchemes.getColorCode(stationName);
-                // })
-                // .attr('fill-opacity', 0.3)
                 .attr('d', area0)
                 .on('click', (d) => {
                     if (o.children) {
@@ -376,7 +380,7 @@ export class PeriodChart extends pip.Events {
             clipPath
                 .attr('id', `clip_${id}`)
                 .append('use')
-                .attr('xlink:href', `#path_${id}`)
+                .attr('xlink:href', `#path_${id}`);
 
             path.transition()
                 .duration(option.duration)
@@ -385,43 +389,49 @@ export class PeriodChart extends pip.Events {
             path.append('title')
                 .text(o.name);
 
-            //create the 'target' svg circles
+            // create the 'target' svg circles
             let target = _cell.append('g')
-                .attr('class', 'target')
+                .attr('class', 'target');
 
-
-            const ratio = outerRadius / 3;
-
-
-            target.append('circle')
-                .attr('r', outerRadius + 3);
+            const ratio = size / 3 - circleStroke / 2;
+            const targetRadius = size / 2 - circleStroke / 2;
+            const strokeWidth = size / 2;
 
             target.append('circle')
-                .attr('r', outerRadius - ratio);
+                .attr('r', targetRadius)
+                .attr('stroke-width', circleStroke);
 
             target.append('circle')
-                .attr('r', outerRadius - ratio * 2);
+                .attr('r', targetRadius - ratio / 2)
+                .attr('stroke-width', circleStroke);
+
+            target.append('circle')
+                .attr('r', targetRadius - ratio)
+                .attr('stroke-width', circleStroke);
 
 
-            //vertical/horizontal lines for the 'target'
+            // vertical/horizontal lines for the 'target'
             target.append('line')
-                .attr('x1', -(outerRadius + 3))
-                .attr('x2', outerRadius + 2)
+                .attr('x1', -(strokeWidth))
+                .attr('x2', strokeWidth)
+                .attr('stroke-width', circleStroke)
                 .attr('y1', 0)
-                .attr('y2',0)
+                .attr('y2', 0);
 
             target.append('line')
                 .attr('x1', 0)
                 .attr('x2', 0)
-                .attr('y1', -(outerRadius + 2))
-                .attr('y2',outerRadius + 2)
+                .attr('stroke-width', circleStroke)
+                .attr('y1', -(strokeWidth))
+                .attr('y2', strokeWidth);
 
 
             _cell.append('circle')
                 .attr('clip-path', `url(#clip_${id})`)
                 .attr('class', 'wrapper')
-                .attr('r', outerRadius)
-                .attr('fill', 'url(#blueGradient)')
+                .attr('r', strokeWidth)
+                .attr('fill', 'url(#blueGradient)');
+
             _cell.append('circle')
                 .attr('class', 'radial-cursor')
                 .attr('cx', 0)
@@ -441,8 +451,11 @@ export class PeriodChart extends pip.Events {
                 _cell.append('text')
                     .attr('class', 'radial-text-md')
                     .attr('x', -14)
-                    .attr('y', outerRadius + outerRadius * 0.5)
-                    .text(o.name);
+                    .text(o.name)
+                    .attr('y', (data, arg, svgEls) => {
+                        const textOffset = svgEls[0].getBBox().height
+                        return size / 2 + textOffset;
+                    });
             }
 
             if (option.missing) {

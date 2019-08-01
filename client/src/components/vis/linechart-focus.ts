@@ -246,7 +246,7 @@ export class LineChartFocus extends pip.Events {
                 .attr('x1', '0%')
                 .attr('x2', '100%')
                 .attr('y1', '0%')
-                .attr('y2', '0')
+                .attr('y2', '0');
 
             gradient.append('stop')
                 .attr('offset', '0%')
@@ -270,7 +270,7 @@ export class LineChartFocus extends pip.Events {
                 .attr('fill', 'url(#waweGradient)');
         }
 
-        function removeWawes(){
+        function removeWawes() {
             self.svg.select('.waweBg').remove();
             self.svg.select('.wawes').remove();
 

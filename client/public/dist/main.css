@@ -352,6 +352,9 @@ body {
 .p-50 {
   padding: 50px !important;
 }
+.mtv-skin .wrapper {
+  background-color: #23242B;
+}
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
@@ -427,7 +430,16 @@ body {
   padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
-  background-color: #23242B;
+  background-color: transparent;
+}
+.mtv-skin .content-wrapper {
+  padding-top: 50px;
+}
+.mtv-skin .content {
+  padding-top: 0;
+}
+.mtv-skin .content .timeseries-overview {
+  margin-top: 20px;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -489,6 +501,11 @@ body {
   border: none;
   border-radius: 10px;
   overflow: hidden;
+  margin-bottom: 0;
+}
+.mtv-skin .box.period-view {
+  border-radius: 0;
+  padding: 30px 10px 10px 10px;
 }
 .mtv-skin .box.timeseries-overview {
   border-bottom-left-radius: 0;
@@ -550,27 +567,23 @@ body {
   stroke: #687ba3;
   stroke-width: 1;
 }
-.mtv-skin .linechart-controls {
-  color: #fff;
-  margin-bottom: 15px;
-}
-.mtv-skin .linechart-controls div {
+.mtv-skin .switch-control div {
   display: inline-block;
   margin-right: 25px;
 }
-.mtv-skin .linechart-controls div:last-child {
+.mtv-skin .switch-control div:last-child {
   margin-right: 0;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"] {
+.mtv-skin .switch-control div input[type="checkbox"] {
   display: none;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch {
   background: #00E04B;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(30px);
 }
-.mtv-skin .linechart-controls div .switch {
+.mtv-skin .switch-control div .switch {
   position: relative;
   padding-left: 50px;
   display: inline-block;
@@ -582,7 +595,7 @@ body {
   transition: all 0.4s ease-in-out;
   vertical-align: middle;
 }
-.mtv-skin .linechart-controls div .switch:before {
+.mtv-skin .switch-control div .switch:before {
   content: '';
   position: absolute;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
@@ -593,6 +606,10 @@ body {
   border-radius: 100%;
   background: #fff;
   transition: all 0.4s ease-in-out;
+}
+.mtv-skin .linechart-controls {
+  color: #fff;
+  margin-bottom: 15px;
 }
 .mtv-skin .dataset-description {
   width: 326px;
@@ -686,18 +703,66 @@ body {
 }
 .mtv-skin .target circle {
   stroke: rgba(218, 227, 245, 0.3);
-  stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
-  stroke-width: 1;
   stroke: rgba(218, 227, 245, 0.3);
+}
+.mtv-skin .multi-period-chart {
+  width: 100% !important;
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
   font-size: 13px;
+}
+.mtv-skin .period-view {
+  background: #2C3034;
+  padding-top: 35px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-color: #484E53;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li {
+  margin-right: -1px;
+  margin: 0;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child a {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child a {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active {
+  border-top: none;
+  background-color: #2569D6;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active a {
+  color: #fff;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li > a {
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-width: 0;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li a {
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .calendar-controls {
+  color: #fff;
 }
 
+.mtv-skin .wrapper {
+  background-color: #23242B;
+}
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
@@ -773,7 +838,16 @@ body {
   padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
-  background-color: #23242B;
+  background-color: transparent;
+}
+.mtv-skin .content-wrapper {
+  padding-top: 50px;
+}
+.mtv-skin .content {
+  padding-top: 0;
+}
+.mtv-skin .content .timeseries-overview {
+  margin-top: 20px;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -835,6 +909,11 @@ body {
   border: none;
   border-radius: 10px;
   overflow: hidden;
+  margin-bottom: 0;
+}
+.mtv-skin .box.period-view {
+  border-radius: 0;
+  padding: 30px 10px 10px 10px;
 }
 .mtv-skin .box.timeseries-overview {
   border-bottom-left-radius: 0;
@@ -896,27 +975,23 @@ body {
   stroke: #687ba3;
   stroke-width: 1;
 }
-.mtv-skin .linechart-controls {
-  color: #fff;
-  margin-bottom: 15px;
-}
-.mtv-skin .linechart-controls div {
+.mtv-skin .switch-control div {
   display: inline-block;
   margin-right: 25px;
 }
-.mtv-skin .linechart-controls div:last-child {
+.mtv-skin .switch-control div:last-child {
   margin-right: 0;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"] {
+.mtv-skin .switch-control div input[type="checkbox"] {
   display: none;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch {
   background: #00E04B;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(30px);
 }
-.mtv-skin .linechart-controls div .switch {
+.mtv-skin .switch-control div .switch {
   position: relative;
   padding-left: 50px;
   display: inline-block;
@@ -928,7 +1003,7 @@ body {
   transition: all 0.4s ease-in-out;
   vertical-align: middle;
 }
-.mtv-skin .linechart-controls div .switch:before {
+.mtv-skin .switch-control div .switch:before {
   content: '';
   position: absolute;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
@@ -939,6 +1014,10 @@ body {
   border-radius: 100%;
   background: #fff;
   transition: all 0.4s ease-in-out;
+}
+.mtv-skin .linechart-controls {
+  color: #fff;
+  margin-bottom: 15px;
 }
 .mtv-skin .dataset-description {
   width: 326px;
@@ -1032,16 +1111,61 @@ body {
 }
 .mtv-skin .target circle {
   stroke: rgba(218, 227, 245, 0.3);
-  stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
-  stroke-width: 1;
   stroke: rgba(218, 227, 245, 0.3);
+}
+.mtv-skin .multi-period-chart {
+  width: 100% !important;
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
   font-size: 13px;
+}
+.mtv-skin .period-view {
+  background: #2C3034;
+  padding-top: 35px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-color: #484E53;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li {
+  margin-right: -1px;
+  margin: 0;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child a {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child a {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active {
+  border-top: none;
+  background-color: #2569D6;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active a {
+  color: #fff;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li > a {
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-width: 0;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li a {
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .calendar-controls {
+  color: #fff;
 }
 
 
@@ -1399,6 +1523,9 @@ body {
 .p-50 {
   padding: 50px !important;
 }
+.mtv-skin .wrapper {
+  background-color: #23242B;
+}
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
@@ -1474,7 +1601,16 @@ body {
   padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
-  background-color: #23242B;
+  background-color: transparent;
+}
+.mtv-skin .content-wrapper {
+  padding-top: 50px;
+}
+.mtv-skin .content {
+  padding-top: 0;
+}
+.mtv-skin .content .timeseries-overview {
+  margin-top: 20px;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -1536,6 +1672,11 @@ body {
   border: none;
   border-radius: 10px;
   overflow: hidden;
+  margin-bottom: 0;
+}
+.mtv-skin .box.period-view {
+  border-radius: 0;
+  padding: 30px 10px 10px 10px;
 }
 .mtv-skin .box.timeseries-overview {
   border-bottom-left-radius: 0;
@@ -1597,27 +1738,23 @@ body {
   stroke: #687ba3;
   stroke-width: 1;
 }
-.mtv-skin .linechart-controls {
-  color: #fff;
-  margin-bottom: 15px;
-}
-.mtv-skin .linechart-controls div {
+.mtv-skin .switch-control div {
   display: inline-block;
   margin-right: 25px;
 }
-.mtv-skin .linechart-controls div:last-child {
+.mtv-skin .switch-control div:last-child {
   margin-right: 0;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"] {
+.mtv-skin .switch-control div input[type="checkbox"] {
   display: none;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch {
   background: #00E04B;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(30px);
 }
-.mtv-skin .linechart-controls div .switch {
+.mtv-skin .switch-control div .switch {
   position: relative;
   padding-left: 50px;
   display: inline-block;
@@ -1629,7 +1766,7 @@ body {
   transition: all 0.4s ease-in-out;
   vertical-align: middle;
 }
-.mtv-skin .linechart-controls div .switch:before {
+.mtv-skin .switch-control div .switch:before {
   content: '';
   position: absolute;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
@@ -1640,6 +1777,10 @@ body {
   border-radius: 100%;
   background: #fff;
   transition: all 0.4s ease-in-out;
+}
+.mtv-skin .linechart-controls {
+  color: #fff;
+  margin-bottom: 15px;
 }
 .mtv-skin .dataset-description {
   width: 326px;
@@ -1733,16 +1874,61 @@ body {
 }
 .mtv-skin .target circle {
   stroke: rgba(218, 227, 245, 0.3);
-  stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
-  stroke-width: 1;
   stroke: rgba(218, 227, 245, 0.3);
+}
+.mtv-skin .multi-period-chart {
+  width: 100% !important;
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
   font-size: 13px;
+}
+.mtv-skin .period-view {
+  background: #2C3034;
+  padding-top: 35px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-color: #484E53;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li {
+  margin-right: -1px;
+  margin: 0;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child a {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child a {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active {
+  border-top: none;
+  background-color: #2569D6;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active a {
+  color: #fff;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li > a {
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-width: 0;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li a {
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .calendar-controls {
+  color: #fff;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -2186,6 +2372,9 @@ body {
 .p-50 {
   padding: 50px !important;
 }
+.mtv-skin .wrapper {
+  background-color: #23242B;
+}
 .mtv-skin .main-header {
   box-shadow: 0 0 14px #000;
 }
@@ -2261,7 +2450,16 @@ body {
   padding-bottom: 4px;
 }
 .mtv-skin .content-wrapper {
-  background-color: #23242B;
+  background-color: transparent;
+}
+.mtv-skin .content-wrapper {
+  padding-top: 50px;
+}
+.mtv-skin .content {
+  padding-top: 0;
+}
+.mtv-skin .content .timeseries-overview {
+  margin-top: 20px;
 }
 .mtv-skin .content .nav-tabs-custom-mtv,
 .mtv-skin .content .nav-tabs-custom-mtv > .tab-content {
@@ -2323,6 +2521,11 @@ body {
   border: none;
   border-radius: 10px;
   overflow: hidden;
+  margin-bottom: 0;
+}
+.mtv-skin .box.period-view {
+  border-radius: 0;
+  padding: 30px 10px 10px 10px;
 }
 .mtv-skin .box.timeseries-overview {
   border-bottom-left-radius: 0;
@@ -2384,27 +2587,23 @@ body {
   stroke: #687ba3;
   stroke-width: 1;
 }
-.mtv-skin .linechart-controls {
-  color: #fff;
-  margin-bottom: 15px;
-}
-.mtv-skin .linechart-controls div {
+.mtv-skin .switch-control div {
   display: inline-block;
   margin-right: 25px;
 }
-.mtv-skin .linechart-controls div:last-child {
+.mtv-skin .switch-control div:last-child {
   margin-right: 0;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"] {
+.mtv-skin .switch-control div input[type="checkbox"] {
   display: none;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch {
   background: #00E04B;
 }
-.mtv-skin .linechart-controls div input[type="checkbox"]:checked + .switch:before {
+.mtv-skin .switch-control div input[type="checkbox"]:checked + .switch:before {
   transform: translateX(30px);
 }
-.mtv-skin .linechart-controls div .switch {
+.mtv-skin .switch-control div .switch {
   position: relative;
   padding-left: 50px;
   display: inline-block;
@@ -2416,7 +2615,7 @@ body {
   transition: all 0.4s ease-in-out;
   vertical-align: middle;
 }
-.mtv-skin .linechart-controls div .switch:before {
+.mtv-skin .switch-control div .switch:before {
   content: '';
   position: absolute;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
@@ -2427,6 +2626,10 @@ body {
   border-radius: 100%;
   background: #fff;
   transition: all 0.4s ease-in-out;
+}
+.mtv-skin .linechart-controls {
+  color: #fff;
+  margin-bottom: 15px;
 }
 .mtv-skin .dataset-description {
   width: 326px;
@@ -2520,16 +2723,61 @@ body {
 }
 .mtv-skin .target circle {
   stroke: rgba(218, 227, 245, 0.3);
-  stroke-width: 1;
   fill: transparent;
 }
 .mtv-skin .target line {
-  stroke-width: 1;
   stroke: rgba(218, 227, 245, 0.3);
+}
+.mtv-skin .multi-period-chart {
+  width: 100% !important;
 }
 .mtv-skin .multi-period-chart .radial-text-md {
   fill: #8A9097;
   font-size: 13px;
+}
+.mtv-skin .period-view {
+  background: #2C3034;
+  padding-top: 35px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-color: #484E53;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li {
+  margin-right: -1px;
+  margin: 0;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:last-child a {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li:first-child a {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active {
+  border-top: none;
+  background-color: #2569D6;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li.active a {
+  color: #fff;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li > a {
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-width: 0;
+}
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li,
+.mtv-skin .period-view .nav-tabs-custom > .nav-tabs > li a {
+  transition: all 0.2s ease-in-out;
+}
+.mtv-skin .period-view .calendar-controls {
+  color: #fff;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
