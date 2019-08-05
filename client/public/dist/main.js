@@ -50501,6 +50501,10 @@ var Content = (function () {
         this.focusChart.trigger('zoomPanMode', isChecked);
         return true;
     };
+    Content.prototype.zooming = function (factor) {
+        this.focusChart.trigger('zooming', factor);
+        return true;
+    };
     Content.prototype._visualize = function () {
         var self = this;
         var data = self.data;
@@ -51469,6 +51473,7 @@ var LineChartFocus = (function (_super) {
         disableEditor();
         var _d = self.addZoom(w, h), zoom = _d.zoom, enableZoom = _d.enableZoom, disableZoom = _d.disableZoom, resetZoom = _d.resetZoom;
         zoom.on('zoom', zoomHandler);
+        self.on('zooming', clickZoom);
         enableZoom();
         var highlightUpdate = self.addHighlights(h - option.errorHeight, x, line).highlightUpdate;
         var savedZoom = d3.zoomIdentity;
@@ -51647,6 +51652,12 @@ var LineChartFocus = (function (_super) {
             var x1 = x(data.timeseries[data.windows[idx][1]][0]);
             disableZoom();
             makeEditable(x0, x1, event);
+        }
+        function clickZoom(factor) {
+            var k = savedZoom.k + factor;
+            debugger;
+            var selection = d3.transition().duration(250);
+            zoom.scaleTo(selection, k);
         }
     };
     LineChartFocus.prototype.addEventEditor = function (g, w, h, x) {

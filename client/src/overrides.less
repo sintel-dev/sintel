@@ -243,15 +243,29 @@
             position: absolute;
             right: 35px;
             bottom: 50px;
+
             li{
                 display: inline-block;
+
                 &:first-child{
                     margin-bottom: 7px;
                     text-align: right;
                     display: block;
                 }
             }
-            button{
+
+            label{
+                margin-bottom: 0;
+            }
+
+            input{
+                &[type="checkbox"]{
+                    opacity: 0;
+                }
+            }
+            button, span{
+                cursor: pointer;
+                display: inline-block;
                 width: 28px;
                 height: 28px;
                 border-radius: 4px;
@@ -259,6 +273,8 @@
                 border: 1px solid #979797;
                 color: #fff;
                 text-align: center;
+                line-height: 26px;
+                outline: none;
             }
         }
     }
