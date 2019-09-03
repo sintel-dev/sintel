@@ -550,7 +550,16 @@ body {
   text-align: right;
   display: block;
 }
-.mtv-skin .chart-focus-container .chart-controls button {
+.mtv-skin .chart-focus-container .chart-controls label {
+  margin-bottom: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls input[type="checkbox"] {
+  opacity: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls button,
+.mtv-skin .chart-focus-container .chart-controls span {
+  cursor: pointer;
+  display: inline-block;
   width: 28px;
   height: 28px;
   border-radius: 4px;
@@ -558,6 +567,8 @@ body {
   border: 1px solid #979797;
   color: #fff;
   text-align: center;
+  line-height: 26px;
+  outline: none;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -958,7 +969,16 @@ body {
   text-align: right;
   display: block;
 }
-.mtv-skin .chart-focus-container .chart-controls button {
+.mtv-skin .chart-focus-container .chart-controls label {
+  margin-bottom: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls input[type="checkbox"] {
+  opacity: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls button,
+.mtv-skin .chart-focus-container .chart-controls span {
+  cursor: pointer;
+  display: inline-block;
   width: 28px;
   height: 28px;
   border-radius: 4px;
@@ -966,6 +986,8 @@ body {
   border: 1px solid #979797;
   color: #fff;
   text-align: center;
+  line-height: 26px;
+  outline: none;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -1721,7 +1743,16 @@ body {
   text-align: right;
   display: block;
 }
-.mtv-skin .chart-focus-container .chart-controls button {
+.mtv-skin .chart-focus-container .chart-controls label {
+  margin-bottom: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls input[type="checkbox"] {
+  opacity: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls button,
+.mtv-skin .chart-focus-container .chart-controls span {
+  cursor: pointer;
+  display: inline-block;
   width: 28px;
   height: 28px;
   border-radius: 4px;
@@ -1729,6 +1760,8 @@ body {
   border: 1px solid #979797;
   color: #fff;
   text-align: center;
+  line-height: 26px;
+  outline: none;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;
@@ -2570,7 +2603,16 @@ body {
   text-align: right;
   display: block;
 }
-.mtv-skin .chart-focus-container .chart-controls button {
+.mtv-skin .chart-focus-container .chart-controls label {
+  margin-bottom: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls input[type="checkbox"] {
+  opacity: 0;
+}
+.mtv-skin .chart-focus-container .chart-controls button,
+.mtv-skin .chart-focus-container .chart-controls span {
+  cursor: pointer;
+  display: inline-block;
   width: 28px;
   height: 28px;
   border-radius: 4px;
@@ -2578,6 +2620,8 @@ body {
   border: 1px solid #979797;
   color: #fff;
   text-align: center;
+  line-height: 26px;
+  outline: none;
 }
 .mtv-skin .multi-line-chart-focus .line-highlight {
   stroke: #FFCD00;

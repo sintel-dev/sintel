@@ -146,13 +146,13 @@
 											Event adding mode
 										</label>
 								</div>
-								<div>
+								<!-- <div>
 										<label for="zoomMode">
 											<input type="checkbox" id="zoomMode" data-bind="click: zoomPanMode" />
 											<span class="switch"></span>
 											Zoom &amp; pane mode
 										</label>
-								</div>
+								</div> -->
 							</div>
 							<!-- <a type="button" class="btn btn-default" data-bind="click: () => { showPrediction(); }"
 								title="show model prediction result">assess mode</a>
@@ -177,9 +177,15 @@
 										</div> -->
 									</div>
 									<ul class="chart-controls">
-										<li><button data-bind="click: zoomPanMode">mv</button></li>
-										<li><button>+</button></li>
-										<li><button>-</button></li>
+										<li>
+											<!-- <button data-bind="click: () => zoomPanMode()">mv</button> -->
+											<label for="zoomMode">
+													<input type="checkbox" id="zoomMode" data-bind="click: zoomPanMode" />
+													<span class="fa fa-arrows"></span>
+											</label>
+										</li>
+										<li><button class="fa fa-plus" data-bind="click: () => zooming(0.5)" ></button></li>
+										<li><button class="fa fa-minus" data-bind="click: () => zooming(-0.5)"></button></li>
 									</ul>
 									<div class="dataset-description" id="datasetDescription">
 											<a href="javascript:void(0)" class="close" data-bind="click: () => showDatasetInfo(false)">x</a>

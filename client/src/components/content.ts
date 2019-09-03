@@ -329,6 +329,11 @@ class Content {
         return true;
     }
 
+    public zooming(factor){
+        this.focusChart.trigger('zooming', factor);
+        return true;
+    }
+
     private _visualize() {
         let self = this;
         let data = self.data;
