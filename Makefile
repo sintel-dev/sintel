@@ -35,21 +35,20 @@ help:
 
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
-	pip install -e .
-	cd client && npm install
-	#-g gulp && npm install
+	pip install .
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
 	cd client && npm install
-	#-g gulp && npm install
 
 .PHONY: install-theme
 install-theme:
-	curl -o theme.zip "http://dongyu.name/themes/AdminLTE-2.4.2.zip"
-	unzip theme.zip -d "./client/public/themes/"
-	rm -f theme.zip
+	rm -f -r ./client/public/themes/
+	mkdir -p ./client/public/themes/
+	curl -o theme.tar.bz2 "http://dongyu.name/themes/AdminLTE-2.4.2.tar.bz2"
+	tar -xf theme.tar.bz2 -C ./client/public/themes/
+	rm -f theme.tar.bz2
 
 .PHONY: init-db
 init-db:
@@ -62,7 +61,7 @@ init-db:
 load-db-nasa:
 	rm -f -r db-instance/dump/nasa/
 	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
-	tar -xvf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
+	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
 	mongorestore --db mtv ./db-instance/dump/nasa/
 
 # ----------------------- session: test ----------------------- #
