@@ -33,7 +33,8 @@ wheels/
 node_modules/
 client/public/lib/
 !client/public/dist/
-client/public/dist/css
+client/public/dist/css/
+client/public/dist/*.map
 client/public/themes/
 npm-debug.log
 package-lock.json
