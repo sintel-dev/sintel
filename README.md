@@ -8,7 +8,9 @@
 
 
 [![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv)
-[![Travis CI Shield](https://travis-ci.org/liudy1991/mtv.svg?branch=master)](https://travis-ci.org/liudy1991/mtv)
+[![Travis CI Shield](https://travis-ci.com/dyuliu/mtv.svg?branch=master)](https://travis-ci.com/dyuliu/mtv)
+[![Coverage Status](https://coveralls.io/repos/dyuliu/mtv/badge.svg?branch=master&service=github)](https://coveralls.io/github/dyuliu/mtv)
+
 
 # MTV
 
