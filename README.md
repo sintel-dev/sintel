@@ -3,13 +3,9 @@
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p>
 
-
-
-
-
-[![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv)
-[![Travis CI Shield](https://travis-ci.com/dyuliu/mtv.svg?branch=master)](https://travis-ci.com/dyuliu/mtv)
-[![Coverage Status](https://coveralls.io/repos/dyuliu/mtv/badge.svg?branch=master&service=github)](https://coveralls.io/github/dyuliu/mtv)
+<!-- [![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv) -->
+[![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)](https://travis-ci.com/dyuliu/mtv)
+[![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)](https://coveralls.io/github/dyuliu/MTV)
 
 
 # MTV
