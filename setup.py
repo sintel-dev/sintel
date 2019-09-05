@@ -13,7 +13,7 @@ with open('HISTORY.md', encoding='utf-8') as history_file:
 
 requirements = [
     'Click>=6.0',
-   
+
     # General
     'termcolor==1.1.0',
     'PyYAML==3.12',

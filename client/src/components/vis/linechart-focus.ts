@@ -27,6 +27,9 @@ export interface Option {
     offset?: number;
     xAxis?: boolean;
     yAxis?: boolean;
+    buffer?: number;
+    flags?: { accessMode: boolean, zoomMode: boolean, eventMode: boolean };
+    // flags
 }
 
 export class LineChartFocus extends pip.Events {
@@ -50,7 +53,13 @@ export class LineChartFocus extends pip.Events {
         context: false,
         xAxis: true,
         yAxis: true,
-        offset: 0
+        offset: 0,
+        buffer: 15,
+        flags: {
+            accessMode: false,
+            zoomMode: false,
+            eventMode: false
+        }
     };
 
     private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -65,12 +74,13 @@ export class LineChartFocus extends pip.Events {
         super();
         let self = this;
         _.extend(self.option, option);
+
+        // add flags to remember modes;
+
         self.svgContainer = d3.select<HTMLElement, any>(ele);
 
-        self.option.width = self.option.width === null ?
-            $(ele).innerWidth() : self.option.width;
-        self.option.height = self.option.height === null ?
-            self.defaultHeight : self.option.height;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+        self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
 
         self.svgContainer
             .style('overflow-x', 'hidden')
@@ -81,6 +91,13 @@ export class LineChartFocus extends pip.Events {
             .attr('class', 'multi-line-chart-focus')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+
+        const wavesContainer = self.svg.append('g')
+            .attr('class', 'wawesContainer');
+
+        wavesContainer.append('rect')
+            .attr('width', '100%')
+            .attr('height', '90');
 
         self.plot();
     }
@@ -124,6 +141,7 @@ export class LineChartFocus extends pip.Events {
             .x(d => x(d[0]))
             .y(d => y(d[1]));
 
+
         let clip = chart.append('defs')
             .append('clipPath')
             .attr('id', 'focusClip')
@@ -131,7 +149,7 @@ export class LineChartFocus extends pip.Events {
             .attr('width', w)
             .attr('height', h + option.errorHeight)
             .attr('x', 0)
-            .attr('y', -option.errorHeight);
+            .attr('y', -(option.errorHeight + option.buffer));
 
         let focus = chart.append('g')
             .attr('class', 'focus')
@@ -144,7 +162,7 @@ export class LineChartFocus extends pip.Events {
             .data(self.data)
             .enter().append('path')
             .attr('class', 'line')
-            .style('stroke', d => colorSchemes.getColorCode('dname'))
+            // .style('stroke', d => colorSchemes.getColorCode('dname'))
             .attr('d', d => line(d.timeseries));
 
         let area = d3.area<[number, number]>()
@@ -152,12 +170,12 @@ export class LineChartFocus extends pip.Events {
             .y0(function(d) { return -ye(d[1]) / 2 - option.errorHeight / 2; })
             .y1(function(d) { return ye(d[1]) / 2 - option.errorHeight / 2; });
 
-        let {editor, updateX, enableEditor,
-             disableEditor, makeEditable} = self.addEventEditor(focus, w, h , x);
+        let {editor, updateX, enableEditor, disableEditor, makeEditable} = self.addEventEditor(focus, w, h , x);
         disableEditor();
 
         let { zoom, enableZoom, disableZoom, resetZoom } = self.addZoom(w, h);
         zoom.on('zoom', zoomHandler);
+        self.on('zooming', clickZoom);
         enableZoom();
 
         // let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
@@ -171,24 +189,27 @@ export class LineChartFocus extends pip.Events {
 
         self.on('brush:update', brushUpdateHandler);
 
-        self.on('zoomPanMode', () => {
-            enableZoom();
-            disableEditor();
+        self.on('zoomPanMode', (zoomMode = false) => {
+            self.option.flags.zoomMode = zoomMode;
+            zoomMode && enableZoom();
+            !zoomMode && disableZoom();
         });
 
-        self.on('addEventMode', () => {
+        self.on('addEventMode', (eventMode = false) => {
+            self.option.flags.eventMode = eventMode;
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
-            disableZoom();
-            enableEditor();
+            eventMode && enableEditor();
+            !eventMode && disableEditor();
         });
 
-        let assessMode = false;
-        self.on('showPrediction', () => {
+        self.on('showPrediction', (assessMode = false) => {
+            self.option.flags.accessMode = assessMode;
+
             if (self.data.length > 1) { return; }
             // only execute when there is only one timeseries
-            assessMode = !assessMode;
             if (assessMode) {
+                generateWawes();
                 focus.append('path')
                     .datum(self.data[0].timeseriesPred)
                     .attr('class', 'line2')
@@ -197,16 +218,63 @@ export class LineChartFocus extends pip.Events {
                 focus.append('path')
                     .datum(self.data[0].timeseriesErr)
                     .attr('class', 'error')
+                    .attr('transform', `translate(0, -${option.buffer})`)
                     .attr('d', area);
             } else {
                 focus.select('.line2').remove();
                 focus.select('.error').remove();
+                removeWawes();
             }
         });
 
         self.on('event:update', eventUpdateHandler);
 
         self.on('event:modify', eventModifyHandler);
+
+        function generateWawes() {
+            self.svg.select('.wawesContainer')
+                .attr('class', 'wawesContainer active');
+
+            const defs = self.svg.append('g')
+                .attr('class', 'wawes')
+                .append('defs');
+
+            const gradient = defs.append('linearGradient')
+                .attr('id', 'waweGradient')
+                .attr('x1', '0%')
+                .attr('x2', '100%')
+                .attr('y1', '0%')
+                .attr('y2', '0');
+
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
+
+            gradient.append('stop')
+                .attr('offset', '50%')
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 0);
+
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#1A1B20')
+                .attr('stop-opacity', 1);
+
+            self.svg.append('rect')
+                .attr('class', 'waweBg')
+                .attr('width', '100%')
+                .attr('height', '90')
+                .attr('fill', 'url(#waweGradient)');
+        }
+
+        function removeWawes() {
+            self.svg.select('.waweBg').remove();
+            self.svg.select('.wawes').remove();
+
+            self.svg.select('.wawesContainer.active')
+                .attr('class', 'wawesContainer');
+        }
 
         // ************  event handlers  ************
         function zoomHandler() {
@@ -222,7 +290,7 @@ export class LineChartFocus extends pip.Events {
                 .attr('d', d => line(d.timeseries));
 
             // update prediction curve
-            if (assessMode) {
+            if (self.option.flags.accessMode) {
                 focus.select('.line2').attr('d', line);
                 focus.select('.error').attr('d', area);
             }
@@ -263,17 +331,15 @@ export class LineChartFocus extends pip.Events {
 
             uf.exit().remove();
 
-            if (assessMode) {
-                focus.select('.line2')
-                    .datum(self.data[0].timeseriesPred)
-                    .transition(t)
-                    .attr('d', line);
+            focus.select('.line2')
+                .datum(self.data[0].timeseriesPred)
+                .transition(t)
+                .attr('d', line);
 
-                focus.select('.error')
-                    .datum(self.data[0].timeseriesErr)
-                    .transition(t)
-                    .attr('d', area);
-            }
+            focus.select('.error')
+                .datum(self.data[0].timeseriesErr)
+                .transition(t)
+                .attr('d', area);
 
             // clean all original windows
             self.svg.selectAll('.window').remove();
@@ -327,6 +393,13 @@ export class LineChartFocus extends pip.Events {
             const x1 = x(data.timeseries[data.windows[idx][1]][0]);
             disableZoom();
             makeEditable(x0, x1, event);
+        }
+
+        function clickZoom(factor) {
+            let k = savedZoom.k + factor;
+            debugger;
+            const selection = d3.transition().duration(250);
+            zoom.scaleTo(selection, k);
         }
     }
 
@@ -396,7 +469,7 @@ export class LineChartFocus extends pip.Events {
             }
 
             if (_.isNull(modifiedEvent)) {
-                pip.modal.trigger('comment:new', {
+                pip.content.trigger('comment:new', {
                     id: 'new',
                     score: 0,
                     start_time: data[startIdx][0],
@@ -406,7 +479,7 @@ export class LineChartFocus extends pip.Events {
                     offset: self.option.offset
                 });
             } else {
-                pip.modal.trigger('comment:start', {
+                pip.content.trigger('comment:start', {
                     id: modifiedEvent.id,
                     score: modifiedEvent.score,
                     start_time: data[startIdx][0],
@@ -529,6 +602,7 @@ export class LineChartFocus extends pip.Events {
 
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')
+            // .attr('filter', 'url(#blurMe)')
             .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
         _.each(self.data, (d, i) => {
@@ -559,7 +633,7 @@ export class LineChartFocus extends pip.Events {
                         .attr('y', 0)
                         .attr('height', h)
                         .on('click', () => {
-                            pip.modal.trigger('comment:start', {
+                            pip.content.trigger('comment:start', {
                                 id: d[3],
                                 score: d[2],
                                 start_time: lineData[d[0]][0],
@@ -582,7 +656,7 @@ export class LineChartFocus extends pip.Events {
                         .attr('y', hz * idx)
                         .attr('height', hz - hzp)
                         .on('click', () => {
-                            pip.modal.trigger('comment:start', {
+                            pip.content.trigger('comment:start', {
                                 id: d[3],
                                 score: d[2],
                                 start_time: lineData[d[0]][0],

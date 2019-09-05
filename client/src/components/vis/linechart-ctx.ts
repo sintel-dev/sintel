@@ -27,6 +27,7 @@ export interface Option {
     offset?: number;
     xAxis?: boolean;
     yAxis?: boolean;
+    buffer?: number;
 }
 
 export class LineChartCtx extends pip.Events {
@@ -39,9 +40,14 @@ export class LineChartCtx extends pip.Events {
 
     private option: Option = {
         // layout
-        height: 40,
+        height: 60,
         width: null,
-        margin: { top: 5, right: 5, bottom: 5, left: 35 },
+        margin: {
+            top: 8,
+            right: 5,
+            bottom: 5,
+            left: 35
+        },
         // animation
         duration: 750,
         delay: 50,
@@ -55,7 +61,8 @@ export class LineChartCtx extends pip.Events {
         context: false,
         xAxis: true,
         yAxis: true,
-        offset: 0
+        offset: 0,
+        buffer: 10
     };
 
 
@@ -69,34 +76,31 @@ export class LineChartCtx extends pip.Events {
         _.extend(self.option, option);
         self.container = d3.select<HTMLElement, any>(ele);
 
-        self.option.width = self.option.width === null ?
-                            $(ele).innerWidth() : self.option.width;
-        self.option.height = self.option.height === null ?
-                            self.option.svgHeight : self.option.height;
+        self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+        self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
 
         // scroll style inside <div> container
         self.container
             // .classed('scroll-style-0', true)
             .style('overflow-x', 'hidden')
             .style('overflow-y', 'hidden');
-
         self.plot();
     }
 
     private plot() {
         let self = this;
         const option = self.option;
-        const [w, h] = [
+        const [w, h, top] = [
             option.width - option.margin.left - option.margin.right,
-            option.height - option.margin.top - option.margin.bottom,
+            option.height - option.margin.top - option.margin.bottom - option.buffer,
+            option.margin.top + option.buffer / 2
         ];
         // define axis scale
         let {x, y} = self.getScale(w, h);
-
         self.canvas = self.container.append<any>('canvas')
             .style('position', 'absolute')
             .style('left', `${option.margin.left}px`)
-            .style('top', `${option.margin.top}px`)
+            .style('top', `${top}px`)
             .attr('width', w)
             .attr('height', h);
 
@@ -111,17 +115,8 @@ export class LineChartCtx extends pip.Events {
         context.beginPath();
         lineCanvas(self.data[0].timeseries);
         context.lineWidth = 1;
-        // context.strokeStyle = colorSchemes.getColorCode('dname');
-        context.strokeStyle = 'rgb(66, 103, 118, 0.7)';
+        context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
         context.stroke();
-
-        // self.svg = self.container.append<SVGElement>('svg')
-        //     .style('position', 'absolute')
-        //     .style('left', 0)
-        //     .style('top', 0)
-        //     .attr('class', 'multi-line-chart-ctx')
-        //     .attr('width', self.option.width)
-        //     .attr('height', self.option.height);
 
         self.svg = self.container.append<SVGElement>('svg')
             .style('position', 'absolute')
@@ -130,6 +125,19 @@ export class LineChartCtx extends pip.Events {
             .attr('class', 'multi-line-chart-ctx')
             .attr('width', self.option.width)
             .attr('height', self.option.height);
+
+        // function used to plot area
+        let area = d3.area<[number, number]>()
+        .x(function(d) { return x(d[0]); })
+        .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
+        .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
+
+        // function used to plot line
+        let line = d3.line<[number, number]>()
+            .x(d => x(d[0]))
+            .y(d => y(d[1]));
+
+        let highlightUpdate = self.addHighlights(h, x, line, area);
 
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
@@ -151,37 +159,7 @@ export class LineChartCtx extends pip.Events {
                 .call(yAxis.ticks(0, ',f'));
         }
 
-        // function used to plot area
-        let area = d3.area<[number, number]>()
-            .x(function(d) { return x(d[0]); })
-            .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
-            .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
-
-        // function used to plot line
-        let line = d3.line<[number, number]>()
-            .x(d => x(d[0]))
-            .y(d => y(d[1]));
-
-        // let lineG = chart.append('g').selectAll('.line')
-        //     .data(self.data)
-        //     .enter()
-        //     .append('path')
-        //     .attr('class', 'line')
-        //     .style('stroke', d => colorSchemes.getColorCode('dname'))
-        //     .attr('d', d => line(d.timeseries));
-
-        // let areaG = chart.append('g')
-        //     .selectAll('.area')
-        //     .data(self.data)
-        //     .enter()
-        //     .append('path')
-        //     .attr('class', 'area')
-        //     .attr('d', d => area(d.timeseries))
-        //     .attr('fill', d => colorSchemes.getColorCode('dname'));
-
-        let highlightUpdate = self.addHighlights(h, x, line, area);
-
-        let {brush, bUpdate} = self.addBrush(chart, w, h, x);
+        let {brush, bUpdate} = self.addBrush(chart, w, h + option.buffer, x);
         brush.on('brush end', brushHandler);
 
         // events
@@ -199,6 +177,8 @@ export class LineChartCtx extends pip.Events {
         function brushHandler() {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
             let s = d3.event.selection || x.range();
+
+
             pip.content.trigger('ctx:brush', {
                 xMove: [s[0], s[1]],
                 xDomain: [x.invert(s[0]), x.invert(s[1])],
@@ -263,6 +243,7 @@ export class LineChartCtx extends pip.Events {
     }
 
     private addBrush(chart, w, h, x) {
+
         let brush = d3.brushX()
             .extent([[0, 0], [w, h]]);
 
@@ -294,9 +275,10 @@ export class LineChartCtx extends pip.Events {
             return colorSchemes.severity5[level];
         };
 
+
         let highlightG = self.svg.append<SVGGElement>('g')
             .attr('class', 'highlights')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
+            .attr('transform', `translate(${option.margin.left},${option.margin.top + option.buffer / 2})`);
 
         let update = function(windows, lineData, name) {
             let u = highlightG

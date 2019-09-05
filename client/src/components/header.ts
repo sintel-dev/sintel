@@ -13,15 +13,16 @@ class Header {
         project: ko.observable<{index: number, name: string}>(null),
         experiment: ko.observable<{index: number, name: string}>(null)
     };
+    public empDetails =  ko.observable(null);
 
     private expList;
 
     constructor(eleId: string) {
         let self = this;
-
         // initialize Knockout Variables
         ko.applyBindings(self, $(eleId)[0]);
 
+        // self.empDetails("Sergiu");
         server.experiments.read<RSI.Response>().done( (data: RSI.Experiment[]) => {
             self.expList = data;
 

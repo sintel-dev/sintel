@@ -8,6 +8,7 @@ import { LineChartCtx } from './vis/linechart-ctx';
 import { LineChartFocus } from './vis/linechart-focus';
 import { PeriodChart} from './vis/period-chart';
 
+import server from '../services/rest-server';
 
 interface CtxCharts {
     [index: string]: LineChartCtx;
@@ -21,12 +22,26 @@ class Content {
 
     public ctxs = ko.observableArray<string>([]);
     public focus = ko.observable<string>('');
+    public modes = ko.observableArray<string>([]);
+    // public empDetails = ko.observable<string>('ceva');
 
     private data: LineChartDataEle[];
 
     private focusChart: LineChartFocus;
     private ctxCharts: CtxCharts = {};
     private periodCharts: PeriodCharts = {};
+
+    private eventInfo: RSI.Event;
+    private commentInfo: RSI.Comment;
+    public event = ko.observable('');
+
+    public datarun = ko.observable('');
+    public dataset = ko.observable('');
+    public eventFrom = ko.observable('');
+    public eventTo = ko.observable('');
+    public level = ko.observable('None');
+    public transcript = ko.observable('');
+    public comment = '';
 
     private config = {
         speed: 500,   // box animation duration,
@@ -43,9 +58,9 @@ class Content {
 
         // default select 0
         $('.chart-focus-container').height(self.config.focusHeight);
-        $('.chart-focus .plot').height(self.config.focusHeight - 45);
+        $('.chart-focus .plot').height(self.config.focusHeight); // - 45);
         $('.chart-ctx-container').height(self.config.ctxHeight);
-        $('.pchart').height(self.config.periodHeight);
+        $('.pchart').height($('.connectedSortable').height() + 'px');
     }
 
     // handle events coming from other components
@@ -54,15 +69,17 @@ class Content {
 
         pip.content.on('experiment:change', (exp: RSI.Experiment) => {
             self._ToggleLoadingOverlay();
+
             dataProcessor.loadData(exp).then((data: LineChartDataEle[]) => {
                 self.data = data;
                 self._ToggleLoadingOverlay();
                 self.ctxs(_.map(data, d => d.dataset.name));
+
                 if (self.focus() === '') {
                     self.focus(data[0].dataset.name);
-                    $($(`.chart-ctx .title`)[0]).css('background-color', 'bisque');
+                    $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active');
                 } else {
-                    $($(`.chart-ctx [name=title-${self.focus()}]`)).css('background-color', 'bisque');
+                    $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
                 }
                 self._visualize();
             });
@@ -87,11 +104,138 @@ class Content {
                 ct.trigger('event:update');
             });
         });
+
         pip.content.on('event:modify', (evt) => {
             self.focusChart.trigger('event:modify', evt);
         });
+
+        $('input[name="level"]').change(function() {
+            let val = this.getAttribute('value');
+            self.level(val);
+        });
+
+        pip.content.on('comment:new', (eventInfo: RSI.Event) => {
+            this.update(eventInfo);
+        });
+
+        pip.content.on('comment:start', (eventInfo: RSI.Event) => {
+            this.update(eventInfo);
+        });
     }
 
+    private showDatasetInfo(visible) {
+        visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+    }
+
+    private async update(eventInfo: RSI.Event) {
+        if (eventInfo.id === 'new') {
+            $('#comment').val('');
+        } else {
+            this.commentInfo = await<any> server.comments.read({}, {
+                event: eventInfo.id
+            });
+            $('#comment').val(this.commentInfo.text);
+        }
+
+        this.eventInfo = eventInfo;
+
+        this.event(eventInfo.id);
+        this.datarun(eventInfo.datarun);
+        this.dataset(eventInfo.dataset);
+        this.eventFrom(new Date(eventInfo.start_time).toUTCString());
+        this.eventTo(new Date(eventInfo.stop_time).toUTCString());
+        this.level(this.fromLevelToScore(eventInfo.score));
+
+        this.showDatasetInfo(true);
+    }
+
+    private fromLevelToScore(score: number): string {
+        let level: number | string = 0;
+        for (let i = 0; i <= 4; i += 1) {
+            if (score > i) { level += 1; }
+        }
+        if (level === 0) { level = 'None'; }
+        $('input[name="level"]').removeAttr('check');
+        $('input[name="level"]').removeClass('active');
+        $(`input[name="level"][value="${level}"]`).attr('check');
+        $(`input[name="level"][value="${level}"]`).addClass('active');
+
+        return String(level);
+    }
+
+    private fromScoreToLevel(level: string): number {
+        if (level === 'None') {
+            return 0;
+        } else {
+            return +level;
+        }
+    }
+
+    public remove() {
+        let self = this;
+        server.events.del<RSI.Response>(self.event()).done(() => {
+            this.showDatasetInfo(false);
+            pip.content.trigger('event:update');
+            // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+        });
+    }
+
+    public modify() {
+        let self = this;
+        pip.content.trigger('event:modify', self.eventInfo);
+        // pip.content.trigger('linechart:highlight:modify', {
+        //     datarun: self.eventInfo.datarun,
+        //     event: self.eventInfo
+        // });
+        $('#datasetDescription').removeClass('active');
+    }
+
+    public save() {
+        let self = this;
+
+        if (self.event() === 'new') {
+            // create new
+            server.events.create<RSI.Response>({
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                this.showDatasetInfo(false);
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                server.comments.create({
+                    event: eid,
+                    text: $('#comment').val()
+                });
+            });
+        } else {
+            // update existing
+            server.events.update<RSI.Response>(self.event(), {
+                start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+                stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+                score: self.fromScoreToLevel(self.level()),
+                datarun: self.eventInfo.datarun
+            }).done(eid => {
+                this.showDatasetInfo(false);
+                pip.content.trigger('event:update');
+                // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+
+                if (self.commentInfo.id === 'new') {
+                    server.comments.create({
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                } else {
+                    server.comments.update(self.commentInfo.id, {
+                        event: eid,
+                        text: $('#comment').val()
+                    });
+                }
+            });
+        }
+    }
 
     // the following public methods are triggered by user interactions
 
@@ -112,21 +256,36 @@ class Content {
                 info: d.period
             }]
         );
-        $(`.chart-ctx .title`).css('background-color', 'white');
-        // console.log($(`.chart-ctx [name=title-${name}]`));
-        $(`.chart-ctx [name=title-${name}]`).css('background-color', 'bisque');
+        $(`.chart-ctx .title`).parent().removeClass('ctx-active');
+        $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active');
     }
 
-    public showMissing() {
+    public showMissing(content, event) {
         let self = this;
-        _.each(self.periodCharts, ct => {
-            ct.option.missing = !ct.option.missing;
-            let _duration = ct.option.duration;
-            ct.option.duration = 0;
-            ct.trigger('update', null);
-            ct.option.duration = _duration;
+        const isChecked = event.target.checked;
 
+        _.each(self.periodCharts, periodChartInstance => {
+
+            // ovveride the missing visual flag for this chart instance.
+            periodChartInstance.option.missing = isChecked;
+
+            // this is required to prevent the update animation from easing in.
+            // we want the chart data paths to remain static, but at the same time,
+            // we want to rerender the chart.
+            let _duration = periodChartInstance.option.duration;
+            periodChartInstance.option.duration = 0;
+
+            // rerender each updated chart, to show the missing period ranges.
+            periodChartInstance.trigger('update', null);
+
+            periodChartInstance.option.duration = _duration;
         });
+
+        return true;
+    }
+
+    public eventsHandler(content, event) {
+        return true;
     }
 
     public backward() {
@@ -139,16 +298,40 @@ class Content {
         }
     }
 
-    public showPrediction() {
-        this.focusChart.trigger('showPrediction');
+    public addEventMode(content, event) {
+        const isChecked = event.target.checked;
+        const zoomModeInput = <HTMLInputElement>document.querySelector('#zoomMode');
+
+        if (isChecked) {
+            zoomModeInput.checked = false;
+            this.focusChart.trigger('zoomPanMode', false);
+        }
+
+        this.focusChart.trigger('addEventMode', isChecked);
+        return true;
     }
 
-    public addEventMode() {
-        this.focusChart.trigger('addEventMode');
+    public showPrediction(content, event) {
+        const isChecked = event.target.checked;
+        this.focusChart.trigger('showPrediction', isChecked);
+        return true;
     }
 
-    public zoomPanMode() {
-        this.focusChart.trigger('zoomPanMode');
+    public zoomPanMode(content, event) {
+        const isChecked = event.target.checked;
+        const eventModeInput = <HTMLInputElement>document.querySelector('#eventMode');
+        if (isChecked) {
+            eventModeInput.checked = false;
+            this.focusChart.trigger('addEventMode', false);
+        }
+
+        this.focusChart.trigger('zoomPanMode', isChecked);
+        return true;
+    }
+
+    public zooming(factor){
+        this.focusChart.trigger('zooming', factor);
+        return true;
     }
 
     private _visualize() {
@@ -177,7 +360,7 @@ class Content {
                         offset: 0,
                         xAxis: false,
                         yAxis: false,
-                        margin: { top: 5, right: 5, bottom: 5, left: 40 },
+                        margin: { top: 9, right: 5, bottom: 9, left: 3 },
                         xDomain: xDomain
                     }
                 );
@@ -188,11 +371,11 @@ class Content {
                 $('.chart-focus .plot')[0],
                 [data[0]],   // By default, plot the first one
                 {
-                    height: self.config.focusHeight - 45,
+                    height: self.config.focusHeight, // - 45,
                     offset: 0,
                     xAxis: true,
                     yAxis: true,
-                    margin: { top: 5, right: 20, bottom: 30, left: 40 },
+                    margin: { top: 20, right: 20, bottom: 40, left: 40 },
                     xDomain: xDomain
                 }
             );
@@ -202,11 +385,11 @@ class Content {
                 $('#year')[0],
                 [{
                     name: data[0].dataset.name,
-                    info: data[0].period
+                    info: data[0].period,
                 }],
                 {
-                    width: $('.pchart').width() - 60,
-                    nCol: 2
+                    width: $('.pchart').width(),
+                    nCol: 3
                 }
             );
 
@@ -218,7 +401,7 @@ class Content {
                     info: data[0].period[0].children
                 }],
                 {
-                    width: $('.pchart').width() - 60,
+                    width: $('.pchart').width(),
                     nCol: 4
                 }
             );
