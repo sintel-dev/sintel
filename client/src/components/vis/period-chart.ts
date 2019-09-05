@@ -1,6 +1,7 @@
 import * as pip from '../../services/pip-client';
 import { PeriodChartDataEle, LineChartDataEleInfoEle } from './data.interface';
 import { colorSchemes } from '../../services/globals';
+import 'tooltipster';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
@@ -389,6 +390,7 @@ export class PeriodChart extends pip.Events {
             path.append('title')
                 .text(o.name);
 
+
             // create the 'target' svg circles
             let target = _cell.append('g')
                 .attr('class', 'target');
@@ -404,7 +406,6 @@ export class PeriodChart extends pip.Events {
             target.append('circle')
                 .attr('r', targetRadius - ratio / 2)
                 .attr('stroke-width', circleStroke);
-
             target.append('circle')
                 .attr('r', targetRadius - ratio)
                 .attr('stroke-width', circleStroke);
@@ -444,8 +445,79 @@ export class PeriodChart extends pip.Events {
                     self.trigger('select', o);
                     // }
                 })
-                .append('title')
-                .text(o.name);
+                .attr('class', 'svg-tooltip')
+                .attr('title', 'Here we are');
+
+
+                $('.svg-tooltip').tooltipster({
+                    theme: 'tooltipster-punk',
+                    'maxWidth': 270, // set max width of tooltip box
+                    contentAsHTML: true, // set title content to html
+                    trigger: 'custom', // add custom trigger
+                     triggerOpen: { // open tooltip when element is clicked, tapped (mobile) or hovered
+                         click: true,
+                         tap: true,
+                         mouseenter: true
+                         },
+                        triggerClose: { // close tooltip when element is clicked again, tapped or when the mouse leaves it
+                         click: true,
+                         scroll: false, // ensuring that scrolling mobile is not tapping!
+                         tap: true,
+                         mouseleave: true
+                         }
+                });
+
+                // .on('mouseover', function(){
+                //     _cell.select('.svg-tooltip')
+                //         .attr('class', 'svg-tooltip svg-tooltip-visible');
+                // })
+                // .on('mouseout', function(){
+                //     _cell.select('.svg-tooltip')
+                //         .attr('class', 'svg-tooltip');
+                // });
+
+
+                // .append('title')
+                // .text(o.name)
+                // .on('mouseover', function(){
+                //     _cell.append('foreignObject')
+                //         .attr({
+                //             'width': 200,
+                //             'x': 20,
+                //             'y': 20,
+                //             'class': 'svg-tooltip'
+                //         });
+                //         debugger;
+                //     // let div = foreinObject.append('xhtml:div')
+                //     //     .append('div')
+                //     //     .attr({'class':'tooltip'})
+
+                //     // div.append('p')
+                //     //     .html('Here is our testing tooltip')
+                // })
+                // .on('mouseout', function(){
+                //     _cell.selectAll('.svg-tooltip').remove();
+                // });
+
+            // const events = ['Investigate', 'Do not investigate', 'Postpone', 'Problem', 'Previously seen', 'Normal', 'TBD']
+
+            // const foreignObject = _cell.append('foreignObject')
+            //     .attr('width', 200)
+            //     .attr('height', 200)
+            //     .attr('x', 0)
+            //     .attr('y', -40);
+
+            // const tooltip = foreignObject.append('xhtml:div').attr('class', 'svg-tooltip');
+            // const ul = tooltip.append('ul');
+
+            // events.map(event => {
+            //     ul.append('li').html(event)
+            // });
+            // tooltip.html('<ul>Events<li>Investigate</li></ul>')
+            // let ul = tooltip.append('ul');
+            // ul.append('li').html('Investigate')
+
+
 
             if (o.level !== 'day') {
                 _cell.append('text')

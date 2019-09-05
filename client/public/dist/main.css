@@ -770,6 +770,17 @@ body {
 .mtv-skin .period-view .calendar-controls {
   color: #fff;
 }
+.mtv-skin .svg-tooltip {
+  background: #676A82;
+}
+.mtv-skin .svg-tooltip li {
+  list-style-type: none;
+  color: #fff;
+  font-size: 13px;
+}
+.mtv-skin .svg-tooltip.svg-tooltip-visible {
+  display: block;
+}
 
 .mtv-skin .wrapper {
   background-color: #23242B;
@@ -1188,6 +1199,17 @@ body {
 }
 .mtv-skin .period-view .calendar-controls {
   color: #fff;
+}
+.mtv-skin .svg-tooltip {
+  background: #676A82;
+}
+.mtv-skin .svg-tooltip li {
+  list-style-type: none;
+  color: #fff;
+  font-size: 13px;
+}
+.mtv-skin .svg-tooltip.svg-tooltip-visible {
+  display: block;
 }
 
 
@@ -1962,6 +1984,17 @@ body {
 }
 .mtv-skin .period-view .calendar-controls {
   color: #fff;
+}
+.mtv-skin .svg-tooltip {
+  background: #676A82;
+}
+.mtv-skin .svg-tooltip li {
+  list-style-type: none;
+  color: #fff;
+  font-size: 13px;
+}
+.mtv-skin .svg-tooltip.svg-tooltip-visible {
+  display: block;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
@@ -2822,6 +2855,17 @@ body {
 }
 .mtv-skin .period-view .calendar-controls {
   color: #fff;
+}
+.mtv-skin .svg-tooltip {
+  background: #676A82;
+}
+.mtv-skin .svg-tooltip li {
+  list-style-type: none;
+  color: #fff;
+  font-size: 13px;
+}
+.mtv-skin .svg-tooltip.svg-tooltip-visible {
+  display: block;
 }
 .main-header nav {
   transition: margin-left 0.3s ease-in-out;
