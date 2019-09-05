@@ -35,7 +35,7 @@ script:
 
 
 deploy:
-  # Automatically build and deploy documentation to GitHub Pages after every
+  # Automatically build and deploy documentation to GitHub Pages
   - provider: pages
     skip-cleanup: true
     github-token: "$GITHUB_TOKEN"
