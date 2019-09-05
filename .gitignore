@@ -31,11 +31,11 @@ wheels/
 
 # Client
 node_modules/
-client/public/lib/
-!client/public/dist/
-client/public/dist/css/
-client/public/dist/*.map
-client/public/themes/
+!/client/public/dist/
+/client/public/dist/*
+!/client/public/dist/*.min.css
+!/client/public/dist/*.min.js
+/client/public/themes/
 npm-debug.log
 package-lock.json
 coverage/
