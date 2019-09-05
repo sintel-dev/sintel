@@ -1,6 +1,7 @@
 import * as pip from '../services/pip-client';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
+import 'select2';
 import * as RSI from '../services/rest-server.interface';
 import dataProcessor from '../services/data-processor';
 import { LineChartDataEle } from './vis/data.interface';
@@ -288,6 +289,12 @@ class Content {
 
     private showDatasetInfo(visible) {
         visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+        if (visible) {
+            $('#datasetDescription').addClass('active');
+            $('#selectLevel').select2({	minimumResultsForSearch: Infinity });
+        } else {
+            $('#datasetDescription').removeClass('active');
+        }
     }
 
     private async update(eventInfo: RSI.Event) {
