@@ -23,6 +23,15 @@ class Content {
     public ctxs = ko.observableArray<string>([]);
     public focus = ko.observable<string>('');
     public modes = ko.observableArray<string>([]);
+    public event = ko.observable('');
+
+    public datarun = ko.observable('');
+    public dataset = ko.observable('');
+    public eventFrom = ko.observable('');
+    public eventTo = ko.observable('');
+    public level = ko.observable('None');
+    public transcript = ko.observable('');
+    public comment = '';
     // public empDetails = ko.observable<string>('ceva');
 
     private data: LineChartDataEle[];
@@ -33,15 +42,6 @@ class Content {
 
     private eventInfo: RSI.Event;
     private commentInfo: RSI.Comment;
-    public event = ko.observable('');
-
-    public datarun = ko.observable('');
-    public dataset = ko.observable('');
-    public eventFrom = ko.observable('');
-    public eventTo = ko.observable('');
-    public level = ko.observable('None');
-    public transcript = ko.observable('');
-    public comment = '';
 
     private config = {
         speed: 500,   // box animation duration,
@@ -121,54 +121,6 @@ class Content {
         pip.content.on('comment:start', (eventInfo: RSI.Event) => {
             this.update(eventInfo);
         });
-    }
-
-    private showDatasetInfo(visible) {
-        visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
-    }
-
-    private async update(eventInfo: RSI.Event) {
-        if (eventInfo.id === 'new') {
-            $('#comment').val('');
-        } else {
-            this.commentInfo = await<any> server.comments.read({}, {
-                event: eventInfo.id
-            });
-            $('#comment').val(this.commentInfo.text);
-        }
-
-        this.eventInfo = eventInfo;
-
-        this.event(eventInfo.id);
-        this.datarun(eventInfo.datarun);
-        this.dataset(eventInfo.dataset);
-        this.eventFrom(new Date(eventInfo.start_time).toUTCString());
-        this.eventTo(new Date(eventInfo.stop_time).toUTCString());
-        this.level(this.fromLevelToScore(eventInfo.score));
-
-        this.showDatasetInfo(true);
-    }
-
-    private fromLevelToScore(score: number): string {
-        let level: number | string = 0;
-        for (let i = 0; i <= 4; i += 1) {
-            if (score > i) { level += 1; }
-        }
-        if (level === 0) { level = 'None'; }
-        $('input[name="level"]').removeAttr('check');
-        $('input[name="level"]').removeClass('active');
-        $(`input[name="level"][value="${level}"]`).attr('check');
-        $(`input[name="level"][value="${level}"]`).addClass('active');
-
-        return String(level);
-    }
-
-    private fromScoreToLevel(level: string): number {
-        if (level === 'None') {
-            return 0;
-        } else {
-            return +level;
-        }
     }
 
     public remove() {
@@ -329,9 +281,57 @@ class Content {
         return true;
     }
 
-    public zooming(factor){
+    public zooming(factor) {
         this.focusChart.trigger('zooming', factor);
         return true;
+    }
+
+    private showDatasetInfo(visible) {
+        visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+    }
+
+    private async update(eventInfo: RSI.Event) {
+        if (eventInfo.id === 'new') {
+            $('#comment').val('');
+        } else {
+            this.commentInfo = await<any> server.comments.read({}, {
+                event: eventInfo.id
+            });
+            $('#comment').val(this.commentInfo.text);
+        }
+
+        this.eventInfo = eventInfo;
+
+        this.event(eventInfo.id);
+        this.datarun(eventInfo.datarun);
+        this.dataset(eventInfo.dataset);
+        this.eventFrom(new Date(eventInfo.start_time).toUTCString());
+        this.eventTo(new Date(eventInfo.stop_time).toUTCString());
+        this.level(this.fromLevelToScore(eventInfo.score));
+
+        this.showDatasetInfo(true);
+    }
+
+    private fromLevelToScore(score: number): string {
+        let level: number | string = 0;
+        for (let i = 0; i <= 4; i += 1) {
+            if (score > i) { level += 1; }
+        }
+        if (level === 0) { level = 'None'; }
+        $('input[name="level"]').removeAttr('check');
+        $('input[name="level"]').removeClass('active');
+        $(`input[name="level"][value="${level}"]`).attr('check');
+        $(`input[name="level"][value="${level}"]`).addClass('active');
+
+        return String(level);
+    }
+
+    private fromScoreToLevel(level: string): number {
+        if (level === 'None') {
+            return 0;
+        } else {
+            return +level;
+        }
     }
 
     private _visualize() {

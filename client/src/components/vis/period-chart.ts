@@ -22,7 +22,7 @@ export interface Option {
     circleStroke?: number; // used to calculate circle target stroke
     scaleFactor?: number;
     marginRatio?: number;
-    dayLevelTranslate?: number
+    dayLevelTranslate?: number;
 }
 
 export class PeriodChart extends pip.Events {
@@ -74,8 +74,9 @@ export class PeriodChart extends pip.Events {
         self.option.marginRatio = self.option.size / 15 * self.option.scaleFactor; // each cell bottom margin
 
         if (self.option.height === null) {
-            const rowsCount =  Math.ceil(data[0].info.length / self.option.nCol)
-            self.option.height = self.option.size * rowsCount + (rowsCount - 1) * self.option.marginRatio + margin.top + margin.bottom; // adding text offset height
+            const rowsCount =  Math.ceil(data[0].info.length / self.option.nCol);
+            self.option.height = self.option.size * rowsCount + (rowsCount - 1)
+                * self.option.marginRatio + margin.top + margin.bottom; // adding text offset height
         } else {
             self.option.height = self.defaultHeight;
         }
@@ -194,11 +195,11 @@ export class PeriodChart extends pip.Events {
                     .merge(_g as any)
                     .attr('class', `feature-cell feature-cell-${data.name}`)
                     .attr('transform', d => {
-                        if(d.level === 'day') {
+                        if (d.level === 'day') {
                             return `
                                 translate(
                                     ${d.col * size + size / 2},
-                                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio*d.row}),
+                                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}),
                                 scale(${self.option.scaleFactor})`;
                         }
                         return `
@@ -341,8 +342,8 @@ export class PeriodChart extends pip.Events {
                 .append('g')
                 .attr('class', `feature-cell feature-cell-${data.name}`)
                 .attr('transform', d => {
-                    if(d.level === 'day') {
-                        return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio*d.row}), scale(${self.option.scaleFactor})`;
+                    if (d.level === 'day') {
+                        return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}), scale(${self.option.scaleFactor})`;
                     }
                     return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}), scale(${self.option.scaleFactor})`;
                 })
@@ -453,7 +454,7 @@ export class PeriodChart extends pip.Events {
                     .attr('x', -14)
                     .text(o.name)
                     .attr('y', (data, arg, svgEls) => {
-                        const textOffset = svgEls[0].getBBox().height
+                        const textOffset = svgEls[0].getBBox().height;
                         return size / 2 + textOffset;
                     });
             }

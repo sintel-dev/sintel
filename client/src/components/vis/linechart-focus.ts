@@ -397,7 +397,7 @@ export class LineChartFocus extends pip.Events {
 
         function clickZoom(factor) {
             let k = savedZoom.k + factor;
-            debugger;
+            // debugger;
             const selection = d3.transition().duration(250);
             zoom.scaleTo(selection, k);
         }
