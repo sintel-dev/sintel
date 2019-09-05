@@ -6,6 +6,7 @@ from pymongo.errors import BulkWriteError
 
 LOGGER = logging.getLogger(__name__)
 
+
 class MongoDB:
 
     def __init__(self, address='localhost', port=27017, db='mtv'):

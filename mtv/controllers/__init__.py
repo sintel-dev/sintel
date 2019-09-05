@@ -1,4 +1,4 @@
-from . import comment, data, datarun, dataset, event, pipeline, test, experiment
+from . import comment, data, datarun, dataset, event, experiment, pipeline, test
 
 __all__ = [
     'comment',

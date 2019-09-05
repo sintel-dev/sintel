@@ -8,6 +8,7 @@ from mtv import model
 
 LOGGER = logging.getLogger(__name__)
 
+
 class Data(Resource):
     def get(self):
         ''' Return data for visualization.
@@ -50,7 +51,8 @@ class Data(Resource):
             })
 
             # fetch raw
-            docs = model.Raw.find(dataset=datarun.dataset.name).order_by('+year')
+            docs = model.Raw.find(
+                dataset=datarun.dataset.name).order_by('+year')
             raw = list()
             for doc in docs:
                 raw.append({
@@ -79,8 +81,6 @@ class Data(Resource):
                 })
             events.append(event)
 
-
-
         return {
             'datasets': datasets,
             'dataruns': dataruns,
@@ -88,4 +88,3 @@ class Data(Resource):
             'predictions': predictions,
             'events': events
         }
-    

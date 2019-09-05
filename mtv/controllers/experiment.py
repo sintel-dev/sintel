@@ -1,6 +1,5 @@
 import logging
 
-from bson import ObjectId
 from flask_restful import Resource
 
 from mtv import model
@@ -10,8 +9,8 @@ LOGGER = logging.getLogger(__name__)
 
 class Experiment(Resource):
     def get(self, experiment):
-        """ Return the specified experiment info 
-        
+        """ Return the specified experiment info
+
         GET /api/v1/experiments/<string:experiment>/
         """
 
@@ -45,10 +44,10 @@ class Experiments(Resource):
 
     def get(self):
         """ Return experiment list
-            
-        GET /api/v1/experiments/ 
+
+        GET /api/v1/experiments/
         """
-        
+
         documents = model.Experiment.find()
 
         docs = list()
@@ -67,5 +66,5 @@ class Experiments(Resource):
                 'end_time': document.start_time.isoformat(),
                 'created_by': document.created_by
             })
-        
+
         return docs

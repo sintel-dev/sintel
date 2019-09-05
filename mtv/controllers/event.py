@@ -97,8 +97,8 @@ class Events(Resource):
             "datarun": body.get('datarun', None)
         }
 
-        if (e['start_time'] is None or e['stop_time'] is None or
-                e['score'] is None or e['datarun'] is None):
+        if (e['start_time'] is None or e['stop_time'] is None
+                or e['score'] is None or e['datarun'] is None):
             LOGGER.exception('incorrect event information creating new event')
             raise ValueError
 

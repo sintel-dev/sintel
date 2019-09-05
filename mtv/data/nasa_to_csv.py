@@ -55,7 +55,6 @@ def main():
     data_dir = 'raw-data/nasa/raw'
 
     # process every file
-    files = []
     for (dirpath, dirnames, filenames) in os.walk(data_dir):
         for name in filenames:
             file_path = os.path.join(dirpath, name)

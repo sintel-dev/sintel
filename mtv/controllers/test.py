@@ -1,4 +1,5 @@
 import logging
+
 from flask_restful import Resource
 
 LOGGER = logging.getLogger(__name__)

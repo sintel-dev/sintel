@@ -1,13 +1,10 @@
 import logging
 import os
 import sys
-import numpy as np
-import pandas as pd
 
-from datetime import datetime
+import pandas as pd
 from flask import Flask
 from flask_cors import CORS
-
 from gevent.pywsgi import WSGIServer
 from mongoengine import connect
 from termcolor import colored
@@ -15,9 +12,10 @@ from termcolor import colored
 from mtv.data.mdb import MongoDB
 from mtv.data.processor import to_mongo_docs
 from mtv.routes import add_routes
-from mtv.utils import import_object, get_files
+from mtv.utils import get_files, import_object
 
 LOGGER = logging.getLogger(__name__)
+
 
 class MTVExplorer:
 
@@ -71,11 +69,11 @@ class MTVExplorer:
         LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
                             'yellow'))
 
-        LOGGER.info(colored('Available on:', 'yellow') +
-                    '  http://0.0.0.0:' + colored(port, 'green'))
+        LOGGER.info(colored('Available on:', 'yellow')
+                    + '  http://0.0.0.0:' + colored(port, 'green'))
 
         if env == 'development':
-            app.run(debug = True, port=port)
+            app.run(debug=True, port=port)
 
         elif env == 'production':
             server = WSGIServer(('0.0.0.0', port), app, log=None)
@@ -100,7 +98,7 @@ class MTVExplorer:
 
         if not os.path.exists(path):
             LOGGER.exception('Data folder path "{}" does not exist'
-                            .format(path))
+                             .format(path))
             raise
 
         files = get_files(path)
@@ -121,7 +119,7 @@ class MTVExplorer:
                     'value': data[value_column].values,
                 }
                 data = pd.DataFrame(columns)[['timestamp', 'value']]
-            
+
             data['timestamp'] = data['timestamp'].astype(int)
             data['value'] = data['value'].astype(float)
             data = data.sort_values('timestamp').set_index('timestamp')
@@ -130,7 +128,7 @@ class MTVExplorer:
                 data = data.loc[start:]
             if (stop is not None):
                 data = data.loc[:stop]
-            
+
             docs = to_mongo_docs(file[0:-4], data, interval)
 
             if docs:

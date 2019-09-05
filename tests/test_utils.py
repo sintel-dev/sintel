@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 class TestUtils(object):
 
     def setUp(self):

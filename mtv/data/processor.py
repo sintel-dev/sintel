@@ -1,26 +1,16 @@
-import csv
 import logging
-import os
-import time
-from bson.int64 import Int64
 from calendar import monthrange
 from datetime import datetime, timezone
-
-import numpy as np
-import pandas as pd
-
-from mtv.data.mdb import MongoDB
-from mtv.utils import get_files
 
 LOGGER = logging.getLogger(__name__)
 
 
 def to_mongo_docs(name, data, interval=30, utc=True):
     # check
-    if (not (60 % interval == 0 or interval % 60 == 0) ):
+    if (not (60 % interval == 0 or interval % 60 == 0)):
         print('60 should be divisible by interval.')
         return None
-    
+
     day_bin_num = 24 * 60 // interval
 
     if (utc):
@@ -49,14 +39,18 @@ def to_mongo_docs(name, data, interval=30, utc=True):
         for m in range(1, 12 + 1):
             days = []
             for d in range(monthrange(y, m)[1]):
-                days.append({'means':[], 'counts':[]})
+                days.append({'means': [], 'counts': []})
                 for n in range(day_bin_num):
                     if (utc):
-                        st = datetime(y,m,d+1, tzinfo=timezone.utc).timestamp() + n * interval * 60
-                        ed = datetime(y,m,d+1, tzinfo=timezone.utc).timestamp() + (n + 1) * interval * 60
+                        st = datetime(
+                            y, m, d + 1, tzinfo=timezone.utc).timestamp() + n * interval * 60
+                        ed = datetime(
+                            y, m, d + 1, tzinfo=timezone.utc).timestamp() + (n + 1) * interval * 60
                     else:
-                        st = datetime(y,m,d+1).timestamp() + n * interval * 60
-                        ed = datetime(y,m,d+1).timestamp() + (n + 1) * interval * 60
+                        st = datetime(
+                            y, m, d + 1).timestamp() + n * interval * 60
+                        ed = datetime(y, m, d + 1).timestamp() + \
+                            (n + 1) * interval * 60
                     mean = data.value.loc[st:ed].mean()
                     count = data.value.loc[st:ed].count()
                     if (count == 0):

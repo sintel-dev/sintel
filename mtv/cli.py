@@ -10,6 +10,7 @@ def _run(explorer, args):
     else:
         explorer.run_module(args.module, args.args)
 
+
 def _add_aggdata(explorer, args):
     explorer.add_aggdata(
         args.path,
@@ -21,6 +22,7 @@ def _add_aggdata(explorer, args):
         args.header,
         args.interval
     )
+
 
 def get_parser():
 
@@ -70,11 +72,23 @@ def get_parser():
                              help='Whether having header in the CSV')
     add_aggdata.add_argument('-I', '--interval', type=int, default=30,
                              help='Interval (minute) used for data aggregation.')
-    add_aggdata.add_argument('--start', type=int, help='Start time, as an integer unix timestamp')
-    add_aggdata.add_argument('--stop', type=int, help='Stop time, as an integer unix timestamp')
-    add_aggdata.add_argument('--col', type=str, default='raw', help='Collection name')
-    add_aggdata.add_argument('path', nargs='?', help='Path to the csv data directory')
-
+    add_aggdata.add_argument(
+        '--start',
+        type=int,
+        help='Start time, as an integer unix timestamp')
+    add_aggdata.add_argument(
+        '--stop',
+        type=int,
+        help='Stop time, as an integer unix timestamp')
+    add_aggdata.add_argument(
+        '--col',
+        type=str,
+        default='raw',
+        help='Collection name')
+    add_aggdata.add_argument(
+        'path',
+        nargs='?',
+        help='Path to the csv data directory')
 
     return parser
 
