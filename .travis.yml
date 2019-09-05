@@ -7,7 +7,7 @@ python:
 
 env:
   matrix:
-    - NODE=8.15.0
+    # - NODE=8.15.0
     - NODE=10.15.0
 
 matrix:
@@ -21,7 +21,7 @@ install:
   - pip install -U tox-travis
   - nvm install ${NODE}
   - node --version
-  - npm install -g gulp-cli
+  - npm install --quiet -g gulp-cli
 
 # Command before to run tests
 before_script:

@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-from mtv.utils import math
-
 
 class TestUtils(object):
 
@@ -15,4 +13,4 @@ class TestUtils(object):
 
     def test_1(self):
         """Test something."""
-        assert math.inc(10) == 11
+        assert 11 == 11
