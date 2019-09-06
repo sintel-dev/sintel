@@ -446,26 +446,40 @@ export class PeriodChart extends pip.Events {
                     // }
                 })
                 .attr('class', 'svg-tooltip')
-                .attr('title', 'Here we are');
+                .attr('title', '["Sarah", "John", "Matthew"]');
 
 
-                $('.svg-tooltip').tooltipster({
-                    theme: 'tooltipster-punk',
-                    'maxWidth': 270, // set max width of tooltip box
-                    contentAsHTML: true, // set title content to html
-                    trigger: 'custom', // add custom trigger
-                     triggerOpen: { // open tooltip when element is clicked, tapped (mobile) or hovered
-                         click: true,
-                         tap: true,
-                         mouseenter: true
-                         },
-                        triggerClose: { // close tooltip when element is clicked again, tapped or when the mouse leaves it
-                         click: true,
-                         scroll: false, // ensuring that scrolling mobile is not tapping!
-                         tap: true,
-                         mouseleave: true
-                         }
-                });
+            $('.svg-tooltip').tooltipster({
+                theme: 'tooltipster-borderless',
+                'maxWidth': 270, // set max width of tooltip box
+                contentAsHTML: true, // set title content to html
+                arrow: false,
+                side: 'right',
+                trigger: 'custom', // add custom trigger
+                triggerOpen: { // open tooltip when element is clicked, tapped (mobile) or hovered
+                    click: true,
+                    tap: true,
+                    mouseenter: true
+                },
+                triggerClose: { // close tooltip when element is clicked again, tapped or when the mouse leaves it
+                    click: true,
+                    scroll: false, // ensuring that scrolling mobile is not tapping!
+                    tap: true,
+                    mouseleave: true
+                },
+
+                functionInit: function (instance, helper) {
+                    var content = instance.content(),
+                        events = JSON.parse(content),
+                        newContent = '<ul><li>Events</li>';
+
+                        events.map(event => {
+                            newContent+= `<li>${event}</li>`;
+                        });
+                    newContent+='</ul>'
+                    instance.content(newContent)
+                }
+            });
 
                 // .on('mouseover', function(){
                 //     _cell.select('.svg-tooltip')
