@@ -1,6 +1,7 @@
 import * as pip from '../../services/pip-client';
 import { PeriodChartDataEle, LineChartDataEleInfoEle } from './data.interface';
 import { colorSchemes } from '../../services/globals';
+import 'tooltipster';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
@@ -389,6 +390,7 @@ export class PeriodChart extends pip.Events {
             path.append('title')
                 .text(o.name);
 
+
             // create the 'target' svg circles
             let target = _cell.append('g')
                 .attr('class', 'target');
@@ -404,7 +406,6 @@ export class PeriodChart extends pip.Events {
             target.append('circle')
                 .attr('r', targetRadius - ratio / 2)
                 .attr('stroke-width', circleStroke);
-
             target.append('circle')
                 .attr('r', targetRadius - ratio)
                 .attr('stroke-width', circleStroke);
@@ -433,19 +434,16 @@ export class PeriodChart extends pip.Events {
                 .attr('fill', 'url(#blueGradient)');
 
             _cell.append('circle')
-                .attr('class', 'radial-cursor')
+                .attr('class', 'radial-cursor svg-tooltip')
                 .attr('cx', 0)
                 .attr('cy', 0)
                 .attr('r', innerRadius)
                 .style('fill', 'white')
                 .style('stroke-width', 0)
                 .on('click', (d) => {
-                    // if (o.children) {
                     self.trigger('select', o);
-                    // }
                 })
-                .append('title')
-                .text(o.name);
+                .attr('title', '["Investigate", "Do not investigate", "Postpone", "Problem", "Previously seen", "Normal", "TBD"]'); //should be gathered from API
 
             if (o.level !== 'day') {
                 _cell.append('text')
@@ -456,6 +454,39 @@ export class PeriodChart extends pip.Events {
                         const textOffset = svgEls[0].getBBox().height
                         return size / 2 + textOffset;
                     });
+            }
+
+            if(o.level === 'year') {
+                $('.svg-tooltip').tooltipster({
+                    'maxWidth': 270,
+                    contentAsHTML: true,
+                    arrow: false,
+                    side: 'right',
+                    trigger: 'custom',
+                    debug: false,
+                    triggerOpen: {
+                        click: true,
+                        tap: true,
+                        mouseenter: true
+                    },
+                    triggerClose: {
+                        click: true,
+                        scroll: false,
+                        tap: true,
+                        mouseleave: true
+                    },
+
+                    functionInit: function (instance, helper) {
+                        const content = instance.content();
+                        const events = JSON.parse(content);
+                        let newContent = '<ul><li class="events">Events</li>';
+                            events.map((event, index) => {
+                                newContent+= `<li><i class="event_${index}"/>${event}</li>`;
+                            });
+                        newContent+='</ul>'
+                        instance.content(newContent)
+                    }
+                });
             }
 
             if (option.missing) {
