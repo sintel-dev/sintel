@@ -434,104 +434,16 @@ export class PeriodChart extends pip.Events {
                 .attr('fill', 'url(#blueGradient)');
 
             _cell.append('circle')
-                .attr('class', 'radial-cursor')
+                .attr('class', 'radial-cursor svg-tooltip')
                 .attr('cx', 0)
                 .attr('cy', 0)
                 .attr('r', innerRadius)
                 .style('fill', 'white')
                 .style('stroke-width', 0)
                 .on('click', (d) => {
-                    // if (o.children) {
                     self.trigger('select', o);
-                    // }
                 })
-                .attr('class', 'svg-tooltip')
-                .attr('title', '["Sarah", "John", "Matthew"]');
-
-
-            $('.svg-tooltip').tooltipster({
-                theme: 'tooltipster-borderless',
-                'maxWidth': 270, // set max width of tooltip box
-                contentAsHTML: true, // set title content to html
-                arrow: false,
-                side: 'right',
-                trigger: 'custom', // add custom trigger
-                triggerOpen: { // open tooltip when element is clicked, tapped (mobile) or hovered
-                    click: true,
-                    tap: true,
-                    mouseenter: true
-                },
-                triggerClose: { // close tooltip when element is clicked again, tapped or when the mouse leaves it
-                    click: true,
-                    scroll: false, // ensuring that scrolling mobile is not tapping!
-                    tap: true,
-                    mouseleave: true
-                },
-
-                functionInit: function (instance, helper) {
-                    var content = instance.content(),
-                        events = JSON.parse(content),
-                        newContent = '<ul><li>Events</li>';
-
-                        events.map(event => {
-                            newContent+= `<li>${event}</li>`;
-                        });
-                    newContent+='</ul>'
-                    instance.content(newContent)
-                }
-            });
-
-                // .on('mouseover', function(){
-                //     _cell.select('.svg-tooltip')
-                //         .attr('class', 'svg-tooltip svg-tooltip-visible');
-                // })
-                // .on('mouseout', function(){
-                //     _cell.select('.svg-tooltip')
-                //         .attr('class', 'svg-tooltip');
-                // });
-
-
-                // .append('title')
-                // .text(o.name)
-                // .on('mouseover', function(){
-                //     _cell.append('foreignObject')
-                //         .attr({
-                //             'width': 200,
-                //             'x': 20,
-                //             'y': 20,
-                //             'class': 'svg-tooltip'
-                //         });
-                //         debugger;
-                //     // let div = foreinObject.append('xhtml:div')
-                //     //     .append('div')
-                //     //     .attr({'class':'tooltip'})
-
-                //     // div.append('p')
-                //     //     .html('Here is our testing tooltip')
-                // })
-                // .on('mouseout', function(){
-                //     _cell.selectAll('.svg-tooltip').remove();
-                // });
-
-            // const events = ['Investigate', 'Do not investigate', 'Postpone', 'Problem', 'Previously seen', 'Normal', 'TBD']
-
-            // const foreignObject = _cell.append('foreignObject')
-            //     .attr('width', 200)
-            //     .attr('height', 200)
-            //     .attr('x', 0)
-            //     .attr('y', -40);
-
-            // const tooltip = foreignObject.append('xhtml:div').attr('class', 'svg-tooltip');
-            // const ul = tooltip.append('ul');
-
-            // events.map(event => {
-            //     ul.append('li').html(event)
-            // });
-            // tooltip.html('<ul>Events<li>Investigate</li></ul>')
-            // let ul = tooltip.append('ul');
-            // ul.append('li').html('Investigate')
-
-
+                .attr('title', '["Investigate", "Do not investigate", "Postpone", "Problem", "Previously seen", "Normal", "TBD"]'); //should be gathered from API
 
             if (o.level !== 'day') {
                 _cell.append('text')
@@ -542,6 +454,39 @@ export class PeriodChart extends pip.Events {
                         const textOffset = svgEls[0].getBBox().height
                         return size / 2 + textOffset;
                     });
+            }
+
+            if(o.level === 'year') {
+                $('.svg-tooltip').tooltipster({
+                    'maxWidth': 270,
+                    contentAsHTML: true,
+                    arrow: false,
+                    side: 'right',
+                    trigger: 'custom',
+                    debug: false,
+                    triggerOpen: {
+                        click: true,
+                        tap: true,
+                        mouseenter: true
+                    },
+                    triggerClose: {
+                        click: true,
+                        scroll: false,
+                        tap: true,
+                        mouseleave: true
+                    },
+
+                    functionInit: function (instance, helper) {
+                        const content = instance.content();
+                        const events = JSON.parse(content);
+                        let newContent = '<ul><li class="events">Events</li>';
+                            events.map((event, index) => {
+                                newContent+= `<li><i class="event_${index}"/>${event}</li>`;
+                            });
+                        newContent+='</ul>'
+                        instance.content(newContent)
+                    }
+                });
             }
 
             if (option.missing) {

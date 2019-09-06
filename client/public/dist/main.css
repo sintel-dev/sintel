@@ -3370,6 +3370,61 @@ body {
   border-bottom: transparent;
 }
 
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style-type: none;
+}
+
+.tooltipster-content {
+  background: #676A82;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 10px 5px 10px;
+  border-radius: 4px;
+}
+.tooltipster-content li {
+  padding-left: 7px;
+  padding-bottom: 5px;
+}
+.tooltipster-content li.events {
+  padding-left: 0;
+  padding-bottom: 8px;
+}
+.tooltipster-content li i {
+  width: 7px;
+  height: 7px;
+  border-radius: 100%;
+  vertical-align: top;
+  display: inline-block;
+  margin-right: 6px;
+  margin-top: 5px;
+}
+.tooltipster-content li i.event_0 {
+  background: #FFCD00;
+}
+.tooltipster-content li i.event_1 {
+  background: #7CA8FF;
+}
+.tooltipster-content li i.event_2 {
+  background: #A042FF;
+}
+.tooltipster-content li i.event_3 {
+  background: #F64242;
+}
+.tooltipster-content li i.event_4 {
+  background: #F5FF00;
+}
+.tooltipster-content li i.event_5 {
+  background: #45F642;
+}
+.tooltipster-content li i.event_6 {
+  background: #C7C7C7;
+}
+
 .multi-line-chart-focus .text-sm,
 .multi-line-chart-ctx .text-sm {
   font-size: 13px;

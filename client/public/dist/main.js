@@ -58506,7 +58506,7 @@ var PeriodChart = (function (_super) {
                 .attr('r', strokeWidth)
                 .attr('fill', 'url(#blueGradient)');
             _cell.append('circle')
-                .attr('class', 'radial-cursor')
+                .attr('class', 'radial-cursor svg-tooltip')
                 .attr('cx', 0)
                 .attr('cy', 0)
                 .attr('r', innerRadius)
@@ -58515,35 +58515,7 @@ var PeriodChart = (function (_super) {
                 .on('click', function (d) {
                 self.trigger('select', o);
             })
-                .attr('class', 'svg-tooltip')
-                .attr('title', '["Sarah", "John", "Matthew"]');
-            $('.svg-tooltip').tooltipster({
-                theme: 'tooltipster-borderless',
-                'maxWidth': 270,
-                contentAsHTML: true,
-                arrow: false,
-                side: 'right',
-                trigger: 'custom',
-                triggerOpen: {
-                    click: true,
-                    tap: true,
-                    mouseenter: true
-                },
-                triggerClose: {
-                    click: true,
-                    scroll: false,
-                    tap: true,
-                    mouseleave: true
-                },
-                functionInit: function (instance, helper) {
-                    var content = instance.content(), events = JSON.parse(content), newContent = '<ul><li>Events</li>';
-                    events.map(function (event) {
-                        newContent += "<li>" + event + "</li>";
-                    });
-                    newContent += '</ul>';
-                    instance.content(newContent);
-                }
-            });
+                .attr('title', '["Investigate", "Do not investigate", "Postpone", "Problem", "Previously seen", "Normal", "TBD"]');
             if (o.level !== 'day') {
                 _cell.append('text')
                     .attr('class', 'radial-text-md')
@@ -58552,6 +58524,37 @@ var PeriodChart = (function (_super) {
                     .attr('y', function (data, arg, svgEls) {
                     var textOffset = svgEls[0].getBBox().height;
                     return size / 2 + textOffset;
+                });
+            }
+            if (o.level === 'year') {
+                $('.svg-tooltip').tooltipster({
+                    'maxWidth': 270,
+                    contentAsHTML: true,
+                    arrow: false,
+                    side: 'right',
+                    trigger: 'custom',
+                    debug: false,
+                    triggerOpen: {
+                        click: true,
+                        tap: true,
+                        mouseenter: true
+                    },
+                    triggerClose: {
+                        click: true,
+                        scroll: false,
+                        tap: true,
+                        mouseleave: true
+                    },
+                    functionInit: function (instance, helper) {
+                        var content = instance.content();
+                        var events = JSON.parse(content);
+                        var newContent = '<ul><li class="events">Events</li>';
+                        events.map(function (event, index) {
+                            newContent += "<li><i class=\"event_" + index + "\"/>" + event + "</li>";
+                        });
+                        newContent += '</ul>';
+                        instance.content(newContent);
+                    }
                 });
             }
             if (option.missing) {
