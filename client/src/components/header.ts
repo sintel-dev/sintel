@@ -56,7 +56,6 @@ class Header {
     public onSelectExperiment(exp: RSI.Experiment, index: number) {
         this.selected.experiment({index, name: exp.name});
         headerConfig.experiment = exp;
-        pip.sidebar.trigger('experiment:change', exp);
         pip.content.trigger('experiment:change', exp);
     }
 
