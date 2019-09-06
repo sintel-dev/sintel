@@ -137,8 +137,6 @@ export class LineChartCtx extends pip.Events {
             .x(d => x(d[0]))
             .y(d => y(d[1]));
 
-        let highlightUpdate = self.addHighlights(h, x, line, area);
-
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
 
@@ -217,9 +215,6 @@ export class LineChartCtx extends pip.Events {
 
             // clean all original windows
             self.svg.selectAll('.window').remove();
-            _.each(self.data, d => {
-                highlightUpdate(d.windows, d.timeseries, 'dname');
-            });
 
             uc.exit().remove();
         }
@@ -236,9 +231,6 @@ export class LineChartCtx extends pip.Events {
 
             self.data[0].windows = newWindows as any;
             self.svg.selectAll('.window').remove();
-            _.each(self.data, (d, i) => {
-                highlightUpdate(d.windows, d.timeseries, 'dname');
-            });
         }
     }
 
@@ -262,62 +254,6 @@ export class LineChartCtx extends pip.Events {
         };
     }
 
-    private addHighlights(h, x, line, area) {
-        let self = this;
-        let option = self.option;
-
-        let scoreColor = (v: number) => {
-            if (v === 0) { return '#777'; }
-            let level = 0;
-            for (let i = 1; i <= 4; i += 1) {
-                if (v > i) { level += 1; }
-            }
-            return colorSchemes.severity5[level];
-        };
-
-
-        let highlightG = self.svg.append<SVGGElement>('g')
-            .attr('class', 'highlights')
-            .attr('transform', `translate(${option.margin.left},${option.margin.top + option.buffer / 2})`);
-
-        let update = function(windows, lineData, name) {
-            let u = highlightG
-                .selectAll<SVGAElement, [number, number, number, string]>(`.window-${name}`)
-                .data(windows, d => d[3]);
-
-            u.enter().append('g')
-                .attr('class', `window window-${name}`)
-                .each(function(d, i) {
-                    d3.select(this).append('path')
-                        .attr('class', 'line-highlight');
-                })
-                .merge(u)
-                .each(function(d, i) {
-                    d3.select(this).select('.line-highlight')
-                        .attr('d', line(_.slice(lineData, d[0], d[1] + 2)));
-                });
-
-            // u.enter().append('g')
-            //     .attr('class', `window window-${name}`)
-            //     .each(function(d, i) {
-            //         d3.select(this).append('path')
-            //             .attr('class', 'area-highlight');
-            //     })
-            //     .merge(u)
-            //     .each(function(d, i) {
-            //         d3.select(this).select('.area-highlight')
-            //             .attr('d', area(_.slice(lineData, d[0], d[1] + 1)));
-            //     });
-
-            u.exit().remove();
-        };
-
-        _.each(self.data, d => {
-            update(d.windows, d.timeseries, 'dname');
-        });
-
-        return update;
-    }
 
     private getScale(w, h) {
         let self = this;
