@@ -444,7 +444,8 @@ export class PeriodChart extends pip.Events {
                 .on('click', (d) => {
                     self.trigger('select', o);
                 })
-                .attr('title', '["Investigate", "Do not investigate", "Postpone", "Problem", "Previously seen", "Normal", "TBD"]'); //should be gathered from API
+                .attr('title', `["Investigate", "Do not investigate", "Postpone",` +
+                    `"Problem", "Previously seen", "Normal", "TBD"]`); // should be gathered from API
 
             if (o.level !== 'day') {
                 _cell.append('text')
@@ -457,7 +458,7 @@ export class PeriodChart extends pip.Events {
                     });
             }
 
-            if(o.level === 'year') {
+            if (o.level === 'year') {
                 $('.svg-tooltip').tooltipster({
                     'maxWidth': 270,
                     contentAsHTML: true,
@@ -482,10 +483,10 @@ export class PeriodChart extends pip.Events {
                         const events = JSON.parse(content);
                         let newContent = '<ul><li class="events">Events</li>';
                             events.map((event, index) => {
-                                newContent+= `<li><i class="event_${index}"/>${event}</li>`;
+                                newContent += `<li><i class="event_${index}"/>${event}</li>`;
                             });
-                        newContent+='</ul>'
-                        instance.content(newContent)
+                        newContent += '</ul>';
+                        instance.content(newContent);
                     }
                 });
             }

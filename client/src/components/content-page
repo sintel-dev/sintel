@@ -1,0 +1,93 @@
+import * as pip from '../services/pip-client';
+import * as ko from 'knockout';
+import * as _ from 'lodash';
+import server from '../services/rest-server';
+
+class Content {
+
+    private slider = $('#page-slider');
+    private items = this.slider.find('.page');
+    private currentItem = this.items.last();
+    private total = this.items.length;
+    private activeIndex = -1;
+
+
+    constructor(eleId: string) {
+        let self = this;
+
+        // initialize Knockout Variables
+        ko.applyBindings(self, $(eleId)[0]);
+
+        self.slider.addClass('ready');
+        self.changePage('landing');
+
+        self.items.get(0).addEventListener('transitionend',
+            () => {
+                self.slider.addClass('loaded');
+            }, {
+                once: true
+            }
+        );
+
+        // self.items.on('click', function() {
+        //     console.log('page click');
+        //     self.changePage('next');
+        // });
+
+        // self.items.mousedown(function(evt) {
+        //     switch (evt.which) {
+        //         case 1:
+        //             self.changePage('next');
+        //             break;
+        //         case 3:
+        //             self.changePage('prev');
+        //             break;
+        //         default:
+        //             alert('You have a strange Mouse!');
+        //     }
+        // });
+
+        // self.slider.on('click', function() {
+        //     self.changePage();
+        // });
+    }
+
+
+    public setupEventHandlers() {
+        // no events currently
+    }
+
+    /**
+     * Event handler for changing page
+     * @param {Experiment} exp The experiment selected
+     */
+    private changePage(pageName) {
+        let self = this;
+        self.slider.removeClass(['prev', 'next']);
+        if (pageName !== 'landing') {
+            self.slider.addClass('next');
+        } else {
+            self.slider.addClass('prev');
+        }
+
+        // reset classes
+        self.items.removeClass(['prev', 'active']);
+
+        // set prev
+
+        const prevItem = self.currentItem;
+
+        // set active
+        const activeItem = self.items.filter(function (index) {
+            let item = $(this);
+            return item.hasClass(`page-${pageName}`);
+        });
+
+        self.currentItem = activeItem;
+
+        prevItem.addClass('prev');
+        activeItem.addClass('active');
+    }
+}
+
+export default Content;

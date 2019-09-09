@@ -4,14 +4,24 @@ import Content from './components/content';
 import Modal from './components/modal';
 
 /**
- * Basic layout
+ * Landing Page
  * ------------------------------
  * |          Header            |
  * |-----------------------------
- * |        |                   |
- * | Side   |     Content       |
- * | Bar    |                   |
- * |        |                   |
+ * |    proj info               |
+ * |                            |
+ * |    exp info                |
+ * |    pipeline info           |
+ * -----------------------------|
+ *
+ * Click EXP Card to EXP page
+* ------------------------------
+ * |          Header            |
+ * |-----------------------------
+ * |    overview   |            |
+ * |               |   period   |
+ * |----------------            |
+ * |    detail     |            |
  * -----------------------------|
  */
 
@@ -19,8 +29,9 @@ export class App {
 
     public header: Header;
     public sidebar: Sidebar;
-    public content: Content;
     public modal: Modal;
+    public content: Content;
+
 
     public bootstrap() {
         this.header = new Header('#header');

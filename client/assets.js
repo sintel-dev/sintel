@@ -11,9 +11,7 @@ let assets = {
         `${THEME}/dist/css/AdminLTE.min.css`,
         `${THEME}/dist/css/skins/_all-skins.min.css`,
         `${THEME}/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css`,
-        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`,
-        `${NPM}/leaflet/dist/leaflet.css`,
-        `${STATIC}/Leaflet.awesome-markers/leaflet.awesome-markers.css`
+        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`
 ],
     js: [
         `${STATIC}/jquery.min.js`,
@@ -39,10 +37,7 @@ let assets = {
         // `${THEME}/dist/js/adminlte.min.js`,
         `${STATIC}/math.js`,
         `${STATIC}/science.js`,
-        `${NPM}/tinycolor/tinycolor.js`,
-        `${NPM}/leaflet/dist/leaflet.js`,
-        `${STATIC}/Leaflet.Control.Custom.js`,
-        `${STATIC}/Leaflet.awesome-markers/leaflet.awesome-markers.js`
+        `${NPM}/tinycolor/tinycolor.js`
         // `${THEME}/dist/js/pages/dashboard.js`,
         // `${THEME}/dist/js/demo.js`,
     ]

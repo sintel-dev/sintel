@@ -1,0 +1,239 @@
+@import "../less/colors";
+
+
+#content-wrapper{
+    margin: 0;
+    padding-top: 50px;
+    background-color: transparent;
+}
+
+// .content{
+//     padding-top: 0;
+
+//     .timeseries-overview{
+//         margin-top: 20px;
+//     }
+
+//     .nav-tabs-custom-mtv, .nav-tabs-custom-mtv>.tab-content {
+//         border: none;
+//         background: none;
+//     }
+
+
+//     .chart-ctx{
+//         height: 60px;
+//         .title{
+//             background: none;
+//             color: #fff;
+//             line-height: 60px;
+//             font-size: 11px;
+//             color: #8A9097;
+//             width: 70px;
+//         }
+
+//         .plot{
+//             height: 60px;
+//             left: auto;
+//             right: 0;
+//             width: calc(100% - 70px);
+//         }
+
+//         &.ctx-active{
+//             transition: all .2s ease-in-out;
+//             background: @second-color;
+//             box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);
+//         }
+
+//         rect{
+//             stroke: none;
+//             &.selection{
+//                 fill: rgba(@gray-color, 0.8);
+//             }
+//             &.handle{
+//                 fill: #B3BBD3;
+//             }
+//         }
+//     }
+
+//     .chart-focus{
+//         top: 0;
+//         .plot{
+//             left: 0;
+//             .wawesContainer{
+//                 opacity: 0;
+//                 transition: all .2s ease-in-out;
+
+//                 &.active{
+//                     opacity: 1;
+//                 }
+
+//                 rect{
+//                     fill: #1A1B20
+//                 }
+//             }
+//         }
+
+//         path.error{
+//             fill: #767E8B;
+//         }
+//     }
+// }
+
+
+/****            PAGE SLIDER           ****/
+
+/* variables */
+
+@offset: 2rem;
+@page-width: 100%;
+@page-height: ~"calc(100vh - 50px)";
+@easing: cubic-bezier(.694, 0, .335, 1);
+
+/* class variables */
+
+.abs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.mask {
+    overflow: hidden;
+}
+
+/* layout */
+
+#page-slider {
+    position: relative;
+    height: @page-height;
+    display: flex;
+    // background: @dark-color;
+
+    &:not(.ready) {
+        visibility: hidden;
+    }
+}
+
+#pageshow {
+    position: relative;
+    flex: 1 1 @page-width;
+    display: flex;
+    align-items: flex-end;
+    padding: @offset;
+}
+
+#pages-main {
+    &:extend(.abs);
+
+    // &:after {
+    //     content: '';
+    //     &:extend(.abs);
+    //     background-color: rgba(0, 0, 0, .25);
+    //     z-index: 100;
+    // }
+
+    .page-content {
+        &:extend(.abs);
+        background-position: center;
+        background-size: cover;
+        z-index: 100;
+    }
+}
+
+/* animation */
+#page-slider {
+    &:not(.loaded) {
+        .page:not(:first-child) {
+            visibility: hidden;
+        }
+    }
+}
+
+#pages-main {
+    overflow: hidden;
+
+    .abs-mask {
+        &:extend(.abs);
+        overflow: hidden;
+        // will-change: transform;
+    }
+
+    .page {
+        &:extend(.abs);
+        overflow: hidden;
+        will-change: transform;
+
+        .page-content {
+            will-change: transform;
+        }
+
+        &.prev {
+            z-index: 5;
+            transform: translate3d(-100%, 0, 0);
+            transition: 1s @easing;
+
+            .abs-mask {
+                transform: translateX(80%);
+                transition: 1s @easing;
+            }
+
+            // .page-content {
+            //     transition: transform 0s 1s;
+            // }
+        }
+
+        &.active {
+            z-index: 10;
+            transform: translate3d(0, 0, 0);
+            transition: transform 1s @easing;
+
+            .abs-mask {
+                transform: translate3d(0, 0, 0);
+                transition: transform 1s @easing;
+            }
+
+            // .page-content {
+            //     transform: scale(1.01);
+            //     transition: transform 1s @easing;
+            // }
+        }
+
+        &:not(.prev):not(.active) {
+            z-index: -1;
+            transform: translate3d(100%, 0, 0);
+
+            .abs-mask {
+                transform: translateX(-50%);
+            }
+        }
+
+        // &:not(.active) {
+        //     .slide-image {
+        //         transform: scale(1.21);
+        //     }
+        // }
+
+        #page-slider.prev & {
+            &.prev {
+                transform: translate3d(100%, 0, 0);
+        
+                .abs-mask {
+                    transform: translate3d(-80%, 0, 0);
+                }
+            }
+        
+            &:not(.prev):not(.active) {
+                transform: translate3d(-100%, 0, 0);
+        
+                .abs-mask {
+                    transform: translate3d(50%, 0, 0);
+                }
+            }
+        }
+        
+    }
+}
+
+
