@@ -1,5 +1,4 @@
 import Header from './components/header';
-// import Sidebar from './components/sidebar';
 import Content from './components/content';
 import Modal from './components/modal';
 
