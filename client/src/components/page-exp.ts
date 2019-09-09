@@ -47,8 +47,8 @@ class PageExp {
     private config = {
         speed: 500,   // box animation duration,
         ctxHeight: 450,
-        focusHeight: 525,
-        periodHeight: 980
+        focusHeight: 450,
+        periodHeight: 880
     };
 
     constructor(eleId: string) {

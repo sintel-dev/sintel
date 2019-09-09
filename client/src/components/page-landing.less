@@ -1,2 +1,120 @@
 @import "../less/colors";
 
+
+
+/* variables */
+@row-title-color: #919295;
+@dot-color: #35363D;
+@dot-color-hover: #D8D8D8;
+
+/* class variables */
+.abs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.title(@top, @left, @size, @color) {
+    font-size: @size;
+    position: absolute;
+    top: @top;
+    left: @left;
+    color: @color;
+    text-transform: uppercase;
+    transform-origin: 0 0;
+    transform: rotate(270deg);
+}
+
+.page-landing {
+
+    .ld-row {
+        margin: 30px 30px 0 30px;
+
+        // &:not(:first-child) {
+        //     margin-top: 30px;
+        // }
+
+        position: relative;
+    }
+
+    .proj-row {
+        height: 24%;
+        .row-title {
+            .title(120px, 30px, 20px, @row-title-color);
+        };
+    }
+
+    .exp-row {
+        height: 32%;
+        .row-title {
+            .title(150px, 30px, 20px, @row-title-color);
+        };
+    }
+
+    .pipe-row {
+        height: 42%;
+        .row-title {
+            .title(120px, 30px, 20px, @row-title-color);
+        };
+    }
+
+    .proj-cards {
+        position: relative;
+        margin-left: 90px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        height: 60%;
+        width: 70%;
+    }
+
+    .exp-cards {
+        position: relative;
+        margin-left: 90px;
+        margin-bottom: 20px;
+        height: 70%;
+        width: 70%;
+    }
+
+    .pipe-cards {
+        position: relative;
+        margin-left: 90px;
+        margin-bottom: 20px;
+        height: 70%;
+        width: 15%;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .card-image {
+        &:extend(.abs);
+        background-position: center;
+        background-size: cover;
+        // z-index: -1;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+
+    .dot {
+        cursor: pointer;
+        height: 10px;
+        width: 10px;
+        margin: 0 2px;
+        background-color: @dot-color;
+        // background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+      
+    .active, .dot:hover {
+        background-color: @dot-color-hover;
+        // background-color: #717171;
+    }
+}
+
