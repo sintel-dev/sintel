@@ -10,14 +10,12 @@
         box-shadow: 0 0 14px #000;
         a{
             transition: all .2s ease-in-out;
+            color: #fff;
         }
         .navbar, .logo, .logo:hover {
             background: @main-color;
         }
 
-        .navbar .sidebar-toggle:hover{
-            background: transparent;
-        }
 
         .navbar-custom-menu{
             .text{
@@ -39,60 +37,6 @@
                     background: @second-color;
                 }
             }
-        }
-    }
-
-    .main-sidebar{
-        background-color: @main-color;
-    }
-
-    .sidebar-menu{
-        >li{
-            > .treeview-menu{
-                background: @main-color;
-            }
-            a{
-                // padding: 0px;
-                color: #fff;
-            }
-
-        }
-
-        .treeview-menu {
-            background: @main-color;
-            .treeview-menu{
-                padding-left: 16px;
-            }
-
-            input{
-                background: transparent;
-                border: 1px solid #fff;
-                border-radius: 4px;
-                padding: 4px;
-                color: #fff;
-                width: 95%;
-                &:focus{
-                    outline: none;
-                }
-            }
-
-            li{
-                padding: 5px 5px 5px 15px;
-                a{
-                    padding: 0;
-                    color: #fff;
-                    cursor: pointer;
-                    transition: all .2s ease-in-out;
-                }
-                li{
-                    padding-left: 0;
-                    a{
-                        color: @gray-text-color;
-                        padding-bottom: 4px;
-                    }
-                }
-            }
-
         }
     }
 
@@ -534,11 +478,6 @@
     }
 }
 
-// .tab-content>.tab-pane{
-//     display: block !important;
-// }
-
-
-// .pchart{
-//     height: 3464px !important;
-// }
+.content-wrapper{
+    margin-left: 0;
+}
