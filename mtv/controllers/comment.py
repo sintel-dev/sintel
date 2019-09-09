@@ -15,7 +15,20 @@ class Comment(Resource):
     """
 
     def get(self, comment):
-        pass
+        """GET /api/v1/comments/<event:string>/"""
+
+        query = {
+            "event": ObjectId(event)
+        }
+
+        document = model.Comment.find_one(**query)
+
+        return {
+            "id": str(document.id),
+            "event": event,
+            "text": document.text,
+            "created_by": document.created_by
+        }
 
     def put(self, comment):
         """PUT /api/v1/comments/<comment:string>/"""
@@ -25,8 +38,7 @@ class Comment(Resource):
         created_by = body.get('created_by', 'default')
 
         if (event is None or text is None):
-            LOGGER.exception('Error updating the comment. '
-                             'Incomplete information')
+            LOGGER.exception('Error updating the comment. Incomplete information')
             raise ValueError
 
         document = model.Comment.find_one(id=ObjectId(comment))
@@ -42,7 +54,12 @@ class Comment(Resource):
 
 class Comments(Resource):
     def get(self):
-        """GET /api/v1/comments/event?=xxx"""
+        """ Return comment list of a given datarun. If the datarun is not
+            specified, return all events.
+        
+        GET /api/v1/comments/event?=xxx
+        """
+
         event = request.args.get('event', None)
 
         if (event is None):
@@ -71,16 +88,16 @@ class Comments(Resource):
 
         POST /api/v1/events/
         """
+
         body = request.json
         e = {
-            "event": body.get('event', None),
-            "text": body.get('text', None),
-            "created_by": body.get('created_by', 'default')
+            'event': body.get('event', None),
+            'text': body.get('text', None),
+            'created_by': body.get('created_by', 'default')
         }
 
         if (e['event'] is None or e['text'] is None):
-            LOGGER.exception(
-                'incorrect event information creating new comment')
+            LOGGER.exception('incorrect event information creating new comment')
             raise ValueError
 
         document = model.Comment.insert(**e)

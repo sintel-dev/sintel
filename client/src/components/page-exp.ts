@@ -292,6 +292,10 @@ class PageExp {
         if (visible) {
             $('#datasetDescription').addClass('active');
             $('#selectLevel').select2({	minimumResultsForSearch: Infinity });
+            // aa.on('select2:select', function(evt) {
+            //     console.log(evt);
+            //     console.log($(this).val());
+            // });
         } else {
             $('#datasetDescription').removeClass('active');
         }
