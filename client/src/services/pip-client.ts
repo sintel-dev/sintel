@@ -21,6 +21,7 @@ export class Events {
 
 export let app = new Events();
 export let header = new Events();
-export let sidebar = new Events();
 export let content = new Events();
 export let modal = new Events();
+export let pageExp = new Events();
+export let pageLanding = new Events();

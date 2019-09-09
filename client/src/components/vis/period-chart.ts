@@ -444,8 +444,9 @@ export class PeriodChart extends pip.Events {
                 .on('click', (d) => {
                     self.trigger('select', o);
                 })
-                .attr('title', `["Investigate", "Do not investigate", "Postpone",` +
-                    `"Problem", "Previously seen", "Normal", "TBD"]`); // should be gathered from API
+                .attr('title',
+                    '["Investigate", "Do not investigate", "Postpone", "Problem", "Previously seen", "Normal", "TBD"]'
+                ); // should be gathered from API
 
             if (o.level !== 'day') {
                 _cell.append('text')

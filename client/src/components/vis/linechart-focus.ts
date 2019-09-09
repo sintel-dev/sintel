@@ -649,30 +649,6 @@ export class LineChartFocus extends pip.Events {
                             'from ' + new Date(lineData[d[0]][0]).toString() + '\n' +
                             'to ' + new Date(lineData[d[1]][0]).toString()
                         );
-
-                    // highlight with bars
-                    let headerBar = g.append('rect')
-                        .attr('class', 'bar-highlight')
-                        .attr('y', hz * idx)
-                        .attr('height', hz - hzp)
-                        .on('click', () => {
-                            pip.content.trigger('comment:start', {
-                                id: d[3],
-                                score: d[2],
-                                start_time: lineData[d[0]][0],
-                                stop_time: lineData[d[1]][0],
-                                datarun: datarun,
-                                dataset: dataset,
-                                offset: self.option.offset
-                            });
-                        });
-
-                    headerBar.append('title')
-                        .text(`score: ${d[2]}` + '\n' +
-                            'from ' + new Date(lineData[d[0]][0]).toUTCString() + '\n' +
-                            'to ' + new Date(lineData[d[1]][0]).toUTCString()
-                        );
-
                     // g.append('text')
                     //     .attr('class', 'text-highlight')
                     //     .attr('y', 11 + 16 * idx)
@@ -693,11 +669,6 @@ export class LineChartFocus extends pip.Events {
                     g.select('.bg-highlight')
                         .attr('x', fx(lineData[stIdx][0]))
                         .attr('width', Math.max(fx(lineData[edIdx][0]) - fx(lineData[stIdx][0]), 10));
-
-                    g.select('.bar-highlight')
-                        .attr('x', fx(lineData[stIdx][0]))
-                        .attr('width', Math.max(fx(lineData[edIdx][0]) - fx(lineData[stIdx][0]), 10))
-                        .attr('fill', scoreColor(d[2]));
 
                     // g.select('text')
                     //     .attr('x', fx(lineData[stIdx][0]))
