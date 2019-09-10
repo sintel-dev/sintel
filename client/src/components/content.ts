@@ -46,6 +46,7 @@ class Content {
             self.changePage(pageName);
             // update corresponding page
         });
+
     }
 
     private initPageLanding() {

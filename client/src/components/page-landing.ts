@@ -19,6 +19,7 @@ class PageLanding {
     public empDetails =  ko.observable(null);
 
     private expList;
+    private once = false;
 
     constructor(eleId: string) {
         let self = this;
@@ -27,10 +28,10 @@ class PageLanding {
         ko.applyBindings(self, $(eleId)[0]);
 
         // todo
-        $('.exp-cards').on('click', function(evt) {
-            console.log('click');
-            self.goExp();
-        });
+        // $('.exp-cards').on('click', function(evt) {
+        //     console.log('click');
+        //     self.goExp();
+        // });
 
         server.experiments.read<RSI.Response>().done( (data: RSI.Experiment[]) => {
             self.expList = data;
@@ -44,6 +45,13 @@ class PageLanding {
             self.selected.experiment({index: -1, name: ''});    // select nothing
             // self.onSelectExperiment(experiments[0], 0);
         });
+
+        // horizontal scroll
+        $('.proj-cards').on('mousewheel', function(evt: any) {
+            // console.log(evt.originalEvent.deltaY);
+            this.scrollLeft += (evt.originalEvent.deltaY);
+            evt.preventDefault();
+        });
     }
 
     // handle events coming from other components
@@ -56,7 +64,15 @@ class PageLanding {
     public goExp() {
         let self = this;
         pip.content.trigger('page:change', 'exp');
-        self.onSelectExperiment(self.experiments()[0], 0);
+        pip.header.trigger('page:change:exp');
+        if (!self.once) {
+            self.onSelectExperiment(self.experiments()[0], 0);
+            self.once = true;
+        }
+    }
+
+    public filterExp() {
+        // pass
     }
 
     // the following public methods are triggered by user interactions on header
@@ -71,7 +87,6 @@ class PageLanding {
     }
 
     public onSelectExperiment(exp: RSI.Experiment, index: number) {
-        console.log(exp);
         this.selected.experiment({index, name: exp.name});
         headerConfig.experiment = exp;
         pip.content.trigger('experiment:change', exp);
