@@ -44,6 +44,13 @@
     display: block;
     border: 1px solid #fff;
     border-top: none;
+
+    &.select2-dropdown--above{
+        border-top: 1px solid #fff;
+        ul.select2-results__options{
+            margin-top: 0;
+        }
+    }
 }
 
 .select2-container{
@@ -101,6 +108,14 @@
     &.select2-container--open{
         .select2-selection--single{
             border-bottom: transparent;
+        }
+    }
+
+    &.select2-container--above{
+        &.select2-container--open{
+            .select2-selection--single{
+                border-bottom: 1px solid #fff !important;
+            }
         }
     }
 }
