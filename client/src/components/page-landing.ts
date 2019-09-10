@@ -65,10 +65,10 @@ class PageLanding {
         let self = this;
         pip.content.trigger('page:change', 'exp');
         pip.header.trigger('page:change:exp');
-        if (!self.once) {
-            self.onSelectExperiment(self.experiments()[0], 0);
-            self.once = true;
-        }
+        // if (!self.once) {
+        self.onSelectExperiment(self.experiments()[0], 0);
+        self.once = true;
+        // }
     }
 
     public filterExp() {

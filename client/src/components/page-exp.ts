@@ -439,7 +439,8 @@ class PageExp {
             // update context
             for (let i = 0; i < data.length; i++) {
                 let dName = data[i].dataset.name;
-                self.ctxCharts[dName].trigger('data:update', [d]);
+                // self.ctxCharts[dName].trigger('data:update', [d]);
+                self.ctxCharts[dName].trigger('data:update', data[i]);
             }
 
             // update period-chart

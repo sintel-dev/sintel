@@ -96,7 +96,7 @@ export class LineChartCtx extends pip.Events {
             option.margin.top + option.buffer / 2
         ];
         // define axis scale
-        let {x, y} = self.getScale(w, h);
+        let { x, y } = self.getScale(w, h);
         self.canvas = self.container.append<any>('canvas')
             .style('position', 'absolute')
             .style('left', `${option.margin.left}px`)
@@ -128,14 +128,16 @@ export class LineChartCtx extends pip.Events {
 
         // function used to plot area
         let area = d3.area<[number, number]>()
-        .x(function(d) { return x(d[0]); })
-        .y0(function(d) { return -(h - y(d[1])) / 2 + h / 2; })
-        .y1(function(d) { return (h - y(d[1])) / 2 + h / 2; });
+            .x(function (d) { return x(d[0]); })
+            .y0(function (d) { return -(h - y(d[1])) / 2 + h / 2; })
+            .y1(function (d) { return (h - y(d[1])) / 2 + h / 2; });
 
         // function used to plot line
         let line = d3.line<[number, number]>()
             .x(d => x(d[0]))
             .y(d => y(d[1]));
+
+        let highlightUpdate = self.addHighlights(h, x, line, area);
 
         let chart = self.svg.append<SVGGElement>('g')
             .attr('transform', `translate(${option.margin.left},${option.margin.top})`);
@@ -157,7 +159,7 @@ export class LineChartCtx extends pip.Events {
                 .call(yAxis.ticks(0, ',f'));
         }
 
-        let {brush, bUpdate} = self.addBrush(chart, w, h + option.buffer, x);
+        let { brush, bUpdate } = self.addBrush(chart, w, h + option.buffer, x);
         brush.on('brush end', brushHandler);
 
         // events
@@ -193,15 +195,22 @@ export class LineChartCtx extends pip.Events {
                 .duration(option.duration)
                 .ease(d3.easeLinear);
 
-            let uc = chart.selectAll<any, LineChartDataEle>('.line')
-                          .data(self.data);
-            uc.enter().append('path')
-                .attr('class', 'line')
-                .merge(uc)
-                .style('stroke', d => colorSchemes.getColorCode('dname'))
-                .style('opacity', 0.5)
-                .transition(t)
-                .attr('d', d => line(d.timeseries));
+            context.clearRect(0, 0, w, h);
+            context.beginPath();
+            lineCanvas(self.data[0].timeseries);
+            context.lineWidth = 1;
+            context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
+            context.stroke();
+
+            // let uc = chart.selectAll<any, LineChartDataEle>('.line')
+            //     .data(self.data);
+            // uc.enter().append('path')
+            //     .attr('class', 'line')
+            //     .merge(uc)
+            //     .style('stroke', d => colorSchemes.getColorCode('dname'))
+            //     .style('opacity', 0.5)
+            //     .transition(t)
+            //     .attr('d', d => line(d.timeseries));
 
             // let uc = chart.selectAll<any, LineChartDataEle>('.area')
             //     .data(self.data);
@@ -215,8 +224,11 @@ export class LineChartCtx extends pip.Events {
 
             // clean all original windows
             self.svg.selectAll('.window').remove();
+            _.each(self.data, d => {
+                highlightUpdate(d.windows, d.timeseries, 'dname');
+            });
 
-            uc.exit().remove();
+            // uc.exit().remove();
         }
 
         async function eventUpdateHandler() {
@@ -231,6 +243,9 @@ export class LineChartCtx extends pip.Events {
 
             self.data[0].windows = newWindows as any;
             self.svg.selectAll('.window').remove();
+            _.each(self.data, (d, i) => {
+                highlightUpdate(d.windows, d.timeseries, 'dname');
+            });
         }
     }
 
@@ -244,7 +259,7 @@ export class LineChartCtx extends pip.Events {
             .call(brush)
             .call(brush.move, x.range());
 
-        let update = function(range) {
+        let update = function (range) {
             brushG.call(brush.move, range);
         };
 
@@ -254,6 +269,62 @@ export class LineChartCtx extends pip.Events {
         };
     }
 
+    private addHighlights(h, x, line, area) {
+        let self = this;
+        let option = self.option;
+
+        let scoreColor = (v: number) => {
+            if (v === 0) { return '#777'; }
+            let level = 0;
+            for (let i = 1; i <= 4; i += 1) {
+                if (v > i) { level += 1; }
+            }
+            return colorSchemes.severity5[level];
+        };
+
+
+        let highlightG = self.svg.append<SVGGElement>('g')
+            .attr('class', 'highlights')
+            .attr('transform', `translate(${option.margin.left},${option.margin.top + option.buffer / 2})`);
+
+        let update = function (windows, lineData, name) {
+            let u = highlightG
+                .selectAll<SVGAElement, [number, number, number, string]>(`.window-${name}`)
+                .data(windows, d => d[3]);
+
+            u.enter().append('g')
+                .attr('class', `window window-${name}`)
+                .each(function (d, i) {
+                    d3.select(this).append('path')
+                        .attr('class', 'line-highlight');
+                })
+                .merge(u)
+                .each(function (d, i) {
+                    d3.select(this).select('.line-highlight')
+                        .attr('d', line(_.slice(lineData, d[0], d[1] + 2)));
+                });
+
+            // u.enter().append('g')
+            //     .attr('class', `window window-${name}`)
+            //     .each(function(d, i) {
+            //         d3.select(this).append('path')
+            //             .attr('class', 'area-highlight');
+            //     })
+            //     .merge(u)
+            //     .each(function(d, i) {
+            //         d3.select(this).select('.area-highlight')
+            //             .attr('d', area(_.slice(lineData, d[0], d[1] + 1)));
+            //     });
+
+            u.exit().remove();
+        };
+
+        _.each(self.data, d => {
+            update(d.windows, d.timeseries, 'dname');
+        });
+
+        return update;
+    }
 
     private getScale(w, h) {
         let self = this;
@@ -287,7 +358,6 @@ export class LineChartCtx extends pip.Events {
             });
             y.domain([mmin, mmax]);
         }
-        return {x, y};
+        return { x, y };
     }
 }
-
