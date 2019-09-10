@@ -34,7 +34,7 @@ class Event(Resource):
         score = body.get('score', None)
         tag = body.get('tag', None)
 
-        print (start_time, stop_time, score)
+        print(start_time, stop_time, score)
         if (None in [start_time, stop_time, score]):
             LOGGER.exception('incorrect event information updating an event')
             raise ValueError

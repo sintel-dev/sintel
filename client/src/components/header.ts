@@ -37,7 +37,7 @@ class Header {
             self.pagebackBtn.removeClass('right').addClass('left');
             pip.content.trigger('page:change', 'exp');
         }
-        
+
     }
 }
 

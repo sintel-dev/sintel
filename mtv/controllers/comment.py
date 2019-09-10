@@ -14,7 +14,7 @@ class Comment(Resource):
         update a comment item
     """
 
-    def get(self, comment):
+    def get(self, event):
         """GET /api/v1/comments/<event:string>/"""
 
         query = {
@@ -56,7 +56,7 @@ class Comments(Resource):
     def get(self):
         """ Return comment list of a given datarun. If the datarun is not
             specified, return all events.
-        
+
         GET /api/v1/comments/event?=xxx
         """
 
