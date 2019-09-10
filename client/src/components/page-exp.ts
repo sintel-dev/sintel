@@ -258,6 +258,9 @@ class PageExp {
         if (isChecked) {
             zoomModeInput.checked = false;
             this.focusChart.trigger('zoomPanMode', false);
+        } else {
+            zoomModeInput.checked = true;
+            this.focusChart.trigger('zoomPanMode', true);
         }
 
         this.focusChart.trigger('addEventMode', isChecked);
