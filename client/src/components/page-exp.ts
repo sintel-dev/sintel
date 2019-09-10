@@ -82,6 +82,7 @@ class PageExp {
                 } else {
                     $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
                 }
+                $('#periodView').text(data[0].dataset.name);
                 self._visualize();
             });
         });
@@ -211,6 +212,7 @@ class PageExp {
         );
         $(`.chart-ctx .title`).parent().removeClass('ctx-active');
         $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active');
+        $('#periodView').text(name);
     }
 
     public showMissing(content, event) {
@@ -258,6 +260,9 @@ class PageExp {
         if (isChecked) {
             zoomModeInput.checked = false;
             this.focusChart.trigger('zoomPanMode', false);
+        } else {
+            zoomModeInput.checked = true;
+            this.focusChart.trigger('zoomPanMode', true);
         }
 
         this.focusChart.trigger('addEventMode', isChecked);

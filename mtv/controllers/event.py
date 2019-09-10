@@ -45,7 +45,7 @@ class Event(Resource):
         if (tag is not None):
             document.tag = tag
         document.save()
-        return 'save success'
+        return event
 
     def delete(self, event):
         """  DEL /api/v1/events/<string:event>/ """
