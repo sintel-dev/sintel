@@ -14,8 +14,8 @@ services:
       - ./db-instance/log:/mtv/log
       - ./db-instance/dump:/mtv/dump
   web:
-    image: dyuliu/mtv
-    # build: .
+    # image: dyuliu/mtv
+    build: .
     container_name: mtv
     depends_on:
       - db

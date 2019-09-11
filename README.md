@@ -185,7 +185,7 @@ to be added
   $ docker-compose -f docker-compose-db.yml up
   ```
 
-- Running up the application. Please check the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is **uncommented** and line 17 (`image: dyuliu/mtv`) is **commented**.
+- Running up the application. **Please check** **(important!!)** the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is <u>uncommented</u> and line 17 (`image: dyuliu/mtv`) is <u>commented</u>. Also, in the file `./mtv/config.yaml`, line 4 (`host: db`) is <u>uncommented</u> and line 3 (`host: 'localhost'`) is <u>commented</u>.
 
   ```bash
   $ docker-compose up -d
