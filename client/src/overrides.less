@@ -2,12 +2,14 @@
 @import './less/dropdown.less';
 
 .mtv-skin{
+    background: @main-color;
     .wrapper{
         background-color: @second-color;
     }
 
     .main-header {
         box-shadow: 0 0 14px #000;
+        background: @main-color;
         a{
             transition: all .2s ease-in-out;
             color: #fff;
@@ -134,7 +136,7 @@
         border: none;
         border-radius: 10px;
         overflow: hidden;
-        margin-bottom: 0;
+        margin-bottom: 20px;
 
         &.period-view{
             border-radius: 0;
@@ -306,6 +308,7 @@
         transform: translateX(100%);
         transition: all .2s ease-in-out;
         background: rgba(35,36,43,0.9);
+        overflow-y: auto;
 
         .line{
             margin-bottom: 0px;
