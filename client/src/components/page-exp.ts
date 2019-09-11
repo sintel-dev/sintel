@@ -51,11 +51,11 @@ class PageExp {
         periodHeight: 880
     };
 
-    getBoxSizes(){
+    public getBoxSizes() {
         const windownHeight = window.innerHeight;
         const ctxHeight = windownHeight * 35 / 100; // 35% for top box
         const focusHeight = windownHeight * 49 / 100; // 49% for the bottom box
-        return [ctxHeight, focusHeight]
+        return [ctxHeight, focusHeight];
     }
 
     constructor(eleId: string) {
