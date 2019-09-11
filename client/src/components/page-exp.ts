@@ -46,10 +46,17 @@ class PageExp {
 
     private config = {
         speed: 500,   // box animation duration,
-        ctxHeight: 450,
-        focusHeight: 450,
+        ctxHeight: this.getBoxSizes()[0],
+        focusHeight: this.getBoxSizes()[1],
         periodHeight: 880
     };
+
+    getBoxSizes(){
+        const windownHeight = window.innerHeight;
+        const ctxHeight = windownHeight * 35 / 100; // 35% for top box
+        const focusHeight = windownHeight * 49 / 100; // 49% for the bottom box
+        return [ctxHeight, focusHeight]
+    }
 
     constructor(eleId: string) {
         let self = this;
