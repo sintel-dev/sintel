@@ -118,9 +118,9 @@ class PageExp {
             self.focusChart.trigger('event:modify', evt);
         });
 
-        $('input[name="level"]').change(function() {
-            let val = this.getAttribute('value');
-            self.level(val);
+        $('select[name="level"]').change(function(e) {
+            let value = (<HTMLInputElement>e.target).value;
+            self.level(value);
         });
 
         pip.content.on('comment:new', (eventInfo: RSI.Event) => {
@@ -304,10 +304,6 @@ class PageExp {
         if (visible) {
             $('#datasetDescription').addClass('active');
             $('#selectLevel').select2({	minimumResultsForSearch: Infinity });
-            // aa.on('select2:select', function(evt) {
-            //     console.log(evt);
-            //     console.log($(this).val());
-            // });
         } else {
             $('#datasetDescription').removeClass('active');
         }
@@ -340,12 +336,10 @@ class PageExp {
         for (let i = 0; i <= 4; i += 1) {
             if (score > i) { level += 1; }
         }
-        if (level === 0) { level = 'None'; }
-        $('input[name="level"]').removeAttr('check');
-        $('input[name="level"]').removeClass('active');
-        $(`input[name="level"][value="${level}"]`).attr('check');
-        $(`input[name="level"][value="${level}"]`).addClass('active');
+        if (level === 0) { level = 0; }
 
+        const DropdownList = (document.getElementById('selectLevel')) as HTMLSelectElement;
+        DropdownList.selectedIndex = level;
         return String(level);
     }
 

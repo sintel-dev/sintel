@@ -299,7 +299,7 @@ export class LineChartCtx extends pip.Events {
                         .attr('class', 'line-highlight');
                 })
                 .merge(u)
-                .each(function (d, i) {
+                .each(function(d, i) {
                     d3.select(this).select('.line-highlight')
                         .attr('d', line(_.slice(lineData, d[0], d[1] + 2)));
                 });

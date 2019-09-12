@@ -15,11 +15,12 @@ let stationColor = {};
 
 export const colorSchemes = {
     severity5: [
-        '#2c7bb6',  // blue, low
-        '#abd9e9',
-        '#ffffbf',
-        '#fdae61',
-        '#d7191c'   // red, high
+        '#FFD93F', // investigate
+        '#94B7FD', // do not investigate
+        '#9649E3', // postpone
+        '#C95555', // problem
+        '#CDD15E', // previously seen
+        '#7EC37C', // normal
     ],
     severity3: [
         '#91bfdb',  // light blue
