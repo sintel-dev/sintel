@@ -90,3 +90,28 @@ class Events(Resource):
             })
 
         return events
+
+    def post(self):
+        """ Return event list of a given datarun. If the datarun is not
+            specified, return all events.
+
+        POST /api/v1/events/?datarun=xxx
+        """
+
+        body = request.json
+        e = {
+            'start_time': body.get('start_time', None),
+            'stop_time': body.get('stop_time', None),
+            'score': body.get('score', None),
+            'datarun': body.get('datarun', None),
+            'tag': body.get('tag', None)
+        }
+
+        if (e['start_time'] is None or e['stop_time'] is None or
+                e['score'] is None or e['datarun'] is None):
+            LOGGER.exception('incorrect event information creating new event')
+            raise ValueError
+
+        e['datarun'] = ObjectId(e['datarun'])
+        document = model.Event.insert(**e)
+        return str(document.id)
