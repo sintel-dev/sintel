@@ -35,7 +35,7 @@ help:
 
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
-	pip install .
+	pip install -e .
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
@@ -63,6 +63,26 @@ load-db-nasa:
 	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
 	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
 	mongorestore --db mtv ./db-instance/dump/nasa/
+
+# ------------------ session: docker installation ------------------- #
+.PHONY: docker-db-up
+docker-db-up: init-db	## download and 
+	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
+	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
+	mv ./db-instance/dump/nasa ./db-instance/dump/mtv
+	docker-compose -f docker-compose-db.yml up
+
+.PHONY: docker-clean
+docker-clean: 			## clean the related containers and volumes
+	docker-compose down -v
+
+.PHONY: docker-up
+docker-up: 				## run mtv with docker
+	docker-compose up -d
+
+.PHONY: docker-down
+docker-down: 			## stop mtv
+	docker-compose down
 
 # ----------------------- session: test ----------------------- #
 

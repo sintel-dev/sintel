@@ -1,10 +1,10 @@
 import {Server, JQueryStaticExt} from './rest-server.interface';
-
+import {server as sv} from '../config';
 
 let jqueryExt = $ as JQueryStaticExt;
 
 let server: Server = new jqueryExt.RestClient(
-    'http://127.0.0.1:3000/api/v1/',
+    `${sv}/api/v1/`,
     {
         cache: 5,                 // This will cache requests for 5 seconds
         cachableMethods: ['GET'],

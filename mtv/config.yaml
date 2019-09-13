@@ -1,11 +1,27 @@
 # MongoDB params
 #===================================
-host: 'localhost' # the host name of `mongod` instance to connect to
-# host: 'db'  # only used for Docker deployment
-port: 27017    # the port that `mongod` instance is running on
-db: 'mtv'    # the name of the database to use
-username:  # username to authenticate with
-password:  # password to authenticate with
+
+# mtv
+host: 'localhost' # mongodb server address
+port: 27017  # mongodb server port
+db: 'mtv'  # database name
+username:  # for auth
+password:  # for auth
+
+# orion
+or_host: 'localhost'   # mongodb server address
+or_port: 27017  # mongodb server port
+or_db: 'orion'  # database name
+or_username:  # for auth
+or_password:  # for auth
+
+# docker
+dk_host: 'db'   # mongodb server address
+dk_port: 27017  # mongodb server port
+dk_db: 'mtv'  # database name
+dk_username:  # for auth
+dk_password:  # for auth
+
 
 # FLASK ENV
 #===================================

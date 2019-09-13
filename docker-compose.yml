@@ -21,6 +21,6 @@ services:
       - db
     ports:
       - "3000:3000"
-    command: mtv run --env production -v
+    command: mtv run --env production -v --docker
     # volumes:
     #   - .:/mtv
