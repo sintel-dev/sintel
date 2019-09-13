@@ -19,11 +19,15 @@ LOGGER = logging.getLogger(__name__)
 
 class MTVExplorer:
 
-    def __init__(self, cf):
+    def __init__(self, cf, docker):
         self._cf = cf.copy()
 
-        self._db = connect(db=cf['db'], host=cf['host'], port=cf['port'],
-                           username=cf['username'], password=cf['password'])
+        if not docker:
+            self._db = connect(db=cf['db'], host=cf['host'], port=cf['port'],
+                               username=cf['username'], password=cf['password'])
+        else:
+            self._db = connect(db=cf['dk_db'], host=cf['dk_host'], port=cf['dk_port'],
+                               username=cf['dk_username'], password=cf['dk_password'])
 
     def _init_flask_app(self, env):
         app = Flask(

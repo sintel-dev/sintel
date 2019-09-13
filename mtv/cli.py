@@ -36,6 +36,9 @@ def get_parser():
     common.add_argument('-v', '--verbose', action='count', default=0,
                         help='Be verbose. Use -vv for increased verbosity.')
 
+    common.add_argument('--docker', action='store_true',
+                        help='deployed in docker environment')
+
     parser = argparse.ArgumentParser(description='MTV Command Line Interface.')
     parser.set_defaults(function=None)
 
@@ -100,6 +103,6 @@ def main():
 
     setup_logging(args.verbose, args.logfile)
     config = read_config('./mtv/config.yaml')
-    explorer = MTVExplorer(config)
+    explorer = MTVExplorer(config, args.docker)
 
     args.function(explorer, args)
