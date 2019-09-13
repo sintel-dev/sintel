@@ -164,42 +164,35 @@ to be added
 
 - Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 
-- Initialize MongoDB folders
+- Load data into the mongo container
 
   ```bash
-  $ make init-db
+  $ make docker-db-up
   ```
 
-- Restore data to the docker image "mongo:4.0" (here takes NASA data as example). 
+- Run up the application. 
 
   ```bash
-  $ curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
-  $ tar -xvf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
-  $ mv ./db-instance/dump/nasa ./db-instance/dump/mtv
-  $ docker-compose -f docker-compose-db.yml up
+  $ make docker-up
   ```
 
-  If you want to use your personal data, please unzip your data dumped from MongoDB to the folder `db-instance/dump/mtv/` and use the following command to restore data:
+  The application should be successfully running on **port 3000** using the **production** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your chrome browser to start your exploration.
+
+  Note: if MTV is deployed in a remote server, please change the variable `server` in `.client/src/config.ts` to the server IP address with right port.
+
+- Stop the application
 
   ```bash
-  $ docker-compose -f docker-compose-db.yml up
+  $ make docker-down
   ```
 
-- Running up the application. **Please check** **(important!!)** the file `docker-compose.yml` under the ProjectRoot and make sure line 18 (`build: .`) is <u>uncommented</u> and line 17 (`image: dyuliu/mtv`) is <u>commented</u>. Also, in the file `./mtv/config.yaml`, line 4 (`host: db`) is <u>uncommented</u> and line 3 (`host: 'localhost'`) is <u>commented</u>.
+- Clean the related containers and data volumes if needed
 
   ```bash
-  $ docker-compose up -d
+  $ make docker-clean
   ```
 
-  Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser to start your exploration.
-
-- Stopping the application
-
-  ```bash
-  $ docker-compose down
-  ```
-
-
+  
 
 ## Production deploy in local secure environment
 
