@@ -9,41 +9,36 @@ LOGGER = logging.getLogger(__name__)
 class Test(Resource):
     def get(self):
         """
-        @api {get} /test/ get
+        @api {get} /test/ Test get
         @apiGroup Test
         @apiVersion 1.0.0
         """
 
-        # Set the response code to 201 and return custom headers
-        return {'task': 'Hello world'}, 201, {'Etag': 'some-opaque-string'}
+        return {'message': 'get'}, 201, {'username': 'dyu'}
 
     def post(self):
         """
-        @api {post} /test/ post
+        @api {post} /test/ Test post
         @apiGroup Test
         @apiVersion 1.0.0
-
-        @apiParam {String} event (*required) Event ID.
         """
 
-        body = request.json
-        request.form
-
-        if body is not None:
-            event = body.get('event', None)
-        else:
-            if 'event' in request.form:
-                event = request.form['event']
-
-        if (event is None):
-            return {'message': 'hey error!'}, 404
-        # Set the response code to 201 and return custom headers
-        return {'event': event}, 200
+        return {'message': 'post'}, 200, {'username': 'dyu'}
 
     def delete(self):
-        LOGGER.info('Test DELETE')
-        return 'delete'
+        """
+        @api {delete} /test/ Test delete
+        @apiGroup Test
+        @apiVersion 1.0.0
+        """
+
+        return {'message': 'delete'}, 200, {'username': 'dyu'}
 
     def put(self):
-        LOGGER.info('Test PUT')
-        return 'put'
+        """
+        @api {put} /test/ Test put
+        @apiGroup Test
+        @apiVersion 1.0.0
+        """
+
+        return {'message': 'put'}, 200, {'username': 'dyu'}

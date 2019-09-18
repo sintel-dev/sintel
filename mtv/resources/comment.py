@@ -26,12 +26,12 @@ class Comment(Resource):
         """
 
         try:
-            ObjectId(comment_id)
+            cid = ObjectId(comment_id)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 400
 
-        document = model.Comment.find_one(id=ObjectId(comment_id))
+        document = model.Comment.find_one(id=cid)
 
         if document is None:
             LOGGER.exception('Error getting comment. '
@@ -151,7 +151,7 @@ class Comments(Resource):
                 "created_by": document.created_by
             })
 
-        return comments
+        return {'comments': comments}
 
     def post(self):
         """
@@ -208,4 +208,4 @@ class Comments(Resource):
             model.Comment.insert(**comment)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e)}, 500
