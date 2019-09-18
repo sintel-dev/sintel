@@ -9,8 +9,7 @@ from gevent.pywsgi import WSGIServer
 from mongoengine import connect
 from termcolor import colored
 
-from mtv.data.mdb import MongoDB
-from mtv.data.processor import to_mongo_docs
+from mtv.db import db
 from mtv.routes import add_routes
 from mtv.utils import get_files, import_object
 
@@ -28,6 +27,21 @@ class MTVExplorer:
         else:
             self._db = connect(db=cf['dk_db'], host=cf['dk_host'], port=cf['dk_port'],
                                username=cf['dk_username'], password=cf['dk_password'])
+
+    def update_db(self, interval, utc, impute):
+
+        # copy from orion
+        db.copy_from(
+            fromdb=self._cf['or_db'],
+            todb=self._cf['db'],
+            fromhost=self._cf['or_host'],
+            fromport=self._cf['or_port'],
+            tohost=self._cf['host'],
+            toport=self._cf['port']
+        )
+
+        # update col "prediction" and "raw"
+        db.updateDB(self._db[self._cf['db']], interval, utc=not utc, impute=not impute)
 
     def _init_flask_app(self, env):
         app = Flask(

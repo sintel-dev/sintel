@@ -30,6 +30,9 @@ server.add('data');
 
 server.add('experiments');
 
+server.add('test');
+
+
 
 /**
  * usage:

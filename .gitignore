@@ -45,6 +45,7 @@ logs/
 client/public/data/
 db-instance/
 mtv/data/raw
+mtv/db/data
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -86,6 +87,9 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/api/
+
+# Restful API documentation
+apidoc/
 
 # PyBuilder
 target/

@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_restful import Api
 
-import mtv.controllers as ctrl
+import mtv.resources as ctrl
 
 
 def add_routes(app):
@@ -31,9 +31,12 @@ def add_routes(app):
     api.add_resource(ctrl.event.Events, '/api/v1/events/')
 
     # comment
-    api.add_resource(ctrl.comment.Comment, '/api/v1/comments/<string:comment>/')
+    api.add_resource(ctrl.comment.Comment, '/api/v1/comments/<string:comment_id>/')
     api.add_resource(ctrl.comment.Comments, '/api/v1/comments/')
 
     # experiment
     api.add_resource(ctrl.experiment.Experiment, '/api/v1/experiments/<string:experiment>/')
     api.add_resource(ctrl.experiment.Experiments, '/api/v1/experiments/')
+
+    # test
+    api.add_resource(ctrl.test.Test, '/api/v1/test/')

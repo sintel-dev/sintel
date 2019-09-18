@@ -41,8 +41,9 @@ class Modal {
                 $('#comment').val('');
             } else {
                 self.commentInfo = await<any> server.comments.read({}, {
-                    event: eventInfo.id
+                    event_id: eventInfo.id
                 });
+                self.commentInfo = self.commentInfo[0];
                 $('#comment').val(self.commentInfo.text);
             }
 
@@ -125,7 +126,7 @@ class Modal {
                 // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
                 server.comments.create({
-                    event: eid,
+                    event_id: eid,
                     text: $('#comment').val()
                 });
             });
@@ -143,12 +144,11 @@ class Modal {
 
                 if (self.commentInfo.id === 'new') {
                     server.comments.create({
-                        event: eid,
+                        event_id: eid,
                         text: $('#comment').val()
                     });
                 } else {
                     server.comments.update(self.commentInfo.id, {
-                        event: eid,
                         text: $('#comment').val()
                     });
                 }

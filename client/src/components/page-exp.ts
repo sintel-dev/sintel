@@ -167,7 +167,7 @@ class PageExp {
                 // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
                 server.comments.create({
-                    event: eid,
+                    event_id: eid,
                     text: $('#comment').val()
                 });
             });
@@ -185,12 +185,11 @@ class PageExp {
 
                 if (self.commentInfo.id === 'new') {
                     server.comments.create({
-                        event: eid,
+                        event_id: eid,
                         text: $('#comment').val()
                     });
                 } else {
                     server.comments.update(self.commentInfo.id, {
-                        event: eid,
                         text: $('#comment').val()
                     });
                 }
@@ -314,8 +313,9 @@ class PageExp {
             $('#comment').val('');
         } else {
             this.commentInfo = await<any> server.comments.read({}, {
-                event: eventInfo.id
+                event_id: eventInfo.id
             });
+            this.commentInfo = this.commentInfo[0];
             $('#comment').val(this.commentInfo.text);
         }
 

@@ -1,6 +1,8 @@
 import Header from './components/header';
 import Content from './components/content';
 import Modal from './components/modal';
+// import server from './services/rest-server';
+// import * as RSI from './services/rest-server.interface';
 
 /**
  * Landing Page
@@ -44,6 +46,16 @@ export class App {
     }
 
     constructor() {
+        // server.test.create<any>({events: 1})
+        //     .done(function(data, textStatus){
+        //         console.log(textStatus);
+        //         console.log(data);
+        //     })
+        //     .fail(function(data, textStatus){
+        //         console.log(textStatus);
+        //         console.log(data);
+        //     });
+
         // initialize your app here
         this.bootstrap();
         this.setupEventHandlers();

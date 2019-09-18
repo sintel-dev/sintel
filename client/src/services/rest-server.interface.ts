@@ -110,7 +110,7 @@ interface AddVerb {
     /**
      * add a Verb
      * @param string resource name
-     * @param string GET/POST/UPDATE/DEL
+     * @param string GET/POST/PUT/DEL
      * @param options config options
      *
      * @returns null
@@ -121,10 +121,10 @@ interface AddVerb {
 interface Resource {
     add: AddResource;
     addVerb: AddVerb;
-    read<T>(id1?: any, ...rest: any[]): T;     // GET
-    create<T>(id1?: any, ...rest: any[]): T;   // POST
-    update<T>(id1?: any, ...rest: any[]): T;   // UPDATE
-    del<T>(id1?: any, ...rest: any[]): T;      // DEL
+    read<T>(id1?: any, ...rest: any[]): JQueryDeferred<T>;     // GET
+    create<T>(id1?: any, ...rest: any[]): JQueryDeferred<T>;   // POST
+    update<T>(id1?: any, ...rest: any[]): JQueryDeferred<T>;   // PUT
+    del<T>(id1?: any, ...rest: any[]): JQueryDeferred<T>;      // DEL
 }
 
 interface Verb {
@@ -152,6 +152,7 @@ export interface Server {
     data: Resource;
     stations: Resource;
     experiments: Resource;
+    test: Resource;
 }
 
 
