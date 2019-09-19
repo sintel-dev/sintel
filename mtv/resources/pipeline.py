@@ -1,6 +1,5 @@
 import logging
 
-from bson import ObjectId
 from flask_restful import Resource
 
 from mtv import model
@@ -19,16 +18,16 @@ def get_pipeline(pipeline_doc):
 
 
 class Pipeline(Resource):
-    def get(self, pipeline_id):
+    def get(self, pipeline_name):
         """
-        @api {get} /pipelines/:pipeline_id/ Get pipeline by ID
+        @api {get} /pipelines/:pipeline_name/ Get pipeline by name
         @apiName GetPipeline
         @apiGroup Pipeline
         @apiVersion 1.0.0
 
-        @apiParam {String} pipeline_id Comment ID.
+        @apiParam {String} pipeline_name Pipeline name.
 
-        @apiSuccess {String} id Comment ID.
+        @apiSuccess {String} id Pipeline ID.
         @apiSuccess {String} insert_time Pipeline creation time.
         @apiSuccess {String} name Pipeline name.
         @apiSuccess {String} created_by User ID.
@@ -39,19 +38,13 @@ class Pipeline(Resource):
         @apiSuccess {Object} mlpipeline.outputs Primitive outputs.
         """
 
-        try:
-            pid = ObjectId(pipeline_id)
-        except Exception as e:
-            LOGGER.exception(e)
-            return {'message': str(e)}, 400
-
-        document = model.Pipeline.find_one(id=pid)
+        document = model.Pipeline.find_one(name=pipeline_name)
 
         if document is None:
             LOGGER.exception('Error getting pipeline. '
-                             'Pipeline %s does not exist.', pipeline_id)
+                             'Pipeline %s does not exist.', pipeline_name)
             return {
-                'message': 'Pipeline {} does not exist'.format(pipeline_id)
+                'message': 'Pipeline {} does not exist'.format(pipeline_name)
             }, 400
 
         try:
