@@ -13,7 +13,7 @@ import Modal from './components/modal';
  * |    pipeline info           |
  * -----------------------------|
  *
- * Click EXP Card to EXP page
+ * Click EXP Card to switch to EXP page
 * ------------------------------
  * |          Header            |
  * |-----------------------------
@@ -26,28 +26,28 @@ import Modal from './components/modal';
 
 export class App {
 
-    public header: Header;
-    public content: Content;
-    public modal: Modal;
+  public header: Header;
+  public content: Content;
+  public modal: Modal;
 
 
-    public bootstrap() {
-        this.header = new Header('#header');
-        this.content = new Content();
-        this.modal = new Modal('#modal-audio');
-    }
+  public bootstrap() {
+    this.header = new Header('#header');
+    this.content = new Content();
+    this.modal = new Modal('#modal-audio');
+  }
 
-    public setupEventHandlers() {
-        this.header.setupEventHandlers();
-        this.content.setupEventHandlers();
-        this.modal.setupEventHandlers();
-    }
+  public setupEventHandlers() {
+    this.header.setupEventHandlers();
+    this.content.setupEventHandlers();
+    this.modal.setupEventHandlers();
+  }
 
-    constructor() {
-        // initialize your app here
-        this.bootstrap();
-        this.setupEventHandlers();
-    }
+  constructor() {
+    // initialize your app here
+    this.bootstrap();
+    this.setupEventHandlers();
+  }
 }
 
 new App();

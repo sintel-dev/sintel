@@ -1,6 +1,4 @@
-@import "../less/colors";
-
-
+@import "../less/colors.less";
 
 /* variables */
 @row-title-color: #919295;
@@ -11,9 +9,9 @@
 @font-inactive-color: #A7A7AA;
 @font-active-color: white;
 
-// @easing: cubic-bezier(.694, 0, .335, 1);    // for transition
-@easing: linear;    // for transition
-
+// @transition-time: 0.3s;
+// @easing2: cubic-bezier(.694, 0, .335, 1);    // for transition
+@easing2: linear;    // for transition
 
 @proj-card-width: 360px;
 @exp-card-width: 320px;
@@ -122,7 +120,7 @@
             border-radius: 10px;
             transition-property: background-color border-color;
             transition-duration: 0.3s;
-            transition-timing-function: @easing;
+            transition-timing-function: @easing2;
 
             .sep-line {
                 border-top: 1px solid #34363B;
@@ -133,7 +131,7 @@
             .title {
                 color: @font-inactive-color;
                 font-size: 25px;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             .exp-info {
@@ -142,7 +140,7 @@
                 bottom: 20px;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             .pipe-info {
@@ -151,7 +149,7 @@
                 bottom: 20px;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             &.active, &:hover {
@@ -218,7 +216,7 @@
                     padding-left: 15px;
                     font-size: 18px;
                     color: @font-inactive-color;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         float: left;
@@ -248,7 +246,7 @@
                     color: @font-inactive-color;
                     font-size: @info-font-size;
                     padding-left: 15px;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         padding-top: 40px;
@@ -325,7 +323,7 @@
                     padding-left: 15px;
                     font-size: 18px;
                     color: @font-inactive-color;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         float: left;
@@ -355,7 +353,7 @@
                     color: @font-inactive-color;
                     font-size: @info-font-size;
                     padding-left: 15px;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         padding-top: 10px;

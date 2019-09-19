@@ -1,14 +1,16 @@
-@import "../less/colors";
+@import "../less/colors.less";
 
 
 /****            PAGE SLIDER           ****/
 
 /* variables */
-
 @offset: 2rem;
 @page-width: 100%;
 @page-height: ~"calc(100vh - 50px)";
+@transition-time: 1s;
 @easing: cubic-bezier(.694, 0, .335, 1);
+
+// @easing: linear;
 
 
 /* class variables */
@@ -99,31 +101,31 @@
         &.prev {
             z-index: 5;
             transform: translate3d(-100%, 0, 0);
-            transition: 1s @easing;
+            transition: @transition-time @easing;
 
             .abs-mask {
                 transform: translateX(80%);
-                transition: 1s @easing;
+                transition: @transition-time @easing;
             }
 
             // .page-content {
-            //     transition: transform 0s 1s;
+            //     transition: transform 0s @transition-time;
             // }
         }
 
         &.active {
             z-index: 10;
             transform: translate3d(0, 0, 0);
-            transition: transform 1s @easing;
+            transition: transform @transition-time @easing;
 
             .abs-mask {
                 transform: translate3d(0, 0, 0);
-                transition: transform 1s @easing;
+                transition: transform @transition-time @easing;
             }
 
             // .page-content {
             //     transform: scale(1.01);
-            //     transition: transform 1s @easing;
+            //     transition: transform @transition-time @easing;
             // }
         }
 

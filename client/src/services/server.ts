@@ -1,19 +1,19 @@
-import {Server, JQueryStaticExt} from './rest-server.interface';
-import {server as sv} from '../config';
+import { Server, JQueryStaticExt } from './server.interface';
+import { server as sv } from '../config';
 
 let jqueryExt = $ as JQueryStaticExt;
 
 let server: Server = new jqueryExt.RestClient(
-    `${sv}/api/v1/`,
-    {
-        cache: 5,                 // This will cache requests for 5 seconds
-        cachableMethods: ['GET'],
-        stringifyData: true,      // true for "Content-Type = application/json"
-        request: function(resource, options) {
-            // customize your request here
-            return $.ajax(options);
-        }
+  `${sv}/api/v1/`,
+  {
+    cache: 5,                 // This will cache requests for 5 seconds
+    cachableMethods: ['GET'],
+    stringifyData: true,      // true for "Content-Type = application/json"
+    request: function (resource, options) {
+      // customize your request here
+      return $.ajax(options);
     }
+  }
 );
 
 server.add('datasets');

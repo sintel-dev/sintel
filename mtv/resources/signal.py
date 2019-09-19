@@ -77,9 +77,6 @@ class Signals(Resource):
 
         documents = model.Signal.find()
 
-        if documents is None:
-            return []
-
         try:
             signals = [get_signal(document) for document in documents]
         except Exception as e:

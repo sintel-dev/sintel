@@ -160,9 +160,6 @@ class Dataruns(Resource):
 
         datarun_docs = model.Datarun.find(experiment=experiment_doc.id)
 
-        if datarun_docs is None:
-            return []
-
         try:
             dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
         except Exception as e:

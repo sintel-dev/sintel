@@ -67,9 +67,6 @@ class Datasets(Resource):
 
         documents = model.Dataset.find()
 
-        if documents is None:
-            return []
-
         try:
             datasets = [get_dataset(document) for document in documents]
         except Exception as e:

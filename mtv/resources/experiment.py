@@ -143,13 +143,10 @@ class Experiments(Resource):
         project = request.args.get('project', None)
 
         query = dict()
-        if project is not None or project == '':
+        if project is not None and project != '':
             query['project'] = project
 
         experiment_docs = model.Experiment.find(**query)
-
-        if (experiment_docs is None):
-            return []
 
         try:
             experiments = [get_experiment(experiment_doc) for experiment_doc in experiment_docs]

@@ -78,9 +78,6 @@ class Pipelines(Resource):
 
         documents = model.Pipeline.find()
 
-        if documents is None:
-            return []
-
         try:
             pipelines = [get_pipeline(document) for document in documents]
         except Exception as e:
