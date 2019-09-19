@@ -116,7 +116,7 @@ const registerLessBuildTasks = (options) => {
         // gulp.src(src)
             .pipe(plugins.less().on('error', function (err) {
                 gutil.log(err);
-                this.emit('end');
+                // this.emit('end');
             }))
             .pipe(plugins.autoprefixer())
             .pipe(gulp.dest(dir))
@@ -163,11 +163,11 @@ const registerAssetsBuildTasks = (options) => {
     let { assetsFile } = options;
 
     // create empty files
-    if (!fs.existsSync(DIST)) { fs.mkDISTSync(DIST); }
+    if (!fs.existsSync(DIST)) { fs.mkdirSync(DIST); }
     fs.writeFile(`${DIST}/none.css`, ' ', (err) => { if (err) throw err; });
     fs.writeFile(`${DIST}/none.js`, ' ', (err) => { if (err) throw err; });
 
-    // update assets
+    // update assets : todo dev/prod
     let replacementAssets;
     gulp.task(`assets:update`, (done) => {
         delete require.cache[require.resolve(assetsFile)]
@@ -185,24 +185,44 @@ const registerAssetsBuildTasks = (options) => {
         done();
     });
 
-    gulp.task(`assets:writeToHTML`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace(replacementAssets, {
+    gulp.task(`assets:writeToHTML:dev`, () => {
+        replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.js`;
+        replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.css`;
+
+        return gulp.src('index.html')
+            .pipe(plugins.htmlReplaceDyu(replacementAssets, {
                 keepUnassigned: true,
                 keepBlockTags: true,
                 resolvePaths: false
             }))
             .pipe(gulp.dest('./'))
-    );
+     });
 
-    gulp.task(`assets:build`, series(
+    gulp.task(`assets:writeToHTML:prod`, () => {
+        replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.min.js`;
+        replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.min.css`;
+    
+        return gulp.src('index.html')
+            .pipe(plugins.htmlReplaceDyu(replacementAssets, {
+                keepUnassigned: true,
+                keepBlockTags: true,
+                resolvePaths: false
+            }))
+            .pipe(gulp.dest('./'))
+    });
+
+    gulp.task(`assets:build:dev`, series(
         `assets:update`,
-        `assets:writeToHTML`,
-        'htmlCleanEmptyLines'
+        `assets:writeToHTML:dev`
+    ));
+
+    gulp.task(`assets:build:prod`, series(
+        `assets:update`,
+        `assets:writeToHTML:prod`
     ));
 
     gulp.task('assets:watch', () => {
-        gulp.watch('assets.js', series('assets:build'));
+        gulp.watch('assets.js', series('assets:build:dev'));
     });
 };
 
@@ -212,60 +232,18 @@ registerAssetsBuildTasks(
     }
 );
 
-
-/******************* build HTML *********************/
-
-const registerHTMLBuildTasks = () => {
-
-    gulp.task(`writeToHTML:dev`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-js': `${DIST}/${jsBundleFileName}.js`,
-                'app-css': `${DIST}/${cssBundleFileName}.css`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
-    );
-
-    gulp.task(`writeToHTML:prod`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-js': `${DIST}/${jsBundleFileName}.min.js`,
-                'app-css': `${DIST}/${cssBundleFileName}.min.css`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
-    );
-}
-
-registerHTMLBuildTasks()
-
 /********************* MAIN ***********************/
 
-gulp.task('build:dev', series(
-    'writeToHTML:dev',
-    parallel(
-        'less:build:dev',
-        'ts:build:dev',
-        'assets:build',
-    )
+gulp.task('build:dev', parallel(
+    'less:build:dev',
+    'ts:build:dev',
+    'assets:build:dev'
 ));
 
-gulp.task('build:prod', series(
-    'writeToHTML:prod',
-    parallel(
-        'less:build:prod',
-        'ts:build:prod',
-        'assets:build',
-    )
+gulp.task('build:prod', parallel(
+    'less:build:prod',
+    'ts:build:prod',
+    'assets:build:prod'
 ));
 
 // watching mode for development use
