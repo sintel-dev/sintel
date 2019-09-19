@@ -79,6 +79,7 @@ export class LineChartFocus extends pip.Events {
 
     self.svgContainer = d3.select<HTMLElement, any>(ele);
 
+    
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
 
