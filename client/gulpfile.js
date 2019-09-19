@@ -116,7 +116,7 @@ const registerLessBuildTasks = (options) => {
         // gulp.src(src)
             .pipe(plugins.less().on('error', function (err) {
                 gutil.log(err);
-                // this.emit('end');
+                this.emit('end');
             }))
             .pipe(plugins.autoprefixer())
             .pipe(gulp.dest(dir))
@@ -185,7 +185,7 @@ const registerAssetsBuildTasks = (options) => {
         done();
     });
 
-    gulp.task(`assets:writeToHTML:dev`, () => {
+    gulp.task(`writeToHTML:dev`, () => {
         replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.js`;
         replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.css`;
 
@@ -198,7 +198,7 @@ const registerAssetsBuildTasks = (options) => {
             .pipe(gulp.dest('./'))
      });
 
-    gulp.task(`assets:writeToHTML:prod`, () => {
+    gulp.task(`writeToHTML:prod`, () => {
         replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.min.js`;
         replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.min.css`;
     
@@ -213,12 +213,12 @@ const registerAssetsBuildTasks = (options) => {
 
     gulp.task(`assets:build:dev`, series(
         `assets:update`,
-        `assets:writeToHTML:dev`
+        `writeToHTML:dev`
     ));
 
     gulp.task(`assets:build:prod`, series(
         `assets:update`,
-        `assets:writeToHTML:prod`
+        `writeToHTML:prod`
     ));
 
     gulp.task('assets:watch', () => {

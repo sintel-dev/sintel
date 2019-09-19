@@ -1,49 +1,37 @@
+@import '../less/colors';
+
+
 .main-header {
-    nav {
-        transition: margin-left .3s ease-in-out;
-        margin-bottom: 0;
-        margin-left: 230px;
-        border: none;
-        min-height: 50px;
-        border-radius: 0;
+    box-shadow: 0 0 14px #000;
+    background: @main-color;
+    a{
+        transition: all .2s ease-in-out;
+        color: #fff;
+    }
+    .navbar, .logo, .logo:hover {
+        background: @main-color;
     }
 
-    .navbar-custom-menu {
-        .project-menu, .experiment-menu {
-            max-height: 500px;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            overflow-x: hidden;
-            overflow-y: auto;
-            > li > a {
-              display: block;
-              white-space: nowrap; /* Prevent text from breaking */
-              border-bottom: 1px solid #f4f4f4;
+
+    .navbar-custom-menu{
+        .text{
+            padding: 15px;
+        }
+
+        .project-menu > li > a {
+            background-color: @main-color;
+            &:hover{
+                background-color: @second-color;
             }
         }
-
-        .text {
-            font-size: 14px;
-            padding-left: 0;
-        }
-    }
-
-    .pageback-btn {
-        float: left;
-        background-color: transparent;
-        background-image: none;
-        padding: 18px 15px;
-        display: none;
-        font-family: fontAwesome;
-        &.left::after {
-            content: "\f053";
-        }
-        &.right::after {
-            content: "\f054";
+        .experiment-menu > li > a{
+            background: @main-color;
+            color: #fff;
+            border-radius: 0;
+            border: none;
+            &:hover{
+                background: @second-color;
+            }
         }
     }
 }
-
-
-
