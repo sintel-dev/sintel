@@ -33,7 +33,7 @@ class PageLanding {
         //     self.goExp();
         // });
 
-        server.experiments.read<RSI.Response>().done( (data: RSI.Experiment[]) => {
+        server.experiments.read().done( (data: RSI.Experiment[]) => {
             self.expList = data;
 
             let projects = _.chain(data).map(d => d.project).uniq().value();
