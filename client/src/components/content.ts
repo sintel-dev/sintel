@@ -17,7 +17,7 @@ class Content {
   /**
    * The content instance serves as a page switcher.
    * It contains two pages: landing page and exp page.
-   * 
+   *
    * By default, landing page is shown.
    */
   constructor() {
@@ -61,7 +61,7 @@ class Content {
   /**
    * Event handler for changing page.
    * Invoked when content receives 'page:change' signal.
-   * 
+   *
    * @param {String} pageName The target page name
    */
   private changePage(pageName) {

@@ -13,6 +13,7 @@ const log = require('fancy-log');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.conf');
 const webpackConfigProd = require('./webpack.conf.prod');
+const gutil = require('gulp-util')
 
 /********************* global variables ***********************/
 const DIST = './public/dist';
@@ -111,12 +112,15 @@ const registerLessBuildTasks = (options) => {
             .pipe(plugins.clean())
     );
 
-    gulp.task('less:compile', () =>
+    gulp.task('less:compile', (done) =>
         gulp.src(entryPoint)
         // gulp.src(src)
             .pipe(plugins.less().on('error', function (err) {
-                gutil.log(err);
-                this.emit('end');
+                log.error('[less]', err.toString({
+                    colors: true,
+                    chunks: false
+                }));
+                done();
             }))
             .pipe(plugins.autoprefixer())
             .pipe(gulp.dest(dir))

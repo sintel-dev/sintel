@@ -29,7 +29,7 @@ class PageLanding {
 
   /**
    * Create landing page instance
-   * 
+   *
    * @param eleId HTMLElement ID used for binding Knockout
    */
   constructor(eleId: string) {
@@ -49,7 +49,7 @@ class PageLanding {
         let a: ProjectDict = {};
         console.log(data);
         _.each(data.experiments, exp => {
-
+          let test = 1;
         });
         a['sdf'] = 10;
       })
@@ -120,7 +120,7 @@ class PageLanding {
       event_id: 1
     });
     ok[1] = 2;
-    let b: ProjectDict = {}
+    let b: ProjectDict = {};
   }
 
 }
