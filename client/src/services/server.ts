@@ -1,24 +1,22 @@
-import { Server, JQueryStaticExt } from './server.interface';
-import { server as sv } from '../config';
+import { Server, JQueryStaticExt } from './server.itf';
+import { server as host } from '../config';
 
 let jqueryExt = $ as JQueryStaticExt;
 
 let server: Server = new jqueryExt.RestClient(
-  `${sv}/api/v1/`,
+  `${host}/api/v1/`,
   {
-    cache: 5,                 // This will cache requests for 5 seconds
+    cache: 5,                 // Cache requests for 5 seconds
     cachableMethods: ['GET'],
-    stringifyData: true,      // true for "Content-Type = application/json"
-    request: function (resource, options) {
-      // customize your request here
-      return $.ajax(options);
-    }
+    stringifyData: true,      // True for passing all POST data through JSON.stringify
   }
 );
 
 server.add('datasets');
 
 server.add('dataruns');
+
+server.add('experiments');
 
 server.add('pipelines');
 
@@ -28,32 +26,25 @@ server.add('comments');
 
 server.add('data');
 
-server.add('experiments');
-
 server.add('test');
 
 
-
 /**
- * usage:
+ * usage examples:
  *
- * return the signal list of a db
- * server.dbs.signals.read('dbName')
- * Get  /dbs/dbName/signals/
+ * server.test.read<dataType>(id)
+ * GET  /test/:id/
  *
- * return all the signal data
- * server.dbs.signals.read('dbName', 'sigName')
- * Get  /dbs/dbName/signals/sigName/
+ * server.test.del<dataType>(id)
+ * DELETE  /test/:id/
  *
- * return the signal date from start_time to end_time
- * server.dbs.signals.read('dbName', 'sigName', {},
- *      {'start': timestamp1, 'end': timestamp2})
- * Get  /dbs/dbName/signals/sigName/?start=timestamp1&end=timestamp2
+ * server.test.update<dataType>(id, {data: 1})
+ * PUT  /test/:id/
+ * Request includes body "{data: 1}"
+ *
+ * server.test.create<dataType>(id, {data: 1}, {data: 1})
+ * POST  /test/:id/?data=1
+ * Request includes body "{data: 1}"
  */
-
-// server.dbs.signals.read('dbName', 'sigName', {'start': timestamp1}, {'end': timestamp2})
-
-// step3: remember to modify the PipServer interface accordingly
-
 
 export default server;

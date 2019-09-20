@@ -28,6 +28,7 @@ def get_datarun(datarun_doc):
     if event_docs is not None:
         for event_doc in event_docs:
             datarun['events'].append({
+                'id': str(event_doc.id),
                 'start_time': event_doc.start_time,
                 'stop_time': event_doc.stop_time,
                 'score': event_doc.score,
@@ -88,6 +89,7 @@ class Datarun(Resource):
         @apiSuccess {String} end_time Datarun end time.
         @apiSuccess {String} status Datarun status.
         @apiSuccess {Object[]} events Event list.
+        @apiSuccess {String} events.id Event ID.
         @apiSuccess {Int} events.start_time Event start time.
         @apiSuccess {Int} events.stop_time Event stop time.
         @apiSuccess {Float} events.score Event anomaly score.
@@ -136,6 +138,7 @@ class Dataruns(Resource):
         @apiSuccess {String} dataruns.end_time Datarun end time.
         @apiSuccess {String} dataruns.status Datarun status.
         @apiSuccess {Object[]} dataruns.events Event list.
+        @apiSuccess {String} dataruns.events.id Event ID.
         @apiSuccess {Int} dataruns.events.start_time Event start time.
         @apiSuccess {Int} dataruns.events.stop_time Event stop time.
         @apiSuccess {Float} dataruns.events.score Event anomaly score.

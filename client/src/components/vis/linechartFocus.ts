@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 import * as pip from '../../services/pipClient';
-import { LineChartDataEle } from './data.interface';
+import { LineChartDataEle } from './data.itf';
 import { colorSchemes } from '../../services/globals';
-import { Event } from '../../services/server.interface';
+import { Event } from '../../services/server.itf';
 import dataProcessor from '../../services/dataProcessor';
 
 

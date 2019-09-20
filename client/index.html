@@ -1,16 +1,20 @@
 <html>
 
-<head>	<!-- build:assets-css -->
+<head>
+	<!-- build:assets-css -->
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/Ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/skins/_all-skins.min.css">
-	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+	<link rel="stylesheet"
+		href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet"
+		href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
 	<link rel="stylesheet" href="./public/lib-static/tooltipster/css/tooltipster.css">
 	<!-- endbuild -->
-	<!-- build:app-css -->
+
+	<!-- build:app-css -->
 	<link rel="stylesheet" href="./public/dist/main.css">
 	<!-- endbuild -->
 
@@ -37,36 +41,29 @@
 						<div id="page-landing" class="page page-landing" data-index="0">
 							<div class="abs-mask">
 								<div class="page-content">
-									<!-- <h1 data-bind="click: ()=>{ goExp('exp') }">exp</h1> -->
+
+									<!-- project row: begin -->
 									<div class="ld-row proj-row">
 										<span class="row-title">Projects</span>
-										<ul class="proj-cards scroll-style">
-											<!-- add forEach -->
-											<li class="card active">
-												<div class="title">NASA-MSL</div>
+										<ul class="proj-cards scroll-style" data-bind="foreach: projects">
+											<li class="card" data-bind="css: { active: $parent.searchActive.bind($parent, 'project', $data) }">
+												<div class="title"
+														 data-bind="text: $data.name"></div>
 												<div class="sep-line"></div>
-												<div class="exp-info">8 experiments</div>
-												<div class="pipe-info">4 unique pipelines</div>
-											</li>
-											<li class="card">
-												<div class="title">NASA-SMAP</div>
-												<div class="sep-line"></div>
-												<div class="exp-info">8 experiments</div>
-												<div class="pipe-info">4 unique pipelines</div>
-											</li>
-											<li class="card">
-												<div class="title">YAHOO-S5</div>
-												<div class="sep-line"></div>
-												<div class="exp-info">3 experiments</div>
-												<div class="pipe-info">1 unique pipelines</div>
+												<div class="exp-info"
+														 data-bind="text: `${$data.experimentNum} experiments`"></div>
+												<div class="pipe-info"
+														 data-bind="text: `${$data.uniquePipelineNum} unique pipelines`"></div>
 											</li>
 										</ul>
-										<div style="text-align:center">
-											<span class="dot active" onclick="currentSlide(1)"></span>
-											<span class="dot" onclick="currentSlide(2)"></span>
-											<span class="dot" onclick="currentSlide(3)"></span>
+										<div style="text-align:center" data-bind="foreach: projects">
+											<span class="dot"	data-bind="
+												click: $parent.onSelectProject.bind($parent, $data),
+												css: { active: $parent.searchActive.bind($parent, 'project', $data) }"> </span>
 										</div>
 									</div>
+									<!-- project row: end -->
+
 									<div class="ld-row exp-row">
 										<span class="row-title">Experiments</span>
 										<ul class="exp-cards scroll-style">
@@ -517,7 +514,8 @@
 			</g> -->
 	<!-- <rect x="50" y="50" height="400" width="400" fill="rgb(255,255,255)" fill-opacity="0.8" />
 		</svg> -->
-	<!-- build:assets-js -->
+
+	<!-- build:assets-js -->
 	<script src="./public/lib-static/jquery.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-ui/jquery-ui.min.js"></script>
 	<script src="./public/lib-static/jquery.rest.js"></script>
@@ -531,7 +529,8 @@
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/moment/min/moment.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+	<script
+		src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/fastclick/lib/fastclick.js"></script>
@@ -540,7 +539,8 @@
 	<script src="./public/lib-static/science.js"></script>
 	<script src="./node_modules/tinycolor/tinycolor.js"></script>
 	<!-- endbuild -->
-		<!-- build:app-js -->
+
+	<!-- build:app-js -->
 	<script src="./public/dist/main.js"></script>
 	<!-- endbuild -->
 

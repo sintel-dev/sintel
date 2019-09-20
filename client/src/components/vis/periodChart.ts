@@ -1,5 +1,5 @@
 import * as pip from '../../services/pipClient';
-import { PeriodChartDataEle, LineChartDataEleInfoEle } from './data.interface';
+import { PeriodChartDataEle, LineChartDataEleInfoEle } from './data.itf';
 import { colorSchemes } from '../../services/globals';
 import 'tooltipster';
 import * as _ from 'lodash';

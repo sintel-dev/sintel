@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as RSI from './server.interface';
+import * as RSI from './server.itf';
 
 
 let colors = [

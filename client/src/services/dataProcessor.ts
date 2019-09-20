@@ -1,7 +1,7 @@
-import { TimeSeriesData, LineChartDataEleInfoEle } from '../components/vis/data.interface';
+import { TimeSeriesData, LineChartDataEleInfoEle } from '../components/vis/data.itf';
 import * as _ from 'lodash';
 import * as G from './globals';
-import * as RSI from './server.interface';
+import * as RSI from './server.itf';
 import server from './server';
 
 

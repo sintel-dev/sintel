@@ -1,5 +1,5 @@
 import { Events } from './pipClient';
-import { TimeSeriesData } from '../components/vis/data.interface';
+import { TimeSeriesData } from '../components/vis/data.itf';
 import * as _ from 'lodash';
 
 

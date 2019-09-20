@@ -2,9 +2,9 @@ import * as pip from '../services/pipClient';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
 import 'select2';
-import * as RSI from '../services/server.interface';
+import * as RSI from '../services/server.itf';
 import dataProcessor from '../services/dataProcessor';
-import { LineChartDataEle } from './vis/data.interface';
+import { LineChartDataEle } from './vis/data.itf';
 import { LineChartCtx } from './vis/linechartCtx';
 import { LineChartFocus } from './vis/linechartFocus';
 import { PeriodChart } from './vis/periodChart';
@@ -134,7 +134,7 @@ class PageExp {
 
   public remove() {
     let self = this;
-    server.events.del<RSI.Response>(self.event()).done(() => {
+    server.events.del<any>(self.event()).done(() => {
       this.showDatasetInfo(false);
       pip.content.trigger('event:update');
       // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
@@ -156,9 +156,11 @@ class PageExp {
 
     if (self.event() === 'new') {
       // create new
-      server.events.create<RSI.Response>({
-        start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      server.events.create<any>({
+        // start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+        // stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+        start_time: Math.trunc(self.eventInfo.start_time / 1000),
+        stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
         score: self.fromScoreToLevel(self.level()),
         datarun: self.eventInfo.datarun
       }).done(eid => {
@@ -173,9 +175,11 @@ class PageExp {
       });
     } else {
       // update existing
-      server.events.update<RSI.Response>(self.event(), {
-        start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      server.events.update<any>(self.event(), {
+        // start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+        // stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+        start_time: Math.trunc(self.eventInfo.start_time / 1000),
+        stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
         score: self.fromScoreToLevel(self.level()),
         datarun: self.eventInfo.datarun
       }).done(eid => {
@@ -323,7 +327,7 @@ class PageExp {
 
     this.event(eventInfo.id);
     this.datarun(eventInfo.datarun);
-    this.dataset(eventInfo.dataset);
+    // this.dataset(eventInfo.dataset);
     this.eventFrom(new Date(eventInfo.start_time).toUTCString());
     this.eventTo(new Date(eventInfo.stop_time).toUTCString());
     this.level(this.fromLevelToScore(eventInfo.score));

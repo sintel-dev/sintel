@@ -17,6 +17,7 @@ def get_event(event_doc):
     if comment_docs is not None:
         for comment_doc in comment_docs:
             comment = {
+                'id': str(comment_doc.id),
                 'text': comment_doc.text,
                 'insert_time': comment_doc.insert_time.isoformat(),
                 'created_by': comment_doc.created_by
@@ -72,6 +73,7 @@ class Event(Resource):
         @apiSuccess {Int} stop_time Event stop time.
         @apiSuccess {Float} score Event anomaly score.
         @apiSuccess {Object[]} comments Event comment list.
+        @apiSuccess {String} comments.id Comment ID.
         @apiSuccess {String} comments.text Comment content.
         @apiSuccess {String} comments.insert_time Comment creation time.
         @apiSuccess {String} comments.created_by User ID.
@@ -114,6 +116,7 @@ class Event(Resource):
         @apiSuccess {Int} stop_time Event stop time.
         @apiSuccess {Float} score Event anomaly score.
         @apiSuccess {Object[]} comments Event comment list.
+        @apiSuccess {String} comments.id Comment ID.
         @apiSuccess {String} comments.text Comment content.
         @apiSuccess {String} comments.insert_time Comment creation time.
         @apiSuccess {String} comments.created_by User ID.
@@ -208,6 +211,7 @@ class Events(Resource):
         @apiSuccess {Int} events.stop_time Event stop time.
         @apiSuccess {Float} events.score Event anomaly score.
         @apiSuccess {Object[]} events.comments Event comment list.
+        @apiSuccess {String} events.comments.id Comment ID.
         @apiSuccess {String} events.comments.text Comment content.
         @apiSuccess {String} events.comments.insert_time Comment creation time.
         @apiSuccess {String} events.comments.created_by User ID.
@@ -258,6 +262,7 @@ class Events(Resource):
         @apiSuccess {Int} stop_time Event stop time.
         @apiSuccess {Float} score Event anomaly score.
         @apiSuccess {Object[]} comments Event comment list.
+        @apiSuccess {String} comments.id Comment ID.
         @apiSuccess {String} comments.text Comment content.
         @apiSuccess {String} comments.insert_time Comment creation time.
         @apiSuccess {String} comments.created_by User ID.

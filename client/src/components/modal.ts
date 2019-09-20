@@ -1,6 +1,6 @@
 import * as pip from '../services/pipClient';
 import * as ko from 'knockout';
-import * as RSI from '../services/server.interface';
+import * as RSI from '../services/server.itf';
 import server from '../services/server';
 
 
@@ -51,7 +51,7 @@ class Modal {
 
       self.event(eventInfo.id);
       self.datarun(eventInfo.datarun);
-      self.dataset(eventInfo.dataset);
+      // self.dataset(eventInfo.dataset);
       self.eventFrom(new Date(eventInfo.start_time).toUTCString());
       self.eventTo(new Date(eventInfo.stop_time).toUTCString());
       self.level(self.fromLevelToScore(eventInfo.score));
@@ -93,7 +93,7 @@ class Modal {
 
   public remove() {
     let self = this;
-    server.events.del<RSI.Response>(self.event()).done(() => {
+    server.events.del<any>(self.event()).done(() => {
       self.modalEle.modal('hide');
       pip.content.trigger('event:update');
       // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
@@ -115,9 +115,11 @@ class Modal {
 
     if (self.event() === 'new') {
       // create new
-      server.events.create<RSI.Response>({
-        start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      server.events.create<any>({
+        // start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
+        // stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+        start_time: Math.trunc(self.eventInfo.start_time / 1000),
+        stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
         score: self.fromScoreToLevel(self.level()),
         datarun: self.eventInfo.datarun
       }).done(eid => {
@@ -132,9 +134,9 @@ class Modal {
       });
     } else {
       // update existing
-      server.events.update<RSI.Response>(self.event(), {
-        start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      server.events.update<any>(self.event(), {
+        start_time: Math.trunc(self.eventInfo.start_time / 1000),
+        stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
         score: self.fromScoreToLevel(self.level()),
         datarun: self.eventInfo.datarun
       }).done(eid => {
