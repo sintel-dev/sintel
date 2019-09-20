@@ -102,11 +102,24 @@ class PageLanding {
     // });
 
     // horizontal scroll
-    // $('.proj-cards').on('mousewheel', function(evt: any) {
-    //     // console.log(evt.originalEvent.deltaY);
-    //     this.scrollLeft += (evt.originalEvent.deltaY);
-    //     evt.preventDefault();
-    // });
+    $('.proj-cards').on('mousewheel', function(evt: any) {
+        this.scrollLeft += (evt.originalEvent.deltaY);
+        evt.preventDefault();
+    });
+
+    $('.exp-cards').on('mousewheel', function(evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
+
+    $('.pipe-cards').on('mousewheel', function(evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
+  }
+
+  public wheel(idx) {
+    console.log(idx);
   }
 
   // handle events coming from other components
@@ -134,6 +147,25 @@ class PageLanding {
   public onSelectProject() {
     // to be filled
   }
+
+  public update() {
+    console.log('childrenComplete');
+    $('.pipe-cards .info p').on('mousewheel', function(evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
+  }
+  
+  /**
+   * Knockout: click event handler.
+   *
+   * Invoked after clicking the project card
+   */
+  public onSelectDot(data) {
+    // to be filled
+    console.log(typeof(data));
+  }
+
 
   public filterExp() {
     // pass
@@ -203,8 +235,11 @@ class PageLanding {
     });
 
     self.projects(projList);
+    
+    // select first project
     self.actives.project = projList[0];
-
+    self.experiments(self.actives.project.experiments);
+    self.pipelines(self.actives.project.pipelines);
   }
 
   private getExperimentEventNum(exp: DT.Experiment) {

@@ -46,114 +46,71 @@
 									<div class="ld-row proj-row">
 										<span class="row-title">Projects</span>
 										<ul class="proj-cards scroll-style" data-bind="foreach: projects">
-											<li class="card" data-bind="css: { active: $parent.searchActive.bind($parent, 'project', $data) }">
-												<div class="title"
-														 data-bind="text: $data.name"></div>
+											<li class="card"
+												data-bind="css: { active: $parent.searchActive.bind($parent, 'project', $data) }">
+												<div class="title" data-bind="text: $data.name"></div>
 												<div class="sep-line"></div>
-												<div class="exp-info"
-														 data-bind="text: `${$data.experimentNum} experiments`"></div>
-												<div class="pipe-info"
-														 data-bind="text: `${$data.uniquePipelineNum} unique pipelines`"></div>
+												<div class="exp-info" data-bind="text: `${$data.experimentNum} experiments`"></div>
+												<div class="pipe-info" data-bind="text: `${$data.uniquePipelineNum} unique pipelines`"></div>
 											</li>
 										</ul>
 										<div style="text-align:center" data-bind="foreach: projects">
-											<span class="dot"	data-bind="
-												click: $parent.onSelectProject.bind($parent, $data),
+											<span class="dot" data-bind="
+												click: $parent.onSelectDot.bind($parent, $data),
 												css: { active: $parent.searchActive.bind($parent, 'project', $data) }"> </span>
 										</div>
 									</div>
 									<!-- project row: end -->
 
+									<!-- experiment row: begin -->
 									<div class="ld-row exp-row">
 										<span class="row-title">Experiments</span>
-										<ul class="exp-cards scroll-style">
-											<!-- add forEach -->
+										<ul class="exp-cards scroll-style" data-bind="foreach: experiments">
 											<li class="card">
 												<div class="header">
-													<span>Experiment 1</span>
-													<span data-bind="click: goExp"> <i class="fa fa-fw fa-search-plus"></i> </span>
+													<span data-bind="text: `Experiment #${$index()+1}`"></span>
+													<span data-bind="click: $parent.goExp.bind($parent, $data)">
+														<i class="fa fa-fw fa-search-plus"></i> </span>
 												</div>
 												<div class="info">
-													<p>Dataset: set1</p>
-													<p>By: Kalyan</p>
-													<p>DC: 08/29/2019</p>
-													<p>Events: 78</p>
-												</div>
-												<div class="matrix" style="background-image: url(./public/imgs/matrix.PNG)"></div>
-											</li>
-											<li class="card">
-												<div class="header">
-													<span>Experiment 2</span>
-													<span data-bind="click: goExp"><i class="fa fa-fw fa-search-plus"></i></span>
-												</div>
-												<div class="info">
-													<p>Dataset: set2</p>
-													<p>By: Dongyu</p>
-													<p>DC: 09/01/2019</p>
-													<p>Events: 56</p>
-												</div>
-												<div class="matrix" style="background-image: url(./public/imgs/matrix.PNG)"></div>
-											</li>
-											<li class="card">
-												<div class="header">
-													<span>Experiment 3</span>
-													<span data-bind="click: goExp"><i class="fa fa-fw fa-search-plus"></i></span>
-												</div>
-												<div class="info">
-													<p>Dataset: set1</p>
-													<p>By: Dongyu</p>
-													<p>DC: 08/27/2019</p>
-													<p>Events: 86</p>
+													<p data-bind="text: `Dataset: ${$data.dataset}`"></p>
+													<p data-bind="text: `By: ${$data.created_by}`"></p>
+													<p data-bind="text: `DC: ${$data.date_creation.substring(0,10)}`"></p>
+													<p data-bind="text: `Events: ${$data.eventNum}`"></p>
 												</div>
 												<div class="matrix" style="background-image: url(./public/imgs/matrix.PNG)"></div>
 											</li>
 										</ul>
-										<div style="text-align:center">
-											<span class="dot active" onclick="currentSlide(1)"></span>
-											<span class="dot" onclick="currentSlide(2)"></span>
-											<span class="dot" onclick="currentSlide(3)"></span>
+										<div style="text-align:center" data-bind="foreach: experiments">
+											<span class="dot" data-bind="
+												click: $parent.onSelectDot.bind($parent, $data)"> </span>
 										</div>
 									</div>
+									<!-- experiment row: end -->
+
+									<!-- pipeline row: begin -->
 									<div class="ld-row pipe-row">
 										<span class="row-title">Pipelines</span>
-										<ul class="pipe-cards scroll-style">
-											<!-- add forEach -->
+										<ul class="pipe-cards scroll-style" data-bind="foreach: pipelines">
 											<li class="card">
 												<div class="header">
-													<span>LSTM_Dynamic</span>
-													<span data-bind="click: filterExp"> <i class="fa fa-fw fa-filter"></i> </span>
+													<span data-bind="text: $data.name"></span>
+													<span data-bind="click: $parent.filterExp.bind($parent, $data)">
+														<i class="fa fa-fw fa-filter"></i> </span>
 												</div>
-												<div class="info">
-													<p>TimeSegMentsAverage</p>
-													<p>SimpleImputer</p>
-													<p>MinMaxScalar</p>
-													<p>RollingWindowSequence</p>
-													<p>LSTMRegressor</p>
-													<p>RegressionErrors</p>
-													<p>FindAnomaly</p>
-												</div>
-											</li>
-											<li class="card">
-												<div class="header">
-													<span>Sum_24h_LSTM</span>
-													<span data-bind="click: filterExp"> <i class="fa fa-fw fa-filter"></i> </span>
-												</div>
-												<div class="info">
-													<p>TimeSegmentsAggregate</p>
-													<p>SimpleImputer</p>
-													<p>MinMaxScalar</p>
-													<p>RollingWindowSequence</p>
-													<p>LSTMRegressor</p>
-													<p>RegressionErrors</p>
-													<p>FindAnomaly</p>
+												<div class="info" data-bind="
+													childrenComplete: $parent.update,
+													foreach: $data.mlpipeline.primitives">
+														<p data-bind="text: $data"></p>
 												</div>
 											</li>
 										</ul>
-										<div style="text-align:center">
-											<span class="dot" onclick="currentSlide(1)"></span>
-											<span class="dot" onclick="currentSlide(2)"></span>
+										<div style="text-align:center" data-bind="foreach: pipelines">
+											<span class="dot" data-bind="
+													click: $parent.onSelectDot.bind($parent, $data)"> </span>
 										</div>
 									</div>
+									<!-- pipeline row: end -->
 								</div>
 							</div>
 						</div>

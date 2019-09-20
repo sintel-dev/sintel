@@ -354,9 +354,15 @@
                     font-size: @info-font-size;
                     padding-left: 15px;
                     transition: color 0.3s @easing2;
+                    overflow-x: auto;
 
                     &:first-child {
                         padding-top: 10px;
+                    }
+
+                    &::-webkit-scrollbar {
+                        width: 0;
+                        height: 0;
                     }
                 }
             }
