@@ -28,6 +28,9 @@ def _inverse_scale_transform(v, a0, b0, a1, b1):
     Returns:
         float: the original value
     """
+    if b0 - a0 == 0:
+        return 0
+
     k = (v - a0) / (b0 - a0)
     return k * (b1 - a1) + a1
 
@@ -105,11 +108,15 @@ def updateDB(database, interval=60, utc=True, impute=True):
 
         # append the subsequent values
         for i, idx in enumerate(v['target_index']):
+            if nm_range[1] - nm_range[0] == 0:
+                raw_es = 0
+            else:
+                raw_es= v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
             data.append([
                 float(idx),
                 _inverse_scale_transform(v['y'][i][0], *nm_range, *raw_range),
                 _inverse_scale_transform(v['y_hat'][i][0], *nm_range, *raw_range),
-                v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0]),
+                raw_es,
                 v['y'][i][0],
                 v['y_hat'][i][0],
                 v['es'][i]

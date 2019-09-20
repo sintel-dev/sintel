@@ -7,10 +7,8 @@
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/Ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/dist/css/skins/_all-skins.min.css">
-	<link rel="stylesheet"
-		href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-	<link rel="stylesheet"
-		href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet" href="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.css">
 	<link rel="stylesheet" href="./public/lib-static/tooltipster/css/tooltipster.css">
 	<!-- endbuild -->
 
@@ -46,8 +44,11 @@
 									<div class="ld-row proj-row">
 										<span class="row-title">Projects</span>
 										<ul class="proj-cards scroll-style" data-bind="foreach: projects">
-											<li class="card"
-												data-bind="css: { active: $parent.searchActive.bind($parent, 'project', $data) }">
+											<li class="card" data-bind="
+												attr: {name: $data.name},
+												css: { active: ($parent.activeProject() != null)
+																			 && ($parent.activeProject().name===$data.name)},
+												click: $parent.onSelectCard.bind($parent, 'proj', $data)">
 												<div class="title" data-bind="text: $data.name"></div>
 												<div class="sep-line"></div>
 												<div class="exp-info" data-bind="text: `${$data.experimentNum} experiments`"></div>
@@ -56,8 +57,9 @@
 										</ul>
 										<div style="text-align:center" data-bind="foreach: projects">
 											<span class="dot" data-bind="
-												click: $parent.onSelectDot.bind($parent, $data),
-												css: { active: $parent.searchActive.bind($parent, 'project', $data) }"> </span>
+												click: $parent.onSelectDot.bind($parent, 'proj', $data),
+												css: { active: ($parent.activeProject() != null)
+													&& ($parent.activeProject().name===$data.name)}"> </span>
 										</div>
 									</div>
 									<!-- project row: end -->
@@ -66,10 +68,15 @@
 									<div class="ld-row exp-row">
 										<span class="row-title">Experiments</span>
 										<ul class="exp-cards scroll-style" data-bind="foreach: experiments">
-											<li class="card">
+											<li class="card" data-bind="
+												attr: {name: $data.id},
+												css: { active: ($parent.activeExperiment() != null)
+																			 && ($parent.activeExperiment().id===$data.id)},
+												click: $parent.onSelectCard.bind($parent, 'exp', $data)">
 												<div class="header">
-													<span data-bind="text: `Experiment #${$index()+1}`"></span>
-													<span data-bind="click: $parent.goExp.bind($parent, $data)">
+													<span data-bind="text: `${$data.id}`"></span>
+													<!-- <span data-bind="text: `Experiment #${$index()+1}`"></span> -->
+													<span data-bind="click: $parent.onGoExperiment.bind($parent, $data)">
 														<i class="fa fa-fw fa-search-plus"></i> </span>
 												</div>
 												<div class="info">
@@ -83,7 +90,9 @@
 										</ul>
 										<div style="text-align:center" data-bind="foreach: experiments">
 											<span class="dot" data-bind="
-												click: $parent.onSelectDot.bind($parent, $data)"> </span>
+												click: $parent.onSelectDot.bind($parent, 'exp', $data),
+												css: { active: ($parent.activeExperiment() != null)
+													&& ($parent.activeExperiment().id===$data.id)}"> </span>
 										</div>
 									</div>
 									<!-- experiment row: end -->
@@ -91,23 +100,28 @@
 									<!-- pipeline row: begin -->
 									<div class="ld-row pipe-row">
 										<span class="row-title">Pipelines</span>
-										<ul class="pipe-cards scroll-style" data-bind="foreach: pipelines">
-											<li class="card">
+										<ul class="pipe-cards scroll-style" data-bind="
+											childrenComplete: pipeCardsRendered, foreach: pipelines">
+											<li class="card" data-bind="
+												attr: {name: $data.id},
+												css: { active: ($parent.activePipeline() != null)
+																			 && ($parent.activePipeline().id===$data.id)},
+												click: $parent.onSelectCard.bind($parent, 'pipe', $data)">
 												<div class="header">
 													<span data-bind="text: $data.name"></span>
-													<span data-bind="click: $parent.filterExp.bind($parent, $data)">
+													<span data-bind="click: $parent.onClickPipelineFilter.bind($parent, $data)">
 														<i class="fa fa-fw fa-filter"></i> </span>
 												</div>
-												<div class="info" data-bind="
-													childrenComplete: $parent.update,
-													foreach: $data.mlpipeline.primitives">
+												<div class="info" data-bind="foreach: $data.mlpipeline.primitives">
 														<p data-bind="text: $data"></p>
 												</div>
 											</li>
 										</ul>
 										<div style="text-align:center" data-bind="foreach: pipelines">
 											<span class="dot" data-bind="
-													click: $parent.onSelectDot.bind($parent, $data)"> </span>
+												click: $parent.onSelectDot.bind($parent, 'pipe', $data),
+												css: { active: ($parent.activePipeline() != null)
+													&& ($parent.activePipeline().id===$data.id)}"> </span>
 										</div>
 									</div>
 									<!-- pipeline row: end -->
@@ -486,8 +500,7 @@
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/moment/min/moment.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-	<script
-		src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+	<script src="./public/themes/AdminLTE-2.4.2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
 	<script src="./public/themes/AdminLTE-2.4.2/bower_components/fastclick/lib/fastclick.js"></script>

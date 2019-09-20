@@ -38,18 +38,14 @@ class Content {
 
   public setupEventHandlers() {
     let self = this;
-
     pip.content.on('page:change', pageName => {
       self.changePage(pageName);
       // update corresponding page
     });
-
   }
 
   private initPageLanding() {
-    let self = this;
-    self.pageLanding = new PageLanding('#page-landing');
-    self.pageLanding.setupEventHandlers();
+    this.pageLanding = new PageLanding('#page-landing');
   }
 
   private initPageExp() {

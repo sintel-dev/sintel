@@ -10,23 +10,13 @@ interface Experiment extends DT.Experiment {
   eventNum: number;
 }
 
-type Project = {
+interface Project {
   name: string;
   experiments: Experiment[];
   experimentNum: number;
   uniquePipelineNum: number;
   pipelines: DT.Pipeline[];
-};
-
-type ProjectList = Project[];
-
-type ProjectDict = {
-  [index: string]: DT.Experiment[]
-};
-
-type PipelineDict = {
-  [index: string]: DT.Pipeline;
-};
+}
 
 class PageLanding {
 
@@ -34,174 +24,174 @@ class PageLanding {
   public experiments = ko.observableArray<Experiment>([]);
   public pipelines = ko.observableArray<DT.Pipeline>([]);
 
-  public empDetails = ko.observable(null);
+  // currently active
+  public activeProject = ko.observable<Project>(null);
+  public activeExperiment = ko.observable<Experiment>(null);
+  public activePipeline = ko.observable<DT.Pipeline>(null);
 
-  private actives = {
-    project: null as Project,
-    experiment: null as Experiment,
-    pipeline: null as DT.Pipeline
-  };
-  private once = false;
+  private previousGoExperiment: Experiment = null;
 
-  public searchActive(name, value) {
+  /**
+   * Create landing page instance
+   *
+   * @param eleId HTMLElement ID used for binding KO
+   */
+  constructor(eleId: string) {
+    ko.applyBindings(this, $(eleId)[0]);
+    this.getCardDataReady();
+    this.setupEventHandlers();
+    this.setupOwnEventHandlers();
+  }
+
+  public onGoExperiment(experiment: Experiment) {
+    // let self = this;
+    pip.content.trigger('page:change', 'exp');
+    pip.header.trigger('page:change:exp');
+    // // if (!self.once) {
+    // self.onSelectExperiment(self.experiments()[0], 0);
+    // self.once = true;
+    if (this.previousGoExperiment == null
+        || this.previousGoExperiment.id !== experiment.id) {
+          headerConfig.experiment = experiment;
+          pip.header.trigger('page:change:exp');
+          pip.content.trigger('page:change', 'exp');
+          pip.pageExp.trigger('experiment:change', experiment);
+        }
+  }
+
+  public onClickPipelineFilter(pipeline: DT.Pipeline) {
+    console.log('onClickPipelineFilter', pipeline);
+    // todo
+  }
+
+  /**
+   * KO: click event handler.
+   *
+   * Invoked after clicking a card.
+   */
+  public onSelectCard(type, data) {
     let self = this;
-    switch (name) {
-      case 'project':
-        return self.actives.project.name === (value as Project).name;
+    switch (type) {
+      case 'proj':
+        {
+          let cdata = data as Project;
+          self.selectProject(cdata);
+          // self.activeProject(cdata);
+        }
         break;
-      case 'experiment':
-        return self.actives.experiment.id === (value as Experiment).id;
+      case 'exp':
+        {
+          let cdata = data as Experiment;
+          self.activeExperiment(cdata);
+          // highlight pipeline
+        }
         break;
-      case 'pipeline':
-        return self.actives.pipeline.name === (value as DT.Pipeline).id;
+      case 'pipe':
+        {
+          let cdata = data as DT.Pipeline;
+          self.activePipeline(cdata);
+          // highlight experiments
+        }
         break;
     }
   }
 
   /**
-   * Create landing page instance
+   * KO: click event handler.
    *
-   * @param eleId HTMLElement ID used for binding Knockout
+   * Invoked after clicking a card dot.
    */
-  constructor(eleId: string) {
+  public onSelectDot(type, data) {
     let self = this;
-
-    // initialize Knockout Variables
-    ko.applyBindings(self, $(eleId)[0]);
-
-    self.getProjectList();
-    // todo
-    // $('.exp-cards').on('click', function(evt) {
-    //     console.log('click');
-    //     self.goExp();
-    // });
-
-    // server.experiments.read<any>({}, {})
-    //   .done(data => {
-    //     let a: ProjectDict = {};
-    //     console.log(data);
-    //     _.each(data.experiments, exp => {
-    //       let test = 1;
-    //     });
-    //     a['sdf'] = 10;
-    //   })
-    //   .fail(data => {
-    //     console.error(data.responseText);
-    //   });
-    // server.experiments.read().done( (data: RSI.Experiment[]) => {
-    //     self.expList = data;
-
-    //     let projects = _.chain(data).map(d => d.project).uniq().value();
-    //     self.projects(projects);
-    //     self.onSelectProject(projects[0], 0);
-
-    //     let experiments = _.filter(data, d => d.project === projects[0]);
-    //     self.experiments(experiments);
-    //     self.selected.experiment({index: -1, name: ''});    // select nothing
-    //     // self.onSelectExperiment(experiments[0], 0);
-    // });
-
-    // horizontal scroll
-    $('.proj-cards').on('mousewheel', function(evt: any) {
-        this.scrollLeft += (evt.originalEvent.deltaY);
-        evt.preventDefault();
-    });
-
-    $('.exp-cards').on('mousewheel', function(evt: any) {
-      this.scrollLeft += (evt.originalEvent.deltaY);
-      evt.preventDefault();
-    });
-
-    $('.pipe-cards').on('mousewheel', function(evt: any) {
-      this.scrollLeft += (evt.originalEvent.deltaY);
-      evt.preventDefault();
-    });
-  }
-
-  public wheel(idx) {
-    console.log(idx);
-  }
-
-  // handle events coming from other components
-  public setupEventHandlers() {
-    let self = this;
-
-    // todo
-  }
-
-  public goExp() {
-    let self = this;
-    pip.content.trigger('page:change', 'exp');
-    pip.header.trigger('page:change:exp');
-    // if (!self.once) {
-    self.onSelectExperiment(self.experiments()[0], 0);
-    self.once = true;
-    // }
+    let animationTime = 500;
+    switch (type) {
+      case 'proj':
+        {
+          let cdata = data as Project;
+          self.selectProject(cdata);
+          // self.activeProject(cdata);
+          let offsetLeft = $(`.card[name=${cdata.name}]`).position().left;
+          $('.proj-cards').animate({scrollLeft: offsetLeft}, animationTime);
+        }
+        break;
+      case 'exp':
+        {
+          let cdata = data as Experiment;
+          self.activeExperiment(cdata);
+          let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
+          $('.exp-cards').animate({scrollLeft: offsetLeft}, animationTime);
+        }
+        break;
+      case 'pipe':
+        {
+          let cdata = data as DT.Pipeline;
+          self.activePipeline(cdata);
+          let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
+          $('.proj-cards').animate({scrollLeft: offsetLeft}, animationTime);
+        }
+        break;
+    }
   }
 
   /**
-   * Knockout: click event handler.
-   *
-   * Invoked after clicking the project card
-   */
-  public onSelectProject() {
-    // to be filled
-  }
-
-  public update() {
-    console.log('childrenComplete');
-    $('.pipe-cards .info p').on('mousewheel', function(evt: any) {
+    * KO: completing rendering event.
+    *
+    * Invoked after rendering the pipeline cards
+    */
+  public pipeCardsRendered() {
+    $('.pipe-cards .info p').on('mousewheel', function (evt: any) {
       this.scrollLeft += (evt.originalEvent.deltaY);
       evt.preventDefault();
     });
   }
-  
+
   /**
-   * Knockout: click event handler.
-   *
-   * Invoked after clicking the project card
+   * Set up event listeners and handlers
+   * for events from the component itself.
    */
-  public onSelectDot(data) {
-    // to be filled
-    console.log(typeof(data));
+  private setupOwnEventHandlers() {
+    $('.proj-cards').on('mousewheel', function (evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
+
+    $('.exp-cards').on('mousewheel', function (evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
+
+    $('.pipe-cards').on('mousewheel', function (evt: any) {
+      this.scrollLeft += (evt.originalEvent.deltaY);
+      evt.preventDefault();
+    });
   }
 
-
-  public filterExp() {
-    // pass
-  }
-
-  // the following public methods are triggered by user interactions on header
-  // public onSelectProject(proj: string, index: number) {
-  //   let self = this;
-  //   this.selected.project({ index, name: proj });
-  //   headerConfig.project = proj;
-
-  //   let experiments = _.filter(self.expList, d => d.project === proj);
-  //   self.experiments(experiments);
-  //   self.selected.experiment({ index: -1, name: '' });    // select nothing
-  // }
-
-  public onSelectExperiment(exp: DT.Experiment, index: number) {
-    // this.selected.experiment({ index, name: exp.name });
-    // headerConfig.experiment = exp;
-    // pip.content.trigger('experiment:change', exp);
-  }
-
-  private async getProjectList() {
+  /**
+   * Set up event handlers to
+   * handle events from other components
+   */
+  private setupEventHandlers() {
     let self = this;
-    let exps = await server.experiments.read<{experiments: DT.Experiment[]}>();
-    let pipes = await server.pipelines.read<{pipelines: DT.Pipeline[]}>();
+    // if any
+  }
+
+  /**
+   * Fill KO observable variables
+   */
+  private async getCardDataReady() {
+    let self = this;
+    let exps = await server.experiments.read<{ experiments: DT.Experiment[] }>();
+    let pipes = await server.pipelines.read<{ pipelines: DT.Pipeline[] }>();
 
     // get pipeline dict
-    let pipeDict: PipelineDict = {};
+    let pipeDict: { [index: string]: DT.Pipeline } = {};
     _.each(pipes.pipelines, pipe => {
       pipeDict[pipe.name] = pipe;
     });
 
     // get project dict and list
-    let projDict: ProjectDict = {};
-    let projList: ProjectList = [];
+    let projDict: { [index: string]: DT.Experiment[] } = {};
+    let projList: Project[] = [];
     _.each(exps.experiments, exp => {
       if (!_.has(projDict, exp.project)) { projDict[exp.project] = []; }
       projDict[exp.project].push(exp);
@@ -221,8 +211,8 @@ class PageLanding {
 
       // get event number of each experiment in this project
       let newExp = _.map(value, v => {
-       (v as Experiment).eventNum = self.getExperimentEventNum(v);
-       return v;
+        (v as Experiment).eventNum = getExperimentEventNum(v);
+        return v;
       });
 
       projList.push({
@@ -234,22 +224,29 @@ class PageLanding {
       });
     });
 
+    // fill KO observable variables
     self.projects(projList);
-    
+
     // select first project
-    self.actives.project = projList[0];
-    self.experiments(self.actives.project.experiments);
-    self.pipelines(self.actives.project.pipelines);
+    self.selectProject(projList[0]);
+
+    function getExperimentEventNum(exp: DT.Experiment) {
+      let sum = 0;
+      _.each(exp.dataruns, datarun => {
+        sum += datarun.events.length;
+      });
+      return sum;
+    }
   }
 
-  private getExperimentEventNum(exp: DT.Experiment) {
-    let sum = 0;
-    _.each(exp.dataruns, datarun => {
-      sum += datarun.events.length;
-    });
-    return sum;
+  /**
+   * Update KO observable variables when selecting a project
+   */
+  private selectProject(project: Project) {
+    this.activeProject(project);
+    this.experiments(project.experiments);
+    this.pipelines(project.pipelines);
   }
-
 }
 
 export default PageLanding;

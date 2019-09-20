@@ -75,7 +75,7 @@ class PageExp {
   public setupEventHandlers() {
     let self = this;
 
-    pip.content.on('experiment:change', (exp: RSI.Experiment) => {
+    pip.pageExp.on('experiment:change', (exp: RSI.Experiment) => {
       self._ToggleLoadingOverlay();
 
       dataProcessor.loadData(exp).then((data: LineChartDataEle[]) => {
