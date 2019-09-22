@@ -1,4 +1,4 @@
-import * as pip from '../services/pipClient';
+import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as RSI from '../services/server.itf';
 import server from '../services/server';

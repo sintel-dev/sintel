@@ -1,12 +1,11 @@
-import * as pip from '../services/pipClient';
+import 'select2';
+import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
-import 'select2';
 import * as RSI from '../services/server.itf';
-import dataProcessor from '../services/dataProcessor';
-import { LineChartDataEle } from './vis/data.itf';
-import { LineChartCtx } from './vis/linechartCtx';
-import { LineChartFocus } from './vis/linechartFocus';
+import * as dataPC from '../services/dataProcessor';
+import { LineChartCtx } from './vis/lineChartCtx';
+import { LineChartFocus } from './vis/lineChartFocus';
 import { PeriodChart } from './vis/periodChart';
 
 import server from '../services/server';
@@ -35,7 +34,7 @@ class PageExp {
   public comment = '';
   // public empDetails = ko.observable<string>('ceva');
 
-  private data: LineChartDataEle[];
+  private data: dataPC.ChartDataEle[];
 
   private focusChart: LineChartFocus;
   private ctxCharts: CtxCharts = {};
@@ -51,85 +50,25 @@ class PageExp {
     periodHeight: 880
   };
 
+  /**
+   * Create experiment page instance
+   *
+   * @param eleId HTMLElement ID used for binding KO
+   */
+  constructor(eleId: string) {
+    ko.applyBindings(this, $(eleId)[0]);
+    $('.chart-focus-container').height(this.config.focusHeight);
+    $('.chart-focus .plot').height(this.config.focusHeight); // - 45);
+    $('.chart-ctx-container').height(this.config.ctxHeight);
+    $('.pchart').height($('.connectedSortable').height() + 'px');
+    this.setupEventHandlers();
+  }
+
   public getBoxSizes() {
     const windownHeight = window.innerHeight;
     const ctxHeight = windownHeight * 35 / 100; // 35% for top box
     const focusHeight = windownHeight * 49 / 100; // 49% for the bottom box
     return [ctxHeight, focusHeight];
-  }
-
-  constructor(eleId: string) {
-    let self = this;
-
-    // initialize Knockout Variables
-    ko.applyBindings(self, $(eleId)[0]);
-
-    // default select 0
-    $('.chart-focus-container').height(self.config.focusHeight);
-    $('.chart-focus .plot').height(self.config.focusHeight); // - 45);
-    $('.chart-ctx-container').height(self.config.ctxHeight);
-    $('.pchart').height($('.connectedSortable').height() + 'px');
-  }
-
-  // handle events coming from other components
-  public setupEventHandlers() {
-    let self = this;
-
-    pip.pageExp.on('experiment:change', (exp: RSI.Experiment) => {
-      self._ToggleLoadingOverlay();
-
-      dataProcessor.loadData(exp).then((data: LineChartDataEle[]) => {
-        self.data = data;
-        self._ToggleLoadingOverlay();
-        self.ctxs(_.map(data, d => d.dataset.name));
-
-        if (self.focus() === '') {
-          self.focus(data[0].dataset.name);
-          $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active');
-        } else {
-          $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
-        }
-        $('#periodView').text(data[0].dataset.name);
-        self._visualize();
-      });
-    });
-
-    pip.content.on('ctx:brush', msg => {
-      self.focusChart.trigger('brush:update', msg);
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('brush:update', msg.xMove);
-      });
-    });
-
-    pip.content.on('focus:zoom', xMove => {
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('brush:update', xMove);
-      });
-    });
-
-    pip.content.on('event:update', () => {
-      self.focusChart.trigger('event:update');
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('event:update');
-      });
-    });
-
-    pip.content.on('event:modify', (evt) => {
-      self.focusChart.trigger('event:modify', evt);
-    });
-
-    $('select[name="level"]').change(function (e) {
-      let value = (<HTMLInputElement>e.target).value;
-      self.level(value);
-    });
-
-    pip.content.on('comment:new', (eventInfo: RSI.Event) => {
-      this.update(eventInfo);
-    });
-
-    pip.content.on('comment:start', (eventInfo: RSI.Event) => {
-      this.update(eventInfo);
-    });
   }
 
   public remove() {
@@ -206,7 +145,7 @@ class PageExp {
   public selectCtx(name) {
     let self = this;
     self.focus(name);
-    let d = _.find(self.data, o => o.dataset.name === name);
+    let d = _.find(self.data, o => o.datarun.signal === name);
 
     // update focus
     self.focusChart.trigger('data:update', [d]);
@@ -216,7 +155,7 @@ class PageExp {
     self.periodCharts['year'].trigger(
       'update',
       [{
-        name: d.dataset.name,
+        name: d.datarun.signal,
         info: d.period
       }]
     );
@@ -373,7 +312,7 @@ class PageExp {
     if (_.isUndefined(self.focusChart)) {
       // plot context chart
       for (let i = 0; i < data.length; i++) {
-        let dName = data[i].dataset.name;
+        let dName = data[i].datarun.signal;
         self.ctxCharts[dName] = new LineChartCtx(
           $(`.chart-ctx [name="${dName}"]`)[0],
           [data[i]],
@@ -405,7 +344,7 @@ class PageExp {
       self.periodCharts['year'] = new PeriodChart(
         $('#year')[0],
         [{
-          name: data[0].dataset.name,
+          name: data[0].datarun.signal,
           info: data[0].period,
         }],
         {
@@ -418,7 +357,7 @@ class PageExp {
       self.periodCharts['month'] = new PeriodChart(
         $('#month')[0],
         [{
-          name: data[0].dataset.name,
+          name: data[0].datarun.signal,
           info: data[0].period[0].children
         }],
         {
@@ -431,7 +370,7 @@ class PageExp {
       self.periodCharts['day'] = new PeriodChart(
         $('#day')[0],
         [{
-          name: data[0].dataset.name,
+          name: data[0].datarun.signal,
           info: data[0].period[0].children[0].children
         }],
         {
@@ -440,7 +379,7 @@ class PageExp {
         }
       );
     } else {
-      let d = _.find(self.data, o => o.dataset.name === self.focus());
+      let d = _.find(self.data, o => o.datarun.signal === self.focus());
 
       // update focus
       self.focusChart.option.xDomain = xDomain;
@@ -448,7 +387,7 @@ class PageExp {
 
       // update context
       for (let i = 0; i < data.length; i++) {
-        let dName = data[i].dataset.name;
+        let dName = data[i].datarun.signal;
         // self.ctxCharts[dName].trigger('data:update', [d]);
         self.ctxCharts[dName].trigger('data:update', data[i]);
       }
@@ -458,7 +397,7 @@ class PageExp {
       self.periodCharts['year'].trigger(
         'update',
         [{
-          name: d.dataset.name,
+          name: d.datarun.signal,
           info: d.period
         }]
       );
@@ -467,11 +406,11 @@ class PageExp {
     // ******* handle chart events *********
     self.periodCharts['year'].on('select', (o) => {
       let newData = [];
-      let d = _.find(data, dd => dd.dataset.name === self.focus());
+      let d = _.find(data, dd => dd.datarun.signal === self.focus());
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.name) { continue; }
         newData.push({
-          name: d.dataset.name,
+          name: d.datarun.signal,
           info: d.period[i].children
         });
       }
@@ -485,13 +424,13 @@ class PageExp {
 
     self.periodCharts['month'].on('select', (o) => {
       let newData = [];
-      let d = _.find(self.data, dd => dd.dataset.name === self.focus());
+      let d = _.find(self.data, dd => dd.datarun.signal === self.focus());
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.parent.name) { continue; }
         for (let j = 0; j < d.period[i].children.length; j++) {
           if (d.period[i].children[j].name !== o.name) { continue; }
           newData.push({
-            name: d.dataset.name,
+            name: d.datarun.signal,
             info: d.period[i].children[j].children
           });
         }
@@ -504,15 +443,86 @@ class PageExp {
     });
   }
 
-  private _ToggleLoadingOverlay() {
-    if ($('.timeseries-overview>.overlay').hasClass('hidden')) {
-      $('.timeseries-overview>.overlay').removeClass('hidden');
-      $('.timeseries-detail>.overlay').removeClass('hidden');
-      $('.period-view>.overlay').removeClass('hidden');
-    } else {
-      $('.timeseries-overview>.overlay').addClass('hidden');
-      $('.timeseries-detail>.overlay').addClass('hidden');
-      $('.period-view>.overlay').addClass('hidden');
+
+  /**
+   * Set up event handlers to handle events from other components
+   */
+  private setupEventHandlers() {
+    let self = this;
+
+    pip.pageExp.on('experiment:change', self.onExperimentChange.bind(self));
+
+    pip.pageExp.on('ctx:brush', msg => {
+      self.focusChart.trigger('brush:update', msg);
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('brush:update', msg.xMove);
+      });
+    });
+
+    pip.content.on('focus:zoom', xMove => {
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('brush:update', xMove);
+      });
+    });
+
+    pip.content.on('event:update', () => {
+      self.focusChart.trigger('event:update');
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('event:update');
+      });
+    });
+
+    pip.content.on('event:modify', (evt) => {
+      self.focusChart.trigger('event:modify', evt);
+    });
+
+    $('select[name="level"]').change(function (e) {
+      let value = (<HTMLInputElement>e.target).value;
+      self.level(value);
+    });
+
+    pip.content.on('comment:new', (eventInfo: RSI.Event) => {
+      this.update(eventInfo);
+    });
+
+    pip.content.on('comment:start', (eventInfo: RSI.Event) => {
+      this.update(eventInfo);
+    });
+  }
+
+  /**
+   * Invoked on receiving signal 'experiment:change'
+   * @param exp The selected experiment
+   */
+  private async onExperimentChange(exp: RSI.Experiment) {
+    let self = this;
+
+    ToggleLoadingOverlay();
+    dataPC.getDataruns(exp).then((data: dataPC.ChartDataEle[]) => {
+      self.data = data;
+      ToggleLoadingOverlay();
+      self.ctxs(_.map(data, d => d.datarun.signal));
+
+      if (self.focus() === '') {
+        self.focus(data[0].datarun.signal);
+        $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active');
+      } else {
+        $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
+      }
+      $('#periodView').text(data[0].datarun.signal);
+      self._visualize();
+    });
+
+    function ToggleLoadingOverlay() {
+      if ($('.timeseries-overview>.overlay').hasClass('hidden')) {
+        $('.timeseries-overview>.overlay').removeClass('hidden');
+        $('.timeseries-detail>.overlay').removeClass('hidden');
+        $('.period-view>.overlay').removeClass('hidden');
+      } else {
+        $('.timeseries-overview>.overlay').addClass('hidden');
+        $('.timeseries-detail>.overlay').addClass('hidden');
+        $('.period-view>.overlay').addClass('hidden');
+      }
     }
   }
 }

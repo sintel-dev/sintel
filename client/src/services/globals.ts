@@ -91,12 +91,10 @@ export const colorSchemes = {
 };
 
 
-interface HeaderConfig {
+type HeaderConfig = {
   experiment: RSI.Experiment;
-  project: string;
-}
+};
 
 export let headerConfig: HeaderConfig = {
-  experiment: null,
-  project: null
+  experiment: null
 };

@@ -1,10 +1,9 @@
 import * as _ from 'lodash';
 import * as d3 from 'd3';
-import * as pip from '../../services/pipClient';
-import { LineChartDataEle } from './data.itf';
+import * as pip from '../../services/pip';
+import * as dataPC from '../../services/dataProcessor';
 import { colorSchemes } from '../../services/globals';
 import { Event } from '../../services/server.itf';
-import dataProcessor from '../../services/dataProcessor';
 
 
 export interface Option {
@@ -68,7 +67,7 @@ export class LineChartFocus extends pip.Events {
 
   constructor(
     ele: HTMLElement,
-    private data: LineChartDataEle[],
+    private data: dataPC.ChartDataEle[],
     option?: Option
   ) {
     super();
@@ -286,7 +285,7 @@ export class LineChartFocus extends pip.Events {
       x.domain(t.rescaleX(copyX).domain());
 
       // update normal line
-      focus.selectAll<any, LineChartDataEle>('.line')
+      focus.selectAll<any, dataPC.ChartDataEle>('.line')
         .attr('d', d => line(d.timeseries));
 
       // update prediction curve
@@ -297,7 +296,7 @@ export class LineChartFocus extends pip.Events {
 
       // update highlighted windows
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.windows, d.timeseries, x, 'dname', i, d.datarun, d.dataset);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun, d.datarun.signal);
       });
 
       // update x axis
@@ -306,7 +305,7 @@ export class LineChartFocus extends pip.Events {
       pip.content.trigger('focus:zoom', x.range().map(t.invertX, t));
     }
 
-    function dataUpdateHandler(newData: LineChartDataEle[]) {
+    function dataUpdateHandler(newData: dataPC.ChartDataEle[]) {
       self.data = newData;
       let sc = self.getScale(w, h);
       [x, y, ye] = [sc.x, sc.y, sc.ye];
@@ -319,7 +318,7 @@ export class LineChartFocus extends pip.Events {
         .duration(option.duration)
         .ease(d3.easeLinear);
 
-      let uf = focus.selectAll<any, LineChartDataEle>('.line')
+      let uf = focus.selectAll<any, dataPC.ChartDataEle>('.line')
         .data(self.data);
       uf.enter().append('path')
         .attr('class', 'line')
@@ -344,7 +343,7 @@ export class LineChartFocus extends pip.Events {
       // clean all original windows
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.windows, d.timeseries, x, 'dname', i, d.datarun.id, d.dataset.name);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
       });
 
       xAxis = d3.axisBottom(x);
@@ -367,19 +366,18 @@ export class LineChartFocus extends pip.Events {
     async function eventUpdateHandler() {
       if (self.data.length > 1) { return; }
       // only execute when there is only one timeseries
-      let newWindows = await dataProcessor.loadEventData(
-        self.data[0].datarun.id,
-        _.map(self.data[0].timeseries, d => d[0]),
-        self.option.offset
+      let newWindows = await dataPC.getEvents(
+        self.data[0].datarun,
+        _.map(self.data[0].timeseries, d => d[0])
         // self.data[0].offset
       );
       enableZoom();
       disableEditor();
 
-      self.data[0].windows = newWindows as any;
+      self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.windows, d.timeseries, x, 'dname', i, d.datarun.id, d.dataset.name);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
       });
     }
 
@@ -388,9 +386,9 @@ export class LineChartFocus extends pip.Events {
       if (self.data.length > 1) { return; }
       // only execute when there is only one timeseries
       let data = self.data[0];
-      const idx = _.findIndex(data.windows, d => d[3] === event.id);
-      const x0 = x(data.timeseries[data.windows[idx][0]][0]);
-      const x1 = x(data.timeseries[data.windows[idx][1]][0]);
+      const idx = _.findIndex(data.eventWindows, d => d[3] === event.id);
+      const x0 = x(data.timeseries[data.eventWindows[idx][0]][0]);
+      const x1 = x(data.timeseries[data.eventWindows[idx][1]][0]);
       disableZoom();
       makeEditable(x0, x1, event);
     }
@@ -475,7 +473,7 @@ export class LineChartFocus extends pip.Events {
           start_time: data[startIdx][0],
           stop_time: data[stopIdx][0],
           datarun: self.data[0].datarun.id,
-          dataset: self.data[0].dataset.name,
+          dataset: self.data[0].datarun.signal,
           offset: self.option.offset
         });
       } else {
@@ -485,7 +483,7 @@ export class LineChartFocus extends pip.Events {
           start_time: data[startIdx][0],
           stop_time: data[stopIdx][0],
           datarun: self.data[0].datarun.id,
-          dataset: self.data[0].dataset.name,
+          dataset: self.data[0].datarun.signal,
           offset: self.option.offset
         });
         modifiedEvent = null;
@@ -606,7 +604,7 @@ export class LineChartFocus extends pip.Events {
       .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
     _.each(self.data, (d, i) => {
-      update(d.windows, d.timeseries, x, 'dname', i, d.datarun.id, d.dataset.name);
+      update(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
     });
 
     return {

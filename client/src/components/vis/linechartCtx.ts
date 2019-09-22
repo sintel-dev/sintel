@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 import * as d3 from 'd3';
-import * as pip from '../../services/pipClient';
-import { LineChartDataEle } from './data.itf';
+import * as pip from '../../services/pip';
 import { colorSchemes } from '../../services/globals';
-import dataProcessor from '../../services/dataProcessor';
+import * as dataPC from '../../services/dataProcessor';
 
 
 
@@ -68,7 +67,7 @@ export class LineChartCtx extends pip.Events {
 
   constructor(
     ele: HTMLElement,
-    private data: LineChartDataEle[],
+    private data: dataPC.ChartDataEle[],
     option?: Option
   ) {
     super();
@@ -179,14 +178,14 @@ export class LineChartCtx extends pip.Events {
       let s = d3.event.selection || x.range();
 
 
-      pip.content.trigger('ctx:brush', {
+      pip.pageExp.trigger('ctx:brush', {
         xMove: [s[0], s[1]],
         xDomain: [x.invert(s[0]), x.invert(s[1])],
         transform: d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
       });
     }
 
-    function dataUpdateHandler(newData: LineChartDataEle[]) {
+    function dataUpdateHandler(newData: dataPC.ChartDataEle[]) {
       self.data = newData;
       let sc = self.getScale(w, h);
       [x, y] = [sc.x, sc.y];
@@ -202,7 +201,7 @@ export class LineChartCtx extends pip.Events {
       context.strokeStyle = 'rgb(36, 116, 241, 0.7)';
       context.stroke();
 
-      // let uc = chart.selectAll<any, LineChartDataEle>('.line')
+      // let uc = chart.selectAll<any, dataPC.ChartDataEle>('.line')
       //     .data(self.data);
       // uc.enter().append('path')
       //     .attr('class', 'line')
@@ -212,7 +211,7 @@ export class LineChartCtx extends pip.Events {
       //     .transition(t)
       //     .attr('d', d => line(d.timeseries));
 
-      // let uc = chart.selectAll<any, LineChartDataEle>('.area')
+      // let uc = chart.selectAll<any, dataPC.ChartDataEle>('.area')
       //     .data(self.data);
       // uc.enter().append('path')
       //     .attr('class', 'area')
@@ -225,7 +224,7 @@ export class LineChartCtx extends pip.Events {
       // clean all original windows
       self.svg.selectAll('.window').remove();
       _.each(self.data, d => {
-        highlightUpdate(d.windows, d.timeseries, 'dname');
+        highlightUpdate(d.eventWindows, d.timeseries, 'dname');
       });
 
       // uc.exit().remove();
@@ -234,17 +233,15 @@ export class LineChartCtx extends pip.Events {
     async function eventUpdateHandler() {
       if (self.data.length > 1) { return; }
       // only execute when there is only one timeseries
-      let newWindows = await dataProcessor.loadEventData(
-        self.data[0].datarun.id,
-        _.map(self.data[0].timeseries, d => d[0]),
-        self.option.offset
-        // self.data[0].offset
+      let newWindows = await dataPC.getEvents(
+        self.data[0].datarun,
+        _.map(self.data[0].timeseries, d => d[0])
       );
 
-      self.data[0].windows = newWindows as any;
+      self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.windows, d.timeseries, 'dname');
+        highlightUpdate(d.eventWindows, d.timeseries, 'dname');
       });
     }
   }
@@ -320,7 +317,7 @@ export class LineChartCtx extends pip.Events {
     };
 
     _.each(self.data, d => {
-      update(d.windows, d.timeseries, 'dname');
+      update(d.eventWindows, d.timeseries, 'dname');
     });
 
     return update;

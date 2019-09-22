@@ -1,4 +1,4 @@
-import * as pip from '../services/pipClient';
+import * as pip from '../services/pip';
 import * as _ from 'lodash';
 import PageExp from './pageExp';
 import PageLanding from './pageLanding';
@@ -32,8 +32,9 @@ class Content {
       { once: true }
     );
 
-    self.initPageLanding();
-    self.initPageExp();
+    self.pageLanding = new PageLanding('#page-landing');
+    self.pageExp = new PageExp('#page-exp');
+
   }
 
   public setupEventHandlers() {
@@ -44,15 +45,6 @@ class Content {
     });
   }
 
-  private initPageLanding() {
-    this.pageLanding = new PageLanding('#page-landing');
-  }
-
-  private initPageExp() {
-    let self = this;
-    self.pageExp = new PageExp('#page-exp');
-    self.pageExp.setupEventHandlers();
-  }
 
   /**
    * Event handler for changing page.

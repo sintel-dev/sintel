@@ -1,5 +1,4 @@
-import { Events } from './pipClient';
-import { TimeSeriesData } from '../components/vis/data.itf';
+import { Events } from './pip';
 import * as _ from 'lodash';
 
 
@@ -12,8 +11,8 @@ export class Smooth extends Events {
     return ls(x, y);
   }
 
-  public simpleMovingAverage(ts: TimeSeriesData, windowSize = 2) {
-    let nts: TimeSeriesData = [];
+  public simpleMovingAverage(ts: [number, number][], windowSize = 2) {
+    let nts: [number, number][] = [];
     for (let i = 0; i < ts.length; i += 1) {
       let st = Math.max(0, i - windowSize);
       let ed = Math.min(ts.length, i + windowSize);

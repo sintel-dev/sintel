@@ -1,9 +1,9 @@
-import * as pip from '../../services/pipClient';
-import { PeriodChartDataEle, LineChartDataEleInfoEle } from './data.itf';
-import { colorSchemes } from '../../services/globals';
 import 'tooltipster';
+import * as pip from '../../services/pip';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
+import * as dataDP from '../../services/dataProcessor';
+
 
 export interface Option {
   // svg layout
@@ -54,7 +54,7 @@ export class PeriodChart extends pip.Events {
 
   constructor(
     ele: HTMLElement,
-    private data: PeriodChartDataEle[],
+    private data: dataDP.PeriodChartDataEle[],
     option?: Option
   ) {
     super();
@@ -133,7 +133,7 @@ export class PeriodChart extends pip.Events {
     self.on('update', update);
 
     // ************  event handlers  ************
-    function update(o: PeriodChartDataEle[]) {
+    function update(o: dataDP.PeriodChartDataEle[]) {
       if (o !== null) {
         self.data = o;
       } else {
@@ -357,7 +357,7 @@ export class PeriodChart extends pip.Events {
 
     return { featurePlot };
 
-    function featurePlot(_cell, o: LineChartDataEleInfoEle, stationName: string, id: any) {
+    function featurePlot(_cell, o: dataDP.ChartDataEleInfoEle, stationName: string, id: any) {
       const { circleStroke } = self.option;
 
       // Extend the domain slightly to match the range of [0, 2π].

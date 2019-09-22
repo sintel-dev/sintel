@@ -11,7 +11,7 @@ password:  # for auth
 # orion
 or_host: 'localhost'   # mongodb server address
 or_port: 27017  # mongodb server port
-or_db: 'orion'  # database name
+or_db: 'orion2'  # database name
 or_username:  # for auth
 or_password:  # for auth
 
