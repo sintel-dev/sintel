@@ -12,6 +12,8 @@
 
 **MTV** is a visual analytics system built for anomaly analysis of multiple time-series data.
 
+The Restful APIs documentation: http://45.77.5.58/apidoc/
+
 
 
 ## License
@@ -96,7 +98,7 @@ $ make install-theme
 
 ### Data
 
-##### Downloading the NASA public data for demo
+##### Downloading the demo data
 
 ```bash
 $ make init-db
@@ -105,9 +107,13 @@ $ make load-db-nasa
 
 This will download and restore the dataset into MongoDB.
 
-##### Using your own data
+##### Working with Orion to generate your own data
 
-You have to create a database with the name **"mtv"** in MongoDB. For the detailed data format in the database, you can refer to the demo data after executing the aforementioned command.
+Once the required data is generated using Orion, you simple type the following command to sync the data from Orion to MTV. Note that you can configure the mongodb in the file `./mtv/config.yaml`.
+
+```bash
+$ mtv update db -v
+```
 
 
 
@@ -119,25 +125,24 @@ Please activate your virtualenv for MTV first, and then use the following comman
 $ mtv run -v
 ```
 
-Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser. The following list the optional arguments for `mtv run`
+Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser (Chrome). The following list the optional arguments for `mtv run`
 
 ```
 usage: mtv run [-h] [-l LOGFILE] [-v] [-P PORT] [-E ENV]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -l LOGFILE, --logfile LOGFILE
-                        Name of the logfile. If not given, log to stdout.
-  -v, --verbose         Be verbose. Use -vv for increased verbosity.
-  -P PORT, --port PORT  Flask server port
-  -E ENV, --env ENV     Flask environment
+  -h, --help             show this help message and exit
+  -l, --logfile LOGFILE  Name of the logfile. If not given, log to stdout.
+  -v, --verbose          Be verbose. Use -vv for increased verbosity.
+  -P PORT, --port PORT   Flask server port
+  -E ENV, --env ENV      Flask environment
 ```
 
 
 
 ### Development
 
-The server-end code and client-end code are in two separate folders, namely, \<project-home>/mtv and \<project-home>/client. 
+The server-end code and client-end code are in two separate folders, namely,` <project-home>/mtv` and `<project-home>/client` 
 
 Run the following command for server-end development
 
@@ -151,12 +156,6 @@ Run the following command for client-end development
 $ cd client
 $ gulp
 ```
-
-
-
-### Testing
-
-to be added
 
 
 
