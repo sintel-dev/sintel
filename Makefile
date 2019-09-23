@@ -66,7 +66,7 @@ load-db-nasa: init-db
 	mongorestore --db mtv ./db-instance/dump/nasa/
 
 .PHONY: load-db-mtv
-load-db-mtv:
+load-db-mtv: init-db
 	rm -f -r db-instance/dump/mtv/
 	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/dump/ && rm mtv.tar.bz2
