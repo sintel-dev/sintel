@@ -54,8 +54,8 @@ class Comment(Resource):
         @apiGroup Comment
         @apiVersion 1.0.0
 
-        @apiParam {String} comment_id (*required) Comment ID.
-        @apiParam {String} text (*required) Comment content.
+        @apiParam {String} comment_id Comment ID.
+        @apiParam {String} text Comment content.
 
         @apiSuccess {String} id Comment ID.
         @apiSuccess {String} event Event ID.
@@ -160,9 +160,9 @@ class Comments(Resource):
         @apiGroup Comment
         @apiVersion 1.0.0
 
-        @apiParam {String} event_id (*required) Event ID.
-        @apiParam {String} text (*required) Content of comment.
-        @apiParam {String} created_by User ID with default value 'default'.
+        @apiParam {String} event_id Event ID.
+        @apiParam {String} text Content of comment.
+        @apiParam {String} [created_by='default'] User ID.
         """
 
         event_id = None

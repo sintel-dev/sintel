@@ -199,13 +199,7 @@
 												<div class="box-body">
 													<div class="chart-focus-container">
 														<div class="chart-focus">
-															<!-- <div class="title" data-bind="text: focus()"></div> -->
 															<div class="plot"></div>
-															<!-- <div class="row">
-																		<div class="col-md-1 title" style="background-color: bisque" data-bind="text: focus()">
-																		</div>
-																		<div class="col-md-11 chart-focus"></div>
-																	</div> -->
 														</div>
 														<ul class="chart-controls">
 															<li>
@@ -223,11 +217,11 @@
 															<a href="javascript:void(0)" class="close"
 																data-bind="click: () => showDatasetInfo(false)">x</a>
 															<div class="line">
-																<label>Dataset:</label>
-																<span class="ml-10" data-bind="text: dataset"></span>
+																<label>Signal:</label>
+																<span class="ml-10" data-bind="text: signal"></span>
 															</div>
 															<div class="line">
-																<label>Model:</label>
+																<label>Datarun:</label>
 																<span class="ml-10" data-bind="text: datarun"></span>
 															</div>
 															<div class="line">
@@ -247,8 +241,9 @@
 															<div class="line">
 																<div>
 																	<select name="level" id="selectLevel" class="select2-hidden select-level">
-																		<option value="None" disabled selected>Please Select</option>
-																		<optgroup label="UK:">
+																		<!-- <option value="None" disabled selected>Please Select</option> -->
+																		<option></option>
+																		<!-- <optgroup label="UK:">
 																			<option value="1">investigate</option>
 																			<option value="2">do not investigate</option>
 																			<option value="3">postpone</option>
@@ -257,7 +252,7 @@
 																			<option value="4">problem</option>
 																			<option value="5">previously seen</option>
 																			<option value="6">normal</option>
-																		</optgroup>
+																		</optgroup> -->
 																	</select>
 																</div>
 															</div>
@@ -285,25 +280,6 @@
 															</div>
 														</div><!-- end dataset-description -->
 													</div>
-													<!-- <div class="row">
-																<div class="col-md-12 chart-focus-container">
-																	<div class="view-btn-group pt-10 pr-10">
-																		<a type="button" class="btn btn-default" data-bind="click: () => { showPrediction(); }"
-																			title="show model prediction result">assess mode</a>
-																		<a type="button" class="btn btn-default" data-bind="click: () => { addEventMode(); }"
-																			title="Add your own event">event adding mode</i></a>
-																		<a type="button" class="btn btn-default" data-bind="click: () => { zoomPanMode(); }"
-																			title="Back">zoom & pan mode</i></a>
-																	</div>
-																	<div class="chart mt-50">
-																		<div class="row">
-																			<div class="col-md-1 title" style="background-color: bisque" data-bind="text: focus()">
-																			</div>
-																			<div class="col-md-11 chart-focus"></div>
-																		</div>
-																	</div>
-																</div>
-															</div> -->
 												</div>
 												<!-- loading status -->
 												<div class="overlay hidden">

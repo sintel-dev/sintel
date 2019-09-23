@@ -2,7 +2,6 @@ import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
 import * as DT from '../services/server.itf';
-import { headerConfig } from '../services/globals';
 import { getProjects } from '../services/dataProcessor';
 
 export interface Experiment extends DT.Experiment {
@@ -55,11 +54,12 @@ class PageLanding {
    * @param experiment The experiment data
    */
   public onGoExperiment(experiment: Experiment) {
+    pip.header.trigger('page:change', 'exp');
+    pip.content.trigger('page:change', 'exp');
+    
     if (this.previousGoExperiment == null
         || this.previousGoExperiment.id !== experiment.id) {
-          headerConfig.experiment = experiment;
-          pip.header.trigger('page:change', 'exp');
-          pip.content.trigger('page:change', 'exp');
+          this.previousGoExperiment = experiment;
           pip.pageExp.trigger('experiment:change', experiment);
         }
   }
@@ -116,7 +116,8 @@ class PageLanding {
           self.selectProject(cdata);
           // self.activeProject(cdata);
           let offsetLeft = $(`.card[name=${cdata.name}]`).position().left;
-          $('.proj-cards').animate({scrollLeft: offsetLeft}, animationTime);
+          let currentOffset = $('.proj-cards').scrollLeft();
+          $('.proj-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
         }
         break;
       case 'exp':
@@ -124,7 +125,8 @@ class PageLanding {
           let cdata = data as Experiment;
           self.activeExperiment(cdata);
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
-          $('.exp-cards').animate({scrollLeft: offsetLeft}, animationTime);
+          let currentOffset = $('.exp-cards').scrollLeft();
+          $('.exp-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
         }
         break;
       case 'pipe':
@@ -132,7 +134,8 @@ class PageLanding {
           let cdata = data as DT.Pipeline;
           self.activePipeline(cdata);
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
-          $('.proj-cards').animate({scrollLeft: offsetLeft}, animationTime);
+          let currentOffset = $('.pipe-cards').scrollLeft();
+          $('.pipe-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
         }
         break;
     }

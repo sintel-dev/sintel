@@ -154,7 +154,8 @@ class Event(Resource):
         event_doc.start_time = d['start_time']
         event_doc.stop_time = d['stop_time']
         event_doc.score = d['score']
-        event_doc.tag = d['tag']
+        if d['tag'] != 'untagged':
+            event_doc.tag = d['tag']
 
         # return result
         try:
@@ -300,6 +301,8 @@ class Events(Resource):
         try:
             d['datarun'] = d['datarun_id']
             del d['datarun_id']
+            if d['tag'] == 'untagged':
+                del d['tag']
             event_doc = model.Event.insert(**d)
             res = get_event(event_doc)
         except Exception as e:

@@ -6,7 +6,7 @@ let jqueryExt = $ as JQueryStaticExt;
 let server: Server = new jqueryExt.RestClient(
   `${host}/api/v1/`,
   {
-    cache: 5,                 // Cache requests for 5 seconds
+    cache: 0,                 // Cache requests for 5 seconds
     cachableMethods: ['GET'],
     stringifyData: true,      // True for passing all POST data through JSON.stringify
   }

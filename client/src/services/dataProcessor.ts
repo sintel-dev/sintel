@@ -3,7 +3,8 @@ import * as DT from './server.itf';
 import server from './server';
 import { Project, Experiment } from '../components/pageLanding';
 
-export type EventWindow = [number, number, number, string];
+export type EventWindow = [number, number, number, string, string];
+// st_index, ed_index, score, id, tag
 
 export interface ChartDataEle {
   timeseries: [number, number][];     // raw signal after aggregation
@@ -65,9 +66,12 @@ export async function getEvents(
   let self = this;
 
   // Get events by datarun ID
-  let data = await server.events.read<DT.Event[]>({}, { datarun: datarun.id });
+  let data = await server.events.read<{events: DT.Event[]}>(
+    {}, 
+    { datarun_id: datarun.id }
+  );
 
-  return _toEventWindows(data, timestamps);
+  return _toEventWindows(data.events, timestamps);
 }
 
 /**
@@ -148,7 +152,8 @@ function _toEventWindows(
     timestamps.indexOf(Math.trunc(d.start_time) * 1000),
     timestamps.indexOf(Math.trunc(d.stop_time) * 1000),
     d.score,
-    d.id
+    d.id,
+    d.tag
   ]);
 }
 

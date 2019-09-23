@@ -1,4 +1,4 @@
-@import '../less/colors';
+@import '../less/colors.less';
 
 
 .main-header {
@@ -8,32 +8,23 @@
     a{
         transition: all .2s ease-in-out;
         color: #fff;
-    }
-    .navbar, .logo, .logo:hover {
-        background: @main-color;
-    }
-
-
-    .navbar-custom-menu {
-        .text{
-            padding: 15px;
-        }
-
-        .project-menu > li > a {
-            background-color: @main-color;
-            &:hover{
-                background-color: @second-color;
-            }
-        }
-
-        .experiment-menu > li > a{
+        &.logo {
             background: @main-color;
-            color: #fff;
-            border-radius: 0;
-            border: none;
-            &:hover{
-                background: @second-color;
-            }
+        }
+    }
+
+    .page-switch-btn {
+        float: left;
+        background-color: transparent;
+        background-image: none;
+        padding: 18px 15px;
+        display: none;
+        font-family: fontAwesome;
+        &.left::after {
+            content: "\f053";
+        }
+        &.right::after {
+            content: "\f054";
         }
     }
 }

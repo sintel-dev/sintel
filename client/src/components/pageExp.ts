@@ -2,7 +2,7 @@ import 'select2';
 import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
-import * as RSI from '../services/server.itf';
+import * as DT from '../services/server.itf';
 import * as dataPC from '../services/dataProcessor';
 import { LineChartCtx } from './vis/lineChartCtx';
 import { LineChartFocus } from './vis/lineChartFocus';
@@ -18,30 +18,70 @@ interface PeriodCharts {
   [index: string]: PeriodChart;
 }
 
+interface EventInfo extends DT.Event {
+  signal: string;
+}
+
 class PageExp {
 
   public ctxs = ko.observableArray<string>([]);
   public focus = ko.observable<string>('');
-  public modes = ko.observableArray<string>([]);
   public event = ko.observable('');
 
-  public datarun = ko.observable('');
-  public dataset = ko.observable('');
+  public datarun = ko.observable<string>('');
+  public signal = ko.observable<string>('');
   public eventFrom = ko.observable('');
   public eventTo = ko.observable('');
-  public level = ko.observable('None');
+  public score = ko.observable(0);
+  public tag = ko.observable<string>('');
   public transcript = ko.observable('');
   public comment = '';
-  // public empDetails = ko.observable<string>('ceva');
 
   private data: dataPC.ChartDataEle[];
 
   private focusChart: LineChartFocus;
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
+  private selectedTagID: string;
+  private tagSelectionData = [
+    {
+      "text": "Unknown",
+      "children": [
+        {
+          "id": 1,
+          "text": "investigate"
+        },
+        {
+          "id": 2,
+          "text": "do not investigate"
+        },
+        {
+          "id": 3,
+          "text": "postpone"
+        }
+      ]
+    },
+    {
+      "text": "Known",
+      "children": [
+        {
+          "id": 4,
+          "text": "problem"
+        },
+        {
+          "id": 5,
+          "text": "previously seen"
+        },
+        {
+          "id": 6,
+          "text": "normal"
+        }
+      ]
+    }
+  ];
 
-  private eventInfo: RSI.Event;
-  private commentInfo: RSI.Comment;
+  private eventInfo: EventInfo;
+  private commentInfo: DT.Comment;
 
   private config = {
     speed: 500,   // box animation duration,
@@ -62,6 +102,7 @@ class PageExp {
     $('.chart-ctx-container').height(this.config.ctxHeight);
     $('.pchart').height($('.connectedSortable').height() + 'px');
     this.setupEventHandlers();
+    this.setupOwnEventHandlers();
   }
 
   public getBoxSizes() {
@@ -73,16 +114,16 @@ class PageExp {
 
   public remove() {
     let self = this;
-    server.events.del<any>(self.event()).done(() => {
-      this.showDatasetInfo(false);
-      pip.content.trigger('event:update');
+    server.events.del(self.event()).done(() => {
+      self.showDatasetInfo(false);
+      pip.pageExp.trigger('event:update');
       // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
     });
   }
 
   public modify() {
     let self = this;
-    pip.content.trigger('event:modify', self.eventInfo);
+    pip.pageExp.trigger('event:modify', self.eventInfo);
     // pip.content.trigger('linechart:highlight:modify', {
     //     datarun: self.eventInfo.datarun,
     //     event: self.eventInfo
@@ -95,40 +136,45 @@ class PageExp {
 
     if (self.event() === 'new') {
       // create new
-      server.events.create<any>({
-        // start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        // stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      server.events.create<DT.Event>({
         start_time: Math.trunc(self.eventInfo.start_time / 1000),
         stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
-        score: self.fromScoreToLevel(self.level()),
-        datarun: self.eventInfo.datarun
-      }).done(eid => {
-        this.showDatasetInfo(false);
-        pip.content.trigger('event:update');
+        score: self.score(),
+        tag: self.fromSelectionIDtoTag(self.selectedTagID),
+        datarun_id: self.eventInfo.datarun
+      }).done((event: DT.Event) => {
+        self.showDatasetInfo(false);
+        pip.pageExp.trigger('event:update');
         // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
-        server.comments.create({
-          event_id: eid,
-          text: $('#comment').val()
-        });
+        if (self.commentInfo == undefined) {
+          server.comments.create({
+            event_id: event.id,
+            text: $('#comment').val()
+          });
+        } else {
+          server.comments.update(self.commentInfo.id, {
+            text: $('#comment').val()
+          });
+        }
       });
     } else {
       // update existing
-      server.events.update<any>(self.event(), {
-        // start_time: Math.trunc((self.eventInfo.start_time - self.eventInfo.offset) / 1000),
-        // stop_time: Math.trunc((self.eventInfo.stop_time - self.eventInfo.offset) / 1000),
+      console.log(self.selectedTagID, self.fromSelectionIDtoTag(self.selectedTagID));
+      server.events.update<DT.Event>(self.event(), {
         start_time: Math.trunc(self.eventInfo.start_time / 1000),
         stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
-        score: self.fromScoreToLevel(self.level()),
-        datarun: self.eventInfo.datarun
-      }).done(eid => {
-        this.showDatasetInfo(false);
-        pip.content.trigger('event:update');
-        // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
+        score: self.score(),
+        tag: self.fromSelectionIDtoTag(self.selectedTagID),
+        event_id: self.eventInfo.id
+      }).done((event: DT.Event) => {
+        self.showDatasetInfo(false);
+        pip.pageExp.trigger('event:update');
+        // pip.pageExp.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
-        if (self.commentInfo.id === 'new') {
+        if (self.commentInfo == undefined) {
           server.comments.create({
-            event_id: eid,
+            event_id: event.id,
             text: $('#comment').val()
           });
         } else {
@@ -141,7 +187,6 @@ class PageExp {
   }
 
   // the following public methods are triggered by user interactions
-
   public selectCtx(name) {
     let self = this;
     self.focus(name);
@@ -242,59 +287,219 @@ class PageExp {
   }
 
   private showDatasetInfo(visible) {
-    visible ? $('#datasetDescription').addClass('active') : $('#datasetDescription').removeClass('active');
+    visible ? $('#datasetDescription').addClass('active') :
+      $('#datasetDescription').removeClass('active');
     if (visible) {
       $('#datasetDescription').addClass('active');
-      $('#selectLevel').select2({ minimumResultsForSearch: Infinity });
+      this.initTagSelectionMenu();
+
+      // const DropdownList = (document.getElementById('selectLevel')) as HTMLSelectElement;
+      // DropdownList.selectedIndex = 3;
     } else {
       $('#datasetDescription').removeClass('active');
     }
   }
 
-  private async update(eventInfo: RSI.Event) {
+  private initTagSelectionMenu() {
+    let s2 = $('#selectLevel').select2({
+      minimumResultsForSearch: Infinity,
+      placeholder: "Select a tag",
+      data: this.tagSelectionData
+    });
+    // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
+    this.selectedTagID = undefined;
+    let tagID = this.fromTagToSelectionID(this.eventInfo.tag);
+    if (tagID !== 'untagged') {
+      s2.val(tagID).trigger('change');
+    }
+  }
+
+  private fromSelectionIDtoTag(id: string): string {
+    switch (id) {
+      case '1':
+        return 'investigate';
+        break;
+      case '2':
+        return 'do not investigate';
+        break;
+      case '3':
+        return 'postpone';
+        break;
+      case '4':
+        return 'problem';
+        break;
+      case '5':
+        return 'previously seen';
+        break;
+      case '6':
+        return 'normal';
+        break;
+      default:
+        return 'untagged';
+    }
+  }
+
+  private fromTagToSelectionID(tag: string): string {
+    switch (tag) {
+      case 'investigate':
+        return '1';
+        break;
+      case 'do not investigate':
+        return '2';
+        break;
+      case 'postpone':
+        return '3';
+        break;
+      case 'problem':
+        return '4';
+        break;
+      case 'previously seen':
+        return '5';
+        break;
+      case 'normal':
+        return '6';
+        break;
+      default: 
+        return 'untagged';
+    }
+  }
+
+
+  private init() {
+    this.ctxs([]);
+    this.focus('');
+    this.event('');
+    this.datarun('');
+    this.signal('');
+    this.eventFrom('');
+    this.eventTo('');
+    this.transcript('');
+    this.comment = '';
+    this.focusChart = undefined;
+    this.ctxCharts = {};
+    this.periodCharts = {};
+  }
+
+  /**
+   * Set up event handlers to handle events from other components
+   */
+  private setupEventHandlers() {
+    let self = this;
+
+    pip.pageExp.on('experiment:change', self.onExperimentChange.bind(self));
+
+    pip.pageExp.on('ctx:brush', msg => {
+      self.focusChart.trigger('brush:update', msg);
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('brush:update', msg.xMove);
+      });
+    });
+
+    pip.pageExp.on('focus:zoom', xMove => {
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('brush:update', xMove);
+      });
+    });
+
+    pip.pageExp.on('event:update', () => {
+      self.focusChart.trigger('event:update');
+      _.each(self.ctxCharts, ct => {
+        ct.trigger('event:update');
+      });
+    });
+
+    pip.pageExp.on('event:modify', (evt) => {
+      self.focusChart.trigger('event:modify', evt);
+    });
+
+    pip.pageExp.on('comment:new', self.onComment.bind(self));
+    pip.pageExp.on('comment:start', self.onComment.bind(self));
+  }
+
+  /**
+   * Set up event listeners and handlers
+   * for events from the component itself.
+   */
+  private setupOwnEventHandlers() {
+    let self = this;
+
+    $('select[name="level"]').change(function (e) {
+      self.selectedTagID = $('#selectLevel option:selected').val() as string;
+    });
+  }
+
+  /**
+   * Invoked on receiving signal 'comment:new' or 'comment:start'
+   * @param eventInfo eventInfo
+   */
+  private async onComment(eventInfo: EventInfo) {
+    let self = this;
     if (eventInfo.id === 'new') {
       $('#comment').val('');
     } else {
-      this.commentInfo = await <any>server.comments.read({}, {
-        event_id: eventInfo.id
-      });
-      this.commentInfo = this.commentInfo[0];
-      $('#comment').val(this.commentInfo.text);
+      let data = await server.comments.read<{ comments: DT.Comment[] }>(
+        {},
+        { event_id: eventInfo.id }
+      );
+      if (data.comments.length === 0) {
+        $('#comment').val('');
+        self.commentInfo = undefined;
+      } else {
+        self.commentInfo = data.comments[0];
+        $('#comment').val(self.commentInfo.text);
+      }
     }
+    self.eventInfo = eventInfo;
+    self.event(eventInfo.id);
+    self.datarun(eventInfo.datarun);
+    self.signal(eventInfo.signal);
+    self.tag(eventInfo.tag);
+    self.score(eventInfo.score);
+    self.eventFrom(new Date(eventInfo.start_time).toUTCString());
+    self.eventTo(new Date(eventInfo.stop_time).toUTCString());
+    // self.level(self.fromScoreToLevel(eventInfo.score));
 
-    this.eventInfo = eventInfo;
-
-    this.event(eventInfo.id);
-    this.datarun(eventInfo.datarun);
-    // this.dataset(eventInfo.dataset);
-    this.eventFrom(new Date(eventInfo.start_time).toUTCString());
-    this.eventTo(new Date(eventInfo.stop_time).toUTCString());
-    this.level(this.fromLevelToScore(eventInfo.score));
-
-    this.showDatasetInfo(true);
+    self.showDatasetInfo(true);
   }
 
-  private fromLevelToScore(score: number): string {
-    let level: number | string = 0;
-    for (let i = 0; i <= 4; i += 1) {
-      if (score > i) { level += 1; }
-    }
-    if (level === 0) { level = 0; }
+  /**
+   * Invoked on receiving signal 'experiment:change'
+   * @param exp The selected experiment
+   */
+  private async onExperimentChange(exp: DT.Experiment) {
+    let self = this;
 
-    const DropdownList = (document.getElementById('selectLevel')) as HTMLSelectElement;
-    DropdownList.selectedIndex = level;
-    return String(level);
+    self.init();
+
+    ToggleLoadingOverlay();
+
+    dataPC.getDataruns(exp).then((data: dataPC.ChartDataEle[]) => {
+      self.data = data;
+      ToggleLoadingOverlay();
+      self.ctxs(_.map(data, d => d.datarun.signal));
+
+      // Select the first ctx chart by default
+      self.focus(data[0].datarun.signal);
+      $(`.chart-ctx .title`).first().parent().addClass('ctx-active');
+      $('#periodView').text(data[0].datarun.signal);
+
+      self.visualize();
+    });
+
+    function ToggleLoadingOverlay() {
+      if ($('.timeseries-overview>.overlay').hasClass('hidden')) {
+        $('.timeseries-overview>.overlay').removeClass('hidden');
+        $('.timeseries-detail>.overlay').removeClass('hidden');
+        $('.period-view>.overlay').removeClass('hidden');
+      } else {
+        $('.timeseries-overview>.overlay').addClass('hidden');
+        $('.timeseries-detail>.overlay').addClass('hidden');
+        $('.period-view>.overlay').addClass('hidden');
+      }
+    }
   }
 
-  private fromScoreToLevel(level: string): number {
-    if (level === 'None') {
-      return 0;
-    } else {
-      return +level;
-    }
-  }
-
-  private _visualize() {
+  private visualize() {
     let self = this;
     let data = self.data;
 
@@ -326,6 +531,7 @@ class PageExp {
         );
       }
 
+      $('.chart-focus .plot').empty();
       // plot focused chart
       self.focusChart = new LineChartFocus(
         $('.chart-focus .plot')[0],
@@ -414,7 +620,6 @@ class PageExp {
           info: d.period[i].children
         });
       }
-      console.log(newData);
       // switch tab
       ($('a[href="#month"]') as any).tab('show');
 
@@ -441,89 +646,6 @@ class PageExp {
       // update
       self.periodCharts['day'].trigger('update', newData);
     });
-  }
-
-
-  /**
-   * Set up event handlers to handle events from other components
-   */
-  private setupEventHandlers() {
-    let self = this;
-
-    pip.pageExp.on('experiment:change', self.onExperimentChange.bind(self));
-
-    pip.pageExp.on('ctx:brush', msg => {
-      self.focusChart.trigger('brush:update', msg);
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('brush:update', msg.xMove);
-      });
-    });
-
-    pip.content.on('focus:zoom', xMove => {
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('brush:update', xMove);
-      });
-    });
-
-    pip.content.on('event:update', () => {
-      self.focusChart.trigger('event:update');
-      _.each(self.ctxCharts, ct => {
-        ct.trigger('event:update');
-      });
-    });
-
-    pip.content.on('event:modify', (evt) => {
-      self.focusChart.trigger('event:modify', evt);
-    });
-
-    $('select[name="level"]').change(function (e) {
-      let value = (<HTMLInputElement>e.target).value;
-      self.level(value);
-    });
-
-    pip.content.on('comment:new', (eventInfo: RSI.Event) => {
-      this.update(eventInfo);
-    });
-
-    pip.content.on('comment:start', (eventInfo: RSI.Event) => {
-      this.update(eventInfo);
-    });
-  }
-
-  /**
-   * Invoked on receiving signal 'experiment:change'
-   * @param exp The selected experiment
-   */
-  private async onExperimentChange(exp: RSI.Experiment) {
-    let self = this;
-
-    ToggleLoadingOverlay();
-    dataPC.getDataruns(exp).then((data: dataPC.ChartDataEle[]) => {
-      self.data = data;
-      ToggleLoadingOverlay();
-      self.ctxs(_.map(data, d => d.datarun.signal));
-
-      if (self.focus() === '') {
-        self.focus(data[0].datarun.signal);
-        $($(`.chart-ctx .title`)[0]).parent().addClass('ctx-active');
-      } else {
-        $($(`.chart-ctx [name=title-${self.focus()}]`)).parent().addClass('ctx-active');
-      }
-      $('#periodView').text(data[0].datarun.signal);
-      self._visualize();
-    });
-
-    function ToggleLoadingOverlay() {
-      if ($('.timeseries-overview>.overlay').hasClass('hidden')) {
-        $('.timeseries-overview>.overlay').removeClass('hidden');
-        $('.timeseries-detail>.overlay').removeClass('hidden');
-        $('.period-view>.overlay').removeClass('hidden');
-      } else {
-        $('.timeseries-overview>.overlay').addClass('hidden');
-        $('.timeseries-detail>.overlay').addClass('hidden');
-        $('.period-view>.overlay').addClass('hidden');
-      }
-    }
   }
 }
 

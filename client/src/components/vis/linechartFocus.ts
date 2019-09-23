@@ -2,8 +2,9 @@ import * as _ from 'lodash';
 import * as d3 from 'd3';
 import * as pip from '../../services/pip';
 import * as dataPC from '../../services/dataProcessor';
-import { colorSchemes } from '../../services/globals';
-import { Event } from '../../services/server.itf';
+import { colorSchemes } from '../../services/helpers';
+import * as DT from '../../services/server.itf';
+
 
 
 export interface Option {
@@ -296,13 +297,13 @@ export class LineChartFocus extends pip.Events {
 
       // update highlighted windows
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun, d.datarun.signal);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
       });
 
       // update x axis
       axisG.select('.axis--x').call(xAxis);
 
-      pip.content.trigger('focus:zoom', x.range().map(t.invertX, t));
+      pip.pageExp.trigger('focus:zoom', x.range().map(t.invertX, t));
     }
 
     function dataUpdateHandler(newData: dataPC.ChartDataEle[]) {
@@ -343,7 +344,7 @@ export class LineChartFocus extends pip.Events {
       // clean all original windows
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
       });
 
       xAxis = d3.axisBottom(x);
@@ -377,11 +378,11 @@ export class LineChartFocus extends pip.Events {
       self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
+        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
       });
     }
 
-    function eventModifyHandler(event: Event) {
+    function eventModifyHandler(event: DT.Event) {
       console.log('modify', event);
       if (self.data.length > 1) { return; }
       // only execute when there is only one timeseries
@@ -403,7 +404,7 @@ export class LineChartFocus extends pip.Events {
 
   private addEventEditor(g, w, h, x) {
     let self = this;
-    let modifiedEvent: Event = null;
+    let modifiedEvent: DT.Event = null;
     let option = self.option;
     let s;
 
@@ -433,7 +434,7 @@ export class LineChartFocus extends pip.Events {
       brushG.on('.brush', null);
     };
 
-    let makeEditable = (x0, x1, event: Event) => {
+    let makeEditable = (x0, x1, event: DT.Event) => {
       modifiedEvent = event;
       brushG.select('.overlay').attr('width', w);
       brushG
@@ -467,24 +468,24 @@ export class LineChartFocus extends pip.Events {
       }
 
       if (_.isNull(modifiedEvent)) {
-        pip.content.trigger('comment:new', {
+        pip.pageExp.trigger('comment:new', {
           id: 'new',
           score: 0,
+          tag: '',
           start_time: data[startIdx][0],
           stop_time: data[stopIdx][0],
           datarun: self.data[0].datarun.id,
-          dataset: self.data[0].datarun.signal,
-          offset: self.option.offset
+          signal: self.data[0].datarun.signal
         });
       } else {
-        pip.content.trigger('comment:start', {
+        pip.pageExp.trigger('comment:start', {
           id: modifiedEvent.id,
           score: modifiedEvent.score,
+          tag: modifiedEvent.tag,
           start_time: data[startIdx][0],
           stop_time: data[stopIdx][0],
           datarun: self.data[0].datarun.id,
-          dataset: self.data[0].datarun.signal,
-          offset: self.option.offset
+          signal: self.data[0].datarun.signal
         });
         modifiedEvent = null;
       }
@@ -589,13 +590,18 @@ export class LineChartFocus extends pip.Events {
     let option = self.option;
     let hz = 25, hzp = 2;
 
-    let scoreColor = (v: number) => {
-      if (v === 0) { return '#777'; }
-      let level = 0;
-      for (let i = 1; i <= 4; i += 1) {
-        if (v > i) { level += 1; }
+    let getTagColor = (tag: string): string => {
+      let tagSeq = ['investigate', 'do not investigate', 'postpone',
+        'problem', 'previously seen', 'normal'];
+      
+      let colorIdx: number;
+      for (let i = 0; i < tagSeq.length; i += 1) {
+        if (tagSeq[i] === tag) {
+          colorIdx = i;
+        }
       }
-      return colorSchemes.severity5[level];
+      if (colorIdx == undefined) { colorIdx = 6; }
+      return colorSchemes.tag[colorIdx];
     };
 
     let highlightG = self.svg.append<SVGGElement>('g')
@@ -604,17 +610,17 @@ export class LineChartFocus extends pip.Events {
       .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
     _.each(self.data, (d, i) => {
-      update(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun.id, d.datarun.signal);
+      update(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
     });
 
     return {
       highlightUpdate: update
     };
 
-    function update(windows, lineData, fx, name, idx, datarun, dataset) {
+    function update(windows, lineData, fx, name, idx, datarun: DT.Datarun) {
 
       let u = highlightG
-        .selectAll<SVGAElement, [number, number, number, string]>(`.window-${name}`)
+        .selectAll<SVGAElement, dataPC.EventWindow>(`.window-${name}`)
         .data(windows, d => d[3]);
 
       u.enter().append('g')
@@ -631,19 +637,19 @@ export class LineChartFocus extends pip.Events {
             .attr('y', 0)
             .attr('height', h)
             .on('click', () => {
-              pip.content.trigger('comment:start', {
+              pip.pageExp.trigger('comment:start', {
                 id: d[3],
                 score: d[2],
+                tag: d[4],
                 start_time: lineData[d[0]][0],
                 stop_time: lineData[d[1]][0],
-                datarun,
-                dataset,
-                offset: self.option.offset
+                datarun: datarun.id,
+                signal: datarun.signal
               });
             });
 
           bgRect.append('title')
-            .text(`score: ${d[2]}` + '\n' +
+            .text(`tag: ${d[4]}` + '\n' +
               'from ' + new Date(lineData[d[0]][0]).toString() + '\n' +
               'to ' + new Date(lineData[d[1]][0]).toString()
             );
@@ -654,19 +660,19 @@ export class LineChartFocus extends pip.Events {
             .attr('y', hz * idx)
             .attr('height', hz - hzp)
             .on('click', () => {
-              pip.content.trigger('comment:start', {
+              pip.pageExp.trigger('comment:start', {
                 id: d[3],
                 score: d[2],
+                tag: d[4],
                 start_time: lineData[d[0]][0],
                 stop_time: lineData[d[1]][0],
-                datarun: datarun,
-                dataset: dataset,
-                offset: self.option.offset
+                datarun: datarun.id,
+                signal: datarun.signal
               });
             });
 
           headerBar.append('title')
-            .text(`score: ${d[2]}` + '\n' +
+            .text(`tag: ${d[4]}` + '\n' +
               'from ' + new Date(lineData[d[0]][0]).toUTCString() + '\n' +
               'to ' + new Date(lineData[d[1]][0]).toUTCString()
             );
@@ -695,7 +701,7 @@ export class LineChartFocus extends pip.Events {
           g.select('.bar-highlight')
             .attr('x', fx(lineData[stIdx][0]))
             .attr('width', Math.max(fx(lineData[edIdx][0]) - fx(lineData[stIdx][0]), 10))
-            .attr('fill', scoreColor(d[2]));
+            .attr('fill', getTagColor(d[4]));
 
           // g.select('text')
           //     .attr('x', fx(lineData[stIdx][0]))
