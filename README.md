@@ -101,7 +101,6 @@ $ make install-theme
 ##### Downloading the demo data
 
 ```bash
-$ make init-db
 $ make load-db-nasa
 ```
 

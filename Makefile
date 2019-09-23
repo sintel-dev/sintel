@@ -51,15 +51,19 @@ install-theme:
 	tar -xf theme.tar.bz2 -C ./client/public/themes/
 	rm -f theme.tar.bz2
 
+.PHONY: clean-db
+clean-db:
+	rm -f -r db-instance/
+
 .PHONY: init-db
-init-db:
+init-db: clean-db
 	mkdir -p db-instance
 	mkdir -p db-instance/data
 	mkdir -p db-instance/log
 	mkdir -p db-instance/dump
 
 .PHONY: load-db-nasa
-load-db-nasa:
+load-db-nasa: init-db
 	rm -f -r db-instance/dump/nasa/
 	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
 	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
