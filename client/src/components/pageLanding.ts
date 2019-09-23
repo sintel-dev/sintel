@@ -123,7 +123,6 @@ class PageLanding {
           $('.card-link').removeClass('active');
           _.each(self.experiments(), exp => {
             if (exp.pipeline === cdata.name) {
-              console.log('activated');
               $(`.card[name=${exp.id}]`).addClass('active');
               $(`.dot[name=${exp.id}]`).addClass('active');
               $(`.card-link[name=${exp.id}]`).addClass('active');
@@ -221,11 +220,16 @@ class PageLanding {
     let exps = self.experiments();
     let pipes = self.pipelines();
     let items = $('#page-slider .page');
+    let done = false;
     items.get(1).addEventListener(
       'transitionend',
-      () => { setTimeout(addLinks, 1000); },
+      () => { done = true; setTimeout(addLinks, 1000); },
       { once: true }
     );
+
+    setTimeout(() => {
+      if (!done) { addLinks(); }
+    }, 3000);
 
     function addLinks() {
       _.each(exps, exp => {
@@ -290,6 +294,11 @@ class PageLanding {
    */
   private selectProject(project: Project) {
     this.activeProject(project);
+    $(`.exp-row .card`).removeClass('active');
+    $(`.exp-row .dot`).removeClass('active');
+    $(`.pipe-row .card`).removeClass('active');
+    $(`.pipe-row .dot`).removeClass('active');
+    d3.selectAll('.card-link').remove();
     this.experiments(project.experiments);
     this.pipelines(project.pipelines);
     this.initDotLinks();
