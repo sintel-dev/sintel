@@ -51,10 +51,6 @@ install-theme:
 	tar -xf theme.tar.bz2 -C ./client/public/themes/
 	rm -f theme.tar.bz2
 
-.PHONY: clean-db
-clean-db:
-	rm -f -r db-instance/
-
 .PHONY: init-db
 init-db: clean-db
 	mkdir -p db-instance
