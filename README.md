@@ -101,7 +101,7 @@ $ make install-theme
 ##### Downloading the demo data
 
 ```bash
-$ make load-db-nasa
+$ make load-db-mtv
 ```
 
 This will download and restore the dataset into MongoDB.
