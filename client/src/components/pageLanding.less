@@ -1,6 +1,4 @@
-@import "../less/colors";
-
-
+@import "../less/colors.less";
 
 /* variables */
 @row-title-color: #919295;
@@ -11,9 +9,9 @@
 @font-inactive-color: #A7A7AA;
 @font-active-color: white;
 
-// @easing: cubic-bezier(.694, 0, .335, 1);    // for transition
-@easing: linear;    // for transition
-
+// @transition-time: 0.3s;
+// @easing2: cubic-bezier(.694, 0, .335, 1);    // for transition
+@easing2: linear;    // for transition
 
 @proj-card-width: 360px;
 @exp-card-width: 320px;
@@ -60,7 +58,40 @@
     box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
 }
 
+/* for animation */
+@keyframes slide-up {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .page-landing {
+
+    .svg-link {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+
+        pointer-events: none;
+        fill: none;
+
+        .card-link {
+            fill: none;
+            stroke-width: 1px;
+            stroke: @dot-color;
+
+            &.active {
+                stroke: @dot-color-hover;
+                stroke-width: 2px;
+                transition: all 0.3s @easing2;
+            }
+        }
+    }
 
     .ld-row {
         position: relative;
@@ -122,7 +153,7 @@
             border-radius: 10px;
             transition-property: background-color border-color;
             transition-duration: 0.3s;
-            transition-timing-function: @easing;
+            transition-timing-function: @easing2;
 
             .sep-line {
                 border-top: 1px solid #34363B;
@@ -133,7 +164,7 @@
             .title {
                 color: @font-inactive-color;
                 font-size: 25px;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             .exp-info {
@@ -142,7 +173,7 @@
                 bottom: 20px;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             .pipe-info {
@@ -151,7 +182,7 @@
                 bottom: 20px;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
-                transition: color 0.3s @easing;
+                transition: color 0.3s @easing2;
             }
 
             &.active, &:hover {
@@ -198,6 +229,7 @@
             border-width: 1px;
             border-color: #282B30;
             border-radius: 10px;
+            animation: slide-up 1s ease;
 
             &.active, &:hover {
                 background-color: #2C3034;
@@ -218,7 +250,7 @@
                     padding-left: 15px;
                     font-size: 18px;
                     color: @font-inactive-color;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         float: left;
@@ -248,7 +280,7 @@
                     color: @font-inactive-color;
                     font-size: @info-font-size;
                     padding-left: 15px;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         padding-top: 40px;
@@ -256,16 +288,15 @@
                 }
             }
 
-            .matrix {
+            .matrix-container {
                 position: absolute;
                 left: 140px;
                 top: @header-height;
                 width: ~"calc(100% - 140px)"; 
                 height: ~"calc(100% - @{header-height})";
-                // background-image: url(./public/imgs/matrix.PNG);
-                background-position: center;
-                background-size: 100%;
-                background-repeat: no-repeat;
+                min-width: 180px;
+                min-height: 160px;
+                // border: 1px solid red;
             }
 
             &.active, &:hover {
@@ -289,7 +320,7 @@
         overflow-x: auto;
 
 
-        margin: 30px 90px 0px 90px;
+        margin: 0 90px 0px 90px;
         height: 100%;
         width: ~"calc(100% - 180px)";
 
@@ -305,6 +336,7 @@
             border-width: 1px;
             border-color: #282B30;
             border-radius: 10px;
+            animation: slide-up 1s ease;
 
             &.active, &:hover {
                 background-color: #2C3034;
@@ -325,7 +357,7 @@
                     padding-left: 15px;
                     font-size: 18px;
                     color: @font-inactive-color;
-                    transition: color 0.3s @easing;
+                    transition: color 0.3s @easing2;
 
                     &:first-child {
                         float: left;
@@ -354,11 +386,18 @@
                 &>p {
                     color: @font-inactive-color;
                     font-size: @info-font-size;
-                    padding-left: 15px;
-                    transition: color 0.3s @easing;
+                    margin-left: 15px;
+                    margin-right: 15px;
+                    transition: color 0.3s @easing2;
+                    overflow-x: auto;
 
                     &:first-child {
                         padding-top: 10px;
+                    }
+
+                    &::-webkit-scrollbar {
+                        width: 0;
+                        height: 0;
                     }
                 }
             }

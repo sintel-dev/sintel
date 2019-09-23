@@ -13,13 +13,14 @@ const log = require('fancy-log');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.conf');
 const webpackConfigProd = require('./webpack.conf.prod');
+const gutil = require('gulp-util')
 
 /********************* global variables ***********************/
 const DIST = './public/dist';
+const cssBundleFileName = 'main';
+const jsBundleFileName = 'main';
 
 /********************* global utils ***********************/
-
-
 gulp.task('htmlCleanEmptyLines', (done) => {
     let content = fs.readFileSync('index.html', 'utf-8');
     let newContent = content.replace(/^\s*[\r\n]/gm, '');
@@ -70,41 +71,12 @@ const registerTypescriptBuildTasks = (options) => {
         });
     });
 
-    let outputRelativeDir = '.' + options.outputDir.substring(__dirname.length);
-    gulp.task(`ts:writeToHTML:dev`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-js': `${outputRelativeDir}/${options.filename}.js`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
-    );
-
-    gulp.task(`ts:writeToHTML:prod`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-js': `${outputRelativeDir}/${options.filename}.min.js`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
-    );
-
     gulp.task('ts:build:dev', series(
-        'ts:clean', 'ts:compile:dev',
-        'ts:writeToHTML:dev', 'htmlCleanEmptyLines'
+        'ts:clean', 'ts:compile:dev'
     ));
 
     gulp.task('ts:build:prod', series(
-        'ts:clean', 'ts:compile:prod',
-        'ts:writeToHTML:prod', 'htmlCleanEmptyLines'
+        'ts:clean', 'ts:compile:prod'
     ));
 
     gulp.task('ts:watch', () => {
@@ -120,7 +92,7 @@ const registerTypescriptBuildTasks = (options) => {
 
 registerTypescriptBuildTasks(
     {
-        filename: 'main',
+        filename: jsBundleFileName,
         entryPoints: {
             'main': __dirname + '/src/main.ts'
         },
@@ -132,19 +104,23 @@ registerTypescriptBuildTasks(
 /********************* build LESS ***********************/
 const registerLessBuildTasks = (options) => {
 
-    let { src, dir, bundleDir, bundleFileName } = options;
+    let { src, entryPoint, dir } = options;
 
     gulp.task('less:clean', () =>
-        gulp.src([dir, `${bundleDir}/${bundleFileName}*.css`],
+        gulp.src([dir, `${DIST}/${cssBundleFileName}*.css`],
             { read: false, allowEmpty: true })
             .pipe(plugins.clean())
     );
 
-    gulp.task('less:compile', () =>
-        gulp.src(src)
+    gulp.task('less:compile', (done) =>
+        gulp.src(entryPoint)
+        // gulp.src(src)
             .pipe(plugins.less().on('error', function (err) {
-                gutil.log(err);
-                this.emit('end');
+                log.error('[less]', err.toString({
+                    colors: true,
+                    chunks: false
+                }));
+                done();
             }))
             .pipe(plugins.autoprefixer())
             .pipe(gulp.dest(dir))
@@ -152,51 +128,23 @@ const registerLessBuildTasks = (options) => {
 
     gulp.task('less:bundle', () =>
         gulp.src(`${dir}/**/*.css`)
-            .pipe(plugins.concat(`${bundleFileName}.css`))
-            .pipe(gulp.dest(bundleDir))
+            .pipe(plugins.concat(`${cssBundleFileName}.css`))
+            .pipe(gulp.dest(DIST))
     );
 
     gulp.task('less:min', () =>
-        gulp.src(`${bundleDir}/${bundleFileName}.css`)
+        gulp.src(`${DIST}/${cssBundleFileName}.css`)
             .pipe(plugins.cssmin())
-            .pipe(plugins.rename(`${bundleFileName}.min.css`))
-            .pipe(gulp.dest(bundleDir))
-    );
-
-    gulp.task(`less:writeToHTML:dev`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-css': `${bundleDir}/${bundleFileName}.css`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
-    );
-
-    gulp.task(`less:writeToHTML:prod`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace({
-                'app-css': `${bundleDir}/${bundleFileName}.min.css`
-            }, {
-                    keepUnassigned: true,
-                    keepBlockTags: true,
-                    resolvePaths: false
-                }
-            ))
-            .pipe(gulp.dest('./'))
+            .pipe(plugins.rename(`${cssBundleFileName}.min.css`))
+            .pipe(gulp.dest(DIST))
     );
 
     gulp.task('less:build:dev', series(
-        'less:clean', 'less:compile', 'less:bundle',
-        'less:writeToHTML:dev', 'htmlCleanEmptyLines'
+        'less:clean', 'less:compile', 'less:bundle'
     ));
 
     gulp.task('less:build:prod', series(
-        'less:clean', 'less:compile', 'less:bundle',
-        'less:min', 'less:writeToHTML:prod', 'htmlCleanEmptyLines'
+        'less:clean', 'less:compile', 'less:bundle', 'less:min'
     ));
 
     gulp.task('less:watch', () => {
@@ -208,8 +156,7 @@ registerLessBuildTasks(
     {
         src: './src/**/*.less',
         dir: `${DIST}/css`,
-        bundleDir: DIST,
-        bundleFileName: 'main'
+        entryPoint: './src/main.less'
     }
 )
 
@@ -217,75 +164,90 @@ registerLessBuildTasks(
 /********************* build Assets ***********************/
 const registerAssetsBuildTasks = (options) => {
 
-    let { dir, assets } = options;
+    let { assetsFile } = options;
 
     // create empty files
-    if (!fs.existsSync(dir)) { fs.mkdirSync(dir); }
-    fs.writeFile(`${dir}/none.css`, ' ', (err) => { if (err) throw err; });
-    fs.writeFile(`${dir}/none.js`, ' ', (err) => { if (err) throw err; });
+    if (!fs.existsSync(DIST)) { fs.mkdirSync(DIST); }
+    fs.writeFile(`${DIST}/none.css`, ' ', (err) => { if (err) throw err; });
+    fs.writeFile(`${DIST}/none.js`, ' ', (err) => { if (err) throw err; });
 
-    // todo update assets
-    let replacement;
-
+    // update assets : todo dev/prod
+    let replacementAssets;
     gulp.task(`assets:update`, (done) => {
-        delete require.cache[require.resolve('./assets')]
-        assets = require('./assets');
-        replacement = {
+        delete require.cache[require.resolve(assetsFile)]
+        let assets = require(assetsFile);
+        replacementAssets = {
             'assets-css': assets.css,
             'assets-js': assets.js
         };
         if (assets.css.length === 0) {
-            replacement[`assets-css`] = [`${dir}/none.css`];
+            replacementAssets[`assets-css`] = [`${DIST}/none.css`];
         }
         if (assets.js.length === 0) {
-            replacement[`assets-js`] = [`${dir}/none.js`];
+            replacementAssets[`assets-js`] = [`${DIST}/none.js`];
         }
         done();
     });
 
-    gulp.task(`assets:writeToHTML`, () =>
-        gulp.src('index.html')
-            .pipe(plugins.htmlReplace(replacement, {
+    gulp.task(`writeToHTML:dev`, () => {
+        replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.js`;
+        replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.css`;
+
+        return gulp.src('index.html')
+            .pipe(plugins.htmlReplaceDyu(replacementAssets, {
                 keepUnassigned: true,
                 keepBlockTags: true,
                 resolvePaths: false
             }))
             .pipe(gulp.dest('./'))
-    );
+     });
 
-    gulp.task(`assets:build`, series(
+    gulp.task(`writeToHTML:prod`, () => {
+        replacementAssets['app-js'] = `${DIST}/${jsBundleFileName}.min.js`;
+        replacementAssets['app-css'] = `${DIST}/${cssBundleFileName}.min.css`;
+    
+        return gulp.src('index.html')
+            .pipe(plugins.htmlReplaceDyu(replacementAssets, {
+                keepUnassigned: true,
+                keepBlockTags: true,
+                resolvePaths: false
+            }))
+            .pipe(gulp.dest('./'))
+    });
+
+    gulp.task(`assets:build:dev`, series(
         `assets:update`,
-        `assets:writeToHTML`,
-        'htmlCleanEmptyLines'
+        `writeToHTML:dev`
+    ));
+
+    gulp.task(`assets:build:prod`, series(
+        `assets:update`,
+        `writeToHTML:prod`
     ));
 
     gulp.task('assets:watch', () => {
-        gulp.watch('assets.js', series('assets:build'));
+        gulp.watch('assets.js', series('assets:build:dev'));
     });
 };
 
 registerAssetsBuildTasks(
     {
-        dir: DIST,
-        assets: require('./assets')
+        assetsFile: './assets'
     }
 );
 
-
 /********************* MAIN ***********************/
 
-// index.html: list all css and js in libraries
 gulp.task('build:dev', parallel(
     'less:build:dev',
     'ts:build:dev',
-    'assets:build'
+    'assets:build:dev'
 ));
 
-// index.html: use bundled css and js in libraries
 gulp.task('build:prod', parallel(
     'less:build:prod',
     'ts:build:prod',
-    'assets:build'
+    'assets:build:prod'
 ));
 
 // watching mode for development use

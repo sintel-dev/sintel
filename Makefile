@@ -35,11 +35,12 @@ help:
 
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
-	pip install .
+	pip install -e .
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
+	# npm install --quiet -g gulp-cli
 	cd client && npm install
 
 .PHONY: install-theme
@@ -50,19 +51,53 @@ install-theme:
 	tar -xf theme.tar.bz2 -C ./client/public/themes/
 	rm -f theme.tar.bz2
 
+.PHONY: clean-db
+clean-db:
+	rm -f -r db-instance/
+
 .PHONY: init-db
-init-db:
+init-db: clean-db
 	mkdir -p db-instance
 	mkdir -p db-instance/data
 	mkdir -p db-instance/log
 	mkdir -p db-instance/dump
 
 .PHONY: load-db-nasa
-load-db-nasa:
+load-db-nasa: init-db
 	rm -f -r db-instance/dump/nasa/
 	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
 	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
 	mongorestore --db mtv ./db-instance/dump/nasa/
+
+.PHONY: load-db-mtv
+load-db-mtv:
+	rm -f -r db-instance/dump/mtv/
+	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	tar -xf mtv.tar.bz2 -C ./db-instance/dump/ && rm mtv.tar.bz2
+	mongorestore --db mtv ./db-instance/dump/mtv/
+
+# ------------------ session: docker installation ------------------- #
+.PHONY: docker-db-up
+docker-db-up: init-db	## download and 
+	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	tar -xf mtv.tar.bz2 -C ./db-instance/dump/ && rm mtv.tar.bz2
+	docker-compose -f docker-compose-db.yml up
+	# curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
+	# tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
+	# mv ./db-instance/dump/nasa ./db-instance/dump/mtv
+	# docker-compose -f docker-compose-db.yml up
+
+.PHONY: docker-clean
+docker-clean: 			## clean the related containers and volumes
+	docker-compose down -v
+
+.PHONY: docker-up
+docker-up: 				## run mtv with docker
+	docker-compose up -d
+
+.PHONY: docker-down
+docker-down: 			## stop mtv
+	docker-compose down
 
 # ----------------------- session: test ----------------------- #
 
@@ -125,7 +160,9 @@ view-docs: docs ## view docs in browser
 serve-docs: view-docs ## compile the docs watching for changes
 	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
 
-
+.PHONY: api-docs
+api-docs:	## generate server API docs
+	apidoc -i mtv\\resources\\ -o apidoc\\
 
 # -------------------- session: release ---------------------- #
 

@@ -11,7 +11,8 @@ let assets = {
         `${THEME}/dist/css/AdminLTE.min.css`,
         `${THEME}/dist/css/skins/_all-skins.min.css`,
         `${THEME}/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css`,
-        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`
+        `${THEME}/bower_components/bootstrap-daterangepicker/daterangepicker.css`,
+        `${STATIC}/tooltipster/css/tooltipster.css`
 ],
     js: [
         `${STATIC}/jquery.min.js`,

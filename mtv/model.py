@@ -54,6 +54,12 @@ class MongoUtils:
         return document
 
     @classmethod
+    def insert_many(cls, docs):
+        # todo: need validation
+        wrapped_docs = [cls(**d) for d in docs]
+        cls.objects.insert(wrapped_docs)
+
+    @classmethod
     def find_or_insert(cls, **kwargs):
         document = cls.find_one(**kwargs)
         if document is None:
@@ -100,13 +106,17 @@ class PipelineField(fields.DictField):
 
 class Dataset(Document, MongoUtils):
     name = fields.StringField(required=True)
-    signal_set = fields.StringField(required=True)
-    satellite_id = fields.StringField()
+    entity_id = fields.StringField()
+
+
+class Signal(Document, MongoUtils):
+    name = fields.StringField(required=True)
+    dataset = fields.ReferenceField(Dataset)
     start_time = fields.IntField()
     stop_time = fields.IntField()
     data_location = fields.StringField()
-    timestamp_column = fields.IntField(default=0)
-    value_column = fields.IntField(default=1)
+    timestamp_column = fields.IntField()
+    value_column = fields.IntField()
     created_by = fields.StringField()
 
 
@@ -116,9 +126,16 @@ class Pipeline(Document, MongoUtils):
     created_by = fields.StringField()
 
 
-class Datarun(Document, MongoUtils):
-    dataset = fields.ReferenceField(Dataset)
+class Experiment(Document, MongoUtils):
+    project = fields.StringField()
     pipeline = fields.ReferenceField(Pipeline)
+    dataset = fields.ReferenceField(Dataset)
+    created_by = fields.StringField()
+
+
+class Datarun(Document, MongoUtils):
+    experiment = fields.ReferenceField(Experiment)
+    signal = fields.ReferenceField(Signal)
     start_time = fields.DateTimeField(required=True)
     end_time = fields.DateTimeField()
     software_versions = fields.ListField(fields.StringField())
@@ -128,8 +145,6 @@ class Datarun(Document, MongoUtils):
     metrics_location = fields.StringField()
     events = fields.IntField()
     status = fields.StringField()
-    created_by = fields.StringField()
-    experiment = fields.StringField()
 
 
 class Event(Document, MongoUtils):
@@ -147,39 +162,23 @@ class Comment(Document, MongoUtils):
 
 
 class Raw(Document, MongoUtils):
-    dataset = fields.StringField()
+    signal = fields.ReferenceField(Signal)
     timestamp = fields.FloatField()
     year = fields.IntField()
     data = fields.ListField(fields.ListField())
-    # meta = {
-    #     'indexes': [
-    #         '$dataset', # text index
-    #         ('dataset', '+year')
-    #     ]
-    # }
-
-
-class Prediction(Document, MongoUtils):
-    dataset = fields.StringField()
-    datarun = fields.ReferenceField(Datarun)
-    offset = fields.IntField()
-    names = fields.ListField(fields.ListField(fields.DictField()))
-    data = fields.ListField(fields.ListField(fields.FloatField()))
     meta = {
         'indexes': [
-            '$dataset'  # text index
+            ('signal', '+year')
         ]
     }
 
 
-class Experiment(Document, MongoUtils):
+class Prediction(Document, MongoUtils):
+    signal = fields.ReferenceField(Signal)
+    datarun = fields.ReferenceField(Datarun)
+    names = fields.ListField(fields.StringField())
+    data = fields.ListField(fields.ListField(fields.FloatField()))
+
+
+class Test(Document, MongoUtils):
     name = fields.StringField(required=True)
-    model_num = fields.IntField(required=True)
-    event_num = fields.IntField(required=True)
-    pipeline = fields.ReferenceField(Pipeline)
-    project = fields.StringField()
-    dataruns = fields.ListField(fields.ReferenceField(Datarun))
-    start_time = fields.DateTimeField(required=True)
-    end_time = fields.DateTimeField()
-    status = fields.StringField()
-    created_by = fields.StringField()
