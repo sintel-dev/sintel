@@ -72,6 +72,27 @@
 
 .page-landing {
 
+    .svg-link {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+
+        pointer-events: none;
+        fill: none;
+
+        .card-link {
+            fill: none;
+            stroke-width: 1px;
+            stroke: @dot-color;
+
+            &.active {
+                stroke: @dot-color-hover;
+                stroke-width: 2px;
+                transition: all 0.3s @easing2;
+            }
+        }
+    }
+
     .ld-row {
         position: relative;
         margin: 30px 30px 0 30px;
@@ -267,16 +288,15 @@
                 }
             }
 
-            .matrix {
+            .matrix-container {
                 position: absolute;
                 left: 140px;
                 top: @header-height;
                 width: ~"calc(100% - 140px)"; 
                 height: ~"calc(100% - @{header-height})";
-                // background-image: url(./public/imgs/matrix.PNG);
-                background-position: center;
-                background-size: 100%;
-                background-repeat: no-repeat;
+                min-width: 180px;
+                min-height: 160px;
+                // border: 1px solid red;
             }
 
             &.active, &:hover {
@@ -300,7 +320,7 @@
         overflow-x: auto;
 
 
-        margin: 30px 90px 0px 90px;
+        margin: 0 90px 0px 90px;
         height: 100%;
         width: ~"calc(100% - 180px)";
 

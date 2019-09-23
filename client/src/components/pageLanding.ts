@@ -2,10 +2,14 @@ import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
 import * as DT from '../services/server.itf';
+import * as d3 from 'd3';
 import { getProjects } from '../services/dataProcessor';
+import { Matrix } from './vis/matrix';
+import { fromIDtoTag, fromTagToID } from '../services/helpers';
 
 export interface Experiment extends DT.Experiment {
   eventNum: number;
+  tagStats?: { [index: string]: number };
 }
 
 export interface Project {
@@ -24,10 +28,12 @@ class PageLanding {
 
   // currently active
   public activeProject = ko.observable<Project>(null);
-  public activeExperiment = ko.observable<Experiment>(null);
-  public activePipeline = ko.observable<DT.Pipeline>(null);
 
   private previousGoExperiment: Experiment = null;
+  private matrixDict: { [index: string]: Matrix };
+
+  private svg = d3.select('#page-landing .svg-link');
+
 
   /**
    * Create landing page instance
@@ -58,10 +64,10 @@ class PageLanding {
     pip.content.trigger('page:change', 'exp');
 
     if (this.previousGoExperiment == null
-        || this.previousGoExperiment.id !== experiment.id) {
-          this.previousGoExperiment = experiment;
-          pip.pageExp.trigger('experiment:change', experiment);
-        }
+      || this.previousGoExperiment.id !== experiment.id) {
+      this.previousGoExperiment = experiment;
+      pip.pageExp.trigger('experiment:change', experiment);
+    }
   }
 
   public onClickPipelineFilter(pipeline: DT.Pipeline) {
@@ -87,15 +93,42 @@ class PageLanding {
       case 'exp':
         {
           let cdata = data as Experiment;
-          self.activeExperiment(cdata);
-          // highlight pipeline
+          // highlight experiment card && dot
+          $(`.exp-row .card`).removeClass('active');
+          $(`.card[name=${cdata.id}]`).addClass('active');
+          $(`.exp-row .dot`).removeClass('active');
+          $(`.dot[name=${cdata.id}]`).addClass('active');
+          // highlight pipeline card && dot
+          let pipe = _.find(self.pipelines(), d => d.name === cdata.pipeline);
+          $(`.pipe-row .card`).removeClass('active');
+          $(`.card[name=${pipe.id}]`).addClass('active');
+          $(`.pipe-row .dot`).removeClass('active');
+          $(`.dot[name=${pipe.id}]`).addClass('active');
+          // highlight links
+          $('.card-link').removeClass('active');
+          $(`.card-link[name=${cdata.id}]`).addClass('active');
         }
         break;
       case 'pipe':
         {
           let cdata = data as DT.Pipeline;
-          self.activePipeline(cdata);
-          // highlight experiments
+          // highlight pipeline card && dot
+          $(`.pipe-row .card`).removeClass('active');
+          $(`.card[name=${cdata.id}]`).addClass('active');
+          $(`.pipe-row .dot`).removeClass('active');
+          $(`.dot[name=${cdata.id}]`).addClass('active');
+          // highlight experiment card && dot & link
+          $(`.exp-row .card`).removeClass('active');
+          $(`.exp-row .dot`).removeClass('active');
+          $('.card-link').removeClass('active');
+          _.each(self.experiments(), exp => {
+            if (exp.pipeline === cdata.name) {
+              console.log('activated');
+              $(`.card[name=${exp.id}]`).addClass('active');
+              $(`.dot[name=${exp.id}]`).addClass('active');
+              $(`.card-link[name=${exp.id}]`).addClass('active');
+            }
+          });
         }
         break;
     }
@@ -117,25 +150,55 @@ class PageLanding {
           // self.activeProject(cdata);
           let offsetLeft = $(`.card[name=${cdata.name}]`).position().left;
           let currentOffset = $('.proj-cards').scrollLeft();
-          $('.proj-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
+          $('.proj-cards').animate({ scrollLeft: currentOffset + offsetLeft }, animationTime);
         }
         break;
       case 'exp':
         {
           let cdata = data as Experiment;
-          self.activeExperiment(cdata);
+          // highlight experiment card && dot
+          $(`.exp-row .card`).removeClass('active');
+          $(`.card[name=${cdata.id}]`).addClass('active');
+          $(`.exp-row .dot`).removeClass('active');
+          $(`.dot[name=${cdata.id}]`).addClass('active');
+          // highlight pipeline card && dot
+          let pipe = _.find(self.pipelines(), d => d.name === cdata.pipeline);
+          $(`.pipe-row .card`).removeClass('active');
+          $(`.card[name=${pipe.id}]`).addClass('active');
+          $(`.pipe-row .dot`).removeClass('active');
+          $(`.dot[name=${pipe.id}]`).addClass('active');
+          // highlight links
+          $('.card-link').removeClass('active');
+          $(`.card-link[name=${cdata.id}]`).addClass('active');
+
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
           let currentOffset = $('.exp-cards').scrollLeft();
-          $('.exp-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
+          $('.exp-cards').animate({ scrollLeft: currentOffset + offsetLeft }, animationTime);
         }
         break;
       case 'pipe':
         {
           let cdata = data as DT.Pipeline;
-          self.activePipeline(cdata);
+          // highlight pipeline card && dot
+          $(`.pipe-row .card`).removeClass('active');
+          $(`.card[name=${cdata.id}]`).addClass('active');
+          $(`.pipe-row .dot`).removeClass('active');
+          $(`.dot[name=${cdata.id}]`).addClass('active');
+          // highlight experiment card && dot & link
+          $(`.exp-row .card`).removeClass('active');
+          $(`.exp-row .dot`).removeClass('active');
+          $('.card-link').removeClass('active');
+          _.each(self.experiments(), exp => {
+            if (exp.pipeline === cdata.name) {
+              console.log('activated');
+              $(`.card[name=${exp.id}]`).addClass('active');
+              $(`.dot[name=${exp.id}]`).addClass('active');
+              $(`.card-link[name=${exp.id}]`).addClass('active');
+            }
+          });
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
           let currentOffset = $('.pipe-cards').scrollLeft();
-          $('.pipe-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
+          $('.pipe-cards').animate({ scrollLeft: currentOffset + offsetLeft }, animationTime);
         }
         break;
     }
@@ -151,6 +214,45 @@ class PageLanding {
       this.scrollLeft += (evt.originalEvent.deltaY);
       evt.preventDefault();
     });
+  }
+
+  private initDotLinks() {
+    let self = this;
+    let exps = self.experiments();
+    let pipes = self.pipelines();
+    let items = $('#page-slider .page');
+    items.get(1).addEventListener(
+      'transitionend',
+      () => { setTimeout(addLinks, 1000); },
+      { once: true }
+    );
+
+    function addLinks() {
+      _.each(exps, exp => {
+        _.each(pipes, pipe => {
+          if (exp.pipeline !== pipe.name) { return; }
+          let dotExp = $(`.exp-row .dot[name=${exp.id}]`).offset();
+          let dotPipe = $(`.pipe-row .dot[name=${pipe.id}]`).offset();
+          let hh = $('header').height();
+          let dh = $(`.exp-row .dot[name=${exp.id}]`).height() / 2;
+          let curve = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+            .curve(d3.curveBasis);
+          let [x0, y0, x1, y1] = [
+            dotExp.left + dh, dotExp.top - hh + dh,
+            dotPipe.left + dh, dotPipe.top - hh + dh
+          ];
+          let [xm0, ym0, xm1, ym1] = [x0, (y0 + y1) / 2, x1, (y0 + y1) / 2];
+          let points = [[x0, y0], [xm0, ym0], [xm1, ym1], [x1, y1]] as [number, number][];
+          self.svg.append('path')
+            .attr('class', 'card-link')
+            .attr('name', exp.id)
+            .attr('d', curve(points));
+        });
+      });
+    }
+
   }
 
   /**
@@ -190,6 +292,42 @@ class PageLanding {
     this.activeProject(project);
     this.experiments(project.experiments);
     this.pipelines(project.pipelines);
+    this.initDotLinks();
+    this.visualize();
+  }
+
+  private visualize() {
+    let self = this;
+
+    let experiments = self.experiments();
+    let maxTagNum = Number.MIN_SAFE_INTEGER;
+    let maxEventnum = Number.MIN_SAFE_INTEGER;
+
+    _.each(experiments, exp => {
+      let tagStats: { [index: string]: number } = {};
+      for (let i = 0; i < 7; i += 1) { tagStats[String(i)] = 0; }
+      _.each(exp.dataruns, datarun => {
+        for (let i = 0; i < datarun.events.length; i += 1) {
+          let tid = fromTagToID(datarun.events[i].tag);
+          tid = tid === 'untagged' ? '0' : tid;
+          if (!_.has(tagStats, tid)) { tagStats[tid] = 0; }
+          tagStats[tid] += 1;
+          maxTagNum = maxTagNum < tagStats[tid] ? tagStats[tid] : maxTagNum;
+        }
+      });
+      exp.tagStats = tagStats;
+      maxEventnum = maxEventnum < exp.eventNum ? exp.eventNum : maxEventnum;
+    });
+
+
+    _.each(experiments, exp => {
+      self[exp.id] = new Matrix(
+        $(`.exp-row .matrix-container[name=${exp.id}]`)[0],
+        exp,
+        { maxTagNum: maxTagNum, maxEventnum: maxEventnum }
+      );
+    });
+
   }
 }
 

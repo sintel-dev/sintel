@@ -19,6 +19,55 @@ export const colorSchemes = {
   }
 };
 
+export let fromIDtoTag = (id: string): string => {
+  switch (id) {
+    case '1':
+      return 'investigate';
+      break;
+    case '2':
+      return 'do not investigate';
+      break;
+    case '3':
+      return 'postpone';
+      break;
+    case '4':
+      return 'problem';
+      break;
+    case '5':
+      return 'previously seen';
+      break;
+    case '6':
+      return 'normal';
+      break;
+    default:
+      return 'untagged';
+  }
+};
+
+export let fromTagToID = (tag: string): string => {
+  switch (tag) {
+    case 'investigate':
+      return '1';
+      break;
+    case 'do not investigate':
+      return '2';
+      break;
+    case 'postpone':
+      return '3';
+      break;
+    case 'problem':
+      return '4';
+      break;
+    case 'previously seen':
+      return '5';
+      break;
+    case 'normal':
+      return '6';
+      break;
+    default:
+      return 'untagged';
+  }
+};
 
 // used for karma test
 export class Calculator {
