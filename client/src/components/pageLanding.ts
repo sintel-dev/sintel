@@ -56,7 +56,7 @@ class PageLanding {
   public onGoExperiment(experiment: Experiment) {
     pip.header.trigger('page:change', 'exp');
     pip.content.trigger('page:change', 'exp');
-    
+
     if (this.previousGoExperiment == null
         || this.previousGoExperiment.id !== experiment.id) {
           this.previousGoExperiment = experiment;
@@ -117,7 +117,7 @@ class PageLanding {
           // self.activeProject(cdata);
           let offsetLeft = $(`.card[name=${cdata.name}]`).position().left;
           let currentOffset = $('.proj-cards').scrollLeft();
-          $('.proj-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
+          $('.proj-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
         }
         break;
       case 'exp':
@@ -126,7 +126,7 @@ class PageLanding {
           self.activeExperiment(cdata);
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
           let currentOffset = $('.exp-cards').scrollLeft();
-          $('.exp-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
+          $('.exp-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
         }
         break;
       case 'pipe':
@@ -135,7 +135,7 @@ class PageLanding {
           self.activePipeline(cdata);
           let offsetLeft = $(`.card[name=${cdata.id}]`).position().left;
           let currentOffset = $('.pipe-cards').scrollLeft();
-          $('.pipe-cards').animate({scrollLeft: currentOffset+offsetLeft}, animationTime);
+          $('.pipe-cards').animate({scrollLeft: currentOffset + offsetLeft}, animationTime);
         }
         break;
     }

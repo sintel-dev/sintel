@@ -67,7 +67,7 @@ export async function getEvents(
 
   // Get events by datarun ID
   let data = await server.events.read<{events: DT.Event[]}>(
-    {}, 
+    {},
     { datarun_id: datarun.id }
   );
 

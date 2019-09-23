@@ -45,36 +45,36 @@ class PageExp {
   private selectedTagID: string;
   private tagSelectionData = [
     {
-      "text": "Unknown",
-      "children": [
+      'text': 'Unknown',
+      'children': [
         {
-          "id": 1,
-          "text": "investigate"
+          'id': 1,
+          'text': 'investigate'
         },
         {
-          "id": 2,
-          "text": "do not investigate"
+          'id': 2,
+          'text': 'do not investigate'
         },
         {
-          "id": 3,
-          "text": "postpone"
+          'id': 3,
+          'text': 'postpone'
         }
       ]
     },
     {
-      "text": "Known",
-      "children": [
+      'text': 'Known',
+      'children': [
         {
-          "id": 4,
-          "text": "problem"
+          'id': 4,
+          'text': 'problem'
         },
         {
-          "id": 5,
-          "text": "previously seen"
+          'id': 5,
+          'text': 'previously seen'
         },
         {
-          "id": 6,
-          "text": "normal"
+          'id': 6,
+          'text': 'normal'
         }
       ]
     }
@@ -147,7 +147,7 @@ class PageExp {
         pip.pageExp.trigger('event:update');
         // pip.content.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
-        if (self.commentInfo == undefined) {
+        if (_.isUndefined(self.commentInfo)) {
           server.comments.create({
             event_id: event.id,
             text: $('#comment').val()
@@ -172,7 +172,7 @@ class PageExp {
         pip.pageExp.trigger('event:update');
         // pip.pageExp.trigger('linechart:highlight:update', self.eventInfo.datarun);
 
-        if (self.commentInfo == undefined) {
+        if (_.isUndefined(self.commentInfo)) {
           server.comments.create({
             event_id: event.id,
             text: $('#comment').val()
@@ -303,7 +303,7 @@ class PageExp {
   private initTagSelectionMenu() {
     let s2 = $('#selectLevel').select2({
       minimumResultsForSearch: Infinity,
-      placeholder: "Select a tag",
+      placeholder: 'Select a tag',
       data: this.tagSelectionData
     });
     // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
@@ -359,7 +359,7 @@ class PageExp {
       case 'normal':
         return '6';
         break;
-      default: 
+      default:
         return 'untagged';
     }
   }

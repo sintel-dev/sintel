@@ -111,7 +111,7 @@ def updateDB(database, interval=60, utc=True, impute=True):
             if nm_range[1] - nm_range[0] == 0:
                 raw_es = 0
             else:
-                raw_es= v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
+                raw_es = v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
             data.append([
                 float(idx),
                 _inverse_scale_transform(v['y'][i][0], *nm_range, *raw_range),
