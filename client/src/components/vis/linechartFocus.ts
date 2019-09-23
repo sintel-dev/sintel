@@ -600,7 +600,7 @@ export class LineChartFocus extends pip.Events {
           colorIdx = i;
         }
       }
-      if (colorIdx == undefined) { colorIdx = 6; }
+      if (_.isUndefined(colorIdx)) { colorIdx = 6; }
       return colorSchemes.tag[colorIdx];
     };
 

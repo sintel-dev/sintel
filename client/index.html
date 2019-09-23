@@ -40,6 +40,7 @@
 						<div id="page-landing" class="page page-landing" data-index="0">
 							<div class="abs-mask">
 								<div class="page-content">
+									<svg class="svg-link"></svg>
 
 									<!-- project row: begin -->
 									<div class="ld-row proj-row">
@@ -71,8 +72,6 @@
 										<ul class="exp-cards scroll-style" data-bind="foreach: experiments">
 											<li class="card" data-bind="
 												attr: {name: $data.id},
-												css: { active: ($parent.activeExperiment() != null)
-																			 && ($parent.activeExperiment().id===$data.id)},
 												click: $parent.onSelectCard.bind($parent, 'exp', $data)">
 												<div class="header">
 													<span data-bind="text: `${$data.id}`"></span>
@@ -86,14 +85,14 @@
 													<p data-bind="text: `DC: ${$data.date_creation.substring(0,10)}`"></p>
 													<p data-bind="text: `Events: ${$data.eventNum}`"></p>
 												</div>
-												<div class="matrix" style="background-image: url(./public/imgs/matrix.PNG)"></div>
+												<div class="matrix-container" 
+														 data-bind="attr: {name: $data.id}"></div>
 											</li>
 										</ul>
 										<div style="text-align:center" data-bind="foreach: experiments">
 											<span class="dot" data-bind="
-												click: $parent.onSelectDot.bind($parent, 'exp', $data),
-												css: { active: ($parent.activeExperiment() != null)
-													&& ($parent.activeExperiment().id===$data.id)}"> </span>
+												attr: {name: $data.id},
+												click: $parent.onSelectDot.bind($parent, 'exp', $data)"></span>
 										</div>
 									</div>
 									<!-- experiment row: end -->
@@ -101,12 +100,15 @@
 									<!-- pipeline row: begin -->
 									<div class="ld-row pipe-row">
 										<span class="row-title">Pipelines</span>
+										<div style="text-align:center" data-bind="foreach: pipelines">
+											<span class="dot" data-bind="
+												attr: {name: $data.id},
+												click: $parent.onSelectDot.bind($parent, 'pipe', $data)"> </span>
+										</div>
 										<ul class="pipe-cards scroll-style" data-bind="
 											childrenComplete: pipeCardsRendered, foreach: pipelines">
 											<li class="card" data-bind="
 												attr: {name: $data.id},
-												css: { active: ($parent.activePipeline() != null)
-																			 && ($parent.activePipeline().id===$data.id)},
 												click: $parent.onSelectCard.bind($parent, 'pipe', $data)">
 												<div class="header">
 													<span data-bind="text: $data.name"></span>
@@ -118,12 +120,7 @@
 												</div>
 											</li>
 										</ul>
-										<div style="text-align:center" data-bind="foreach: pipelines">
-											<span class="dot" data-bind="
-												click: $parent.onSelectDot.bind($parent, 'pipe', $data),
-												css: { active: ($parent.activePipeline() != null)
-													&& ($parent.activePipeline().id===$data.id)}"> </span>
-										</div>
+										
 									</div>
 									<!-- pipeline row: end -->
 								</div>
