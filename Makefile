@@ -40,6 +40,7 @@ install: clean-build clean-pyc clean-client ## install the packages for running 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
+	# npm install --quiet -g gulp-cli
 	cd client && npm install
 
 .PHONY: install-theme
@@ -145,7 +146,9 @@ view-docs: docs ## view docs in browser
 serve-docs: view-docs ## compile the docs watching for changes
 	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
 
-
+.PHONY: api-docs
+api-docs:	## generate server API docs
+	apidoc -i mtv\\resources\\ -o apidoc\\
 
 # -------------------- session: release ---------------------- #
 

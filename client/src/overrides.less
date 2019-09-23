@@ -3,132 +3,17 @@
 
 .mtv-skin{
     background: @main-color;
+
+    .nav-tabs-custom {
+        margin-bottom: 0 !important;
+    }
+      
+    .box-body {
+        padding: 0;
+    }
+
     .wrapper{
         background-color: @second-color;
-    }
-
-    .main-header {
-        box-shadow: 0 0 14px #000;
-        background: @main-color;
-        a{
-            transition: all .2s ease-in-out;
-            color: #fff;
-        }
-        .navbar, .logo, .logo:hover {
-            background: @main-color;
-        }
-
-
-        .navbar-custom-menu{
-            .text{
-                padding: 15px;
-            }
-
-            .project-menu > li > a {
-                background-color: @main-color;
-                &:hover{
-                    background-color: @second-color;
-                }
-            }
-            .experiment-menu > li > a{
-                background: @main-color;
-                color: #fff;
-                border-radius: 0;
-                border: none;
-                &:hover{
-                    background: @second-color;
-                }
-            }
-        }
-    }
-
-    #content-wrapper{
-        margin: 0;
-        padding-top: 50px;
-        background-color: transparent;
-    }
-
-    .page-exp {
-        padding-top: 0;
-
-        .timeseries-overview{
-            margin-top: 0;
-        }
-
-        .nav-tabs-custom-mtv, .nav-tabs-custom-mtv>.tab-content {
-            border: none;
-            background: none;
-        }
-
-
-        .chart-ctx{
-            height: 60px;
-            .title{
-                background: none;
-                color: #fff;
-                line-height: 60px;
-                font-size: 11px;
-                color: #8A9097;
-                width: 70px;
-            }
-
-            .plot{
-                height: 60px;
-                left: auto;
-                right: 0;
-                width: calc(100% - 70px);
-            }
-
-            .handle{
-                display: none;
-                height: 18px;
-                y:0;
-                ry: 3;
-            }
-
-            &.ctx-active{
-                transition: all .2s ease-in-out;
-                background: @second-color;
-                box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);
-
-                .handle{
-                    display: block;
-                }
-            }
-
-            rect{
-                stroke: none;
-                &.selection{
-                    fill: rgba(@gray-color, 0.8);
-                }
-                &.handle{
-                    fill: #B3BBD3;
-                }
-            }
-        }
-
-        .chart-focus{
-            top: 0;
-            .plot{
-                left: 0;
-                .wawesContainer{
-                    opacity: 0;
-                    transition: all .2s ease-in-out;
-
-                    &.active{
-                        opacity: 1;
-                    }
-
-                    rect{
-                        fill: #1A1B20
-                    }
-                }
-            }
-
-            path.error{
-                fill: #767E8B;
-            }
-        }
     }
 
     .box{
