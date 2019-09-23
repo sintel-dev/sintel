@@ -546,6 +546,7 @@ class PageExp {
         }
       );
 
+      $('.multi-period-chart').remove();
       // plot year period chart
       self.periodCharts['year'] = new PeriodChart(
         $('#year')[0],
