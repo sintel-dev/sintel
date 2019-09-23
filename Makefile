@@ -65,13 +65,24 @@ load-db-nasa:
 	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
 	mongorestore --db mtv ./db-instance/dump/nasa/
 
+.PHONY: load-db-multi
+load-db-multi:
+	rm -f -r db-instance/dump/multi/
+	curl -o multi.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	tar -xf multi.tar.bz2 -C ./db-instance/dump/ && rm multi.tar.bz2
+	mongorestore --db mtv ./db-instance/dump/multi/
+
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
 docker-db-up: init-db	## download and 
-	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
-	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
-	mv ./db-instance/dump/nasa ./db-instance/dump/mtv
+	curl -o multi.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	tar -xf multi.tar.bz2 -C ./db-instance/dump/ && rm multi.tar.bz2
+	mv ./db-instance/dump/multi ./db-instance/dump/mtv
 	docker-compose -f docker-compose-db.yml up
+	# curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
+	# tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
+	# mv ./db-instance/dump/nasa ./db-instance/dump/mtv
+	# docker-compose -f docker-compose-db.yml up
 
 .PHONY: docker-clean
 docker-clean: 			## clean the related containers and volumes
