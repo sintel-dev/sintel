@@ -218,7 +218,7 @@ export class Matrix extends pip.Events {
       .enter().append('rect')
       .attr('class', 'cell')
       .attr('x', (d, i) => fx(String(i % rowNum)) )
-      .attr('y', (d, i) => (size + fx.paddingInner()) * i)
+      .attr('y', (d, i) => (size + fx.paddingInner() * 1.2) * Math.trunc(i / rowNum ))
       .attr('width', size )
       .attr('height', size )
       .attr('fill', d => color(d[1]))
