@@ -74,63 +74,66 @@ def updateDB(database, interval=60, utc=True, impute=True):
     cc = 0
     total = dataruns.count()
     for datarun in dataruns:
-        cc += 1
-        LOGGER.info('{}/{}: Processing datarun {}'.format(cc, total, datarun.id))
+        try:
+            cc += 1
+            LOGGER.info('{}/{}: Processing datarun {}'.format(cc, total, datarun.id))
 
-        if (model.Prediction.find_one(datarun=datarun.id) is not None):
-            continue
+            if (model.Prediction.find_one(datarun=datarun.id) is not None):
+                continue
 
-        v = dict()
-        for grid_out in fs.find({'datarun_id': datarun.id}, no_cursor_timeout=True):
-            data = pickle.loads(grid_out.read())
-            v[grid_out.variable] = data
+            v = dict()
+            for grid_out in fs.find({'datarun_id': datarun.id}, no_cursor_timeout=True):
+                data = pickle.loads(grid_out.read())
+                v[grid_out.variable] = data
 
-        data = list()
+            data = list()
 
-        nm_range = (np.nanmin(v['X_nm'], axis=0)[0], np.nanmax(v['X_nm'], axis=0)[0])
-        raw_range = (np.nanmin(v['X_raw'], axis=0)[0], np.nanmax(v['X_raw'], axis=0)[0])
+            nm_range = (np.nanmin(v['X_nm'], axis=0)[0], np.nanmax(v['X_nm'], axis=0)[0])
+            raw_range = (np.nanmin(v['X_raw'], axis=0)[0], np.nanmax(v['X_raw'], axis=0)[0])
 
-        # the first window does not have prediction values
-        # fill the first window with the original values
-        for i, idx in enumerate(v['raw_index']):
-            if idx == v['target_index'][0]:
-                break
+            # the first window does not have prediction values
+            # fill the first window with the original values
+            for i, idx in enumerate(v['raw_index']):
+                if idx == v['target_index'][0]:
+                    break
 
-            data.append([
-                float(idx),
-                _inverse_scale_transform(v['X_nm'][i][0], *nm_range, *raw_range),
-                _inverse_scale_transform(v['X_nm'][i][0], *nm_range, *raw_range),
-                0.0,
-                v['X_nm'][i][0],
-                v['X_nm'][i][0],
-                0.0
-            ])
+                data.append([
+                    float(idx),
+                    _inverse_scale_transform(v['X_nm'][i][0], *nm_range, *raw_range),
+                    _inverse_scale_transform(v['X_nm'][i][0], *nm_range, *raw_range),
+                    0.0,
+                    v['X_nm'][i][0],
+                    v['X_nm'][i][0],
+                    0.0
+                ])
 
-        # append the subsequent values
-        for i, idx in enumerate(v['target_index']):
-            if nm_range[1] - nm_range[0] == 0:
-                raw_es = 0
-            else:
-                raw_es = v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
-            data.append([
-                float(idx),
-                _inverse_scale_transform(v['y'][i][0], *nm_range, *raw_range),
-                _inverse_scale_transform(v['y_hat'][i][0], *nm_range, *raw_range),
-                raw_es,
-                v['y'][i][0],
-                v['y_hat'][i][0],
-                v['es'][i]
-            ])
+            # append the subsequent values
+            for i, idx in enumerate(v['target_index']):
+                if nm_range[1] - nm_range[0] == 0:
+                    raw_es = 0
+                else:
+                    raw_es = v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
+                data.append([
+                    float(idx),
+                    _inverse_scale_transform(v['y'][i][0], *nm_range, *raw_range),
+                    _inverse_scale_transform(v['y_hat'][i][0], *nm_range, *raw_range),
+                    raw_es,
+                    v['y'][i][0],
+                    v['y_hat'][i][0],
+                    v['es'][i]
+                ])
 
-        doc = {
-            'signal': datarun.signal.id,
-            'datarun': datarun.id,
-            'names': ['timestamp', 'y_raw', 'y_raw_hat', 'es_raw',
-                      'y', 'y_hat', 'es'],
-            'data': data
-        }
+            doc = {
+                'signal': datarun.signal.id,
+                'datarun': datarun.id,
+                'names': ['timestamp', 'y_raw', 'y_raw_hat', 'es_raw',
+                        'y', 'y_hat', 'es'],
+                'data': data
+            }
 
-        model.Prediction(**doc).save()
+            model.Prediction(**doc).save()
+        except Exception as e:
+            print(e)
 
     # ----------- Handle raw ------------- #
     # updated by signals
