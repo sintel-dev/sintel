@@ -33,15 +33,6 @@
             border-bottom-right-radius: 0;
             position: relative;
             margin-bottom: 28px;
-
-            &:after{
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 19%;
-                bottom: 0;
-                background-image: linear-gradient(to top, rgba(36,36,44, 0.9), rgba(36,36,44,0));
-            }
         }
         hr{
             border-top: 1px solid #000;
@@ -124,9 +115,13 @@
     }
 
     .switch-control{
+        label{
+            cursor: pointer;
+        }
+
         div{
             display: inline-block;
-            margin-right: 25px;
+            margin-right: 25px; 
             &:last-child{
                 margin-right: 0;
             }
@@ -177,10 +172,6 @@
     .linechart-controls{
         color: #fff;
         margin-bottom: 15px;
-
-        label{
-            cursor: pointer;
-        }
     }
 
     //dataset details within the chart
