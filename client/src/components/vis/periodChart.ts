@@ -175,7 +175,6 @@ export class PeriodChart extends pip.Events {
             let dt = new Date(`${mm} ${i + 1}, ${yy} 00:00:00`);
             dd.col = (i + offset) % nCol;
             dd.row = Math.floor((i + offset) / nCol);
-            dd.name += `[${dt.toString().substring(0, 3)}]`;
           });
         });
       } else {
@@ -198,14 +197,14 @@ export class PeriodChart extends pip.Events {
           .attr('transform', d => {
             if (d.level === 'day') {
               return `
-                                translate(
-                                    ${d.col * size + size / 2},
-                                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}),
-                                scale(${self.option.scaleFactor})`;
+                translate(
+                    ${d.col * size + size / 2},
+                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}),
+                scale(${self.option.scaleFactor})`;
             }
             return `
-                            translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}),
-                            scale(${self.option.scaleFactor})`;
+              translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}),
+              scale(${self.option.scaleFactor})`;
           })
           .each(function (d, count) {
             const randomID = self.generateRandomID();
@@ -448,16 +447,17 @@ export class PeriodChart extends pip.Events {
           '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'
         ); // should be gathered from API
 
-      if (o.level !== 'day') {
-        _cell.append('text')
-          .attr('class', 'radial-text-md')
-          .attr('x', -14)
-          .text(o.name)
-          .attr('y', (data, arg, svgEls) => {
-            const textOffset = svgEls[0].getBBox().height;
-            return size / 2 + textOffset;
-          });
-      }
+      _cell.append('text')
+        .attr('class', 'radial-text-md')
+        .text(o.name)
+        .attr('x', function(data, arg, svgEls) {
+          const textOffset = svgEls[0].clientWidth;
+          return -(textOffset / 2);
+        })
+        .attr('y', (data, arg, svgEls) => {
+          const textOffset = svgEls[0].getBBox().height;
+          return size / 2 + textOffset;
+        });
 
       if (o.level === 'year') {
         $('.svg-tooltip').tooltipster({
