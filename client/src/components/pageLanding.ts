@@ -221,22 +221,44 @@ class PageLanding {
     let pipes = self.pipelines();
     let items = $('#page-slider .page');
     let done = false;
+
+    d3.selectAll('.card-link').remove();
+
     items.get(1).addEventListener(
       'transitionend',
-      () => { done = true; setTimeout(addLinks, 1000); },
+      () => { done = true; update(); },
       { once: true }
     );
 
     setTimeout(() => {
-      if (!done) { addLinks(); }
-    }, 3000);
+      if (!done) { update(); }
+    }, 1500);
+
+    function update(delay = 500) {
+      setTimeout(addLinks, 500);
+    }
 
     function addLinks() {
+      // for (let i = 0; i < exps.length; i++) {
+      //   for (let j = 0; j < pipes.length; j++) {
+      //     let dotExp = $(`.exp-row .dot[name=${exps[i].id}]`);
+      //     let dotPipe = $(`.pipe-row .dot[name=${pipes[j].id}]`);
+      //     if (dotExp.length === 0 || dotPipe.length === 0) {
+      //       update();
+      //       return;
+      //     }
+      //   }
+      // }
+
+      // at first, remove all the links
+      d3.selectAll('.card-link').remove();
+
+      // add links
       _.each(exps, exp => {
         _.each(pipes, pipe => {
           if (exp.pipeline !== pipe.name) { return; }
-          let dotExp = $(`.exp-row .dot[name=${exp.id}]`).offset();
-          let dotPipe = $(`.pipe-row .dot[name=${pipe.id}]`).offset();
+          let dotExpOffset = $(`.exp-row .dot[name=${exp.id}]`).offset();
+          let dotPipeOffset = $(`.pipe-row .dot[name=${pipe.id}]`).offset();
           let hh = $('header').height();
           let dh = $(`.exp-row .dot[name=${exp.id}]`).height() / 2;
           let curve = d3.line()
@@ -244,8 +266,8 @@ class PageLanding {
             .y(d => d[1])
             .curve(d3.curveBasis);
           let [x0, y0, x1, y1] = [
-            dotExp.left + dh, dotExp.top - hh + dh,
-            dotPipe.left + dh, dotPipe.top - hh + dh
+            dotExpOffset.left + dh, dotExpOffset.top - hh + dh,
+            dotPipeOffset.left + dh, dotPipeOffset.top - hh + dh
           ];
           let [xm0, ym0, xm1, ym1] = [x0, (y0 + y1) / 2, x1, (y0 + y1) / 2];
           let points = [[x0, y0], [xm0, ym0], [xm1, ym1], [x1, y1]] as [number, number][];
@@ -293,12 +315,15 @@ class PageLanding {
    * Update KO observable variables when selecting a project
    */
   private selectProject(project: Project) {
+    let ap = this.activeProject();
+    if (ap && ap.name === project.name) {
+      return;
+    } // do nothing if select the name project
     this.activeProject(project);
     $(`.exp-row .card`).removeClass('active');
     $(`.exp-row .dot`).removeClass('active');
     $(`.pipe-row .card`).removeClass('active');
     $(`.pipe-row .dot`).removeClass('active');
-    d3.selectAll('.card-link').remove();
     this.experiments(project.experiments);
     this.pipelines(project.pipelines);
     this.initDotLinks();
