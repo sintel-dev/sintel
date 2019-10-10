@@ -573,8 +573,7 @@ export class PeriodChart extends pip.Events {
           return colorSchemes.tag[colorIdx];
         };
 
-
-        const eventsTooptip = (eventYear) => {
+        const eventsTooltip = (eventYear) => {
           const year = Number(eventYear);
           const events = self.groupEventsPerYear(year);
           if (events.length) {
@@ -598,7 +597,7 @@ export class PeriodChart extends pip.Events {
             const base = new Date(Number(o.name)).getTime() / 1000;
             const startTime = ((event[Number(o.name)].start_time - base) / secondsInMonth) * circleMonths;
             const stopTime = ((event[Number(o.name)].stop_time - base) / secondsInMonth) * circleMonths;
-            const { eventStartDate, eventStopDate } = eventsTooptip(o.name)[0];
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.name)[0];
 
             arc
               .startAngle(startTime)
@@ -609,9 +608,7 @@ export class PeriodChart extends pip.Events {
               .attr('d', arc)
               .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'));
 
-
-
-            //@TODO - find a way to get rig of repetitive code
+            //@TODO - find a way to remove repetitive code
             $('.circle-arc').tooltipster({
               'maxWidth': 170,
               contentAsHTML: true,
@@ -660,7 +657,7 @@ export class PeriodChart extends pip.Events {
 
             const startTime = ((event[monthNames.indexOf(o.name)].start_time - base) / secondsInDay) * circleDays;
             const stopTime = ((event[monthNames.indexOf(o.name)].stop_time - base) / secondsInDay) * circleDays;
-            const { eventStartDate, eventStopDate } = eventsTooptip(o.parent.name)[0];
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.name)[0];
 
             arc
               .innerRadius(targetRadius - 1)
@@ -717,10 +714,7 @@ export class PeriodChart extends pip.Events {
             const base = new Date(Number(o.parent.parent.name), monthNames.indexOf(o.parent.name), Number(o.name)).getTime() / 1000;
             const startTime = ((event[o.name].start_time - base) / 3600) * circleHours;
             const stopTime = ((event[o.name].stop_time - base) / 3600) * circleHours;
-            const { eventStartDate, eventStopDate } = eventsTooptip(o.parent.parent.name)[0];
-
-            // const eventStartDate = new Date(event[o.name].start_time * 1000).toDateString()
-            // const eventStopDate = new Date(event[o.name].stop_time * 1000).toDateString()
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.parent.name)[0];
 
             arc
               .innerRadius(targetRadius + 0.5)
