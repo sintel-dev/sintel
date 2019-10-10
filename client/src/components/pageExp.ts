@@ -201,7 +201,8 @@ class PageExp {
       'update',
       [{
         name: d.datarun.signal,
-        info: d.period
+        info: d.period,
+        events: d.datarun.events
       }]
     );
     $(`.chart-ctx .title`).parent().removeClass('ctx-active');
@@ -553,6 +554,7 @@ class PageExp {
         [{
           name: data[0].datarun.signal,
           info: data[0].period,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -565,7 +567,8 @@ class PageExp {
         $('#month')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children
+          info: data[0].period[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -578,7 +581,8 @@ class PageExp {
         $('#day')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children[0].children
+          info: data[0].period[0].children[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -605,7 +609,8 @@ class PageExp {
         'update',
         [{
           name: d.datarun.signal,
-          info: d.period
+          info: d.period,
+          events: d.datarun.events
         }]
       );
     }
@@ -618,7 +623,8 @@ class PageExp {
         if (d.period[i].name !== o.name) { continue; }
         newData.push({
           name: d.datarun.signal,
-          info: d.period[i].children
+          info: d.period[i].children,
+          events: d.datarun.events
         });
       }
       // switch tab
@@ -637,7 +643,8 @@ class PageExp {
           if (d.period[i].children[j].name !== o.name) { continue; }
           newData.push({
             name: d.datarun.signal,
-            info: d.period[i].children[j].children
+            info: d.period[i].children[j].children,
+            events: d.datarun.events
           });
         }
       }
