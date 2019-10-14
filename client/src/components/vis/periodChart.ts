@@ -3,6 +3,7 @@ import * as pip from '../../services/pip';
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 import * as dataDP from '../../services/dataProcessor';
+import { colorSchemes } from '../../services/helpers';
 
 
 export interface Option {
@@ -328,6 +329,108 @@ export class PeriodChart extends pip.Events {
     return Math.random().toString(36).substr(2, 9);
   }
 
+  private toTimestamp = function (strDate) {
+    var datum = Date.parse(strDate);
+    return datum / 1000;
+  }
+
+  /**
+   * @TODO - if possible, make a single function out of those three
+  * (groupEventPerYear, groupEventsPerMonth, groupEventsPerDay)
+  * should be something like groupEvents(criteria) where criteria = year or month or day
+  */
+  private groupEventsPerYear(year) {
+    const self = this;
+    const events = self.data[0].events;
+    const eventsPerYear = [];
+
+    events.forEach(evt => {
+      const startYear = new Date(evt.start_time * 1000).getFullYear();
+      const endYear = new Date(evt.stop_time * 1000).getFullYear();
+      let currentYear = startYear;
+
+      while (currentYear <= endYear) {
+        const maxYearDate = self.toTimestamp(`12/31/${currentYear} 23:59:59`);
+        const minYearDate = self.toTimestamp(`01/01/${currentYear} 00:00:00`);
+
+        eventsPerYear.push({
+          [currentYear]: {
+            id: evt.id,
+            score: evt.score,
+            start_time: startYear === currentYear ? evt.start_time : minYearDate,
+            stop_time: endYear === currentYear ? evt.stop_time : maxYearDate,
+            tag: evt.tag
+          }
+        });
+        currentYear++;
+      }
+    });
+
+    return eventsPerYear.filter(event => event[year]);
+  }
+
+  private groupEventsPerMonth(monthName, year) {
+    const self = this;
+    const eventsPerMonth = [];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const eventsPerYear = self.groupEventsPerYear(year);
+    eventsPerYear.forEach(event => {
+      const startMonth = new Date(event[year].start_time * 1000).getMonth();
+      const endMonth = new Date(event[year].stop_time * 1000).getMonth();
+      let currentMonth = startMonth;
+
+      while (currentMonth <= endMonth) {
+        const maxDaysInMonth = new Date(year, months.indexOf(monthName) + 1, 0).getDate();
+        const maxMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${maxDaysInMonth}/${year} 23:59:59`);
+        const minMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/01/${year} 00:00:00`);
+
+        eventsPerMonth.push({
+          [currentMonth]: {
+            id: event[year].id,
+            score: event[year].score,
+            start_time: startMonth === currentMonth ? event[year].start_time : minMonthDate,
+            stop_time: endMonth === currentMonth ? event[year].stop_time : maxMonthDate,
+            tag: event[year].tag
+          }
+        })
+        currentMonth++;
+      }
+    });
+    return eventsPerMonth.filter(event => event[months.indexOf(monthName)]);
+  }
+
+  private groupEventsPerDay(day, monthName, year) {
+    const self = this;
+    const eventsPerDay = [];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNumber = months.indexOf(monthName);
+    const eventsPerMonth = self.groupEventsPerMonth(monthName, year);
+    eventsPerMonth.forEach(event => {
+      const startDay = new Date(event[monthNumber].start_time * 1000).getDate();
+      const endDay = new Date(event[monthNumber].stop_time * 1000).getDate();
+      let currentDay = startDay;
+      const month = months.indexOf(monthName);
+
+      while (currentDay <= endDay) {
+        const maxDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 23:59:59`);
+        const minDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 00:00:00`);
+
+        eventsPerDay.push({
+          [currentDay]: {
+            id: event[month].id,
+            score: event[month].score,
+            start_time: startDay === currentDay ? event[month].start_time : minDayDate,
+            stop_time: endDay === currentDay ? event[month].stop_time : maxDayDate,
+            tag: event[month].tag
+          }
+        });
+        currentDay++;
+      }
+    });
+    return eventsPerDay.filter(event => event[day]);
+  }
+
   private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
     let self = this;
     let option = self.option;
@@ -443,75 +546,292 @@ export class PeriodChart extends pip.Events {
         .on('click', (d) => {
           self.trigger('select', o);
         })
-        .attr('title',
-          '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'
-        ); // should be gathered from API
+        .attr('title', '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'); // should be gathered from API
 
-      _cell.append('text')
-        .attr('class', 'radial-text-md')
-        .text(o.name)
-        .attr('x', function(data, arg, svgEls) {
-          const textOffset = svgEls[0].clientWidth;
-          return -(textOffset / 2);
-        })
-        .attr('y', (data, arg, svgEls) => {
-          const textOffset = svgEls[0].getBBox().height;
-          return size / 2 + textOffset;
-        });
 
-      if (o.level === 'year') {
-        $('.svg-tooltip').tooltipster({
-          'maxWidth': 270,
-          contentAsHTML: true,
-          arrow: false,
-          side: 'right',
-          trigger: 'custom',
-          debug: false,
-          triggerOpen: {
-            click: true,
-            tap: true,
-            mouseenter: true
-          },
-          triggerClose: {
-            click: true,
-            scroll: false,
-            tap: true,
-            mouseleave: true
-          },
+      // @TODO - refactor
+      if (self.data[0].events.length) {
+        const PI = Math.PI;
+        const secondsInMonth = 2629743.83
+        const secondsInDay = 86400;
+        const circleMonths = (2 * PI) / 12;
+        const circleHours = (2 * PI) / 24;
+        colorSchemes.tag.push('#fff');
+        const eventRange = [];
 
-          functionInit: function (instance, helper) {
-            const content = instance.content();
-            const events = JSON.parse(content);
-            let newContent = '<ul><li class="events">Events</li>';
-            events.map((event, index) => {
-              newContent += `<li><i class="event_${index}"/>${event}</li>`;
+
+        const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const getTagColor = (tag: string): string => {
+          let colorIdx: number = 0;
+          for (let i = 0; i < tagSeq.length; i += 1) {
+            if (tagSeq[i] === tag) {
+              colorIdx = i;
+            }
+          }
+          return colorSchemes.tag[colorIdx];
+        };
+
+        const eventsTooltip = (eventYear) => {
+          const year = Number(eventYear);
+          const events = self.groupEventsPerYear(year);
+          if (events.length) {
+            events.forEach(event => {
+              eventRange.push({
+                eventStartDate: new Date(event[year].start_time * 1000).toDateString(),
+                eventStopDate: new Date(event[year].stop_time * 1000).toDateString()
+              });
             });
-            newContent += '</ul>';
-            instance.content(newContent);
           }
-        });
-      }
+          return eventRange;
+        }
 
-      if (option.missing) {
-        let missedData = [];
-        let area00 = d3.areaRadial<number>()
-          .angle((d, i) => angle(d))
-          .innerRadius(d => radius(0))
-          .outerRadius(d => radius(0))
-          .curve(d3.curveCardinal);
-        _.each(o.bins, (b, bi) => {
-          if (o.counts[bi] === 0) {
-            missedData.push(bi);
-            _cell.append('path')
-              .datum(missedData)
-              .attr('class', 'missed-bins')
-              .attr('d', area00([bi, bi + 1]))
-              .attr('fill', '#b70e13')
-              .attr('stroke', '#b70e13')
-              .attr('stroke-width', 2)
-              .attr('stroke-opacity', 0.7);
-          }
-        });
+        const arc = d3.arc()
+          .innerRadius(targetRadius - 2)
+          .outerRadius(targetRadius + 2);
+
+        if (o.level === 'year') {
+          const events = self.groupEventsPerYear(Number(o.name));
+          events.length && events.forEach(event => {
+            const base = new Date(Number(o.name)).getTime() / 1000;
+            const startTime = ((event[Number(o.name)].start_time - base) / secondsInMonth) * circleMonths;
+            const stopTime = ((event[Number(o.name)].stop_time - base) / secondsInMonth) * circleMonths;
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.name)[0];
+
+            arc
+              .startAngle(startTime)
+              .endAngle(stopTime);
+
+            target.append('path')
+              .attr('class', 'circle-arc')
+              .attr('d', arc)
+              .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'));
+
+            //@TODO - find a way to remove repetitive code
+            $('.circle-arc').tooltipster({
+              'maxWidth': 170,
+              contentAsHTML: true,
+              arrow: false,
+              side: 'right',
+              trigger: 'custom',
+              debug: false,
+              triggerOpen: {
+                click: true,
+                tap: true,
+                mouseenter: true
+              },
+              triggerClose: {
+                click: true,
+                scroll: false,
+                tap: true,
+                mouseleave: true
+              },
+
+              functionInit: function (instance) {
+                let tooltipContent = `
+                      <ul class="tooltip-events">
+                        <li class="events">${event.tag || 'untagged'} </li>
+                        <li>
+                          <span>START</span>
+                          <span>${eventStartDate} </span>
+                        </li>
+                        <li>
+                          <span>END</span>
+                          <span> ${eventStopDate}</span>
+                        </li>
+                      </ul>`;
+                instance.content(tooltipContent);
+              }
+            });
+          });
+        }
+
+        if (o.level === 'month') {
+          const events = self.groupEventsPerMonth(o.name, o.parent.name); //month name and year
+          events.length && events.forEach(event => {
+            const base = new Date(Number(o.parent.name), monthNames.indexOf(o.name)).getTime() / 1000;
+
+            const daysInMonth = o.children.length;
+            const circleDays = (2 * PI) / daysInMonth;
+
+            const startTime = ((event[monthNames.indexOf(o.name)].start_time - base) / secondsInDay) * circleDays;
+            const stopTime = ((event[monthNames.indexOf(o.name)].stop_time - base) / secondsInDay) * circleDays;
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.name)[0];
+
+            arc
+              .innerRadius(targetRadius - 1)
+              .outerRadius(targetRadius + 1)
+              .startAngle(startTime)
+              .endAngle(stopTime);
+
+            target.append('path')
+              .attr('class', 'circle-arc')
+              .attr('d', arc)
+              .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'));
+
+            $('.circle-arc').tooltipster({
+              'maxWidth': 170,
+              contentAsHTML: true,
+              arrow: false,
+              side: 'right',
+              trigger: 'custom',
+              debug: false,
+              triggerOpen: {
+                click: true,
+                tap: true,
+                mouseenter: true
+              },
+              triggerClose: {
+                click: true,
+                scroll: false,
+                tap: true,
+                mouseleave: true
+              },
+
+              functionInit: function (instance) {
+                let tooltipContent = `
+                      <ul class="tooltip-events">
+                        <li class="events">${event[monthNames.indexOf(o.name)].tag || 'untagged'} </li>
+                        <li>
+                          <span>START</span>
+                          <span>${eventStartDate} </span>
+                        </li>
+                        <li>
+                          <span>END</span>
+                          <span> ${eventStopDate}</span>
+                        </li>
+                      </ul>`;
+                instance.content(tooltipContent);
+              }
+            });
+          });
+        }
+
+        if (o.level === 'day') {
+          const dayEvents = self.groupEventsPerDay(o.name, o.parent.name, o.parent.parent.name);
+          dayEvents.length && dayEvents.forEach(event => {
+            const base = new Date(Number(o.parent.parent.name), monthNames.indexOf(o.parent.name), Number(o.name)).getTime() / 1000;
+            const startTime = ((event[o.name].start_time - base) / 3600) * circleHours;
+            const stopTime = ((event[o.name].stop_time - base) / 3600) * circleHours;
+            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.parent.name)[0];
+
+            arc
+              .innerRadius(targetRadius + 0.5)
+              .outerRadius(targetRadius - 0.5)
+              .startAngle(startTime)
+              .endAngle(stopTime);
+
+            target.append('path')
+              .attr('class', 'circle-arc')
+              .attr('d', arc)
+              .attr('fill', getTagColor(event[o.name].tag || 'untagged'));
+
+
+            $('.circle-arc').tooltipster({
+              'maxWidth': 170,
+              contentAsHTML: true,
+              arrow: false,
+              side: 'right',
+              trigger: 'custom',
+              debug: false,
+              triggerOpen: {
+                click: true,
+                tap: true,
+                mouseenter: true
+              },
+              triggerClose: {
+                click: true,
+                scroll: false,
+                tap: true,
+                mouseleave: true
+              },
+
+              functionInit: function (instance) {
+                let tooltipContent = `
+                        <ul class="tooltip-events">
+                          <li class="events">${event[o.name].tag || 'untagged'} </li>
+                          <li>
+                            <span>START</span>
+                            <span>${eventStartDate} </span>
+                          </li>
+                          <li>
+                            <span>END</span>
+                            <span> ${eventStopDate}</span>
+                          </li>
+                        </ul>`;
+                instance.content(tooltipContent);
+              }
+            });
+          })
+        }
+
+        _cell.append('text')
+          .attr('class', 'radial-text-md')
+          .text(o.name)
+          .attr('x', function (data, arg, svgEls) {
+            const textOffset = svgEls[0].clientWidth;
+            return -(textOffset / 2);
+          })
+          .attr('y', (data, arg, svgEls) => {
+            const textOffset = svgEls[0].getBBox().height;
+            return size / 2 + textOffset;
+          });
+
+        if (o.level === 'year') {
+          $('.svg-tooltip').tooltipster({
+            'maxWidth': 270,
+            contentAsHTML: true,
+            arrow: false,
+            side: 'right',
+            trigger: 'custom',
+            debug: false,
+            triggerOpen: {
+              click: true,
+              tap: true,
+              mouseenter: true
+            },
+            triggerClose: {
+              click: true,
+              scroll: false,
+              tap: true,
+              mouseleave: true
+            },
+
+            functionInit: function (instance, helper) {
+              const content = instance.content();
+              const events = JSON.parse(content);
+              let newContent = '<ul><li class="events">Events</li>';
+              events.map((event, index) => {
+                newContent += `<li><i class="event_${index}"/>${event}</li>`;
+              });
+              newContent += '</ul>';
+              instance.content(newContent);
+            }
+          });
+        }
+
+        if (option.missing) {
+          let missedData = [];
+          let area00 = d3.areaRadial<number>()
+            .angle((d, i) => angle(d))
+            .innerRadius(d => radius(0))
+            .outerRadius(d => radius(0))
+            .curve(d3.curveCardinal);
+          _.each(o.bins, (b, bi) => {
+            if (o.counts[bi] === 0) {
+              missedData.push(bi);
+              _cell.append('path')
+                .datum(missedData)
+                .attr('class', 'missed-bins')
+                .attr('d', area00([bi, bi + 1]))
+                .attr('fill', '#b70e13')
+                .attr('stroke', '#b70e13')
+                .attr('stroke-width', 2)
+                .attr('stroke-opacity', 0.7);
+            }
+          });
+        }
       }
     }
   }

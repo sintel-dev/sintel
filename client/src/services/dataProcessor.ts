@@ -29,6 +29,7 @@ export interface ChartDataEleInfoEle {
 export interface PeriodChartDataEle {
   name: string;
   info: ChartDataEleInfoEle[];
+  events?: any;
 }
 
 /**
