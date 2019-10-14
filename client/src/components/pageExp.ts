@@ -49,15 +49,15 @@ class PageExp {
       'children': [
         {
           'id': 1,
-          'text': 'investigate'
+          'text': '<i class="select investigate"></i>investigate'
         },
         {
           'id': 2,
-          'text': 'do not investigate'
+          'text': '<i class="select not_investigate"></i>do not investigate'
         },
         {
           'id': 3,
-          'text': 'postpone'
+          'text': '<i class="select postpone"></i>postpone'
         }
       ]
     },
@@ -66,15 +66,15 @@ class PageExp {
       'children': [
         {
           'id': 4,
-          'text': 'problem'
+          'text': '<i class="select problem"></i>problem'
         },
         {
           'id': 5,
-          'text': 'previously seen'
+          'text': '<i class="select seen"></i>previously seen'
         },
         {
           'id': 6,
-          'text': 'normal'
+          'text': '<i class="select normal"></i>normal'
         }
       ]
     }
@@ -305,7 +305,8 @@ class PageExp {
     let s2 = $('#selectLevel').select2({
       minimumResultsForSearch: Infinity,
       placeholder: 'Select a tag',
-      data: this.tagSelectionData
+      data: this.tagSelectionData,
+      escapeMarkup: markup => markup
     });
     // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
     this.selectedTagID = undefined;
