@@ -168,6 +168,7 @@ class Raw(Document, MongoUtils):
     data = fields.ListField(fields.ListField())
     meta = {
         'indexes': [
+            'signal',
             ('signal', '+year')
         ]
     }
@@ -178,6 +179,11 @@ class Prediction(Document, MongoUtils):
     datarun = fields.ReferenceField(Datarun)
     names = fields.ListField(fields.StringField())
     data = fields.ListField(fields.ListField(fields.FloatField()))
+    meta = {
+        'indexes': [
+            'datarun'
+        ]
+    }
 
 
 class Test(Document, MongoUtils):

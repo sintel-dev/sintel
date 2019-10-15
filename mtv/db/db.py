@@ -151,7 +151,9 @@ def updateDB(database, interval=60, utc=True, impute=True):
         if (model.Raw.find_one(signal=signal.id) is not None):
             continue
 
-        data = load_signal(signal.data_location)
+        data = load_signal(signal.data_location,
+                           timestamp_column=signal.timestamp_column,
+                           value_column=signal.value_column)
         data = data.sort_values('timestamp').set_index('timestamp')
         data = data.loc[signal.start_time:signal.stop_time]
 
