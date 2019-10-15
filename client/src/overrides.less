@@ -7,7 +7,7 @@
     .nav-tabs-custom {
         margin-bottom: 0 !important;
     }
-      
+
     .box-body {
         padding: 0;
     }
@@ -121,7 +121,7 @@
 
         div{
             display: inline-block;
-            margin-right: 25px; 
+            margin-right: 25px;
             &:last-child{
                 margin-right: 0;
             }
@@ -357,10 +357,11 @@
         }
 
         .period-view-label{
-            color: #8A9097;
-            font-size: 20px;
+            color: #fff;
+            font-size: 25px;
             margin: 0;
             padding: 8px 0 0 0;
+            font-weight: bold;
         }
     }
 
@@ -377,5 +378,25 @@
         &.svg-tooltip-visible{
             display: block;
         }
+    }
+
+    .tooltip-events{
+        li {
+            padding-bottom: 13px;
+
+            &.events{
+                text-transform: uppercase;
+                font-weight: bold
+            }
+
+            span{
+                display: block;
+                letter-spacing: 1.2px;
+            }
+        }
+    }
+
+    .circle-arc {
+        cursor: pointer;
     }
 }

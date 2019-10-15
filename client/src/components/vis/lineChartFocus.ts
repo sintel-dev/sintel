@@ -592,7 +592,7 @@ export class LineChartFocus extends pip.Events {
 
     let getTagColor = (tag: string): string => {
       let tagSeq = ['investigate', 'do not investigate', 'postpone',
-        'problem', 'previously seen', 'normal'];
+      'problem', 'previously seen', 'normal'];
 
       let colorIdx: number;
       for (let i = 0; i < tagSeq.length; i += 1) {

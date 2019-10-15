@@ -49,15 +49,15 @@ class PageExp {
       'children': [
         {
           'id': 1,
-          'text': 'investigate'
+          'text': '<i class="select investigate"></i>investigate'
         },
         {
           'id': 2,
-          'text': 'do not investigate'
+          'text': '<i class="select not_investigate"></i>do not investigate'
         },
         {
           'id': 3,
-          'text': 'postpone'
+          'text': '<i class="select postpone"></i>postpone'
         }
       ]
     },
@@ -66,15 +66,15 @@ class PageExp {
       'children': [
         {
           'id': 4,
-          'text': 'problem'
+          'text': '<i class="select problem"></i>problem'
         },
         {
           'id': 5,
-          'text': 'previously seen'
+          'text': '<i class="select seen"></i>previously seen'
         },
         {
           'id': 6,
-          'text': 'normal'
+          'text': '<i class="select normal"></i>normal'
         }
       ]
     }
@@ -201,7 +201,8 @@ class PageExp {
       'update',
       [{
         name: d.datarun.signal,
-        info: d.period
+        info: d.period,
+        events: d.datarun.events
       }]
     );
     $(`.chart-ctx .title`).parent().removeClass('ctx-active');
@@ -304,7 +305,8 @@ class PageExp {
     let s2 = $('#selectLevel').select2({
       minimumResultsForSearch: Infinity,
       placeholder: 'Select a tag',
-      data: this.tagSelectionData
+      data: this.tagSelectionData,
+      escapeMarkup: markup => markup
     });
     // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
     this.selectedTagID = undefined;
@@ -553,6 +555,7 @@ class PageExp {
         [{
           name: data[0].datarun.signal,
           info: data[0].period,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -565,7 +568,8 @@ class PageExp {
         $('#month')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children
+          info: data[0].period[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -578,7 +582,8 @@ class PageExp {
         $('#day')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children[0].children
+          info: data[0].period[0].children[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -605,7 +610,8 @@ class PageExp {
         'update',
         [{
           name: d.datarun.signal,
-          info: d.period
+          info: d.period,
+          events: d.datarun.events
         }]
       );
     }
@@ -618,7 +624,8 @@ class PageExp {
         if (d.period[i].name !== o.name) { continue; }
         newData.push({
           name: d.datarun.signal,
-          info: d.period[i].children
+          info: d.period[i].children,
+          events: d.datarun.events
         });
       }
       // switch tab
@@ -637,7 +644,8 @@ class PageExp {
           if (d.period[i].children[j].name !== o.name) { continue; }
           newData.push({
             name: d.datarun.signal,
-            info: d.period[i].children[j].children
+            info: d.period[i].children[j].children,
+            events: d.datarun.events
           });
         }
       }
