@@ -660,8 +660,8 @@ export class PeriodChart extends pip.Events {
             const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.name)[0];
 
             arc
-              .innerRadius(targetRadius - 1)
-              .outerRadius(targetRadius + 1)
+              .innerRadius(targetRadius - 2)
+              .outerRadius(targetRadius + 2)
               .startAngle(startTime)
               .endAngle(stopTime);
 
@@ -717,8 +717,8 @@ export class PeriodChart extends pip.Events {
             const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.parent.name)[0];
 
             arc
-              .innerRadius(targetRadius + 0.5)
-              .outerRadius(targetRadius - 0.5)
+              .innerRadius(targetRadius + 1.5)
+              .outerRadius(targetRadius - 1.5)
               .startAngle(startTime)
               .endAngle(stopTime);
 
