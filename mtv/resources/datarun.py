@@ -43,7 +43,7 @@ def get_datarun(datarun_doc):
     }
 
     # get raw
-    raw_docs = model.Raw.find(signal=datarun_doc.signal.id).order_by('+year')
+    raw_docs = model.Raw.find(datarun=datarun_doc.id).order_by('+year')
     for raw_doc in raw_docs:
         datarun['raw'].append({
             'timestamp': raw_doc.timestamp,

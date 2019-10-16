@@ -25,11 +25,7 @@ def _add_aggdata(explorer, args):
 
 
 def _update_db(explorer, args):
-    explorer.update_db(
-        args.interval,
-        args.utc,
-        args.impute
-    )
+    explorer.update_db()
 
 
 def get_parser():
@@ -74,11 +70,6 @@ def get_parser():
     update_db = update_model.add_parser('db', parents=[common],
                                         help='Add raw data')
     update_db.set_defaults(function=_update_db)
-
-    update_db.add_argument('-I', '--interval', type=int, default=60,
-                           help='Interval (minute) used for data aggregation.')
-    update_db.add_argument('--utc', action='store_true', help='Use UTC time.')
-    update_db.add_argument('--impute', action='store_true', help='Fill missing values.')
 
     # mtv add
     add = action.add_parser('add', help='Add an object to the database')

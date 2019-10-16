@@ -330,9 +330,9 @@ export class PeriodChart extends pip.Events {
   }
 
   private toTimestamp = function (strDate) {
-    var datum = Date.parse(strDate);
+    let datum = Date.parse(strDate);
     return datum / 1000;
-  }
+  };
 
   /**
    * @TODO - if possible, make a single function out of those three
@@ -393,7 +393,7 @@ export class PeriodChart extends pip.Events {
             stop_time: endMonth === currentMonth ? event[year].stop_time : maxMonthDate,
             tag: event[year].tag
           }
-        })
+        });
         currentMonth++;
       }
     });
@@ -546,13 +546,14 @@ export class PeriodChart extends pip.Events {
         .on('click', (d) => {
           self.trigger('select', o);
         })
-        .attr('title', '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'); // should be gathered from API
+        .attr('title', '["investigate", "do not investigate", "postpone",'
+                       + '"problem", "previously seen", "normal", "TBD"]'); // should be gathered from API
 
 
       // @TODO - refactor
       if (self.data[0].events.length) {
         const PI = Math.PI;
-        const secondsInMonth = 2629743.83
+        const secondsInMonth = 2629743.83;
         const secondsInDay = 86400;
         const circleMonths = (2 * PI) / 12;
         const circleHours = (2 * PI) / 24;
@@ -564,7 +565,7 @@ export class PeriodChart extends pip.Events {
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         const getTagColor = (tag: string): string => {
-          let colorIdx: number = 0;
+          let colorIdx = 0;
           for (let i = 0; i < tagSeq.length; i += 1) {
             if (tagSeq[i] === tag) {
               colorIdx = i;
@@ -585,7 +586,7 @@ export class PeriodChart extends pip.Events {
             });
           }
           return eventRange;
-        }
+        };
 
         const arc = d3.arc()
           .innerRadius(targetRadius - 2)
@@ -608,7 +609,7 @@ export class PeriodChart extends pip.Events {
               .attr('d', arc)
               .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'));
 
-            //@TODO - find a way to remove repetitive code
+            // @TODO - find a way to remove repetitive code
             $('.circle-arc').tooltipster({
               'maxWidth': 170,
               contentAsHTML: true,
@@ -648,7 +649,7 @@ export class PeriodChart extends pip.Events {
         }
 
         if (o.level === 'month') {
-          const events = self.groupEventsPerMonth(o.name, o.parent.name); //month name and year
+          const events = self.groupEventsPerMonth(o.name, o.parent.name); // month name and year
           events.length && events.forEach(event => {
             const base = new Date(Number(o.parent.name), monthNames.indexOf(o.name)).getTime() / 1000;
 
@@ -763,7 +764,7 @@ export class PeriodChart extends pip.Events {
                 instance.content(tooltipContent);
               }
             });
-          })
+          });
         }
 
         _cell.append('text')

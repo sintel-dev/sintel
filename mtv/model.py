@@ -162,14 +162,14 @@ class Comment(Document, MongoUtils):
 
 
 class Raw(Document, MongoUtils):
-    signal = fields.ReferenceField(Signal)
+    datarun = fields.ReferenceField(Signal)
     timestamp = fields.FloatField()
     year = fields.IntField()
     data = fields.ListField(fields.ListField())
     meta = {
         'indexes': [
-            'signal',
-            ('signal', '+year')
+            'datarun',
+            ('datarun', '+year')
         ]
     }
 

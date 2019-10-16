@@ -6,6 +6,8 @@ import pandas as pd
 from flask import Flask
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
+from pymongo import MongoClient
+from gridfs import GridFS
 from mongoengine import connect
 from termcolor import colored
 
@@ -27,21 +29,6 @@ class MTVExplorer:
         else:
             self._db = connect(db=cf['dk_db'], host=cf['dk_host'], port=cf['dk_port'],
                                username=cf['dk_username'], password=cf['dk_password'])
-
-    def update_db(self, interval, utc, impute):
-
-        # copy from orion
-        db.copy_from(
-            fromdb=self._cf['or_db'],
-            todb=self._cf['db'],
-            fromhost=self._cf['or_host'],
-            fromport=self._cf['or_port'],
-            tohost=self._cf['host'],
-            toport=self._cf['port']
-        )
-
-        # update col "prediction" and "raw"
-        db.updateDB(self._db[self._cf['db']], interval, utc=not utc, impute=not impute)
 
     def _init_flask_app(self, env):
         app = Flask(
@@ -67,6 +54,22 @@ class MTVExplorer:
         add_routes(app)
 
         return app
+
+    def update_db(self):
+
+        # copy from orion
+        db.copy_from(
+            fromdb=self._cf['or_db'],
+            todb=self._cf['db'],
+            fromhost=self._cf['or_host'],
+            fromport=self._cf['or_port'],
+            tohost=self._cf['host'],
+            toport=self._cf['port']
+        )
+
+        # update col "prediction" and "raw"
+        db_cli = MongoClient(self._cf['or_host'], port=self._cf['or_port'])
+        db.update_db(GridFS(db_cli[self._cf['or_db']]))
 
     def run_server(self, env, port):
 
