@@ -175,7 +175,6 @@ export class LineChartFocus extends pip.Events {
 
     let { zoom, enableZoom, disableZoom, resetZoom } = self.addZoom(w, h);
     zoom.on('zoom', zoomHandler);
-    self.on('zooming', clickZoom);
     enableZoom();
 
     // let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
@@ -393,13 +392,6 @@ export class LineChartFocus extends pip.Events {
       disableZoom();
       makeEditable(x0, x1, event);
     }
-
-    function clickZoom(factor) {
-      let k = savedZoom.k + factor;
-      // debugger;
-      const selection = d3.transition().duration(250);
-      zoom.scaleTo(selection, k);
-    }
   }
 
   private addEventEditor(g, w, h, x) {
@@ -581,6 +573,16 @@ export class LineChartFocus extends pip.Events {
       zoomRect  // .transition().duration(750)
         .call(zoom.transform, d3.zoomIdentity);
     };
+
+    const zoomIn = $('#zoomIn');
+    const zoomOut = $('#zoomOut');
+    zoomIn.on('click', function(){
+      zoom.scaleBy(zoomRect, 1.03)
+    });
+
+    zoomOut.on('click', function() {
+      zoom.scaleBy(zoomRect, 0.95);
+    });
 
     return { zoom, enableZoom, disableZoom, resetZoom };
   }

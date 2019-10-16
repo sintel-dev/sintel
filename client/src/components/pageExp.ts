@@ -282,10 +282,6 @@ class PageExp {
     return true;
   }
 
-  public zooming(factor) {
-    this.focusChart.trigger('zooming', factor);
-    return true;
-  }
 
   private showDatasetInfo(visible) {
     visible ? $('#datasetDescription').addClass('active') :
