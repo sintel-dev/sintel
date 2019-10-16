@@ -176,7 +176,7 @@
 
     //dataset details within the chart
     .dataset-description{
-        width: 326px;
+        width: 400px;
         height: calc(100% - 90px);
         position: absolute;
         right: 0px;
@@ -224,18 +224,17 @@
         }
 
         label, span{
-            // dislay: block;
-            margin-bottom: 9px;
+            margin-bottom: 6px;
         }
 
         span{
             color: #B5B5B5;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         textarea{
             width: 270px;
-            height: 95px;
+            height: 135px;
             border: 1px solid #979797;
             background: transparent;
             border-radius: 4px;
@@ -398,5 +397,9 @@
 
     .circle-arc {
         cursor: pointer;
+        &:hover{
+            transform: scale(0.98);
+            transition: all .2s ease-in-out;
+        }
     }
 }

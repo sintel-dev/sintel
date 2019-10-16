@@ -34,7 +34,7 @@
 			<div id="page-slider">
 				<div id="pageshow">
 					<div id="pages-main" class="pages">
-						
+
 						<div id="page-landing" class="page page-landing" data-index="0">
 							<div class="abs-mask">
 								<div class="page-content">
@@ -83,7 +83,7 @@
 													<p data-bind="text: `DC: ${$data.date_creation.substring(0,10)}`"></p>
 													<p data-bind="text: `Events: ${$data.eventNum}`"></p>
 												</div>
-												<div class="matrix-container" 
+												<div class="matrix-container"
 														 data-bind="attr: {name: $data.id}"></div>
 											</li>
 										</ul>
@@ -118,7 +118,7 @@
 												</div>
 											</li>
 										</ul>
-										
+
 									</div>
 									<!-- pipeline row: end -->
 								</div>
@@ -204,8 +204,8 @@
 																	<span class="fa fa-arrows"></span>
 																</label>
 															</li>
-															<li><button class="fa fa-plus" data-bind="click: () => zooming(0.5)"></button></li>
-															<li><button class="fa fa-minus" data-bind="click: () => zooming(-0.5)"></button>
+															<li><button class="fa fa-plus" id="zoomIn"></button></li>
+															<li><button class="fa fa-minus" id="zoomOut"></button>
 															</li>
 														</ul>
 														<div class="dataset-description scroll-style-1" id="datasetDescription">
@@ -346,7 +346,7 @@
 								</div>
 							</div>
 						</div>
-						
+
 					</div>
 				</div>
 			</div>
