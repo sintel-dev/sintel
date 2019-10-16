@@ -610,7 +610,7 @@ export class PeriodChart extends pip.Events {
               .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
               .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2)
+                d3.select(this).attr('stroke-width', 2);
               })
               .on('mouseout', function(d) {
                 d3.select(this).attr('stroke-width', 0);
@@ -679,7 +679,7 @@ export class PeriodChart extends pip.Events {
               .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
               .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2)
+                d3.select(this).attr('stroke-width', 2);
               })
               .on('mouseout', function(d) {
                 d3.select(this).attr('stroke-width', 0);
@@ -743,7 +743,7 @@ export class PeriodChart extends pip.Events {
               .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
               .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2)
+                d3.select(this).attr('stroke-width', 2);
               })
               .on('mouseout', function(d) {
                 d3.select(this).attr('stroke-width', 0);

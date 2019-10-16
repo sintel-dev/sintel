@@ -79,7 +79,7 @@ export class LineChartFocus extends pip.Events {
 
     self.svgContainer = d3.select<HTMLElement, any>(ele);
     const mltseriesTitleWidth = $('.chart-ctx .title').innerWidth() / 2;
-    
+
     self.option.width = self.option.width === null ? $(ele).innerWidth() - mltseriesTitleWidth : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
 
@@ -302,7 +302,7 @@ export class LineChartFocus extends pip.Events {
 
       // update x axis
       axisG.select('.axis--x').call(xAxis);
-      
+
       pip.pageExp.trigger('focus:zoom', x.range().map(t.invertX, t));
     }
 
@@ -577,8 +577,8 @@ export class LineChartFocus extends pip.Events {
 
     const zoomIn = $('#zoomIn');
     const zoomOut = $('#zoomOut');
-    zoomIn.on('click', function(){
-      zoom.scaleBy(zoomRect, 1.03)
+    zoomIn.on('click', function() {
+      zoom.scaleBy(zoomRect, 1.03);
     });
 
     zoomOut.on('click', function() {
@@ -727,7 +727,7 @@ export class LineChartFocus extends pip.Events {
   private getScale(w, h) {
     let self = this;
     let option = self.option;
-    
+
     let x, y, ye;
     x = d3.scaleTime().range([0, w]);
     if (option.xDomain) {

@@ -8,7 +8,6 @@ import pandas as pd
 from pymongo import MongoClient
 
 from mtv import model
-from mtv.db.data import load_signal
 
 LOGGER = logging.getLogger(__name__)
 

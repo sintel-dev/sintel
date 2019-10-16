@@ -11,19 +11,6 @@ def _run(explorer, args):
         explorer.run_module(args.module, args.args)
 
 
-def _add_aggdata(explorer, args):
-    explorer.add_aggdata(
-        args.path,
-        args.col,
-        args.start,
-        args.stop,
-        args.timestamp_column,
-        args.value_column,
-        args.header,
-        args.interval
-    )
-
-
 def _update_db(explorer, args):
     explorer.update_db()
 
@@ -77,35 +64,9 @@ def get_parser():
     add_model.required = True
 
     # mtv add aggdata
-    add_aggdata = add_model.add_parser('aggdata', parents=[common],
-                                       help='Add raw data')
-    add_aggdata.set_defaults(function=_add_aggdata)
-
-    add_aggdata.add_argument('-T', '--timestamp-column', type=int, default=0,
-                             help='Position of the timestamp column in the CSV')
-    add_aggdata.add_argument('-V', '--value-column', type=int, default=1,
-                             help='Position of the value column in the CSV')
-    add_aggdata.add_argument('-H', '--header', action='store_true',
-                             help='Whether having header in the CSV')
-    add_aggdata.add_argument('-I', '--interval', type=int, default=30,
-                             help='Interval (minute) used for data aggregation.')
-    add_aggdata.add_argument(
-        '--start',
-        type=int,
-        help='Start time, as an integer unix timestamp')
-    add_aggdata.add_argument(
-        '--stop',
-        type=int,
-        help='Stop time, as an integer unix timestamp')
-    add_aggdata.add_argument(
-        '--col',
-        type=str,
-        default='raw',
-        help='Collection name')
-    add_aggdata.add_argument(
-        'path',
-        nargs='?',
-        help='Path to the csv data directory')
+    # add_aggdata = add_model.add_parser('aggdata', parents=[common],
+    #                                    help='Add raw data')
+    # add_aggdata.set_defaults(function=_add_aggdata)
 
     return parser
 
