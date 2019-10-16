@@ -78,8 +78,9 @@ export class LineChartFocus extends pip.Events {
     // add flags to remember modes;
 
     self.svgContainer = d3.select<HTMLElement, any>(ele);
-
-    self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+    const mltseriesTitleWidth = $('.chart-ctx .title').innerWidth() / 2;
+    
+    self.option.width = self.option.width === null ? $(ele).innerWidth() - mltseriesTitleWidth : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
 
     self.svgContainer
@@ -175,7 +176,6 @@ export class LineChartFocus extends pip.Events {
 
     let { zoom, enableZoom, disableZoom, resetZoom } = self.addZoom(w, h);
     zoom.on('zoom', zoomHandler);
-    self.on('zooming', clickZoom);
     enableZoom();
 
     // let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
@@ -302,7 +302,7 @@ export class LineChartFocus extends pip.Events {
 
       // update x axis
       axisG.select('.axis--x').call(xAxis);
-
+      
       pip.pageExp.trigger('focus:zoom', x.range().map(t.invertX, t));
     }
 
@@ -392,13 +392,6 @@ export class LineChartFocus extends pip.Events {
       const x1 = x(data.timeseries[data.eventWindows[idx][1]][0]);
       disableZoom();
       makeEditable(x0, x1, event);
-    }
-
-    function clickZoom(factor) {
-      let k = savedZoom.k + factor;
-      // debugger;
-      const selection = d3.transition().duration(250);
-      zoom.scaleTo(selection, k);
     }
   }
 
@@ -582,6 +575,16 @@ export class LineChartFocus extends pip.Events {
         .call(zoom.transform, d3.zoomIdentity);
     };
 
+    const zoomIn = $('#zoomIn');
+    const zoomOut = $('#zoomOut');
+    zoomIn.on('click', function(){
+      zoom.scaleBy(zoomRect, 1.03)
+    });
+
+    zoomOut.on('click', function() {
+      zoom.scaleBy(zoomRect, 0.95);
+    });
+
     return { zoom, enableZoom, disableZoom, resetZoom };
   }
 
@@ -724,7 +727,7 @@ export class LineChartFocus extends pip.Events {
   private getScale(w, h) {
     let self = this;
     let option = self.option;
-
+    
     let x, y, ye;
     x = d3.scaleTime().range([0, w]);
     if (option.xDomain) {
