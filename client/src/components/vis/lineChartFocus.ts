@@ -720,8 +720,6 @@ export class LineChartFocus extends pip.Events {
 
       u.exit().remove();
     }
-
-
   }
 
   private getScale(w, h) {

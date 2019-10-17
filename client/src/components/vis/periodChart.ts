@@ -353,6 +353,12 @@ export class PeriodChart extends pip.Events {
     events.forEach(evt => {
       const startYear = new Date(evt.start_time * 1000).getFullYear();
       const endYear = new Date(evt.stop_time * 1000).getFullYear();
+
+      const eventPeriod = {
+        startDate: new Date(evt.start_time * 1000).toDateString(),
+        stopDate: new Date(evt.stop_time * 1000).toDateString()
+      };
+
       let currentYear = startYear;
 
       while (currentYear <= endYear) {
@@ -365,7 +371,8 @@ export class PeriodChart extends pip.Events {
             score: evt.score,
             start_time: startYear === currentYear ? evt.start_time : minYearDate,
             stop_time: endYear === currentYear ? evt.stop_time : maxYearDate,
-            tag: evt.tag
+            tag: evt.tag,
+            eventPeriod
           }
         });
         currentYear++;
@@ -379,11 +386,17 @@ export class PeriodChart extends pip.Events {
     const self = this;
     const eventsPerMonth = [];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
     const eventsPerYear = self.groupEventsPerYear(year);
+
     eventsPerYear.forEach(event => {
       const startMonth = new Date(event[year].start_time * 1000).getMonth();
       const endMonth = new Date(event[year].stop_time * 1000).getMonth();
+
+      const eventPeriod = {
+        startDate: event[year].eventPeriod.startDate,
+        stopDate: event[year].eventPeriod.stopDate
+      };
+
       let currentMonth = startMonth;
 
       while (currentMonth <= endMonth) {
@@ -397,7 +410,8 @@ export class PeriodChart extends pip.Events {
             score: event[year].score,
             start_time: startMonth === currentMonth ? event[year].start_time : minMonthDate,
             stop_time: endMonth === currentMonth ? event[year].stop_time : maxMonthDate,
-            tag: event[year].tag
+            tag: event[year].tag,
+            eventPeriod
           }
         });
         currentMonth++;
@@ -418,6 +432,11 @@ export class PeriodChart extends pip.Events {
       let currentDay = startDay;
       const month = months.indexOf(monthName);
 
+      const eventPeriod = {
+        startDate: event[month].eventPeriod.startDate,
+        stopDate: event[month].eventPeriod.stopDate
+      };
+
       while (currentDay <= endDay) {
         const maxDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 23:59:59`);
         const minDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 00:00:00`);
@@ -428,7 +447,8 @@ export class PeriodChart extends pip.Events {
             score: event[month].score,
             start_time: startDay === currentDay ? event[month].start_time : minDayDate,
             stop_time: endDay === currentDay ? event[month].stop_time : maxDayDate,
-            tag: event[month].tag
+            tag: event[month].tag,
+            eventPeriod
           }
         });
         currentDay++;
@@ -552,8 +572,9 @@ export class PeriodChart extends pip.Events {
         .on('click', (d) => {
           self.trigger('select', o);
         })
-        .attr('title', '["investigate", "do not investigate", "postpone",'
-                       + '"problem", "previously seen", "normal", "TBD"]'); // should be gathered from API
+        .attr('title',
+          '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'
+        ); // should be gathered from API
 
 
       // @TODO - refactor
@@ -565,8 +586,6 @@ export class PeriodChart extends pip.Events {
         const circleHours = (2 * PI) / 24;
         colorSchemes.tag.push('#fff');
         const eventRange = [];
-
-
         const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -580,20 +599,6 @@ export class PeriodChart extends pip.Events {
           return colorSchemes.tag[colorIdx];
         };
 
-        const eventsTooltip = (eventYear) => {
-          const year = Number(eventYear);
-          const events = self.groupEventsPerYear(year);
-          if (events.length) {
-            events.forEach(event => {
-              eventRange.push({
-                eventStartDate: new Date(event[year].start_time * 1000).toDateString(),
-                eventStopDate: new Date(event[year].stop_time * 1000).toDateString()
-              });
-            });
-          }
-          return eventRange;
-        };
-
         const arc = d3.arc()
           .innerRadius(targetRadius - 2)
           .outerRadius(targetRadius + 2);
@@ -604,22 +609,23 @@ export class PeriodChart extends pip.Events {
             const base = new Date(Number(o.name)).getTime() / 1000;
             const startTime = ((event[Number(o.name)].start_time - base) / secondsInMonth) * circleMonths;
             const stopTime = ((event[Number(o.name)].stop_time - base) / secondsInMonth) * circleMonths;
-            const { eventStartDate, eventStopDate } = eventsTooltip(o.name)[0];
+            const { startDate, stopDate } = event[Number(o.name)].eventPeriod;
+            const arcClassName = `${startDate.replace(/ /g, '_')}`;
 
             arc
               .startAngle(startTime)
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', 'circle-arc')
+              .attr('class', `circle-arc ${arcClassName}`)
               .attr('d', arc)
               .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2);
+              .on('mouseover', function() {
+                $(`.${arcClassName}`).addClass('active');
               })
-              .on('mouseout', function(d) {
-                d3.select(this).attr('stroke-width', 0);
+              .on('mouseout', function() {
+                $(`.${arcClassName}`).removeClass('active');
               });
 
             // @TODO - find a way to remove repetitive code
@@ -645,14 +651,14 @@ export class PeriodChart extends pip.Events {
               functionInit: function (instance) {
                 let tooltipContent = `
                       <ul class="tooltip-events">
-                        <li class="events">${event.tag || 'untagged'} </li>
+                        <li class="events">${event[o.name].tag || 'untagged'} </li>
                         <li>
                           <span>START</span>
-                          <span>${eventStartDate} </span>
+                          <span>${startDate} </span>
                         </li>
                         <li>
                           <span>END</span>
-                          <span> ${eventStopDate}</span>
+                          <span> ${stopDate}</span>
                         </li>
                       </ul>`;
                 instance.content(tooltipContent);
@@ -665,13 +671,12 @@ export class PeriodChart extends pip.Events {
           const events = self.groupEventsPerMonth(o.name, o.parent.name); // month name and year
           events.length && events.forEach(event => {
             const base = new Date(Number(o.parent.name), monthNames.indexOf(o.name)).getTime() / 1000;
-
             const daysInMonth = o.children.length;
             const circleDays = (2 * PI) / daysInMonth;
-
             const startTime = ((event[monthNames.indexOf(o.name)].start_time - base) / secondsInDay) * circleDays;
             const stopTime = ((event[monthNames.indexOf(o.name)].stop_time - base) / secondsInDay) * circleDays;
-            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.name)[0];
+            const { startDate, stopDate } = event[monthNames.indexOf(o.name)].eventPeriod;
+            const arcClassName = `${startDate.replace(/ /g, '_')}`;
 
             arc
               .innerRadius(targetRadius - 2)
@@ -680,15 +685,15 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', 'circle-arc')
+              .attr('class', `circle-arc ${arcClassName}`)
               .attr('d', arc)
               .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
-              .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2);
+              .on('mouseover', function() {
+                $(`.${arcClassName}`).addClass('active');
               })
-              .on('mouseout', function(d) {
-                d3.select(this).attr('stroke-width', 0);
+              .on('mouseout', function() {
+                $(`.${arcClassName}`).removeClass('active');
               });
 
             $('.circle-arc').tooltipster({
@@ -716,11 +721,11 @@ export class PeriodChart extends pip.Events {
                         <li class="events">${event[monthNames.indexOf(o.name)].tag || 'untagged'} </li>
                         <li>
                           <span>START</span>
-                          <span>${eventStartDate} </span>
+                          <span>${startDate} </span>
                         </li>
                         <li>
                           <span>END</span>
-                          <span> ${eventStopDate}</span>
+                          <span> ${stopDate}</span>
                         </li>
                       </ul>`;
                 instance.content(tooltipContent);
@@ -735,7 +740,8 @@ export class PeriodChart extends pip.Events {
             const base = new Date(Number(o.parent.parent.name), monthNames.indexOf(o.parent.name), Number(o.name)).getTime() / 1000;
             const startTime = ((event[o.name].start_time - base) / 3600) * circleHours;
             const stopTime = ((event[o.name].stop_time - base) / 3600) * circleHours;
-            const { eventStartDate, eventStopDate } = eventsTooltip(o.parent.parent.name)[0];
+            const { startDate, stopDate } = event[o.name].eventPeriod;
+            const arcClassName = `${startDate.replace(/ /g, '_')}`;
 
             arc
               .innerRadius(targetRadius + 1.5)
@@ -744,15 +750,15 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', 'circle-arc')
+              .attr('class', `circle-arc ${arcClassName}`)
               .attr('d', arc)
               .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function(d) {
-                d3.select(this).attr('stroke-width', 2);
+              .on('mouseover', function() {
+                $(`.${arcClassName}`).addClass('active');
               })
-              .on('mouseout', function(d) {
-                d3.select(this).attr('stroke-width', 0);
+              .on('mouseout', function() {
+                $(`.${arcClassName}`).removeClass('active');
               });
 
 
@@ -781,11 +787,11 @@ export class PeriodChart extends pip.Events {
                           <li class="events">${event[o.name].tag || 'untagged'} </li>
                           <li>
                             <span>START</span>
-                            <span>${eventStartDate} </span>
+                            <span>${startDate} </span>
                           </li>
                           <li>
                             <span>END</span>
-                            <span> ${eventStopDate}</span>
+                            <span> ${stopDate}</span>
                           </li>
                         </ul>`;
                 instance.content(tooltipContent);
