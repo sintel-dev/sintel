@@ -14,7 +14,8 @@ export interface Option {
   margin?: { top: number, right: number, bottom: number, left: number };
 
   maxTagNum?: number;
-  maxEventnum?: number;
+  maxEventNum?: number;
+  maxScore?: number;
   matrixHeight?: number;
   matrixWidth?: number;
   matrixMargin?: { top: number, right: number, bottom: number, left: number };
@@ -126,7 +127,6 @@ export class Matrix extends pip.Events {
     let binNum = bins.length;
     let interval = -1;
     // find max score
-    let maxScore = 6;
     let tScore = false;
     _.each(self.data.dataruns, datarun => {
       for (let i = 0; i < datarun.events.length; i += 1) {
@@ -136,13 +136,14 @@ export class Matrix extends pip.Events {
       }
     });
     if (!tScore) { return; }
-    interval = maxScore / binNum;
+    self.option.maxScore = self.option.maxScore > 6 ? 6 : self.option.maxScore;
+    interval = self.option.maxScore / binNum;
     let maxCount = 0;
     let outerMaxNum = 0;
     // get bins
     _.each(self.data.dataruns, datarun => {
       for (let i = 0; i < datarun.events.length; i += 1) {
-        if (datarun.events[i].score > maxScore) {
+        if (datarun.events[i].score > self.option.maxScore) {
           outerMaxNum += 1;
         } else {
           let idx = Math.trunc(datarun.events[i].score / interval);
@@ -156,20 +157,23 @@ export class Matrix extends pip.Events {
     fx.domain([0, binNum]);
     fy.domain([0, maxCount]);
 
-    let curve = d3.line()
-      .x(d => d[0])
-      .y(d => d[1])
-      .curve(d3.curveCardinal);
+    // let curve = d3.line()
+    //   .x(d => d[0])
+    //   .y(d => d[1])
+    //   .curve(d3.curveCardinal);
 
     let points = _.map(_.range(binNum), i => {
       return [fx(i + 0.5), -fy(bins[i])];
     }) as [number, number][];
 
     points.unshift([0, 0]);
-    points.push([binNum, -fy(outerMaxNum)]);
+    points.push([fx(binNum), -fy(outerMaxNum)]);
 
     areaG.append('path')
       .attr('class', 'area')
+      // .style('fill', 'none')
+      // .style('stroke-width', '1px')
+      // .style('stroke', 'white')
       .attr('d', area(points));
 
 
@@ -185,7 +189,7 @@ export class Matrix extends pip.Events {
       .append('text')
       .attr('class', 'axis-text')
       .attr('text-anchor', 'end')
-      .text(maxScore);
+      .text(self.option.maxScore);
   }
 
   private addMatrixHeatmap(g: d3.Selection<SVGGElement, any, any, any>) {
@@ -200,9 +204,13 @@ export class Matrix extends pip.Events {
 
     let color = d3.scaleLinear<any>()
       .range(['#A3A4A5', '#43434E'])
-      .domain([0, self.option.maxEventnum]);
+      .domain([0, self.option.maxEventNum]);
       // .domain(d3.extent(cells, d => d[1]));
-
+    let cx = d3.scaleLinear<any>()
+      .range([0, 0.85])
+      .domain([0, self.option.maxEventNum]);
+    let color2 = function(t) { return d3.interpolateGreys(cx(t)); };
+    console.log(self.option.maxEventNum);
     let rowNum = 6;
     let fx = d3.scaleBand()
       .range([ 0, w ])
@@ -222,6 +230,7 @@ export class Matrix extends pip.Events {
       .attr('width', size )
       .attr('height', size )
       .attr('fill', d => color(d[1]))
+      // .attr('fill', d => color2(d[1]))
       .append('title')
       .text(d => `signal: ${d[0]}\n` + `events: ${d[1]}`);
   }
@@ -277,7 +286,7 @@ export class Matrix extends pip.Events {
       .attr('height', fx.bandwidth())
       .attr('fill', d => getTagColor(fromIDtoTag(d[0])) )
       .append('title')
-      .text(d => fromIDtoTag(d[0]) + `(${d[1]})`);
+      .text(d => fromIDtoTag(d[0]) + `: ${d[1]}`);
 
     let curve = d3.line()
       .x(d => d[0])
@@ -303,7 +312,7 @@ export class Matrix extends pip.Events {
       })
       .attr('fill', d => getTagColor(fromIDtoTag(d[0])) )
       .append('title')
-      .text(d => fromIDtoTag(d[0]) + `(${d[1]})`);
+      .text(d => fromIDtoTag(d[0]) + `: ${d[1]}`);
 
     cg.append('line')
       .attr('class', 'sep-line')

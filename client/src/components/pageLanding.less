@@ -1,11 +1,13 @@
 @import "../less/colors.less";
 
 /* variables */
-@row-title-color: #919295;
+@row-title-color: white;
+@row-margin-lr: 50px;
+@row-padding-lr: 10px;
 @dot-color: #35363D;
 @dot-color-hover: #D8D8D8;
 @header-height: 50px;
-@info-font-size: 15px;
+@info-font-size: 17px;
 @font-inactive-color: #A7A7AA;
 @font-active-color: white;
 
@@ -14,8 +16,8 @@
 @easing2: linear;    // for transition
 
 @proj-card-width: 360px;
-@exp-card-width: 320px;
-@pipe-card-width: 250px;
+@exp-card-width: 330px;
+@pipe-card-width: 240px;
 
 /* class variables */
 .abs {
@@ -26,15 +28,14 @@
     width: 100%;
 }
 
-.title(@top, @left, @size, @color) {
-    font-size: @size;
+.title(@size, @color) {
     position: absolute;
-    top: @top;
-    left: @left;
+    top: -@size - 5px;
+    left: @row-padding-lr;
+    font-size: @size;
     color: @color;
     text-transform: uppercase;
-    transform-origin: 8% 61%;
-    transform: rotate(270deg);
+    margin: 0 @row-margin-lr 0 @row-margin-lr;
 }
 
 .flex-layout {
@@ -45,24 +46,6 @@
     align-items: center;
 }
 
-.scroll-style::-webkit-scrollbar {
-    width: 7px;
-    height: 9px;
-}
-
-.scroll-style::-webkit-scrollbar-thumb {
-    height: 3px;
-    border: 2px solid rgba(0, 0, 0, 0);
-    background-clip: padding-box;
-    border-radius: 5px;
-    background-color: #616467;
-    box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
-}
-
-.scroll-style::-webkit-scrollbar-track{
-    background: #2C3034;
-    border-radius: 5px;;
-}
 
 /* for animation */
 @keyframes slide-up {
@@ -81,6 +64,7 @@
         position: absolute;
         width: 100vw;
         height: 100vh;
+        display: none;
 
         pointer-events: none;
         fill: none;
@@ -100,34 +84,36 @@
 
     .ld-row {
         position: relative;
-        margin: 30px 30px 0 25px;
+        margin: 65px 30px 0 25px;
         &:not(:first-child) {
-            margin-top: 60px;
+            margin-top: 50px;
         }
     }
 
     .proj-row {
-        height: 20%;
-        min-height: 200px;
+        height: 15vh;
+        min-height: 180px;
+        max-height: 240px;
         .row-title {
-            .title(122px, 0px, 20px, @row-title-color);
-            transform-origin: 9% 60%;
-        };
-    }
-
-    .exp-row {
-        height: 25%;
-        min-height: 240px;
-        .row-title {
-            .title(160px, 0px, 20px, @row-title-color);
+            .title(20px, @row-title-color);
         };
     }
 
     .pipe-row {
-        height: 35%;
-        min-height: 320px;
+        height: 25vh;
+        min-height: 220px;
+        max-height: 240px;
         .row-title {
-            .title(120px, 0px, 20px, @row-title-color);
+            .title(20px, @row-title-color);
+        };
+    }
+
+    .exp-row {
+        height: 25vh;
+        min-height: 240px;
+        max-height: 280px;
+        .row-title {
+            .title(20px, @row-title-color);
         };
     }
 
@@ -138,8 +124,9 @@
         list-style: none;
         white-space: nowrap;
         overflow-x: auto;
-        padding-left: 13px;
-        margin: 30px 50px 0px 50px;
+        overflow-y: hidden;
+        margin: 0 @row-margin-lr 0 @row-margin-lr;
+        padding: 0 @row-padding-lr 0 @row-padding-lr;
         height: 100%;
         width: ~"calc(100% - 100px)";
 
@@ -160,10 +147,11 @@
 
             &.active{
                 border-color: #B2C1FF;
+                border-width: 1px;
             }
 
             &.active, &:hover {
-                background-color: #2C3034;
+                background-color: #26292c;
             }
 
             &:hover{
@@ -173,8 +161,82 @@
         }
     }
 
+    .proj-cards {
+        .card {
+            height: 100% - 10px;
+            .sep-line {
+                border-top: 1px solid #34363B;
+                margin-top: 15px;
+                margin-bottom: 5px;
+            }
+
+            .title {
+                color: @font-inactive-color;
+                font-size: 25px;
+                transition: color 0.3s @easing2;
+            }
+
+            .exp-info {
+                position: absolute;
+                right: 20px;
+                bottom: 15%;
+                color: @font-inactive-color;
+                font-size: @info-font-size;
+                transition: color 0.3s @easing2;
+            }
+
+            .pipe-info {
+                position: absolute;
+                left: 20px;
+                bottom: 15%;
+                color: @font-inactive-color;
+                font-size: @info-font-size;
+                transition: color 0.3s @easing2;
+            }
+
+            &.active, &:hover {
+                cursor: pointer;
+
+                .title {
+                    color: @font-active-color;
+                }
+                .exp-info {
+                    color: @font-active-color;
+                }
+                .pipe-info{
+                    color: @font-active-color;
+                }
+            }
+        }
+    }
+
+    .pipe-cards {
+        .card {
+            flex: 0 0 @pipe-card-width;
+        }
+    }
+
+    .exp-cards {
+        .card {
+            // padding: 20px;
+            flex: 0 0 @exp-card-width;
+
+            .matrix-container {
+                position: absolute;
+                left: 140px;
+                top: @header-height;
+                width: ~"calc(100% - 140px)"; 
+                height: ~"calc(100% - @{header-height})";
+                min-width: 180px;
+                min-height: 160px;
+            }
+        }
+    }
+
     .exp-cards, .pipe-cards {
         .card{
+            animation: slide-up 1s ease;
+
             .header {
                 position: absolute;
                 left: 0;
@@ -235,6 +297,7 @@
             }
 
             &.active, &:hover {
+                cursor: pointer;
                 .header>span {
                     color: @font-active-color;
                 }
@@ -245,88 +308,6 @@
         }
     }
 
-    .proj-cards {
-        .card {
-            height: 70%;
-            .sep-line {
-                border-top: 1px solid #34363B;
-                margin-top: 15px;
-                margin-bottom: 5px;
-            }
-
-            .title {
-                color: @font-inactive-color;
-                font-size: 25px;
-                transition: color 0.3s @easing2;
-            }
-
-            .exp-info {
-                position: absolute;
-                left: 20px;
-                bottom: 20px;
-                color: @font-inactive-color;
-                font-size: @info-font-size;
-                transition: color 0.3s @easing2;
-            }
-
-            .pipe-info {
-                position: absolute;
-                right: 20px;
-                bottom: 20px;
-                color: @font-inactive-color;
-                font-size: @info-font-size;
-                transition: color 0.3s @easing2;
-            }
-
-            &.active, &:hover {
-                cursor: pointer;
-
-                .title {
-                    color: @font-active-color;
-                }
-                .exp-info {
-                    color: @font-active-color;
-                }
-                .pipe-info{
-                    color: @font-active-color;
-                }
-            }
-        }
-    }
-
-    .exp-cards {
-        .card {
-            padding: 20px;
-
-            .matrix-container {
-                position: absolute;
-                left: 140px;
-                top: @header-height;
-                width: ~"calc(100% - 140px)"; 
-                height: ~"calc(100% - @{header-height})";
-                min-width: 180px;
-                min-height: 160px;
-            }
-        }
-    }
-
-    .pipe-cards {
-        .card {
-            animation: slide-up 1s ease;
-            
-            .matrix {
-                position: absolute;
-                left: 140px;
-                top: @header-height;
-                width: ~"calc(100% - 140px)"; 
-                height: ~"calc(100% - @{header-height})";
-                // background-image: url(./public/imgs/matrix.PNG);
-                background-position: center;
-                background-size: 100%;
-                background-repeat: no-repeat;
-            }
-        }
-    }
 
     .dot {
         cursor: pointer;

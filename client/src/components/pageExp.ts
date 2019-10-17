@@ -39,6 +39,7 @@ class PageExp {
 
   private data: dataPC.ChartDataEle[];
 
+  private selectedDatarun: DT.Datarun = null;
   private focusChart: LineChartFocus;
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
@@ -191,6 +192,7 @@ class PageExp {
     let self = this;
     self.focus(name);
     let d = _.find(self.data, o => o.datarun.signal === name);
+    self.selectedDatarun = d.datarun;
 
     // update focus
     self.focusChart.trigger('data:update', [d]);
@@ -404,6 +406,17 @@ class PageExp {
       _.each(self.ctxCharts, ct => {
         ct.trigger('event:update');
       });
+      // TODO
+      console.log(self.selectedDatarun);
+      server.events.read<{events: DT.Event[]}>(
+        {},
+        { datarun_id: self.selectedDatarun.id }
+      ).done((data) => {
+        self.periodCharts['year'].trigger('event:update', data.events);
+        self.periodCharts['month'].trigger('event:update', data.events);
+        self.periodCharts['day'].trigger('event:update', data.events);
+      });
+
     });
 
     pip.pageExp.on('event:modify', (evt) => {
@@ -477,6 +490,8 @@ class PageExp {
       self.ctxs(_.map(data, d => d.datarun.signal));
 
       // Select the first ctx chart by default
+      // self.selectCtx(data[0].datarun.signal);
+      self.selectedDatarun = data[0].datarun;
       self.focus(data[0].datarun.signal);
       $(`.chart-ctx .title`).first().parent().addClass('ctx-active');
       $('#periodView').text(data[0].datarun.signal);

@@ -132,6 +132,7 @@ export class PeriodChart extends pip.Events {
 
     // ************  events  ************
     self.on('update', update);
+    self.on('event:update', eventUpdateHandler.bind(self));
 
     // ************  event handlers  ************
     function update(o: dataDP.PeriodChartDataEle[]) {
@@ -213,6 +214,11 @@ export class PeriodChart extends pip.Events {
           });
         _g.exit().remove();
       });
+    }
+
+    function eventUpdateHandler(events) {
+      self.data[0].events = events;
+      update(self.data);
     }
 
     function zoomHandler() {
@@ -329,10 +335,10 @@ export class PeriodChart extends pip.Events {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  private toTimestamp(strDate) {
-    const datum = Date.parse(strDate);
+  private toTimestamp = function (strDate) {
+    let datum = Date.parse(strDate);
     return datum / 1000;
-  }
+  };
 
   /**
    * @TODO - if possible, make a single function out of those three
@@ -408,7 +414,6 @@ export class PeriodChart extends pip.Events {
             eventPeriod
           }
         });
-
         currentMonth++;
       }
     });
@@ -622,7 +627,6 @@ export class PeriodChart extends pip.Events {
               .on('mouseout', function() {
                 $(`.${arcClassName}`).removeClass('active');
               });
-
 
             // @TODO - find a way to remove repetitive code
             $('.circle-arc').tooltipster({

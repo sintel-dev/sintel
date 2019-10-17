@@ -2,43 +2,8 @@
 @import './less/dropdown.less';
 
 .mtv-skin{
-    background: @main-color;
 
-    .nav-tabs-custom {
-        margin-bottom: 0 !important;
-    }
-
-    .box-body {
-        padding: 0;
-    }
-
-    .wrapper{
-        background-color: @second-color;
-    }
-
-    .box{
-        background-color: @main-color;
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-bottom: 20px;
-
-        &.period-view{
-            border-radius: 0;
-            padding: 30px 10px 10px 10px;
-        }
-
-        &.timeseries-overview{
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            position: relative;
-            margin-bottom: 28px;
-        }
-        hr{
-            border-top: 1px solid #000;
-        }
-    }
-
+    
     //SVG overridings
     .axis{
         .domain, line{
@@ -177,10 +142,10 @@
     //dataset details within the chart
     .dataset-description{
         width: 400px;
-        height: calc(100% - 90px);
+        height: calc(100%);
         position: absolute;
         right: 0px;
-        top: 90px;
+        top: 0px;
         color: #fff;
         padding: 12px 12px 12px 15px;
         box-sizing: border-box;
@@ -215,6 +180,11 @@
                     }
                 }
             }
+
+            label {
+                font-size: 16px;
+            }
+
             label.btn{
                 color: #000;
             }
@@ -229,11 +199,11 @@
 
         span{
             color: #B5B5B5;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         textarea{
-            width: 270px;
+            width: 90%;
             height: 135px;
             border: 1px solid #979797;
             background: transparent;
@@ -244,7 +214,7 @@
         a{
             &.close{
                 background: none;
-                font-size: 15px;
+                font-size: 18px;
                 position: absolute;
                 right: 5px;
                 top: 5px;
@@ -255,27 +225,6 @@
                 text-shadow: none;
                 outline: none;
             }
-        }
-
-        .btn-L1 {
-            background-color: #2c7bb6;
-            border-color: #2c7bb6;
-        }
-        .btn-L2 {
-            background-color: #abd9e9;
-            border-color: #abd9e9;
-        }
-        .btn-L3 {
-            background-color: #ffffbf;
-            border-color: #ffffbf;
-        }
-        .btn-L4 {
-            background-color: #fdae61;
-            border-color: #fdae61;
-        }
-        .btn-L5 {
-            background-color: #d7191c;
-            border-color: #d7191c;
         }
     }
 

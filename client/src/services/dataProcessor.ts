@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as DT from './server.itf';
 import server from './server';
-import { Project, Experiment } from '../components/pageLanding';
+import { Project, Experiment, Pipeline } from '../components/pageLanding';
 
 export type EventWindow = [number, number, number, string, string];
 // st_index, ed_index, score, id, tag
@@ -80,12 +80,18 @@ export async function getEvents(
  */
 export async function getProjects(): Promise<Project[]> {
   let exps = await server.experiments.read<{ experiments: DT.Experiment[] }>();
-  let pipes = await server.pipelines.read<{ pipelines: DT.Pipeline[] }>();
+  let pipes = await server.pipelines.read<{ pipelines: Pipeline[] }>();
 
   // get pipeline dict
-  let pipeDict: { [index: string]: DT.Pipeline } = {};
+  let pipeDict: { [index: string]: Pipeline } = {};
   _.each(pipes.pipelines, pipe => {
     pipeDict[pipe.name] = pipe;
+    // compute experiment number of this pipeline
+    let count = 0;
+    for (let i = 0; i < exps.experiments.length; i++) {
+      if (exps.experiments[i].pipeline === pipe.name) { count++; }
+    }
+    pipe.experimentNum = count;
   });
 
   // get project dict and list
@@ -100,7 +106,7 @@ export async function getProjects(): Promise<Project[]> {
 
     // get pipeline of this project
     let pipelineNameSet = new Set();
-    let pipelines: DT.Pipeline[] = [];
+    let pipelines: Pipeline[] = [];
     for (let i = 0; i < value.length; i += 1) {
       if (!pipelineNameSet.has(value[i].pipeline)) {
         pipelineNameSet.add(value[i].pipeline);

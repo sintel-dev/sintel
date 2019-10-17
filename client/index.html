@@ -38,11 +38,11 @@
 						<div id="page-landing" class="page page-landing" data-index="0">
 							<div class="abs-mask">
 								<div class="page-content">
-									<svg class="svg-link"></svg>
+									<!-- <svg class="svg-link"></svg> -->
 
 									<!-- project row: begin -->
 									<div class="ld-row proj-row">
-										<span class="row-title">Projects</span>
+										<span class="row-title">Datasets</span>
 										<ul class="proj-cards scroll-style" data-bind="foreach: projects">
 											<li class="card" data-bind="
 												attr: {name: $data.name},
@@ -55,14 +55,47 @@
 												<div class="pipe-info" data-bind="text: `${$data.uniquePipelineNum} unique pipelines`"></div>
 											</li>
 										</ul>
-										<div style="text-align:center" data-bind="foreach: projects">
+										<!-- <div style="text-align:center" data-bind="foreach: projects">
 											<span class="dot" data-bind="
 												click: $parent.onSelectDot.bind($parent, 'proj', $data),
 												css: { active: ($parent.activeProject() != null)
 													&& ($parent.activeProject().name===$data.name)}"> </span>
-										</div>
+										</div> -->
 									</div>
 									<!-- project row: end -->
+
+									<!-- pipeline row: begin -->
+									<div class="ld-row pipe-row">
+										<span class="row-title">Pipelines</span>
+										<!-- <div style="text-align:center" data-bind="foreach: pipelines">
+											<span class="dot" data-bind="
+												attr: {name: $data.id},
+												click: $parent.onSelectDot.bind($parent, 'pipe', $data)"> </span>
+										</div> -->
+										<ul class="pipe-cards scroll-style" data-bind="
+											childrenComplete: pipeCardsRendered, foreach: pipelines">
+											<li class="card" data-bind="
+												attr: {name: $data.id},
+												click: $parent.onSelectCard.bind($parent, 'pipe', $data)">
+												<div class="header">
+													<span data-bind="text: `#${$index()+1} ${$data.name}`"></span>
+													<!-- <span data-bind="click: $parent.onClickPipelineFilter.bind($parent, $data)">
+														<i class="fa fa-fw fa-filter"></i> </span> -->
+												</div>
+												<div class="info">
+													<!-- unique signal subset -->
+													<p data-bind="text: `Primitives: ${$data.mlpipeline.primitives.length}`"></p>
+													<p data-bind="text: `Experiments: ${$data.experimentNum}`"></p>
+													<p data-bind="text: `DC: ${$data.insert_time.substring(0,10)}`"></p>
+													<p data-bind="text: `By: ${$data.created_by}`"></p>
+												</div>
+												<!-- <div class="info" data-bind="foreach: $data.mlpipeline.primitives">
+														<p data-bind="text: $data"></p>
+												</div> -->
+											</li>
+										</ul>
+									</div>
+									<!-- pipeline row: end -->
 
 									<!-- experiment row: begin -->
 									<div class="ld-row exp-row">
@@ -72,55 +105,28 @@
 												attr: {name: $data.id},
 												click: $parent.onSelectCard.bind($parent, 'exp', $data)">
 												<div class="header">
-													<span data-bind="text: `${$data.id}`"></span>
-													<!-- <span data-bind="text: `Experiment #${$index()+1}`"></span> -->
+													<!-- <span data-bind="text: `${$data.id}`"></span> -->
+													<span data-bind="text: `#${$index()+1} ${$data.dataset}_${$data.pipeline}`"></span>
 													<span data-bind="click: $parent.onGoExperiment.bind($parent, $data)">
 														<i class="fa fa-fw fa-search-plus"></i> </span>
 												</div>
 												<div class="info">
-													<p data-bind="text: `Dataset: ${$data.dataset}`"></p>
-													<p data-bind="text: `By: ${$data.created_by}`"></p>
-													<p data-bind="text: `DC: ${$data.date_creation.substring(0,10)}`"></p>
+													<p data-bind="text: `Signals: ${$data.dataruns.length}`"></p>
 													<p data-bind="text: `Events: ${$data.eventNum}`"></p>
+													<p data-bind="text: `DC: ${$data.date_creation.substring(0,10)}`"></p>
+													<p data-bind="text: `By: ${$data.created_by}`"></p>
 												</div>
 												<div class="matrix-container"
 														 data-bind="attr: {name: $data.id}"></div>
 											</li>
 										</ul>
-										<div style="text-align:center" data-bind="foreach: experiments">
+										<!-- <div style="text-align:center" data-bind="foreach: experiments">
 											<span class="dot" data-bind="
 												attr: {name: $data.id},
 												click: $parent.onSelectDot.bind($parent, 'exp', $data)"></span>
-										</div>
+										</div> -->
 									</div>
 									<!-- experiment row: end -->
-
-									<!-- pipeline row: begin -->
-									<div class="ld-row pipe-row">
-										<span class="row-title">Pipelines</span>
-										<div style="text-align:center" data-bind="foreach: pipelines">
-											<span class="dot" data-bind="
-												attr: {name: $data.id},
-												click: $parent.onSelectDot.bind($parent, 'pipe', $data)"> </span>
-										</div>
-										<ul class="pipe-cards scroll-style" data-bind="
-											childrenComplete: pipeCardsRendered, foreach: pipelines">
-											<li class="card" data-bind="
-												attr: {name: $data.id},
-												click: $parent.onSelectCard.bind($parent, 'pipe', $data)">
-												<div class="header">
-													<span data-bind="text: $data.name"></span>
-													<span data-bind="click: $parent.onClickPipelineFilter.bind($parent, $data)">
-														<i class="fa fa-fw fa-filter"></i> </span>
-												</div>
-												<div class="info" data-bind="foreach: $data.mlpipeline.primitives">
-														<p data-bind="text: $data"></p>
-												</div>
-											</li>
-										</ul>
-
-									</div>
-									<!-- pipeline row: end -->
 								</div>
 							</div>
 						</div>
@@ -136,7 +142,7 @@
 													<div class="box-title">timeseries overview</div>
 												</div>
 												<div class="box-body">
-													<div class="chart-ctx-container scroll-style-1">
+													<div class="chart-ctx-container scroll-style">
 														<div data-bind="foreach: ctxs">
 															<div class="chart-ctx">
 																<div class="title" data-bind="
@@ -162,14 +168,14 @@
 														<label for="accessMode">
 															<input type="checkbox" id="accessMode" data-bind="click: showPrediction" />
 															<span class="switch"></span>
-															Access Mode
+															Show Predictions
 														</label>
 													</div>
 													<div>
 														<label for="eventMode">
 															<input type="checkbox" id="eventMode" data-bind="click: addEventMode" />
 															<span class="switch"></span>
-															Event adding mode
+															Add Events
 														</label>
 													</div>
 													<!-- <div>
@@ -208,20 +214,12 @@
 															<li><button class="fa fa-minus" id="zoomOut"></button>
 															</li>
 														</ul>
-														<div class="dataset-description scroll-style-1" id="datasetDescription">
+														<div class="dataset-description scroll-style" id="datasetDescription">
 															<a href="javascript:void(0)" class="close"
 																data-bind="click: () => showDatasetInfo(false)">x</a>
 															<div class="line">
 																<label>Signal:</label>
 																<span class="ml-10" data-bind="text: signal"></span>
-															</div>
-															<div class="line">
-																<label>Datarun:</label>
-																<span class="ml-10" data-bind="text: datarun"></span>
-															</div>
-															<div class="line">
-																<label>Event:</label>
-																<span class="ml-10" data-bind="text: event"></span>
 															</div>
 															<div class="line">
 																<label>From </label>
@@ -231,7 +229,7 @@
 																<label>To </label>
 																<span class="ml-10" data-bind="text: eventTo"></span>
 																<button type="button" class="btn btn-xs btn-danger"
-																	data-bind="click: modify, visible: event()!=='new'">Modify</button>
+																	data-bind="click: modify, visibel: event()!=='new'">Modify</button>
 															</div>
 															<div class="line">
 																<div>
@@ -293,8 +291,7 @@
 													<div class="row">
 														<div class="col-md-12 pchart">
 															<div class="nav-tabs-custom nav-tabs-custom-mtv">
-																<p id="periodView" class="pull-left period-view-label">
-																</p>
+																<p id="periodView" class="pull-left period-view-label">	</p>
 																<ul class="nav nav-tabs pull-right">
 																	<li><a href="#day" data-toggle="tab">Day</a></li>
 																	<li><a href="#month" data-toggle="tab">Month</a>
@@ -305,20 +302,20 @@
 																	<div class="tab-content">
 																		<div class="view-btn-group">
 																			<div class="switch-control">
-																				<div>
+																				<!-- <div>
 																					<label for="showMissing">
 																						<input type="checkbox" id="showMissing" value="peste"
 																							data-bind="click: showMissing">
 																						<span class="switch"></span>
 																						Show Missing
 																					</label>
-																				</div>
+																				</div> -->
 																				<div>
 																					<label for="events">
 																						<input type="checkbox" id="events" value="peste2"
 																							data-bind="click: eventsHandler">
 																						<span class="switch"></span>
-																						Events
+																						Show Events
 																					</label>
 																				</div>
 																			</div>
