@@ -44,36 +44,38 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
-  private tagSelectionData = [{
-      'text': 'Unknown',
-      'children': [{
-          'id': 1,
-          'text': '<i class="select investigate"></i>investigate'
-        },
-        {
-          'id': 2,
-          'text': '<i class="select not_investigate"></i>do not investigate'
-        },
-        {
-          'id': 3,
-          'text': '<i class="select postpone"></i>postpone'
-        }]
-    },
-    {
-      'text': 'Known',
-      'children': [{
-          'id': 4,
-          'text': '<i class="select problem"></i>problem'
-        },
-        {
-          'id': 5,
-          'text': '<i class="select seen"></i>previously seen'
-        },
-        {
-          'id': 6,
-          'text': '<i class="select normal"></i>normal'
-        }]
-    }];
+  private tagSelectionData = [
+  {
+    'text': 'Unknown',
+    'children': [{
+        'id': 1,
+        'text': '<i class="select investigate"></i>investigate'
+      },
+      {
+        'id': 2,
+        'text': '<i class="select not_investigate"></i>do not investigate'
+      },
+      {
+        'id': 3,
+        'text': '<i class="select postpone"></i>postpone'
+      }]
+  },
+  {
+    'text': 'Known',
+    'children': [{
+        'id': 4,
+        'text': '<i class="select problem"></i>problem'
+      },
+      {
+        'id': 5,
+        'text': '<i class="select seen"></i>previously seen'
+      },
+      {
+        'id': 6,
+        'text': '<i class="select normal"></i>normal'
+      }]
+  }
+];
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -291,11 +293,15 @@ class PageExp {
       this.initTagSelectionMenu();
     } else {
       $('#selectLevel').empty();
+      $('#selectLevel').append('<option></option>');
       $('#datasetDescription').removeClass('active');
     }
   }
 
   private initTagSelectionMenu() {
+    console.log('initTagSelectionMenu');
+    $('#selectLevel').empty();
+    $('#selectLevel').append('<option></option>');
     let s2 = $('#selectLevel').select2({
       minimumResultsForSearch: Infinity,
       placeholder: 'Select a tag',
@@ -305,6 +311,7 @@ class PageExp {
     // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
     this.selectedTagID = undefined;
     let tagID = this.fromTagToSelectionID(this.eventInfo.tag);
+    console.log(this.eventInfo.tag, tagID);
     if (tagID !== 'untagged') {
       s2.val(tagID).trigger('change');
     }
