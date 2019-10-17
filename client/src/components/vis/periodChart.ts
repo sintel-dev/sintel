@@ -583,7 +583,7 @@ export class PeriodChart extends pip.Events {
           self.trigger('select', o);
         })
         .attr('title',
-          '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'
+          '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "untagged"]'
         ); // should be gathered from API
 
       // @TODO - refactor

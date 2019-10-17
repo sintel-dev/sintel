@@ -194,6 +194,44 @@
             transform: translateX(0%);
         }
 
+        .select-line{
+            div {
+                display: inline-block;
+            }
+            .indicator {
+                border-radius: 100%;
+                width: 15px;
+                height: 15px;
+                display: inline-block;
+                margin-left: 10px;
+                margin-bottom: 5px;
+                vertical-align: middle;
+
+    
+                &.id1{
+                    background: #FFCD00;
+                }
+                &.id2{
+                    background: #7CA8FF;
+                }
+                &.id3 {
+                    background: #A042FF
+                }
+                &.id4{
+                    background: #F64242;
+                }
+                &.id5{
+                    background: #F5FF00
+                }
+                &.id6 {
+                    background: #45F642;
+                }
+                &.untagged {
+                    background: #B5B5B5;
+                }
+            }
+        }
+
         label, span{
             margin-bottom: 6px;
         }
