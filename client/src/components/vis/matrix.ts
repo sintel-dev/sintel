@@ -210,7 +210,6 @@ export class Matrix extends pip.Events {
       .range([0, 0.85])
       .domain([0, self.option.maxEventNum]);
     let color2 = function(t) { return d3.interpolateGreys(cx(t)); };
-    console.log(self.option.maxEventNum);
     let rowNum = 6;
     let fx = d3.scaleBand()
       .range([ 0, w ])

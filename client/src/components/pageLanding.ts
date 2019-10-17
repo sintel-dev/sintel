@@ -28,7 +28,7 @@ class PageLanding {
 
   public projects = ko.observableArray<Project>([]);
   public experiments = ko.observableArray<Experiment>([]);
-  public pipelines = ko.observableArray<DT.Pipeline>([]);
+  public pipelines = ko.observableArray<Pipeline>([]);
 
   // currently active
   public activeProject = ko.observable<Project>(null);
@@ -348,7 +348,18 @@ class PageLanding {
     $(`.pipe-row .card`).removeClass('active');
     $(`.pipe-row .dot`).removeClass('active');
     this.experiments(project.experiments);
-    this.pipelines(project.pipelines);
+
+    let pipelines = project.pipelines;
+    _.each(pipelines, pipe => {
+      let count = 0;
+      for (let i = 0; i < project.experiments.length; i++) {
+        if (project.experiments[i].pipeline === pipe.name) { count++; }
+      }
+      pipe.experimentNum = count;
+    });
+
+    this.pipelines(_.cloneDeep(pipelines));
+
     // this.initDotLinks();
     this.visualize();
   }

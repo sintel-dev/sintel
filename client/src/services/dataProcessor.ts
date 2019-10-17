@@ -86,12 +86,12 @@ export async function getProjects(): Promise<Project[]> {
   let pipeDict: { [index: string]: Pipeline } = {};
   _.each(pipes.pipelines, pipe => {
     pipeDict[pipe.name] = pipe;
-    // compute experiment number of this pipeline
-    let count = 0;
-    for (let i = 0; i < exps.experiments.length; i++) {
-      if (exps.experiments[i].pipeline === pipe.name) { count++; }
-    }
-    pipe.experimentNum = count;
+    // // compute experiment number of this pipeline
+    // let count = 0;
+    // for (let i = 0; i < exps.experiments.length; i++) {
+    //   if (exps.experiments[i].pipeline === pipe.name) { count++; }
+    // }
+    // pipe.experimentNum = count;
   });
 
   // get project dict and list
