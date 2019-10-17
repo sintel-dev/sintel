@@ -44,11 +44,9 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
-  private tagSelectionData = [
-    {
+  private tagSelectionData = [{
       'text': 'Unknown',
-      'children': [
-        {
+      'children': [{
           'id': 1,
           'text': '<i class="select investigate"></i>investigate'
         },
@@ -59,13 +57,11 @@ class PageExp {
         {
           'id': 3,
           'text': '<i class="select postpone"></i>postpone'
-        }
-      ]
+        }]
     },
     {
       'text': 'Known',
-      'children': [
-        {
+      'children': [{
           'id': 4,
           'text': '<i class="select problem"></i>problem'
         },
@@ -76,10 +72,8 @@ class PageExp {
         {
           'id': 6,
           'text': '<i class="select normal"></i>normal'
-        }
-      ]
-    }
-  ];
+        }]
+    }];
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -286,15 +280,11 @@ class PageExp {
 
 
   private showDatasetInfo(visible) {
-    visible ? $('#datasetDescription').addClass('active') :
-      $('#datasetDescription').removeClass('active');
     if (visible) {
       $('#datasetDescription').addClass('active');
       this.initTagSelectionMenu();
-
-      // const DropdownList = (document.getElementById('selectLevel')) as HTMLSelectElement;
-      // DropdownList.selectedIndex = 3;
     } else {
+      $('#selectLevel').empty();
       $('#datasetDescription').removeClass('active');
     }
   }
@@ -318,22 +308,16 @@ class PageExp {
     switch (id) {
       case '1':
         return 'investigate';
-        break;
       case '2':
         return 'do not investigate';
-        break;
       case '3':
         return 'postpone';
-        break;
       case '4':
         return 'problem';
-        break;
       case '5':
         return 'previously seen';
-        break;
       case '6':
         return 'normal';
-        break;
       default:
         return 'untagged';
     }
@@ -343,22 +327,16 @@ class PageExp {
     switch (tag) {
       case 'investigate':
         return '1';
-        break;
       case 'do not investigate':
         return '2';
-        break;
       case 'postpone':
         return '3';
-        break;
       case 'problem':
         return '4';
-        break;
       case 'previously seen':
         return '5';
-        break;
       case 'normal':
         return '6';
-        break;
       default:
         return 'untagged';
     }
