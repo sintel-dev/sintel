@@ -585,7 +585,6 @@ export class PeriodChart extends pip.Events {
         const circleMonths = (2 * PI) / 12;
         const circleHours = (2 * PI) / 24;
         colorSchemes.tag.push('#fff');
-        const eventRange = [];
         const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
