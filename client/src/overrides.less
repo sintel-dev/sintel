@@ -279,7 +279,6 @@
         }
     }
 
-
     .target{
         circle{
             stroke: rgba(218, 227, 245, 0.3);
@@ -397,9 +396,10 @@
 
     .circle-arc {
         cursor: pointer;
-        &:hover{
+        transition: all .2s ease-in-out;
+        &.active{
             transform: scale(0.98);
-            transition: all .2s ease-in-out;
+            stroke-width: 3px;
         }
     }
 }
