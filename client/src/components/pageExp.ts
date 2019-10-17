@@ -233,8 +233,10 @@ class PageExp {
   public eventsHandler(content, event) {
     const state = event.target.checked;
 
-    // @TODO - space for improvements - animations
+    // @TODO - space for improvements - animations/code optimisation
     this.periodCharts['year'].trigger('showPeriod', state);
+    this.periodCharts['month'].trigger('showPeriod', state);
+    this.periodCharts['day'].trigger('showPeriod', state);
     return true;
   }
 

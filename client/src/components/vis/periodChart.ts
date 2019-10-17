@@ -695,7 +695,9 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', `circle-arc ${arcClassName}`)
+              .attr('class', () =>
+                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+              )
               .attr('d', arc)
               .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
@@ -760,7 +762,9 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', `circle-arc ${arcClassName}`)
+              .attr('class', () =>
+                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+              )
               .attr('d', arc)
               .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
