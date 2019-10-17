@@ -231,6 +231,10 @@ class PageExp {
   }
 
   public eventsHandler(content, event) {
+    const state = event.target.checked;
+
+    // @TODO - space for improvements - animations
+    this.periodCharts['year'].trigger('showPeriod', state);
     return true;
   }
 
@@ -341,7 +345,6 @@ class PageExp {
         return 'untagged';
     }
   }
-
 
   private init() {
     this.ctxs([]);
