@@ -12,12 +12,16 @@ export interface Experiment extends DT.Experiment {
   tagStats?: { [index: string]: number };
 }
 
+export interface Pipeline extends DT.Pipeline {
+  experimentNum: number;
+}
+
 export interface Project {
   name: string;
   experiments: Experiment[];
   experimentNum: number;
   uniquePipelineNum: number;
-  pipelines: DT.Pipeline[];
+  pipelines: Pipeline[];
 }
 
 class PageLanding {
@@ -309,6 +313,25 @@ class PageLanding {
   private setupEventHandlers() {
     let self = this;
     // if any
+
+    pip.pageLanding.on('update:experiments', () => {
+      getProjects().then(projects => {
+        self.projects(projects);
+        let selectedProject = _.find(projects, d => d.name === self.activeProject().name);
+        self.activeProject(selectedProject);
+        $(`.exp-row .card`).removeClass('active');
+        $(`.exp-row .dot`).removeClass('active');
+        $(`.pipe-row .card`).removeClass('active');
+        $(`.pipe-row .dot`).removeClass('active');
+        self.experiments(selectedProject.experiments);
+        self.pipelines(selectedProject.pipelines);
+        // self.initDotLinks();
+        self.visualize();
+        let activeExperimentID = $(`.exp-row .card.active`).attr('name');
+        let selectedExperiment = _.find(selectedProject.experiments, d => d.id === activeExperimentID);
+        self.onSelectCard('exp', selectedExperiment);
+      });
+    });
   }
 
   /**
@@ -326,7 +349,7 @@ class PageLanding {
     $(`.pipe-row .dot`).removeClass('active');
     this.experiments(project.experiments);
     this.pipelines(project.pipelines);
-    this.initDotLinks();
+    // this.initDotLinks();
     this.visualize();
   }
 
@@ -335,7 +358,8 @@ class PageLanding {
 
     let experiments = self.experiments();
     let maxTagNum = Number.MIN_SAFE_INTEGER;
-    let maxEventnum = Number.MIN_SAFE_INTEGER;
+    let maxEventNum = Number.MIN_SAFE_INTEGER;
+    let maxScore = Number.MIN_SAFE_INTEGER;
 
     _.each(experiments, exp => {
       let tagStats: { [index: string]: number } = {};
@@ -347,18 +371,22 @@ class PageLanding {
           if (!_.has(tagStats, tid)) { tagStats[tid] = 0; }
           tagStats[tid] += 1;
           maxTagNum = maxTagNum < tagStats[tid] ? tagStats[tid] : maxTagNum;
+
+          maxScore = maxScore > datarun.events[i].score ? maxScore : datarun.events[i].score;
+          maxEventNum = maxEventNum < datarun.events.length ? datarun.events.length : maxEventNum;
         }
       });
       exp.tagStats = tagStats;
-      maxEventnum = maxEventnum < exp.eventNum ? exp.eventNum : maxEventnum;
     });
 
 
     _.each(experiments, exp => {
-      self[exp.id] = new Matrix(
+      $(`.exp-row .matrix-container[name=${exp.id}]`).empty();
+      // self.matrixDict[exp.id] =
+      new Matrix(
         $(`.exp-row .matrix-container[name=${exp.id}]`)[0],
         exp,
-        { maxTagNum: maxTagNum, maxEventnum: maxEventnum }
+        { maxTagNum, maxEventNum, maxScore: Math.ceil(maxScore * 1.05) }
       );
     });
 

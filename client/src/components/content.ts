@@ -59,6 +59,7 @@ class Content {
       self.slider.addClass('next');
     } else {
       self.slider.addClass('prev');
+      pip.pageLanding.trigger('update:experiments');
     }
 
     // reset classes

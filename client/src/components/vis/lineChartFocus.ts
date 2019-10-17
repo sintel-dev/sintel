@@ -591,7 +591,7 @@ export class LineChartFocus extends pip.Events {
   private addHighlights(h, x, line) {
     let self = this;
     let option = self.option;
-    let hz = 25, hzp = 2;
+    let hz = 12, hzp = 2;
 
     let getTagColor = (tag: string): string => {
       let tagSeq = ['investigate', 'do not investigate', 'postpone',

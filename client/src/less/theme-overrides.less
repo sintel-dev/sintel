@@ -1,0 +1,41 @@
+@import './colors.less';
+@import './dropdown.less';
+
+.mtv-skin{
+    background: @main-color;
+
+    .nav-tabs-custom {
+        margin-bottom: 0 !important;
+    }
+
+    .box-body {
+        padding: 0;
+    }
+
+    .wrapper{
+        background-color: @second-color;
+    }
+
+    .box{
+        background-color: @main-color;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+
+        &.period-view{
+            border-radius: 0;
+            padding: 30px 10px 10px 10px;
+        }
+
+        &.timeseries-overview{
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            position: relative;
+            margin-bottom: 28px;
+        }
+        hr{
+            border-top: 1px solid #000;
+        }
+    }
+}

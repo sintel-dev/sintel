@@ -165,6 +165,8 @@ class Dataruns(Resource):
 
         try:
             dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
+            # sort by signal name
+            dataruns.sort(key=lambda x: x['signal'], reverse=False)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

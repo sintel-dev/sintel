@@ -132,6 +132,7 @@ export class PeriodChart extends pip.Events {
 
     // ************  events  ************
     self.on('update', update);
+    self.on('event:update', eventUpdateHandler.bind(self));
 
     // ************  event handlers  ************
     function update(o: dataDP.PeriodChartDataEle[]) {
@@ -213,6 +214,11 @@ export class PeriodChart extends pip.Events {
           });
         _g.exit().remove();
       });
+    }
+
+    function eventUpdateHandler(events) {
+      self.data[0].events = events;
+      update(self.data);
     }
 
     function zoomHandler() {
