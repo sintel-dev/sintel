@@ -103,7 +103,6 @@ export async function getProjects(): Promise<Project[]> {
   });
 
   _.forIn(projDict, (value, key) => {
-
     // get pipeline of this project
     let pipelineNameSet = new Set();
     let pipelines: Pipeline[] = [];
@@ -127,6 +126,18 @@ export async function getProjects(): Promise<Project[]> {
       experiments: newExp as Experiment[],
       pipelines
     });
+  });
+
+  _.each(projList, proj => {
+    if (proj.name === 'SES') {
+      proj.signalNum = 71;
+    } else if (proj.name === 'SMAP') {
+      proj.signalNum = 55;
+    } else if (proj.name === 'MSL') {
+      proj.signalNum = 27;
+    } else {
+      proj.signalNum = 50;
+    }
   });
 
   return projList;

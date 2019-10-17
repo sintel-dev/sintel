@@ -18,6 +18,7 @@ export interface Pipeline extends DT.Pipeline {
 
 export interface Project {
   name: string;
+  signalNum?: number;
   experiments: Experiment[];
   experimentNum: number;
   uniquePipelineNum: number;
@@ -318,6 +319,7 @@ class PageLanding {
       getProjects().then(projects => {
         self.projects(projects);
         let selectedProject = _.find(projects, d => d.name === self.activeProject().name);
+        let activeExperimentID = $(`.exp-row .card.active`).attr('name');
         self.activeProject(selectedProject);
         $(`.exp-row .card`).removeClass('active');
         $(`.exp-row .dot`).removeClass('active');
@@ -327,7 +329,7 @@ class PageLanding {
         self.pipelines(selectedProject.pipelines);
         // self.initDotLinks();
         self.visualize();
-        let activeExperimentID = $(`.exp-row .card.active`).attr('name');
+        console.log(activeExperimentID, selectedProject.experiments);
         let selectedExperiment = _.find(selectedProject.experiments, d => d.id === activeExperimentID);
         self.onSelectCard('exp', selectedExperiment);
       });

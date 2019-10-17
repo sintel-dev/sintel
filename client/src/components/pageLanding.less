@@ -176,6 +176,15 @@
                 transition: color 0.3s @easing2;
             }
 
+            .signal-info {
+                position: absolute;
+                left: 20px;
+                bottom: ~"calc(15% + 30px)"; ;
+                color: @font-inactive-color;
+                font-size: @info-font-size;
+                transition: color 0.3s @easing2;
+            }
+
             .exp-info {
                 position: absolute;
                 right: 20px;
@@ -198,6 +207,9 @@
                 cursor: pointer;
 
                 .title {
+                    color: @font-active-color;
+                }
+                .signal-info {
                     color: @font-active-color;
                 }
                 .exp-info {

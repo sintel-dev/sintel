@@ -51,6 +51,7 @@
 												click: $parent.onSelectCard.bind($parent, 'proj', $data)">
 												<div class="title" data-bind="text: $data.name"></div>
 												<div class="sep-line"></div>
+												<div class="signal-info" data-bind="text: `${$data.signalNum} signals`"></div>
 												<div class="exp-info" data-bind="text: `${$data.experimentNum} experiments`"></div>
 												<div class="pipe-info" data-bind="text: `${$data.uniquePipelineNum} unique pipelines`"></div>
 											</li>
