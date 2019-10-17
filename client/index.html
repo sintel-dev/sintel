@@ -279,13 +279,29 @@
 													<div class="row">
 														<div class="col-md-12 pchart">
 															<div class="nav-tabs-custom nav-tabs-custom-mtv">
-																<p id="periodView" class="pull-left period-view-label">	</p>
-																<ul class="nav nav-tabs pull-right">
-																	<li><a href="#day" data-toggle="tab">Day</a></li>
-																	<li><a href="#month" data-toggle="tab">Month</a>
-																	</li>
-																	<li class="active"><a href="#year" data-toggle="tab">Year</a></li>
-																</ul>
+																<div class="calendar-info">
+																	<div class="item">
+																		<p id="periodView" class="period-view-label">	</p>
+																	</div>
+																	<div class="item switch-control">
+																		<div>
+																			<label for="events">
+																				<input type="checkbox" checked id="events" data-bind="click: eventsHandler">
+																				<span class="switch"></span>
+																				Show Events
+																			</label>
+																		</div>
+																	</div>
+																	<div class="item">
+																		<ul class="nav nav-tabs pull-right">
+																			<li><a href="#day" data-toggle="tab">Day</a></li>
+																			<li><a href="#month" data-toggle="tab">Month</a>
+																			</li>
+																			<li class="active"><a href="#year" data-toggle="tab">Year</a></li>
+																		</ul>
+																	</div>
+																	
+																</div>
 																<div class="calendar-controls">
 																	<div class="tab-content">
 																		<div class="view-btn-group">
@@ -299,12 +315,12 @@
 																					</label>
 																				</div> -->
 																				<div>
-																					<label for="events">
+																					<!-- <label for="events">
 																						<input type="checkbox" id="events" value="peste2"
 																							data-bind="click: eventsHandler">
 																						<span class="switch"></span>
 																						Show Events
-																					</label>
+																					</label> -->
 																				</div>
 																			</div>
 																			<!-- <button class="btn btn-default" data-bind="click: () => { showMissing(); }" title="show missing data period">show missing</button>

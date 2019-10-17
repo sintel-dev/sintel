@@ -25,6 +25,7 @@ export interface Option {
   scaleFactor?: number;
   marginRatio?: number;
   dayLevelTranslate?: number;
+  isPeriodVisible?: boolean;
 }
 
 export class PeriodChart extends pip.Events {
@@ -46,7 +47,8 @@ export class PeriodChart extends pip.Events {
     circleStroke: 1,
     scaleFactor: 0.9,
     marginRatio: 0,
-    dayLevelTranslate: 40
+    dayLevelTranslate: 40,
+    isPeriodVisible: true
   };
 
   private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -133,6 +135,7 @@ export class PeriodChart extends pip.Events {
     // ************  events  ************
     self.on('update', update);
     self.on('event:update', eventUpdateHandler.bind(self));
+    self.on('showPeriod', self.showPeriod);
 
     // ************  event handlers  ************
     function update(o: dataDP.PeriodChartDataEle[]) {
@@ -224,6 +227,13 @@ export class PeriodChart extends pip.Events {
     function zoomHandler() {
       zoomG.attr('transform', d3.event.transform);
     }
+  }
+
+  private showPeriod(isVisible) {
+    this.option.isPeriodVisible = isVisible;
+
+    // @TODO - avoid triggering rerendering of the entire chart
+    this.trigger('update', this.data);
   }
 
   private normalize() {
@@ -576,7 +586,6 @@ export class PeriodChart extends pip.Events {
           '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "TBD"]'
         ); // should be gathered from API
 
-
       // @TODO - refactor
       if (self.data[0].events.length) {
         const PI = Math.PI;
@@ -585,7 +594,6 @@ export class PeriodChart extends pip.Events {
         const circleMonths = (2 * PI) / 12;
         const circleHours = (2 * PI) / 24;
         colorSchemes.tag.push('#fff');
-        const eventRange = [];
         const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -617,7 +625,9 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', `circle-arc ${arcClassName}`)
+              .attr('class', () =>
+                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+              )
               .attr('d', arc)
               .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
@@ -685,7 +695,9 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', `circle-arc ${arcClassName}`)
+              .attr('class', () =>
+                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+              )
               .attr('d', arc)
               .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
               .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
@@ -750,7 +762,9 @@ export class PeriodChart extends pip.Events {
               .endAngle(stopTime);
 
             target.append('path')
-              .attr('class', `circle-arc ${arcClassName}`)
+              .attr('class', () =>
+                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+              )
               .attr('d', arc)
               .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
               .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))

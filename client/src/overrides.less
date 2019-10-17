@@ -82,6 +82,7 @@
     .switch-control{
         label{
             cursor: pointer;
+            color: #fff;
         }
 
         div{
@@ -256,15 +257,33 @@
         padding-top: 35px;
 
         .nav-tabs-custom{
-            >.nav-tabs {
+            .calendar-info{
+                border-bottom: 1px solid #484E53;
                 padding-bottom: 20px;
                 margin-bottom: 20px;
-                border-color: #484E53;
-                >li{
-                    margin-right: -1px;
-                    margin: 0;
+                
+                .item{
+                    display: inline-block;
+                    margin-right: 10px;
+                    vertical-align: top;
+                    line-height: 34px;
+                    &:last-child{
+                        margin-right: 0;
+                        float: right;
+                    }
+                }
+            }
+
+            .nav-tabs {
+                border-bottom: none;
+                li {
+                    margin-right: -2px;
                     border: none;
                     transition: all .2s ease-in-out;
+                    float: right;
+                    a{
+                        border-radius: 0;
+                    }
 
                     &:last-child {
                         &, a{
@@ -280,9 +299,9 @@
                     }
                     &.active{
                         border-top: none;
-                        background-color: #2569D6;
                         a{
                             color: #fff;
+                            background-color: #2569D6;
                         }
                     }
 
@@ -307,7 +326,7 @@
             color: #fff;
             font-size: 25px;
             margin: 0;
-            padding: 8px 0 0 0;
+            padding: 0;
             font-weight: bold;
         }
     }
@@ -346,6 +365,12 @@
     .circle-arc {
         cursor: pointer;
         transition: all .2s ease-in-out;
+        opacity: 0;
+
+        &.visible {
+            opacity: 1;
+        }
+
         &.active{
             transform: scale(0.98);
             stroke-width: 3px;
