@@ -428,6 +428,10 @@ export class LineChartFocus extends pip.Events {
     };
 
     let makeEditable = (x0, x1, event: DT.Event) => {
+      // disable window events
+      self.svg.selectAll('.window *')
+        .attr('pointer-events', 'none');
+
       modifiedEvent = event;
       brushG.select('.overlay').attr('width', w);
       brushG
@@ -459,6 +463,10 @@ export class LineChartFocus extends pip.Events {
         }
         i += 1;
       }
+
+      // restore window events
+      self.svg.selectAll('.window *')
+        .attr('pointer-events', 'all');
 
       if (_.isNull(modifiedEvent)) {
         pip.pageExp.trigger('comment:new', {

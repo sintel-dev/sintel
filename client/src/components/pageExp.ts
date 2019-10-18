@@ -3,6 +3,7 @@ import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
 import * as DT from '../services/server.itf';
+import * as d3 from 'd3';
 import * as dataPC from '../services/dataProcessor';
 import { LineChartCtx } from './vis/lineChartCtx';
 import { LineChartFocus } from './vis/lineChartFocus';
@@ -32,7 +33,7 @@ class PageExp {
   public signal = ko.observable<string>('');
   public eventFrom = ko.observable('');
   public eventTo = ko.observable('');
-  public score = ko.observable(0);
+  public score = ko.observable('0');
   public tag = ko.observable<string>('');
   public transcript = ko.observable('');
   public comment = '';
@@ -456,7 +457,7 @@ class PageExp {
     self.datarun(eventInfo.datarun);
     self.signal(eventInfo.signal);
     self.tag(eventInfo.tag);
-    self.score(eventInfo.score);
+    self.score(d3.format('.3f')(eventInfo.score));
     self.eventFrom(new Date(eventInfo.start_time).toUTCString());
     self.eventTo(new Date(eventInfo.stop_time).toUTCString());
     // self.level(self.fromScoreToLevel(eventInfo.score));
