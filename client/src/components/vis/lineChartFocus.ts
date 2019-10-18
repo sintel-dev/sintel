@@ -78,8 +78,9 @@ export class LineChartFocus extends pip.Events {
     // add flags to remember modes;
 
     self.svgContainer = d3.select<HTMLElement, any>(ele);
+    const mltseriesTitleWidth = $('.chart-ctx .title').innerWidth() / 2;
 
-    self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
+    self.option.width = self.option.width === null ? $(ele).innerWidth() - mltseriesTitleWidth : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
 
     self.svgContainer
@@ -175,7 +176,6 @@ export class LineChartFocus extends pip.Events {
 
     let { zoom, enableZoom, disableZoom, resetZoom } = self.addZoom(w, h);
     zoom.on('zoom', zoomHandler);
-    self.on('zooming', clickZoom);
     enableZoom();
 
     // let { brush, enableBrush, disableBrush, makeWindowEditable } = self.addBrush(focus, w, h, x);
@@ -393,13 +393,6 @@ export class LineChartFocus extends pip.Events {
       disableZoom();
       makeEditable(x0, x1, event);
     }
-
-    function clickZoom(factor) {
-      let k = savedZoom.k + factor;
-      // debugger;
-      const selection = d3.transition().duration(250);
-      zoom.scaleTo(selection, k);
-    }
   }
 
   private addEventEditor(g, w, h, x) {
@@ -582,17 +575,27 @@ export class LineChartFocus extends pip.Events {
         .call(zoom.transform, d3.zoomIdentity);
     };
 
+    const zoomIn = $('#zoomIn');
+    const zoomOut = $('#zoomOut');
+    zoomIn.on('click', function() {
+      zoom.scaleBy(zoomRect, 1.03);
+    });
+
+    zoomOut.on('click', function() {
+      zoom.scaleBy(zoomRect, 0.95);
+    });
+
     return { zoom, enableZoom, disableZoom, resetZoom };
   }
 
   private addHighlights(h, x, line) {
     let self = this;
     let option = self.option;
-    let hz = 25, hzp = 2;
+    let hz = 12, hzp = 2;
 
     let getTagColor = (tag: string): string => {
       let tagSeq = ['investigate', 'do not investigate', 'postpone',
-        'problem', 'previously seen', 'normal'];
+      'problem', 'previously seen', 'normal'];
 
       let colorIdx: number;
       for (let i = 0; i < tagSeq.length; i += 1) {
@@ -717,8 +720,6 @@ export class LineChartFocus extends pip.Events {
 
       u.exit().remove();
     }
-
-
   }
 
   private getScale(w, h) {

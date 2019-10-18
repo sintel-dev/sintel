@@ -1,11 +1,13 @@
 @import "../less/colors.less";
 
 /* variables */
-@row-title-color: #919295;
+@row-title-color: white;
+@row-margin-lr: 50px;
+@row-padding-lr: 10px;
 @dot-color: #35363D;
 @dot-color-hover: #D8D8D8;
 @header-height: 50px;
-@info-font-size: 14px;
+@info-font-size: 17px;
 @font-inactive-color: #A7A7AA;
 @font-active-color: white;
 
@@ -14,8 +16,8 @@
 @easing2: linear;    // for transition
 
 @proj-card-width: 360px;
-@exp-card-width: 320px;
-@pipe-card-width: 250px;
+@exp-card-width: 330px;
+@pipe-card-width: 240px;
 
 /* class variables */
 .abs {
@@ -26,15 +28,14 @@
     width: 100%;
 }
 
-.title(@top, @left, @size, @color) {
-    font-size: @size;
+.title(@size, @color) {
     position: absolute;
-    top: @top;
-    left: @left;
+    top: -@size - 5px;
+    left: @row-padding-lr;
+    font-size: @size;
     color: @color;
     text-transform: uppercase;
-    transform-origin: 0 0;
-    transform: rotate(270deg);
+    margin: 0 @row-margin-lr 0 @row-margin-lr;
 }
 
 .flex-layout {
@@ -45,18 +46,6 @@
     align-items: center;
 }
 
-.scroll-style::-webkit-scrollbar {
-    width: 7px;
-    height: 9px;
-}
-.scroll-style::-webkit-scrollbar-thumb {
-    height: 3px;
-    border: 2px solid rgba(0, 0, 0, 0);
-    background-clip: padding-box;
-    border-radius: 3px;
-    background-color: rgba(0, 0, 0, 0.15);
-    box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
-}
 
 /* for animation */
 @keyframes slide-up {
@@ -71,11 +60,11 @@
 }
 
 .page-landing {
-
     .svg-link {
         position: absolute;
         width: 100vw;
         height: 100vh;
+        display: none;
 
         pointer-events: none;
         fill: none;
@@ -95,59 +84,60 @@
 
     .ld-row {
         position: relative;
-        margin: 30px 30px 0 30px;
+        margin: 65px 30px 0 25px;
         &:not(:first-child) {
-            margin-top: 60px;
+            margin-top: 50px;
         }
     }
 
     .proj-row {
-        height: 20%;
-        min-height: 200px;
+        height: 15vh;
+        min-height: 180px;
+        max-height: 240px;
         .row-title {
-            .title(150px, 30px, 20px, @row-title-color);
-        };
-    }
-
-    .exp-row {
-        height: 25%;
-        min-height: 240px;
-        .row-title {
-            .title(160px, 30px, 20px, @row-title-color);
+            .title(20px, @row-title-color);
         };
     }
 
     .pipe-row {
-        height: 35%;
-        min-height: 320px;
+        height: 25vh;
+        min-height: 220px;
+        max-height: 240px;
         .row-title {
-            .title(120px, 30px, 20px, @row-title-color);
+            .title(20px, @row-title-color);
         };
     }
 
-    .proj-cards {
-        
+    .exp-row {
+        height: 25vh;
+        min-height: 240px;
+        max-height: 280px;
+        .row-title {
+            .title(20px, @row-title-color);
+        };
+    }
+
+    .proj-cards, .exp-cards, .pipe-cards {
+
         &:extend(.flex-layout);
-        
         position: relative;
         list-style: none;
         white-space: nowrap;
         overflow-x: auto;
-
-
-        margin: 30px 90px 0px 90px;
+        overflow-y: hidden;
+        margin: 0 @row-margin-lr 0 @row-margin-lr;
+        padding: 0 @row-padding-lr 0 @row-padding-lr;
         height: 100%;
-        width: ~"calc(100% - 180px)";
+        width: ~"calc(100% - 100px)";
 
         .card {
             position: relative;
             flex: 0 0 @proj-card-width;
-            height: 70%;
-            margin-left: 20px;
+            height: 90%;
             margin-right: 20px;
             padding: 20px;
             background-color: #282B30;
-            border-style: solid;
+            border: 1px solid #282B30;
             border-width: 1px;
             border-color: #282B30;
             border-radius: 10px;
@@ -155,6 +145,25 @@
             transition-duration: 0.3s;
             transition-timing-function: @easing2;
 
+            &.active{
+                border-color: #B2C1FF;
+                border-width: 1px;
+            }
+
+            &.active, &:hover {
+                background-color: #26292c;
+            }
+
+            &:hover{
+                transform: scale(1.05);
+                z-index: 9;
+            }
+        }
+    }
+
+    .proj-cards {
+        .card {
+            height: 100% - 10px;
             .sep-line {
                 border-top: 1px solid #34363B;
                 margin-top: 15px;
@@ -167,10 +176,19 @@
                 transition: color 0.3s @easing2;
             }
 
-            .exp-info {
+            .signal-info {
                 position: absolute;
                 left: 20px;
-                bottom: 20px;
+                bottom: ~"calc(15% + 30px)"; ;
+                color: @font-inactive-color;
+                font-size: @info-font-size;
+                transition: color 0.3s @easing2;
+            }
+
+            .exp-info {
+                position: absolute;
+                right: 20px;
+                bottom: 15%;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
                 transition: color 0.3s @easing2;
@@ -178,19 +196,20 @@
 
             .pipe-info {
                 position: absolute;
-                right: 20px;
-                bottom: 20px;
+                left: 20px;
+                bottom: 15%;
                 color: @font-inactive-color;
                 font-size: @info-font-size;
                 transition: color 0.3s @easing2;
             }
 
             &.active, &:hover {
-                background-color: #2C3034;
-                border-color: #616467;
                 cursor: pointer;
 
                 .title {
+                    color: @font-active-color;
+                }
+                .signal-info {
                     color: @font-active-color;
                 }
                 .exp-info {
@@ -203,90 +222,16 @@
         }
     }
 
-    .exp-cards {
-        
-        &:extend(.flex-layout);
-        
-        position: relative;
-        list-style: none;
-        white-space: nowrap;
-        overflow-x: auto;
-
-
-        margin: 30px 90px 0px 90px;
-        height: 100%;
-        width: ~"calc(100% - 180px)";
-
+    .pipe-cards {
         .card {
-            position: relative;
+            flex: 0 0 @pipe-card-width;
+        }
+    }
+
+    .exp-cards {
+        .card {
+            // padding: 20px;
             flex: 0 0 @exp-card-width;
-            height: 90%;
-            margin-left: 20px;
-            margin-right: 20px;
-            padding: 20px;
-            background-color: #282B30;
-            border-style: solid;
-            border-width: 1px;
-            border-color: #282B30;
-            border-radius: 10px;
-            animation: slide-up 1s ease;
-
-            &.active, &:hover {
-                background-color: #2C3034;
-                border-color: #616467;
-            }
-
-            .header {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: @header-height;
-                line-height: @header-height;
-                background-color: #26292D;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                &>span {
-                    padding-left: 15px;
-                    font-size: 18px;
-                    color: @font-inactive-color;
-                    transition: color 0.3s @easing2;
-
-                    &:first-child {
-                        float: left;
-                    }
-                    &:not(:first-child) {
-                        float: right;
-                        padding-top: 15;
-                        padding-right: 10px;
-                        &:hover {
-                            cursor: pointer;
-                        }
-                    }
-                }
-            }
-
-            .info {
-                position: absolute;
-                left: 0;
-                top: @header-height;
-                width: 100%;
-                height: ~"calc(100% - @{header-height})";
-                background-color: #2A2E32;
-                border-bottom-left-radius: 10px;
-                border-bottom-right-radius: 10px;
- 
-                &>p {
-                    color: @font-inactive-color;
-                    font-size: @info-font-size;
-                    padding-left: 15px;
-                    transition: color 0.3s @easing2;
-
-                    &:first-child {
-                        padding-top: 40px;
-                    }
-                }
-            }
 
             .matrix-container {
                 position: absolute;
@@ -296,52 +241,13 @@
                 height: ~"calc(100% - @{header-height})";
                 min-width: 180px;
                 min-height: 160px;
-                // border: 1px solid red;
-            }
-
-            &.active, &:hover {
-                .header>span {
-                    color: @font-active-color;
-                }
-                .info>p {
-                    color: @font-active-color;
-                }
             }
         }
     }
 
-    .pipe-cards {
-        
-        &:extend(.flex-layout);
-        
-        position: relative;
-        list-style: none;
-        white-space: nowrap;
-        overflow-x: auto;
-
-
-        margin: 0 90px 0px 90px;
-        height: 100%;
-        width: ~"calc(100% - 180px)";
-
-        .card {
-            position: relative;
-            flex: 0 0 @pipe-card-width;
-            height: 90%;
-            margin-left: 20px;
-            margin-right: 20px;
-            padding: 20px;
-            background-color: #282B30;
-            border-style: solid;
-            border-width: 1px;
-            border-color: #282B30;
-            border-radius: 10px;
+    .exp-cards, .pipe-cards {
+        .card{
             animation: slide-up 1s ease;
-
-            &.active, &:hover {
-                background-color: #2C3034;
-                border-color: #616467;
-            }
 
             .header {
                 position: absolute;
@@ -353,6 +259,7 @@
                 background-color: #26292D;
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
+
                 &>span {
                     padding-left: 15px;
                     font-size: 18px;
@@ -379,7 +286,6 @@
                 top: @header-height;
                 width: 100%;
                 height: ~"calc(100% - @{header-height})";
-                background-color: #2A2E32;
                 border-bottom-left-radius: 10px;
                 border-bottom-right-radius: 10px;
  
@@ -402,19 +308,8 @@
                 }
             }
 
-            .matrix {
-                position: absolute;
-                left: 140px;
-                top: @header-height;
-                width: ~"calc(100% - 140px)"; 
-                height: ~"calc(100% - @{header-height})";
-                // background-image: url(./public/imgs/matrix.PNG);
-                background-position: center;
-                background-size: 100%;
-                background-repeat: no-repeat;
-            }
-
             &.active, &:hover {
+                cursor: pointer;
                 .header>span {
                     color: @font-active-color;
                 }
@@ -424,6 +319,7 @@
             }
         }
     }
+
 
     .dot {
         cursor: pointer;
@@ -437,7 +333,6 @@
 
         &.active, &:hover {
             background-color: @dot-color-hover;
-
         }
     }
 }

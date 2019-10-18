@@ -12,19 +12,24 @@ export interface Experiment extends DT.Experiment {
   tagStats?: { [index: string]: number };
 }
 
+export interface Pipeline extends DT.Pipeline {
+  experimentNum: number;
+}
+
 export interface Project {
   name: string;
+  signalNum?: number;
   experiments: Experiment[];
   experimentNum: number;
   uniquePipelineNum: number;
-  pipelines: DT.Pipeline[];
+  pipelines: Pipeline[];
 }
 
 class PageLanding {
 
   public projects = ko.observableArray<Project>([]);
   public experiments = ko.observableArray<Experiment>([]);
-  public pipelines = ko.observableArray<DT.Pipeline>([]);
+  public pipelines = ko.observableArray<Pipeline>([]);
 
   // currently active
   public activeProject = ko.observable<Project>(null);
@@ -221,22 +226,44 @@ class PageLanding {
     let pipes = self.pipelines();
     let items = $('#page-slider .page');
     let done = false;
+
+    d3.selectAll('.card-link').remove();
+
     items.get(1).addEventListener(
       'transitionend',
-      () => { done = true; setTimeout(addLinks, 1000); },
+      () => { done = true; update(); },
       { once: true }
     );
 
     setTimeout(() => {
-      if (!done) { addLinks(); }
-    }, 3000);
+      if (!done) { update(); }
+    }, 1500);
+
+    function update(delay = 500) {
+      setTimeout(addLinks, 500);
+    }
 
     function addLinks() {
+      // for (let i = 0; i < exps.length; i++) {
+      //   for (let j = 0; j < pipes.length; j++) {
+      //     let dotExp = $(`.exp-row .dot[name=${exps[i].id}]`);
+      //     let dotPipe = $(`.pipe-row .dot[name=${pipes[j].id}]`);
+      //     if (dotExp.length === 0 || dotPipe.length === 0) {
+      //       update();
+      //       return;
+      //     }
+      //   }
+      // }
+
+      // at first, remove all the links
+      d3.selectAll('.card-link').remove();
+
+      // add links
       _.each(exps, exp => {
         _.each(pipes, pipe => {
           if (exp.pipeline !== pipe.name) { return; }
-          let dotExp = $(`.exp-row .dot[name=${exp.id}]`).offset();
-          let dotPipe = $(`.pipe-row .dot[name=${pipe.id}]`).offset();
+          let dotExpOffset = $(`.exp-row .dot[name=${exp.id}]`).offset();
+          let dotPipeOffset = $(`.pipe-row .dot[name=${pipe.id}]`).offset();
           let hh = $('header').height();
           let dh = $(`.exp-row .dot[name=${exp.id}]`).height() / 2;
           let curve = d3.line()
@@ -244,8 +271,8 @@ class PageLanding {
             .y(d => d[1])
             .curve(d3.curveBasis);
           let [x0, y0, x1, y1] = [
-            dotExp.left + dh, dotExp.top - hh + dh,
-            dotPipe.left + dh, dotPipe.top - hh + dh
+            dotExpOffset.left + dh, dotExpOffset.top - hh + dh,
+            dotPipeOffset.left + dh, dotPipeOffset.top - hh + dh
           ];
           let [xm0, ym0, xm1, ym1] = [x0, (y0 + y1) / 2, x1, (y0 + y1) / 2];
           let points = [[x0, y0], [xm0, ym0], [xm1, ym1], [x1, y1]] as [number, number][];
@@ -287,21 +314,55 @@ class PageLanding {
   private setupEventHandlers() {
     let self = this;
     // if any
+
+    pip.pageLanding.on('update:experiments', () => {
+      getProjects().then(projects => {
+        self.projects(projects);
+        let selectedProject = _.find(projects, d => d.name === self.activeProject().name);
+        let activeExperimentID = $(`.exp-row .card.active`).attr('name');
+        self.activeProject(selectedProject);
+        $(`.exp-row .card`).removeClass('active');
+        $(`.exp-row .dot`).removeClass('active');
+        $(`.pipe-row .card`).removeClass('active');
+        $(`.pipe-row .dot`).removeClass('active');
+        self.experiments(selectedProject.experiments);
+        self.pipelines(selectedProject.pipelines);
+        // self.initDotLinks();
+        self.visualize();
+        console.log(activeExperimentID, selectedProject.experiments);
+        let selectedExperiment = _.find(selectedProject.experiments, d => d.id === activeExperimentID);
+        self.onSelectCard('exp', selectedExperiment);
+      });
+    });
   }
 
   /**
    * Update KO observable variables when selecting a project
    */
   private selectProject(project: Project) {
+    let ap = this.activeProject();
+    if (ap && ap.name === project.name) {
+      return;
+    } // do nothing if select the name project
     this.activeProject(project);
     $(`.exp-row .card`).removeClass('active');
     $(`.exp-row .dot`).removeClass('active');
     $(`.pipe-row .card`).removeClass('active');
     $(`.pipe-row .dot`).removeClass('active');
-    d3.selectAll('.card-link').remove();
     this.experiments(project.experiments);
-    this.pipelines(project.pipelines);
-    this.initDotLinks();
+
+    let pipelines = project.pipelines;
+    _.each(pipelines, pipe => {
+      let count = 0;
+      for (let i = 0; i < project.experiments.length; i++) {
+        if (project.experiments[i].pipeline === pipe.name) { count++; }
+      }
+      pipe.experimentNum = count;
+    });
+
+    this.pipelines(_.cloneDeep(pipelines));
+
+    // this.initDotLinks();
     this.visualize();
   }
 
@@ -310,7 +371,8 @@ class PageLanding {
 
     let experiments = self.experiments();
     let maxTagNum = Number.MIN_SAFE_INTEGER;
-    let maxEventnum = Number.MIN_SAFE_INTEGER;
+    let maxEventNum = Number.MIN_SAFE_INTEGER;
+    let maxScore = Number.MIN_SAFE_INTEGER;
 
     _.each(experiments, exp => {
       let tagStats: { [index: string]: number } = {};
@@ -322,18 +384,22 @@ class PageLanding {
           if (!_.has(tagStats, tid)) { tagStats[tid] = 0; }
           tagStats[tid] += 1;
           maxTagNum = maxTagNum < tagStats[tid] ? tagStats[tid] : maxTagNum;
+
+          maxScore = maxScore > datarun.events[i].score ? maxScore : datarun.events[i].score;
+          maxEventNum = maxEventNum < datarun.events.length ? datarun.events.length : maxEventNum;
         }
       });
       exp.tagStats = tagStats;
-      maxEventnum = maxEventnum < exp.eventNum ? exp.eventNum : maxEventnum;
     });
 
 
     _.each(experiments, exp => {
-      self[exp.id] = new Matrix(
+      $(`.exp-row .matrix-container[name=${exp.id}]`).empty();
+      // self.matrixDict[exp.id] =
+      new Matrix(
         $(`.exp-row .matrix-container[name=${exp.id}]`)[0],
         exp,
-        { maxTagNum: maxTagNum, maxEventnum: maxEventnum }
+        { maxTagNum, maxEventNum, maxScore: Math.ceil(maxScore * 1.05) }
       );
     });
 

@@ -43,7 +43,7 @@ def get_datarun(datarun_doc):
     }
 
     # get raw
-    raw_docs = model.Raw.find(signal=datarun_doc.signal.id).order_by('+year')
+    raw_docs = model.Raw.find(datarun=datarun_doc.id).order_by('+year')
     for raw_doc in raw_docs:
         datarun['raw'].append({
             'timestamp': raw_doc.timestamp,
@@ -165,6 +165,8 @@ class Dataruns(Resource):
 
         try:
             dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
+            # sort by signal name
+            dataruns.sort(key=lambda x: x['signal'], reverse=False)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

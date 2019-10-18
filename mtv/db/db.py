@@ -4,11 +4,10 @@ from calendar import monthrange
 from datetime import datetime, timezone
 
 import numpy as np
-from gridfs import GridFS
+import pandas as pd
 from pymongo import MongoClient
 
 from mtv import model
-from mtv.db.data import load_signal
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,8 +39,8 @@ def copy_from(fromdb, todb, fromhost='localhost', fromport=27017,
     to_client = MongoClient(tohost, port=toport)
     from_client = MongoClient(fromhost, port=fromport)
 
-    cnames = ['comment', 'datarun', 'dataset', 'event', 'experiment',
-              'fs.chunks', 'fs.files', 'pipeline', 'signal']
+    cnames = ['comment', 'datarun', 'dataset', 'event',
+              'experiment', 'pipeline', 'signal']
 
     for cname in cnames:
         to_col = to_client[todb][cname]
@@ -59,32 +58,26 @@ def copy_from2(fromdb, todb, fromhost='localhost', fromport=27017,
     client.admin.command('copydb', fromdb=fromdb, todb=todb, fromhost=fromhost)
 
 
-def updateDB(database, interval=60, utc=True, impute=True):
-    fs = GridFS(database)
-
-    if not (60 % interval == 0 or interval % 60 == 0):
-        LOGGER.exception("Interval should equal to n (int) * 60.")
-        raise
-
-    # ----------- Handle prediction ------------- #
-    # updated by dataruns
+def update_db(fs, utc=True):
 
     # get datarun list
     dataruns = model.Datarun.find()
     cc = 0
     total = dataruns.count()
+
+    # updated by dataruns
     for datarun in dataruns:
         try:
             cc += 1
             LOGGER.info('{}/{}: Processing datarun {}'.format(cc, total, datarun.id))
 
+            # ------ Handle prediction -------- #
             if (model.Prediction.find_one(datarun=datarun.id) is not None):
                 continue
 
             v = dict()
             for grid_out in fs.find({'datarun_id': datarun.id}, no_cursor_timeout=True):
-                data = pickle.loads(grid_out.read())
-                v[grid_out.variable] = data
+                v[grid_out.variable] = pickle.loads(grid_out.read())
 
             data = list()
 
@@ -132,102 +125,73 @@ def updateDB(database, interval=60, utc=True, impute=True):
             }
 
             model.Prediction(**doc).save()
+
+            # ------ Handle Raw -------- #
+            if (utc):
+                year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
+                year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
+            else:
+                year_start = datetime.fromtimestamp(v['raw_index'][0]).year
+                year_end = datetime.fromtimestamp(v['raw_index'][-1]).year
+            
+            # construct dataframe from ndarrays
+            data = pd.DataFrame(data=v['X_raw'], index=v['raw_index'])
+
+            # optimal interval for periodical description
+            diff = (v['raw_index'][1] - v['raw_index'][0]) / 60
+            my_interval = 1440
+            for interval in [30, 60, 120, 180, 240, 360, 480, 720]:
+                if diff <= interval:
+                    my_interval = interval
+                    break
+            
+            day_bin_num = 24 * 60 // my_interval
+
+            docs = []
+            # year
+            for y in range(year_start, year_end + 1):
+                if (utc):
+                    dt = datetime(y, 1, 1, tzinfo=timezone.utc)
+                else:
+                    dt = datetime(y, 1, 1)
+
+                docs.append({
+                    'datarun': datarun.id,
+                    'timestamp': dt.timestamp(),
+                    'year': dt.year,
+                    'data': [None for i in range(12)]
+                })
+                # month
+                for m in range(1, 12 + 1):
+                    days = []
+                    # day
+                    for d in range(monthrange(y, m)[1]):
+                        days.append({'means': [], 'counts': []})
+                        # bin
+                        for n in range(day_bin_num):
+                            if (utc):
+                                st = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
+                                    + n * my_interval * 60
+                                ed = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
+                                    + (n + 1) * my_interval * 60
+                            else:
+                                st = datetime(y, m, d + 1).timestamp() \
+                                    + n * my_interval * 60
+                                ed = datetime(y, m, d + 1).timestamp() \
+                                    + (n + 1) * my_interval * 60
+                            mean = data.loc[st:ed - 1].mean(skipna=True)[0]
+                            count = data.loc[st:ed - 1].count()[0]
+                            if (count == 0):
+                                mean = 0
+                            days[-1]['means'].append(float(mean))
+                            days[-1]['counts'].append(int(count))
+                        # end of bin
+                    # end of day
+                    docs[-1]['data'][m - 1] = days
+                # end of month
+            # end of year
+            
+            model.Raw.insert_many(docs)
+
         except Exception as e:
             print(e)
-
-    # ----------- Handle raw ------------- #
-    # updated by signals
-
-    signals = model.Signal.find()
-    cc = 0
-    total = signals.count()
-    interval_options = [30, 60, 120, 180, 240, 360, 480, 720]
-
-    for signal in signals:
-
-        cc += 1
-        LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
-
-        if (model.Raw.find_one(signal=signal.id) is not None):
-            continue
-
-        data = load_signal(signal.data_location)
-        data = data.sort_values('timestamp').set_index('timestamp')
-        data = data.loc[signal.start_time:signal.stop_time]
-
-        if (utc):
-            year_start = datetime.utcfromtimestamp(data.index.values[0]).year
-            year_end = datetime.utcfromtimestamp(data.index.values[-1]).year
-        else:
-            year_start = datetime.fromtimestamp(data.index.values[0]).year
-            year_end = datetime.fromtimestamp(data.index.values[-1]).year
-
-        global_mean = data.mean(skipna=True)['value']
-
-        # compute average time interval
-        diff_sum = 0
-        for i in range(data.index.values.size - 1):
-            diff_sum += data.index.values[i + 1] - data.index.values[i]
-
-        diff_sum /= float(data.index.values.size - 1)
-        ave_interval = diff_sum / 60
-        my_interval = interval if ave_interval < interval else ave_interval / 60
-        if (ave_interval < interval):
-            my_interval = interval
-        else:
-            for op in interval_options:
-                if (op >= ave_interval):
-                    my_interval = op
-                    break
-
-        day_bin_num = 24 * 60 // my_interval
-
-        docs = []
-        # year
-        for y in range(year_start, year_end + 1):
-            if (utc):
-                dt = datetime(y, 1, 1, tzinfo=timezone.utc)
-            else:
-                dt = datetime(y, 1, 1)
-
-            docs.append({
-                'signal': signal.id,
-                'timestamp': dt.timestamp(),
-                'year': dt.year,
-                'data': [None for i in range(12)]
-            })
-            # month
-            for m in range(1, 12 + 1):
-                days = []
-                # day
-                for d in range(monthrange(y, m)[1]):
-                    days.append({'means': [], 'counts': []})
-                    # bin
-                    for n in range(day_bin_num):
-                        if (utc):
-                            st = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
-                                + n * my_interval * 60
-                            ed = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
-                                + (n + 1) * my_interval * 60
-                        else:
-                            st = datetime(y, m, d + 1).timestamp() \
-                                + n * my_interval * 60
-                            ed = datetime(y, m, d + 1).timestamp() \
-                                + (n + 1) * my_interval * 60
-                        mean = data.value.loc[st:ed - 1].mean()
-                        count = data.value.loc[st:ed - 1].count()
-                        if (count == 0):
-                            mean = 0
-                            # fill missing value
-                            if impute:
-                                mean = global_mean
-                                count = 1
-                        days[-1]['means'].append(float(mean))
-                        days[-1]['counts'].append(int(count))
-                    # end of bin
-                # end of day
-
-                docs[-1]['data'][m - 1] = days
-            # end of month
-        model.Raw.insert_many(docs)
-        # end of year

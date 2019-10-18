@@ -10,7 +10,7 @@
 }
 
 .select-level{
-    width: 150px;
+    width: 175px;
 }
 
 .select2 {
@@ -105,6 +105,9 @@
 
     .select2-selection--single .select2-selection__rendered{
         color: #fff;
+        i{
+            display: none;
+        }
     }
 
     &.select2-container--open{
@@ -117,6 +120,39 @@
         &.select2-container--open{
             .select2-selection--single{
                 border-bottom: 1px solid #fff !important;
+            }
+        }
+    }
+
+    i{
+        &.select{
+            border-radius: 100%;
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+
+            &.investigate{
+                background: #FFCD00;
+            }
+
+            &.not_investigate{
+                background: #7CA8FF;
+            }
+
+            &.postpone {
+                background: #A042FF
+            }
+            &.problem{
+                background: #F64242;
+            }
+            &.seen{
+                background: #F5FF00
+            }
+
+            &.normal {
+                background: #45F642;
             }
         }
     }

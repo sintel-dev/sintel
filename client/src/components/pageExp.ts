@@ -39,46 +39,43 @@ class PageExp {
 
   private data: dataPC.ChartDataEle[];
 
+  private selectedDatarun: DT.Datarun = null;
   private focusChart: LineChartFocus;
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
   private tagSelectionData = [
-    {
-      'text': 'Unknown',
-      'children': [
-        {
-          'id': 1,
-          'text': 'investigate'
-        },
-        {
-          'id': 2,
-          'text': 'do not investigate'
-        },
-        {
-          'id': 3,
-          'text': 'postpone'
-        }
-      ]
-    },
-    {
-      'text': 'Known',
-      'children': [
-        {
-          'id': 4,
-          'text': 'problem'
-        },
-        {
-          'id': 5,
-          'text': 'previously seen'
-        },
-        {
-          'id': 6,
-          'text': 'normal'
-        }
-      ]
-    }
-  ];
+  {
+    'text': 'Unknown',
+    'children': [{
+        'id': 1,
+        'text': '<i class="select investigate"></i>investigate'
+      },
+      {
+        'id': 2,
+        'text': '<i class="select not_investigate"></i>do not investigate'
+      },
+      {
+        'id': 3,
+        'text': '<i class="select postpone"></i>postpone'
+      }]
+  },
+  {
+    'text': 'Known',
+    'children': [{
+        'id': 4,
+        'text': '<i class="select problem"></i>problem'
+      },
+      {
+        'id': 5,
+        'text': '<i class="select seen"></i>previously seen'
+      },
+      {
+        'id': 6,
+        'text': '<i class="select normal"></i>normal'
+      }]
+  }
+];
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -160,7 +157,7 @@ class PageExp {
       });
     } else {
       // update existing
-      console.log(self.selectedTagID, self.fromSelectionIDtoTag(self.selectedTagID));
+      // console.log(self.selectedTagID, self.fromSelectionIDtoTag(self.selectedTagID));
       server.events.update<DT.Event>(self.event(), {
         start_time: Math.trunc(self.eventInfo.start_time / 1000),
         stop_time: Math.trunc(self.eventInfo.stop_time / 1000),
@@ -191,6 +188,7 @@ class PageExp {
     let self = this;
     self.focus(name);
     let d = _.find(self.data, o => o.datarun.signal === name);
+    self.selectedDatarun = d.datarun;
 
     // update focus
     self.focusChart.trigger('data:update', [d]);
@@ -201,7 +199,8 @@ class PageExp {
       'update',
       [{
         name: d.datarun.signal,
-        info: d.period
+        info: d.period,
+        events: d.datarun.events
       }]
     );
     $(`.chart-ctx .title`).parent().removeClass('ctx-active');
@@ -234,6 +233,12 @@ class PageExp {
   }
 
   public eventsHandler(content, event) {
+    const state = event.target.checked;
+
+    // @TODO - space for improvements - animations/code optimisation
+    this.periodCharts['year'].trigger('showPeriod', state);
+    this.periodCharts['month'].trigger('showPeriod', state);
+    this.periodCharts['day'].trigger('showPeriod', state);
     return true;
   }
 
@@ -281,36 +286,34 @@ class PageExp {
     return true;
   }
 
-  public zooming(factor) {
-    this.focusChart.trigger('zooming', factor);
-    return true;
-  }
 
   private showDatasetInfo(visible) {
-    visible ? $('#datasetDescription').addClass('active') :
-      $('#datasetDescription').removeClass('active');
     if (visible) {
       $('#datasetDescription').addClass('active');
       this.initTagSelectionMenu();
-
-      // const DropdownList = (document.getElementById('selectLevel')) as HTMLSelectElement;
-      // DropdownList.selectedIndex = 3;
     } else {
+      $('#selectLevel').empty();
+      $('#selectLevel').append('<option></option>');
       $('#datasetDescription').removeClass('active');
     }
   }
 
   private initTagSelectionMenu() {
+    $('#selectLevel').empty();
+    $('#selectLevel').append('<option></option>');
     let s2 = $('#selectLevel').select2({
       minimumResultsForSearch: Infinity,
       placeholder: 'Select a tag',
-      data: this.tagSelectionData
+      data: this.tagSelectionData,
+      escapeMarkup: markup => markup
     });
     // console.log(this.eventInfo.tag, this.fromTagToSelectionID(this.eventInfo.tag));
     this.selectedTagID = undefined;
     let tagID = this.fromTagToSelectionID(this.eventInfo.tag);
     if (tagID !== 'untagged') {
       s2.val(tagID).trigger('change');
+    } else {
+      $('.select-line .indicator').attr('class', 'indicator untagged');
     }
   }
 
@@ -318,22 +321,16 @@ class PageExp {
     switch (id) {
       case '1':
         return 'investigate';
-        break;
       case '2':
         return 'do not investigate';
-        break;
       case '3':
         return 'postpone';
-        break;
       case '4':
         return 'problem';
-        break;
       case '5':
         return 'previously seen';
-        break;
       case '6':
         return 'normal';
-        break;
       default:
         return 'untagged';
     }
@@ -343,27 +340,20 @@ class PageExp {
     switch (tag) {
       case 'investigate':
         return '1';
-        break;
       case 'do not investigate':
         return '2';
-        break;
       case 'postpone':
         return '3';
-        break;
       case 'problem':
         return '4';
-        break;
       case 'previously seen':
         return '5';
-        break;
       case 'normal':
         return '6';
-        break;
       default:
         return 'untagged';
     }
   }
-
 
   private init() {
     this.ctxs([]);
@@ -406,6 +396,15 @@ class PageExp {
       _.each(self.ctxCharts, ct => {
         ct.trigger('event:update');
       });
+      server.events.read<{events: DT.Event[]}>(
+        {},
+        { datarun_id: self.selectedDatarun.id }
+      ).done((data) => {
+        self.periodCharts['year'].trigger('event:update', data.events);
+        self.periodCharts['month'].trigger('event:update', data.events);
+        self.periodCharts['day'].trigger('event:update', data.events);
+      });
+
     });
 
     pip.pageExp.on('event:modify', (evt) => {
@@ -425,6 +424,9 @@ class PageExp {
 
     $('select[name="level"]').change(function (e) {
       self.selectedTagID = $('#selectLevel option:selected').val() as string;
+      // update indicator color
+      let indicator = $('.select-line .indicator');
+      indicator.attr('class', `indicator id${self.selectedTagID}`);
     });
   }
 
@@ -479,6 +481,8 @@ class PageExp {
       self.ctxs(_.map(data, d => d.datarun.signal));
 
       // Select the first ctx chart by default
+      // self.selectCtx(data[0].datarun.signal);
+      self.selectedDatarun = data[0].datarun;
       self.focus(data[0].datarun.signal);
       $(`.chart-ctx .title`).first().parent().addClass('ctx-active');
       $('#periodView').text(data[0].datarun.signal);
@@ -553,6 +557,7 @@ class PageExp {
         [{
           name: data[0].datarun.signal,
           info: data[0].period,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -565,7 +570,8 @@ class PageExp {
         $('#month')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children
+          info: data[0].period[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -578,7 +584,8 @@ class PageExp {
         $('#day')[0],
         [{
           name: data[0].datarun.signal,
-          info: data[0].period[0].children[0].children
+          info: data[0].period[0].children[0].children,
+          events: data[0].datarun.events
         }],
         {
           width: $('.pchart').width(),
@@ -601,24 +608,37 @@ class PageExp {
 
       // update period-chart
       ($(`a[href="#year"]`) as any).tab('show');
-      self.periodCharts['year'].trigger(
-        'update',
-        [{
-          name: d.datarun.signal,
-          info: d.period
-        }]
-      );
+      server.events.read<{events: DT.Event[]}>(
+        {},
+        { datarun_id: d.datarun.id }
+      ).done((edata) => {
+        self.periodCharts['year'].trigger(
+          'update',
+          [{
+            name: d.datarun.signal,
+            info: d.period,
+            events: edata.events
+          }]
+        );
+      });
     }
 
     // ******* handle chart events *********
-    self.periodCharts['year'].on('select', (o) => {
+    self.periodCharts['year'].on('select', async (o) => {
       let newData = [];
       let d = _.find(data, dd => dd.datarun.signal === self.focus());
+      let edata: {events: DT.Event[]} = await server.events.read<any>(
+        {},
+        { datarun_id: d.datarun.id }
+      );
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.name) { continue; }
+
+
         newData.push({
           name: d.datarun.signal,
-          info: d.period[i].children
+          info: d.period[i].children,
+          events: edata.events
         });
       }
       // switch tab
@@ -628,16 +648,21 @@ class PageExp {
       self.periodCharts['month'].trigger('update', newData);
     });
 
-    self.periodCharts['month'].on('select', (o) => {
+    self.periodCharts['month'].on('select', async (o) => {
       let newData = [];
       let d = _.find(self.data, dd => dd.datarun.signal === self.focus());
+      let edata: {events: DT.Event[]} = await server.events.read<any>(
+        {},
+        { datarun_id: d.datarun.id }
+      );
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.parent.name) { continue; }
         for (let j = 0; j < d.period[i].children.length; j++) {
           if (d.period[i].children[j].name !== o.name) { continue; }
           newData.push({
             name: d.datarun.signal,
-            info: d.period[i].children[j].children
+            info: d.period[i].children[j].children,
+            events: edata.events
           });
         }
       }

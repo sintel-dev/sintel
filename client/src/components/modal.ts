@@ -112,7 +112,6 @@ class Modal {
 
   public save() {
     let self = this;
-
     if (self.event() === 'new') {
       // create new
       server.events.create<any>({

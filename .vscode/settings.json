@@ -1,6 +1,6 @@
 {
     "restructuredtext.confPath": "",
-    "python.pythonPath": "D:\\coding_tools\\anaconda3\\envs\\mtv\\python.exe",
+    "python.pythonPath": "/Users/dyu/anaconda3/envs/mtv/bin/python",
     "code-runner.executorMap": {
         "python": "D:\\coding_tools\\anaconda3\\envs\\mtv\\python.exe"
     },

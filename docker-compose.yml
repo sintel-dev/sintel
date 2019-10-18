@@ -2,7 +2,7 @@ version: "3"
 services:
   db:
     image: mongo:4.0
-    container_name: db
+    container_name: mtv-db
     ports:
       - "127.0.0.1:27018:27017"
     # command: mongod --port 27017 --dbpath /mtv/db-instance/data --logpath /mtv/db-instance/log/db.log --fork
@@ -14,8 +14,8 @@ services:
       - ./db-instance/log:/mtv/log
       - ./db-instance/dump:/mtv/dump
   web:
-    # image: dyuliu/mtv
-    build: .
+    image: mtv
+    # build: .
     container_name: mtv
     depends_on:
       - db

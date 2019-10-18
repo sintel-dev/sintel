@@ -58,42 +58,37 @@ init-db: clean-db
 	mkdir -p db-instance/log
 	mkdir -p db-instance/dump
 
-.PHONY: load-db-nasa
-load-db-nasa: init-db
-	rm -f -r db-instance/dump/nasa/
-	curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
-	tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
-	mongorestore --db mtv ./db-instance/dump/nasa/
-
 .PHONY: load-db-mtv
 load-db-mtv: init-db
-	rm -f -r db-instance/dump/mtv/
+	rm -f -r db-instance/data/mtv/
 	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
-	tar -xf mtv.tar.bz2 -C ./db-instance/dump/ && rm mtv.tar.bz2
-	mongorestore --db mtv ./db-instance/dump/mtv/
+	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
+	mongorestore --db mtv ./db-instance/data/mtv/
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
 docker-db-up: init-db	## download and 
 	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
-	tar -xf mtv.tar.bz2 -C ./db-instance/dump/ && rm mtv.tar.bz2
+	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	docker-compose -f docker-compose-db.yml up
-	# curl -o nasa.tar.bz2 "http://dongyu.name/data/nasa"
-	# tar -xf nasa.tar.bz2 -C ./db-instance/dump/ && rm nasa.tar.bz2
-	# mv ./db-instance/dump/nasa ./db-instance/dump/mtv
-	# docker-compose -f docker-compose-db.yml up
-
-.PHONY: docker-clean
-docker-clean: 			## clean the related containers and volumes
-	docker-compose down -v
 
 .PHONY: docker-up
-docker-up: 				## run mtv with docker
+docker-up: 				## set up
 	docker-compose up -d
 
+.PHONY: docker-start
+	docker-compose start
+
+.PHONY: docker-stop
+	docker-compose stop
+
 .PHONY: docker-down
-docker-down: 			## stop mtv
-	docker-compose down
+docker-clean: 			## remove containers, volumes, and networks
+	docker-compose down -v
+
+.PHONY: docker-clean
+docker-clean: 			## remove containers, volumes, networks, and images
+	docker-compose down -v --rmi all
 
 # ----------------------- session: test ----------------------- #
 
@@ -227,9 +222,4 @@ clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
 
-.PHONY: clean-docker
-clean-docker:
-	docker-compose down -v
-	docker image remove -f dyuliu/mtv
-	docker image remove -f mongo:4.0
 
