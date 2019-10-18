@@ -74,9 +74,9 @@ class Comment(Resource):
                 text = request.form['text']
 
         # validate
-        if text is None or text == '':
-            LOGGER.exception('Error updating comment. Lack of comment content.')
-            return {'message': 'Lack of comment content.'}, 400
+        # if text is None or text == '':
+        #     LOGGER.exception('Error updating comment. Lack of comment content.')
+        #     return {'message': 'Lack of comment content.'}, 400
 
         # get data from db
         try:
