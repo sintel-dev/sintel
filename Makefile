@@ -77,13 +77,15 @@ docker-up: 				## set up
 	docker-compose up -d
 
 .PHONY: docker-start
+docker-start:
 	docker-compose start
 
 .PHONY: docker-stop
+docker-stop:
 	docker-compose stop
 
 .PHONY: docker-down
-docker-clean: 			## remove containers, volumes, and networks
+docker-down: 			## remove containers, volumes, and networks
 	docker-compose down -v
 
 .PHONY: docker-clean
