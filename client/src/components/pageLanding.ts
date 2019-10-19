@@ -319,6 +319,16 @@ class PageLanding {
       getProjects().then(projects => {
         self.projects(projects);
         let selectedProject = _.find(projects, d => d.name === self.activeProject().name);
+        let pipelines = selectedProject.pipelines;
+        _.each(pipelines, pipe => {
+          let count = 0;
+          for (let i = 0; i < selectedProject.experiments.length; i++) {
+            if (selectedProject.experiments[i].pipeline === pipe.name) { count++; }
+          }
+          pipe.experimentNum = count;
+        });
+        self.pipelines(pipelines);
+
         let activeExperimentID = $(`.exp-row .card.active`).attr('name');
         self.activeProject(selectedProject);
         $(`.exp-row .card`).removeClass('active');
@@ -326,10 +336,8 @@ class PageLanding {
         $(`.pipe-row .card`).removeClass('active');
         $(`.pipe-row .dot`).removeClass('active');
         self.experiments(selectedProject.experiments);
-        self.pipelines(selectedProject.pipelines);
         // self.initDotLinks();
         self.visualize();
-        console.log(activeExperimentID, selectedProject.experiments);
         let selectedExperiment = _.find(selectedProject.experiments, d => d.id === activeExperimentID);
         self.onSelectCard('exp', selectedExperiment);
       });
