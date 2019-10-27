@@ -43,7 +43,7 @@ export class PeriodChart extends pip.Events {
     minSize: 6,
     missing: false,
     circleStroke: 1,
-    dayLevelTranslate: 40,
+    dayLevelTranslate: 30,
     isPeriodVisible: true,
     colSpace: 10,
     rowSpace: 30
@@ -78,15 +78,18 @@ export class PeriodChart extends pip.Events {
     const {nCol, rowSpace, colSpace} = self.option;
     const rowsCount = Math.ceil(data[0].info.length / nCol);
     let diffSize = elementWidth - elementHeight;
+    let size = 0;
+    self.option.height = elementHeight;
 
-    if (diffSize > 0) {
-      self.option.size = (elementHeight - (diffSize / rowsCount) - (rowsCount * rowSpace)) / rowsCount;
-      if (self.data[0].info[0].level === 'day') {
-        self.option.size = (elementHeight - ((diffSize / rowsCount) + (rowsCount * rowSpace) + self.option.dayLevelTranslate )) / rowsCount;
+    if(diffSize > 0) { // width is bigger than height
+      size = (elementHeight - ((rowsCount * rowSpace) + (diffSize / rowsCount))) / rowsCount;
+      if (self.data[0].info[0].level === 'day') { // day level needs an additional top space
+        size = (elementHeight - ((rowsCount * rowSpace) + self.option.dayLevelTranslate + (diffSize / rowsCount))) / rowsCount;
       }
     } else {
-      self.option.size = (elementWidth - 2 - ((nCol - 1)  * colSpace))  / nCol;
+      size = (elementWidth - 2 - ((nCol - 1) * colSpace) + diffSize/nCol) / nCol;
     }
+    self.option.size = size;
   }
 
   private plot() {
@@ -296,6 +299,7 @@ export class PeriodChart extends pip.Events {
   }
 
   private addLabels(g, size) {
+    const textOffset = 10;
     let self = this;
     if (self.data[0].info[0].level === 'day') {
       let names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -307,7 +311,7 @@ export class PeriodChart extends pip.Events {
         .enter()
         .append('text')
         .attr('class', 'radial-text-md weekday-text')
-        .attr('x', d => d * size + size / 2)
+        .attr('x', d => d * (size + self.option.colSpace) + size / 2 - textOffset)
         .attr('y', 0)
         .text(d => names[d]);
     }
