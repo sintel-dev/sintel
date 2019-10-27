@@ -81,13 +81,13 @@ export class PeriodChart extends pip.Events {
     let size = 0;
     self.option.height = elementHeight;
 
-    if(diffSize > 0) { // width is bigger than height
+    if (diffSize > 0) { // width is bigger than height
       size = (elementHeight - ((rowsCount * rowSpace) + (diffSize / rowsCount))) / rowsCount;
       if (self.data[0].info[0].level === 'day') { // day level needs an additional top space
         size = (elementHeight - ((rowsCount * rowSpace) + self.option.dayLevelTranslate + (diffSize / rowsCount))) / rowsCount;
       }
     } else {
-      size = (elementWidth - 2 - ((nCol - 1) * colSpace) + diffSize/nCol) / nCol;
+      size = (elementWidth - 2 - ((nCol - 1) * colSpace) + diffSize / nCol) / nCol;
     }
     self.option.size = size;
   }
@@ -122,7 +122,7 @@ export class PeriodChart extends pip.Events {
     let { featurePlot } = self.addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius);
 
     // add labels
-    let { label1} = self.addLabels(g, size);
+    let { label1 } = self.addLabels(g, size);
 
     // ************  events  ************
     self.on('update', update);
