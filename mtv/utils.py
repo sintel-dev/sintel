@@ -3,13 +3,14 @@ import json
 import logging
 import os
 
-from yaml import load, dump
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
-
 from bson import ObjectId
+from yaml import load
+
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+
 
 LOGGER = logging.getLogger(__name__)
 
