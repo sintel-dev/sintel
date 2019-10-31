@@ -194,10 +194,17 @@
             transform: translateX(0%);
         }
 
-        .select-line{
-            div {
-                display: inline-block;
+        .select-line {
+            ul {
+                li{
+                    display: inline-block;
+                    vertical-align: middle;
+                    span.select2{
+                        display: block
+                    }
+                }
             }
+
             .indicator {
                 border-radius: 100%;
                 width: 15px;
@@ -207,7 +214,6 @@
                 margin-bottom: 5px;
                 vertical-align: middle;
 
-    
                 &.id1{
                     background: #FFCD00;
                 }

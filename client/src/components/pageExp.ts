@@ -102,7 +102,7 @@ class PageExp {
     $('.chart-focus-container').height(this.config.focusHeight);
     $('.chart-focus .plot').height(this.config.focusHeight); // - 45);
     $('.chart-ctx-container').height(this.config.ctxHeight);
-    $('.pchart').height($('.connectedSortable').height() + 'px');
+    $('.pchart').height(($('.connectedSortable.ui-sortable').height() - 40) + 'px');
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
   }
@@ -669,7 +669,7 @@ class PageExp {
       }
       // switch tab
       ($('a[href="#month"]') as any).tab('show');
-
+      
       // update
       self.periodCharts['month'].trigger('update', newData);
     });
