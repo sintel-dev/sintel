@@ -480,10 +480,7 @@ class PageExp {
         break;
       case 'month':
           start_time = new Date(period.parent.name, months.indexOf(period.name), 1).getTime();
-          //yet to be covered
-          stop_time = new Date(period.parent.name, months.indexOf(period.name), 0).getTime();
-
-          debugger;
+          stop_time = new Date(period.parent.name, months.indexOf(period.name) + 1, 0).getTime();
           break;
     }
 
