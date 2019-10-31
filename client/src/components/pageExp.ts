@@ -45,6 +45,10 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
+  private period = {
+    start_time: null,
+    stop_time: null
+  }
   private tagSelectionData = [
   {
     'text': 'Unknown',
@@ -465,6 +469,31 @@ class PageExp {
     self.showDatasetInfo(true);
   }
 
+  private updateBrushPeriod(period) {
+    let start_time = 0;
+    let stop_time = 0;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    switch(period.level) {
+      case 'year':
+        start_time = new Date(period.name).getTime();
+        stop_time = new Date(period.name, 11, 31).getTime();
+        break;
+      case 'month':
+          start_time = new Date(period.parent.name, months.indexOf(period.name), 1).getTime();
+          stop_time = new Date(period.parent.name, months.indexOf(period.name) + 1, 0).getTime();
+          break;
+    }
+
+    this.period = {
+      start_time,
+      stop_time
+    }
+
+    _.each(this.ctxCharts, ct => {
+      ct.trigger('brush:selectedPeriod', this.period)
+    });
+  }
+
   /**
    * Invoked on receiving signal 'experiment:change'
    * @param exp The selected experiment
@@ -628,14 +657,10 @@ class PageExp {
     self.periodCharts['year'].on('select', async (o) => {
       let newData = [];
       let d = _.find(data, dd => dd.datarun.signal === self.focus());
-      let edata: {events: DT.Event[]} = await server.events.read<any>(
-        {},
-        { datarun_id: d.datarun.id }
-      );
+      let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
+      self.updateBrushPeriod(o)
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.name) { continue; }
-
-
         newData.push({
           name: d.datarun.signal,
           info: d.period[i].children,
@@ -652,10 +677,8 @@ class PageExp {
     self.periodCharts['month'].on('select', async (o) => {
       let newData = [];
       let d = _.find(self.data, dd => dd.datarun.signal === self.focus());
-      let edata: {events: DT.Event[]} = await server.events.read<any>(
-        {},
-        { datarun_id: d.datarun.id }
-      );
+      let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
+      self.updateBrushPeriod(o)
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.parent.name) { continue; }
         for (let j = 0; j < d.period[i].children.length; j++) {

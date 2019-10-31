@@ -284,7 +284,7 @@ export class LineChartFocus extends pip.Events {
       savedZoom = t;
 
       x.domain(t.rescaleX(copyX).domain());
-
+      
       // update normal line
       focus.selectAll<any, dataPC.ChartDataEle>('.line')
         .attr('d', d => line(d.timeseries));

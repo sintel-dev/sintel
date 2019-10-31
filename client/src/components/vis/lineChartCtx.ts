@@ -168,6 +168,11 @@ export class LineChartCtx extends pip.Events {
       brush.on('brush end', brushHandler);
     });
 
+    self.on('brush:selectedPeriod', period => {
+      const {start_time, stop_time} = period;
+      bUpdate([x(start_time) < 0 ? 0 : x(start_time), x(stop_time)])
+    })
+
     self.on('data:update', dataUpdateHandler);
 
     self.on('event:update', eventUpdateHandler);
@@ -176,8 +181,8 @@ export class LineChartCtx extends pip.Events {
     function brushHandler() {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') { return; } // ignore brush-by-zoom
       let s = d3.event.selection || x.range();
-
-
+   
+      // top chart brush handler
       pip.pageExp.trigger('ctx:brush', {
         xMove: [s[0], s[1]],
         xDomain: [x.invert(s[0]), x.invert(s[1])],
@@ -255,7 +260,7 @@ export class LineChartCtx extends pip.Events {
       .attr('class', 'brush')
       .call(brush)
       .call(brush.move, x.range());
-
+      
     let update = function (range) {
       brushG.call(brush.move, range);
     };
