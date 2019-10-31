@@ -63,16 +63,15 @@ export class PeriodChart extends pip.Events {
     _.extend(self.option, option);
     self.svgContainer = d3.select<HTMLElement, any>(ele);
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
-    self.scaleGlyphs($(ele), data);
+    self.layoutGlyphs($(ele), data);
 
     // append svg to the container
-    self.svg = self.svgContainer.append<SVGElement>('svg')
-      .attr('class', 'multi-period-chart');
+    self.svg = self.svgContainer.append<SVGElement>('svg').attr('class', 'multi-period-chart');
     self.plot();
   }
 
-  private scaleGlyphs(ele, data) {
-    const elementWidth = $('.pchart').width();
+  private layoutGlyphs(ele, data) {
+    const elementWidth = this.option.width;
     const elementHeight = ele.height();
     const self = this;
     const {nCol, rowSpace, colSpace} = self.option;
@@ -82,12 +81,15 @@ export class PeriodChart extends pip.Events {
     self.option.height = elementHeight;
 
     if (diffSize > 0) { // width is bigger than height
-      size = (elementHeight - ((rowsCount * rowSpace) + (diffSize / rowsCount))) / rowsCount;
+      size = (elementHeight - ((rowsCount * rowSpace))) / rowsCount;
       if (self.data[0].info[0].level === 'day') { // day level needs an additional top space
         size = (elementHeight - ((rowsCount * rowSpace) + self.option.dayLevelTranslate + (diffSize / rowsCount))) / rowsCount;
       }
     } else {
-      size = (elementWidth - 2 - ((nCol - 1) * colSpace) + diffSize / nCol) / nCol;
+      size = (elementWidth - 2 - ((nCol - 1) * colSpace)) / nCol;
+      if (size * rowsCount * rowSpace > elementHeight) {
+        size = size - (elementHeight / (rowsCount * rowSpace));
+      }
     }
     self.option.size = size;
   }
