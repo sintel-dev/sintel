@@ -48,7 +48,7 @@ class PageExp {
   private period = {
     start_time: null,
     stop_time: null
-  }
+  };
   private tagSelectionData = [
   {
     'text': 'Unknown',
@@ -473,7 +473,7 @@ class PageExp {
     let start_time = 0;
     let stop_time = 0;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    switch(period.level) {
+    switch (period.level) {
       case 'year':
         start_time = new Date(period.name).getTime();
         stop_time = new Date(period.name, 11, 31).getTime();
@@ -487,10 +487,10 @@ class PageExp {
     this.period = {
       start_time,
       stop_time
-    }
+    };
 
     _.each(this.ctxCharts, ct => {
-      ct.trigger('brush:selectedPeriod', this.period)
+      ct.trigger('brush:selectedPeriod', this.period);
     });
   }
 
@@ -658,7 +658,7 @@ class PageExp {
       let newData = [];
       let d = _.find(data, dd => dd.datarun.signal === self.focus());
       let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
-      self.updateBrushPeriod(o)
+      self.updateBrushPeriod(o);
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.name) { continue; }
         newData.push({
@@ -669,7 +669,7 @@ class PageExp {
       }
       // switch tab
       ($('a[href="#month"]') as any).tab('show');
-      
+
       // update
       self.periodCharts['month'].trigger('update', newData);
     });
@@ -678,7 +678,7 @@ class PageExp {
       let newData = [];
       let d = _.find(self.data, dd => dd.datarun.signal === self.focus());
       let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
-      self.updateBrushPeriod(o)
+      self.updateBrushPeriod(o);
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.parent.name) { continue; }
         for (let j = 0; j < d.period[i].children.length; j++) {

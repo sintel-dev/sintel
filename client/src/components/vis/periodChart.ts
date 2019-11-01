@@ -63,7 +63,7 @@ export class PeriodChart extends pip.Events {
     _.extend(self.option, option);
     self.svgContainer = d3.select<HTMLElement, any>(ele);
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
-    $(ele).height(($('.pchart').height() - 80) + 'px') // firefox bug
+    $(ele).height(($('.pchart').height() - 80) + 'px'); // firefox bug
     self.layoutGlyphs($(ele), data);
 
     // append svg to the container
@@ -813,10 +813,12 @@ export class PeriodChart extends pip.Events {
           .attr('class', 'radial-text-md')
           .text(o.name)
           .attr('x', function (data, arg, svgEls) {
-            const textOffset = ~~(svgEls[0].getBBox().width)
+            // tslint:disable-next-line
+            const textOffset = ~~(svgEls[0].getBBox().width);
             return -(textOffset / 2);
           })
           .attr('y', (data, arg, svgEls) => {
+            // tslint:disable-next-line
             const textOffset = ~~(svgEls[0].getBBox().height);
             return size / 2 + textOffset;
           });
