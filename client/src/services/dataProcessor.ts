@@ -40,8 +40,10 @@ export interface PeriodChartDataEle {
 export async function getDataruns(exp: DT.Experiment): Promise<ChartDataEle[]> {
   let {dataruns} = await server.dataruns.read<{dataruns: DT.Datarun[]}>({}, { experiment_id: exp.id });
 
+  let cc = 0;
   let res: ChartDataEle[] = [];
   _.each(dataruns, datarun => {
+    console.log(cc++, datarun.signal);
     let timeseries = _toTimeSeriesData(datarun.prediction, 'y_raw');
     let timeseriesPred = _toTimeSeriesData(datarun.prediction, 'y_raw_hat');
     let timeseriesErr = _toTimeSeriesData(datarun.prediction, 'es_raw');
