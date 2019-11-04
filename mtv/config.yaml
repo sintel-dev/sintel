@@ -4,14 +4,14 @@
 # mtv
 host: 'localhost' # mongodb server address
 port: 27017  # mongodb server port
-db: 'mtv-cms-sample'  # database name
+db: 'mtv'  # database name
 username:  # for auth
 password:  # for auth
 
 # orion
 or_host: 'localhost'   # mongodb server address
 or_port: 27017  # mongodb server port
-or_db: 'orion-cms-sample'  # database name
+or_db: 'orion'  # database name
 or_username:  # for auth
 or_password:  # for auth
 
