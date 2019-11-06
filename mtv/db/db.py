@@ -61,7 +61,7 @@ def copy_from2(fromdb, todb, fromhost='localhost', fromport=27017,
 def update_db(fs, utc=True):
 
     # get datarun list
-    dataruns = model.Datarun.find()
+    dataruns = model.Datarun.find({}).timeout(False)
     cc = 0
     total = dataruns.count()
 
