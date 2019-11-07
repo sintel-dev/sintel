@@ -25,6 +25,7 @@ export interface Option {
   isPeriodVisible?: boolean;
   colSpace?: number;
   rowSpace?: number;
+  grouppedEvents?: Object;
 }
 
 export class PeriodChart extends pip.Events {
@@ -46,8 +47,8 @@ export class PeriodChart extends pip.Events {
     dayLevelTranslate: 30,
     isPeriodVisible: true,
     colSpace: 10,
-    rowSpace: 30
-
+    rowSpace: 30,
+    grouppedEvents: {}
   };
 
   private svgContainer: d3.Selection<HTMLElement, any, any, any>;
@@ -103,6 +104,8 @@ export class PeriodChart extends pip.Events {
     let outerRadius = (size / 2) - (padding / 2);
     let innerRadius = Math.max(outerRadius / 8, option.minSize);
 
+    self.groupEvents();
+
     // layout setting
     _.each(self.data, d => {
       _.each(d.info, (dd, i) => {
@@ -140,6 +143,7 @@ export class PeriodChart extends pip.Events {
         o = self.data;
       }
       self.normalize();
+      self.groupEvents();
 
       if (o[0].info[0].level === 'year') {
         let newHeight = size * Math.ceil((o[0].info.length) / nCol);
@@ -343,128 +347,221 @@ export class PeriodChart extends pip.Events {
     return datum / 1000;
   };
 
-  /**
-   * @TODO - if possible, make a single function out of those three
-  * (groupEventPerYear, groupEventsPerMonth, groupEventsPerDay)
-  * should be something like groupEvents(criteria) where criteria = year or month or day
-  */
-  private groupEventsPerYear(year) {
-    const self = this;
-    const events = self.data[0].events;
-    const eventsPerYear = [];
+  private groupEvents() {
+      const result = {};
+      const self = this;
+      const events = self.data[0].events;
+      events.forEach(event => {
+          const {start_time, stop_time} = event;
+          const eventStartYear = new Date(start_time * 1000).getFullYear();
+          const eventStopYear = new Date(stop_time * 1000).getFullYear();
+          let currentYear = eventStartYear;
 
-    events.forEach(evt => {
-      const startYear = new Date(evt.start_time * 1000).getFullYear();
-      const endYear = new Date(evt.stop_time * 1000).getFullYear();
+          while (currentYear <= eventStopYear) {
+            const yearStartDate = self.toTimestamp(`01/01/${currentYear} 00:00:00`);
+            const yearStopDate = self.toTimestamp(`12/31/${currentYear} 23:59:59`);
+            const eventProps = {
+              id: event.id,
+              start_time: start_time >= yearStartDate ? start_time : yearStartDate,
+              stop_time: stop_time <= yearStopDate ? stop_time : yearStopDate,
+              tag: event.tag,
+              score: event.score
+            };
 
-      const eventPeriod = {
-        startDate: new Date(evt.start_time * 1000).toDateString(),
-        stopDate: new Date(evt.stop_time * 1000).toDateString()
-      };
+            if (result[currentYear]) {
+              result[currentYear]['events'][event.id] = eventProps;
+            } else {
+              result[currentYear] = {
+                events: {[event.id]: eventProps},
+                months: {}
+              };
+            }
 
-      let currentYear = startYear;
+            const eventStartMonth = new Date(result[currentYear].events[event.id].start_time * 1000).getMonth() + 1;
+            const eventStopMonth = new Date(result[currentYear].events[event.id].stop_time * 1000).getMonth() + 1;
+            let currentMonth = eventStartMonth;
 
-      while (currentYear <= endYear) {
-        const maxYearDate = self.toTimestamp(`12/31/${currentYear} 23:59:59`);
-        const minYearDate = self.toTimestamp(`01/01/${currentYear} 00:00:00`);
+            while (currentMonth <= eventStopMonth) {
+                const maxDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+                const monthDateStart = self.toTimestamp(`${currentMonth}/01/${currentYear} 00:00:00`);
+                const monthDateStop = self.toTimestamp(`${currentMonth }/${maxDaysInMonth}/${currentYear} 23:59:59`);
 
-        eventsPerYear.push({
-          [currentYear]: {
-            id: evt.id,
-            score: evt.score,
-            start_time: startYear === currentYear ? evt.start_time : minYearDate,
-            stop_time: endYear === currentYear ? evt.stop_time : maxYearDate,
-            tag: evt.tag,
-            eventPeriod
-          }
-        });
-        currentYear++;
-      }
-    });
+                let month = {
+                  id: event.id,
+                  start_time: start_time >= monthDateStart ? start_time : monthDateStart,
+                  stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
+                  tag: event.tag,
+                  score: event.score,
+                  days: {}
+                };
 
-    return eventsPerYear.filter(event => event[year]);
+                const eventStartDay = new Date(month.start_time * 1000).getDate();
+                const eventStopDay = new Date(month.stop_time * 1000).getDate();
+                let currentDay = eventStartDay;
+
+                result[currentYear].months[currentMonth] = month;
+
+                while (currentDay <= eventStopDay) {
+                    const dayDateStart = self.toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 00:00:00`);
+                    const dayDateStop = self.toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 23:59:59`);
+
+                    let day = {
+                      id: event.id,
+                      start_time: start_time >= dayDateStart ? start_time : dayDateStart,
+                      stop_time: stop_time <= dayDateStop ? stop_time : dayDateStop,
+                      tag: event.tag,
+                      score: event.score,
+                    };
+
+                    result[currentYear].months[currentMonth].days[currentDay] = day;
+                    currentDay++;
+                }
+                currentMonth++;
+            }
+            currentYear++;
+        }
+      });
+      self.option.grouppedEvents = result;
   }
 
-  private groupEventsPerMonth(monthName, year) {
+  private drawArc = (eventProps, interval, arc, target) => {
     const self = this;
-    const eventsPerMonth = [];
+
+    const PI = Math.PI;
+    const secondsInMonth = 2629743.83;
+    const circleMonths = (2 * PI) / 12;
+    const {start_time, stop_time, tag, score} = eventProps;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const eventsPerYear = self.groupEventsPerYear(year);
+    const monthNumber = months.indexOf(interval.period.month);
+    const daysInMonth = new Date(Number(interval.period.year), monthNumber, 0).getDate();
+    const circleDays = (2 * PI) / daysInMonth;
+    const secondsInDay = 86400;
+    const circleHours = (2 * PI) / 24;
+    const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
+    const rootEvent = self.data[0].events.filter(event => event.id === eventProps.id)[0];
+    const startDate = new Date(rootEvent.start_time * 1000).toDateString();
+    const stopDate = new Date(rootEvent.stop_time * 1000).toDateString();
+    const arcClassName = `${startDate.replace(/ /g, '_')}`;
 
-    eventsPerYear.forEach(event => {
-      const startMonth = new Date(event[year].start_time * 1000).getMonth();
-      const endMonth = new Date(event[year].stop_time * 1000).getMonth();
+    let arcStart = 0;
+    let arcStop = 0;
+    let base = 0;
 
-      const eventPeriod = {
-        startDate: event[year].eventPeriod.startDate,
-        stopDate: event[year].eventPeriod.stopDate
-      };
+    if (interval.level === 'year') {
+      base = new Date(Number(interval.period.year)).getTime() / 1000;
+      arcStart = ((start_time - base) / secondsInMonth) * circleMonths;
+      arcStop = ((stop_time - base) / secondsInMonth) * circleMonths;
+    }
 
-      let currentMonth = startMonth;
+    if (interval.level === 'month') {
+      base = new Date(Number(interval.period.year), monthNumber).getTime() / 1000;
+      arcStart = ((start_time - base) / secondsInDay) * circleDays;
+      arcStop = ((stop_time - base) / secondsInDay) * circleDays;
+    }
 
-      while (currentMonth <= endMonth) {
-        const maxDaysInMonth = new Date(year, months.indexOf(monthName) + 1, 0).getDate();
-        const maxMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${maxDaysInMonth}/${year} 23:59:59`);
-        const minMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/01/${year} 00:00:00`);
+    if (interval.level === 'day') {
+      base = new Date(Number(interval.period.year), monthNumber, interval.period.day).getTime() / 1000;
+      arcStart = ((start_time - base) / 3600) * circleHours;
+      arcStop = ((stop_time - base) / 3600) * circleHours;
+    }
 
-        eventsPerMonth.push({
-          [currentMonth]: {
-            id: event[year].id,
-            score: event[year].score,
-            start_time: startMonth === currentMonth ? event[year].start_time : minMonthDate,
-            stop_time: endMonth === currentMonth ? event[year].stop_time : maxMonthDate,
-            tag: event[year].tag,
-            eventPeriod
-          }
-        });
-        currentMonth++;
+    const getTagColor = (tagType: string): string => {
+      let colorIdx = 0;
+      for (let i = 0; i < tagSeq.length; i += 1) {
+        if (tagSeq[i] === tagType) {
+          colorIdx = i;
+        }
+      }
+      return colorSchemes.tag[colorIdx];
+    };
+
+    arc
+      .startAngle(arcStart)
+      .endAngle(arcStop);
+
+    target
+      .append('path')
+      .attr('class' , () =>
+        self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+      )
+      .attr('d', arc)
+      .attr('fill', getTagColor(tag || 'untagged'))
+      .attr('stroke', 3)
+      .on('mouseover', function() {
+        $(`.${arcClassName}`).addClass('active');
+      })
+      .on('mouseout', function() {
+        $(`.${arcClassName}`).removeClass('active');
+      });
+
+    $('.circle-arc').tooltipster({
+      'maxWidth': 170,
+      contentAsHTML: true,
+      arrow: false,
+      side: 'right',
+      trigger: 'custom',
+      debug: false,
+      triggerOpen: {
+        click: true,
+        tap: true,
+        mouseenter: true
+      },
+      triggerClose: {
+        click: true,
+        scroll: false,
+        tap: true,
+        mouseleave: true
+      },
+
+      functionInit: function (instance) {
+        let tooltipContent = `
+            <ul class="tooltip-events">
+              <li class="events">${tag || 'untagged'} </li>
+              <li>
+                <span>START</span>
+                <span>${startDate} </span>
+              </li>
+              <li>
+                <span>END</span>
+                <span>${stopDate}</span>
+              </li>
+            </ul>`;
+        instance.content(tooltipContent);
       }
     });
-    return eventsPerMonth.filter(event => event[months.indexOf(monthName)]);
-  }
+  };
 
-  private groupEventsPerDay(day, monthName, year) {
+  private drawEvents(level, period, arc, target) {
+    let filteredEvents = {};
     const self = this;
-    const eventsPerDay = [];
+    const grouppedEvents = self.option.grouppedEvents;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthNumber = months.indexOf(monthName);
-    const eventsPerMonth = self.groupEventsPerMonth(monthName, year);
-    eventsPerMonth.forEach(event => {
-      const startDay = new Date(event[monthNumber].start_time * 1000).getDate();
-      const endDay = new Date(event[monthNumber].stop_time * 1000).getDate();
-      let currentDay = startDay;
-      const month = months.indexOf(monthName);
+    const month = level === 'month' || level === 'day' ? months.indexOf(period.month) + 1 : null;
 
-      const eventPeriod = {
-        startDate: event[month].eventPeriod.startDate,
-        stopDate: event[month].eventPeriod.stopDate
-      };
+    if (level === 'year') {
+      filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].events : null;
+      filteredEvents && Object.keys(filteredEvents).forEach((eventKey) => self.drawArc(filteredEvents[eventKey], {level, period}, arc, target));
+    }
 
-      while (currentDay <= endDay) {
-        const maxDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 23:59:59`);
-        const minDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 00:00:00`);
+    if (level === 'month') {
+      filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].months[month] : null;
+      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target)
+    }
 
-        eventsPerDay.push({
-          [currentDay]: {
-            id: event[month].id,
-            score: event[month].score,
-            start_time: startDay === currentDay ? event[month].start_time : minDayDate,
-            stop_time: endDay === currentDay ? event[month].stop_time : maxDayDate,
-            tag: event[month].tag,
-            eventPeriod
-          }
-        });
-        currentDay++;
-      }
-    });
-    return eventsPerDay.filter(event => event[day]);
+    if (level === 'day') {
+      const eventExist = grouppedEvents[period.year] !== undefined &&
+                        grouppedEvents[period.year].months !== undefined &&
+                        grouppedEvents[period.year].months[month] !== undefined || null;
+
+      filteredEvents = eventExist &&  grouppedEvents[period.year].months[month].days[period.day];
+      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target);
+    }
   }
 
   private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
     let self = this;
     let option = self.option;
 
-    // let cell = g.append('g').attr('class', `${self.data[0].info[0].level }_level`);
     // plot data on each station
     _.each(self.data, (data, count) => {
       let cell = g
@@ -485,13 +582,19 @@ export class PeriodChart extends pip.Events {
           const randomID = self.generateRandomID();
           featurePlot(d3.select(this), d, data.name, randomID);
         });
-
     });
 
     return { featurePlot };
 
     function featurePlot(_cell, o: dataDP.ChartDataEleInfoEle, stationName: string, id: any) {
       const { circleStroke } = self.option;
+
+      // create the 'target' svg circles
+      let target = _cell.append('g').attr('class', 'target');
+      const ratio = size / 3 - circleStroke / 2;
+      const targetRadius = size / 2 - circleStroke / 2;
+      const strokeWidth = size / 2;
+      const arc = d3.arc().innerRadius(targetRadius - 2).outerRadius(targetRadius + 2);
 
       // Extend the domain slightly to match the range of [0, 2π].
       angle.domain([0, o.bins.length - 0.05]);
@@ -524,15 +627,6 @@ export class PeriodChart extends pip.Events {
       path.append('title')
         .text(o.name);
 
-
-      // create the 'target' svg circles
-      let target = _cell.append('g')
-        .attr('class', 'target');
-
-      const ratio = size / 3 - circleStroke / 2;
-      const targetRadius = size / 2 - circleStroke / 2;
-      const strokeWidth = size / 2;
-
       target.append('circle')
         .attr('r', targetRadius)
         .attr('stroke-width', circleStroke);
@@ -543,7 +637,6 @@ export class PeriodChart extends pip.Events {
       target.append('circle')
         .attr('r', targetRadius - ratio)
         .attr('stroke-width', circleStroke);
-
 
       // vertical/horizontal lines for the 'target'
       target.append('line')
@@ -559,7 +652,6 @@ export class PeriodChart extends pip.Events {
         .attr('stroke-width', circleStroke)
         .attr('y1', -(strokeWidth))
         .attr('y2', strokeWidth);
-
 
       _cell.append('circle')
         .attr('clip-path', `url(#clip_${id})`)
@@ -581,232 +673,24 @@ export class PeriodChart extends pip.Events {
           '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "untagged"]'
         ); // should be gathered from API
 
-      // @TODO - refactor
       if (self.data[0].events.length) {
-        const PI = Math.PI;
-        const secondsInMonth = 2629743.83;
-        const secondsInDay = 86400;
-        const circleMonths = (2 * PI) / 12;
-        const circleHours = (2 * PI) / 24;
-        colorSchemes.tag.push('#fff');
-        const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        const getTagColor = (tag: string): string => {
-          let colorIdx = 0;
-          for (let i = 0; i < tagSeq.length; i += 1) {
-            if (tagSeq[i] === tag) {
-              colorIdx = i;
-            }
-          }
-          return colorSchemes.tag[colorIdx];
-        };
-
-        const arc = d3.arc()
-          .innerRadius(targetRadius - 2)
-          .outerRadius(targetRadius + 2);
 
         if (o.level === 'year') {
-          const events = self.groupEventsPerYear(Number(o.name));
-          events.length && events.forEach(event => {
-            const base = new Date(Number(o.name)).getTime() / 1000;
-            const startTime = ((event[Number(o.name)].start_time - base) / secondsInMonth) * circleMonths;
-            const stopTime = ((event[Number(o.name)].stop_time - base) / secondsInMonth) * circleMonths;
-            const { startDate, stopDate } = event[Number(o.name)].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-            // @TODO - find a way to remove repetitive code
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                      <ul class="tooltip-events">
-                        <li class="events">${event[o.name].tag || 'untagged'} </li>
-                        <li>
-                          <span>START</span>
-                          <span>${startDate} </span>
-                        </li>
-                        <li>
-                          <span>END</span>
-                          <span> ${stopDate}</span>
-                        </li>
-                      </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.name;
+          self.drawEvents('year', {year}, arc, target);
         }
 
         if (o.level === 'month') {
-          const events = self.groupEventsPerMonth(o.name, o.parent.name); // month name and year
-          events.length && events.forEach(event => {
-            const base = new Date(Number(o.parent.name), monthNames.indexOf(o.name)).getTime() / 1000;
-            const daysInMonth = o.children.length;
-            const circleDays = (2 * PI) / daysInMonth;
-            const startTime = ((event[monthNames.indexOf(o.name)].start_time - base) / secondsInDay) * circleDays;
-            const stopTime = ((event[monthNames.indexOf(o.name)].stop_time - base) / secondsInDay) * circleDays;
-            const { startDate, stopDate } = event[monthNames.indexOf(o.name)].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .innerRadius(targetRadius - 2)
-              .outerRadius(targetRadius + 2)
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                      <ul class="tooltip-events">
-                        <li class="events">${event[monthNames.indexOf(o.name)].tag || 'untagged'} </li>
-                        <li>
-                          <span>START</span>
-                          <span>${startDate} </span>
-                        </li>
-                        <li>
-                          <span>END</span>
-                          <span> ${stopDate}</span>
-                        </li>
-                      </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.parent.name;
+          const month = o.name;
+          self.drawEvents('month', {year, month}, arc, target);
         }
 
         if (o.level === 'day') {
-          const dayEvents = self.groupEventsPerDay(o.name, o.parent.name, o.parent.parent.name);
-          dayEvents.length && dayEvents.forEach(event => {
-            const base = new Date(Number(o.parent.parent.name), monthNames.indexOf(o.parent.name), Number(o.name)).getTime() / 1000;
-            const startTime = ((event[o.name].start_time - base) / 3600) * circleHours;
-            const stopTime = ((event[o.name].stop_time - base) / 3600) * circleHours;
-            const { startDate, stopDate } = event[o.name].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .innerRadius(targetRadius + 1.5)
-              .outerRadius(targetRadius - 1.5)
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                        <ul class="tooltip-events">
-                          <li class="events">${event[o.name].tag || 'untagged'} </li>
-                          <li>
-                            <span>START</span>
-                            <span>${startDate} </span>
-                          </li>
-                          <li>
-                            <span>END</span>
-                            <span> ${stopDate}</span>
-                          </li>
-                        </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.parent.parent.name;
+          const month = o.parent.name;
+          const day = o.name;
+          self.drawEvents('day', {year, month, day}, arc, target);
         }
 
         _cell.append('text')
