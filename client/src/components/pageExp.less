@@ -52,42 +52,43 @@
         overflow-y: scroll;
     }
 
+    .sortable {
+        background: #000;
+    }
+
     .chart-ctx {
         position: relative;
         width: 100%;
-        height: 40px;
-        .title {
-            position: absolute;
-            width: 100px;
-            cursor: pointer;
-            text-align: center;
-            line-height: 40px;
-            background-color: white;
-            transition: background-color 1s;
-            overflow: hidden;
-            white-space: nowrap;
-            // overflow: visible;
-        }
-        .plot {
-            position: absolute;
-            left: 101px;
-            width: calc(100% - 101px);
-            height: 40px;
-        }
-    }
-
-    .chart-ctx{
         height: 60px;
-        .title{
-            background: none;
-            color: #fff;
+        
+        display: flex;
+        align-items: center;
+        background: #2C3034;
+        margin-bottom: 1px;
+        i {
+            &.fa-ellipsis-v {
+                margin-left: 14px;
+                width: 10px;
+                height: 18px;
+                color: #8A9097;
+                font-size: 20px;
+                cursor: move;
+            }
+        }
+
+        .title {
             line-height: 60px;
             font-size: 15px;
             color: #8A9097;
-            width: 70px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 1s;
+            white-space: nowrap;
+            width: 34px;
         }
-
-        .plot{
+        
+        .plot {
+            position: absolute;
             height: 60px;
             left: auto;
             right: 0;
@@ -96,13 +97,11 @@
 
         .handle{
             display: none;
-            // height: 18px;
             height: 42px;
             y: 0;
             ry: 3;
         }
-
-        &.ctx-active{
+        &.ctx-active {
             transition: all .2s ease-in-out;
             background: @second-color;
             box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);

@@ -103,6 +103,7 @@ class PageExp {
     $('.chart-focus .plot').height(this.config.focusHeight); // - 45);
     $('.chart-ctx-container').height(this.config.ctxHeight);
     $('.pchart').height(($('.connectedSortable.ui-sortable').height() - 40) + 'px');
+    (<any>$('.sortable')).sortable();
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
   }
