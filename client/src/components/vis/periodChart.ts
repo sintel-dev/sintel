@@ -529,7 +529,7 @@ export class PeriodChart extends pip.Events {
         instance.content(tooltipContent);
       }
     });
-  };
+  }
 
   private drawEvents(level, period, arc, target) {
     let filteredEvents = {};
@@ -540,12 +540,15 @@ export class PeriodChart extends pip.Events {
 
     if (level === 'year') {
       filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].events : null;
-      filteredEvents && Object.keys(filteredEvents).forEach((eventKey) => self.drawArc(filteredEvents[eventKey], {level, period}, arc, target));
+      filteredEvents &&
+      Object.keys(filteredEvents).forEach((eventKey) =>
+        self.drawArc(filteredEvents[eventKey], {level, period}, arc, target)
+      );
     }
 
     if (level === 'month') {
       filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].months[month] : null;
-      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target)
+      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target);
     }
 
     if (level === 'day') {

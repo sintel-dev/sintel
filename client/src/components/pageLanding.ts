@@ -84,6 +84,7 @@ class PageLanding {
    * KO: click event handler.
    *
    * Invoked after clicking a card.
+   * @TODO - this one needs refactor, as we don't use SVG dot highlight anymore
    */
   public onSelectCard(type, data) {
     let self = this;
@@ -126,9 +127,10 @@ class PageLanding {
           $(`.exp-row .card`).removeClass('active');
           $(`.exp-row .dot`).removeClass('active');
           $('.card-link').removeClass('active');
+          $('.exp-cards .card').css({'display': 'none'});
           _.each(self.experiments(), exp => {
             if (exp.pipeline === cdata.name) {
-              $(`.card[name=${exp.id}]`).addClass('active');
+              $(`.exp-cards .card[name=${exp.id}]`).css({'display': 'block'}).addClass('active');
               $(`.dot[name=${exp.id}]`).addClass('active');
               $(`.card-link[name=${exp.id}]`).addClass('active');
             }
