@@ -2,8 +2,8 @@
 @import './less/dropdown.less';
 
 .mtv-skin{
-
-    
+    font-size: 14px;
+    line-height: 1.42857143;
     //SVG overridings
     .axis{
         .domain, line{
@@ -417,6 +417,22 @@
 
         &.active{
             transform: scale(0.98);
+        }
+    } 
+
+
+    // @TODO - find a proper place, ADMIN LTE theme removal
+    &.fixed {
+        .main-header, .main-sidebar, .left-side {
+            position: fixed;
+        }
+
+        .main-header{
+            top: 0;
+            right: 0;
+            left: 0;
+
+            
         }
     }
 }
