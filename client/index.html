@@ -1,10 +1,12 @@
 <html>
 
 <head>
-	<!-- tooltipster will be removed/simplified soon-->	<!-- build:assets-css -->
+	<!-- tooltipster will be removed/simplified soon-->
+	<!-- build:assets-css -->
 	<link rel="stylesheet" href="./public/lib-static/tooltipster/css/tooltipster.css">
 	<!-- endbuild -->
-	<!-- build:app-css -->
+
+	<!-- build:app-css -->
 	<link rel="stylesheet" href="./public/dist/main.css">
 	<!-- endbuild -->
 
@@ -138,16 +140,12 @@
 												</div>
 												<div class="box-body">
 													<div class="chart-ctx-container scroll-style">
-														<div data-bind="foreach: ctxs">
-															<div class="chart-ctx">
-																<div class="title" data-bind="
-																					text: $data,
-																					attr: {name: 'title-' + $data, title: $data},
-																					click: $parent.selectCtx.bind($parent, $data)">
-																</div>
-																<div class="plot" data-bind="attr: {name: $data}"></div>
+														<div data-bind="foreach: ctxs" id="sortable" class="sortable">
+															<div class="chart-ctx" data-bind="attr: {id: 'item_' + $index()}">
+																		<i class="fa fa-ellipsis-v" data-bind="click: $parent.selectCtx.bind($parent, $data)"></i>
+																		<span class="title" data-bind="text: $data, attr: {name: 'title-' + $data, title: $data}, click: $parent.selectCtx.bind($parent, $data)"></span>
+																	<div class="plot" data-bind="attr: {name: $data}"></div>
 															</div>
-															<hr class="mt-n mb-n">
 														</div>
 													</div>
 												</div>
@@ -440,13 +438,15 @@
 			</radialGradient>
 		</defs>
 	</svg>
-	<!-- build:assets-js -->
+
+	<!-- build:assets-js -->
 	<script src="./public/lib-static/jquery.min.js"></script>
 	<script src="./public/lib-static/jquery-ui.js"></script>
 	<script src="./public/lib-static/jquery.rest.js"></script>
 	<script src="./public/lib-static/bootstrap.min.js"></script>
 	<!-- endbuild -->
-	<!-- build:app-js -->
+
+	<!-- build:app-js -->
 	<script src="./public/dist/main.js"></script>
 	<!-- endbuild -->
 </body>
