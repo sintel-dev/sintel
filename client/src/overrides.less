@@ -321,41 +321,47 @@
             .nav-tabs {
                 border-bottom: none;
                 li {
-                    margin-right: -2px;
                     border: none;
                     transition: all .2s ease-in-out;
                     float: right;
-                    a{
+                    button {
                         border-radius: 0;
+                        outline: none;
+                        line-height: 1.42857143;
+                        padding: 10px 15px;
+                        &:disabled{
+                            opacity: 0.4;
+                            cursor: not-allowed;
+                        }
                     }
 
                     &:last-child {
-                        &, a{
+                        &, button{
                             border-top-left-radius: 3px;
                             border-bottom-left-radius: 3px;
                         }
                     }
                     &:first-child{
-                        &, a{
+                        &, button{
                             border-top-right-radius: 3px;
                             border-bottom-right-radius: 3px;
                         }
                     }
                     &.active{
                         border-top: none;
-                        a{
+                        button{
                             color: #fff;
                             background-color: #2569D6;
                         }
                     }
 
-                    > a{
+                    > button{
                         color: rgba(255,255,255,0.5);
                         background-color: rgba(0,0,0,0.4);
                         border-width: 0;
                     }
 
-                    &, a{
+                    &, button{
                         transition: all .2s ease-in-out;
                     }
                 }

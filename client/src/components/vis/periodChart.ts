@@ -593,7 +593,7 @@ export class PeriodChart extends pip.Events {
       const { circleStroke } = self.option;
 
       // create the 'target' svg circles
-      let target = _cell.append('g').attr('class', 'target');
+      let target = _cell.append('g').attr('class', 'target').on('click', () => self.trigger('select', o));
       const ratio = size / 3 - circleStroke / 2;
       const targetRadius = size / 2 - circleStroke / 2;
       const strokeWidth = size / 2;
@@ -660,7 +660,8 @@ export class PeriodChart extends pip.Events {
         .attr('clip-path', `url(#clip_${id})`)
         .attr('class', 'wrapper')
         .attr('r', strokeWidth)
-        .attr('fill', 'url(#blueGradient)');
+        .attr('fill', 'url(#blueGradient)')
+        .on('click', () => self.trigger('select', o));
 
       _cell.append('circle')
         .attr('class', 'radial-cursor svg-tooltip')
@@ -669,9 +670,7 @@ export class PeriodChart extends pip.Events {
         .attr('r', innerRadius)
         .style('fill', 'white')
         .style('stroke-width', 0)
-        .on('click', (d) => {
-          self.trigger('select', o);
-        })
+        .on('click', () => self.trigger('select', o))
         .attr('title',
           '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "untagged"]'
         ); // should be gathered from API
