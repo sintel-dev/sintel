@@ -113,7 +113,11 @@ class PageLanding {
 
           // highlight pipeline card
           $('.pipe-row .card').each((index, el) => {
-            $(el).attr('name') !== cdata.id ? $(el).removeClass('active') : $(el).toggleClass('active');
+            if ($(el).attr('name') !== cdata.id) {
+              $(el).removeClass('active');
+            } else {
+              $(el).toggleClass('active');
+            }
           });
 
           if ($(element).hasClass('active')) {
