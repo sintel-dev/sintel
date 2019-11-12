@@ -84,66 +84,61 @@ class PageLanding {
    * KO: click event handler.
    *
    * Invoked after clicking a card.
-   * @TODO - this one needs refactor, as we don't use SVG dot highlight anymore
    */
   public onSelectCard(type, data) {
     let self = this;
     switch (type) {
-      case 'proj':
-        {
+      case 'proj': {
           let cdata = data as Project;
           self.selectProject(cdata);
           // self.activeProject(cdata);
         }
         break;
-      case 'exp':
-        {
+      case 'exp': {
           let cdata = data as Experiment;
-          // highlight experiment card && dot
+          // highlight experiment card
           $(`.exp-row .card`).removeClass('active');
           $(`.card[name=${cdata.id}]`).addClass('active');
-          $(`.exp-row .dot`).removeClass('active');
-          $(`.dot[name=${cdata.id}]`).addClass('active');
-          // highlight pipeline card && dot
+
+          // highlight pipeline card
           let pipe = _.find(self.pipelines(), d => d.name === cdata.pipeline);
           $(`.pipe-row .card`).removeClass('active');
           $(`.card[name=${pipe.id}]`).addClass('active');
-          $(`.pipe-row .dot`).removeClass('active');
-          $(`.dot[name=${pipe.id}]`).addClass('active');
-          // highlight links
-          $('.card-link').removeClass('active');
-          $(`.card-link[name=${cdata.id}]`).addClass('active');
         }
         break;
       case 'pipe':
         {
           let cdata = data as DT.Pipeline;
-          // highlight pipeline card && dot
-          $(`.pipe-row .card`).removeClass('active');
-          $(`.card[name=${cdata.id}]`).addClass('active');
-          $(`.pipe-row .dot`).removeClass('active');
-          $(`.dot[name=${cdata.id}]`).addClass('active');
-          // highlight experiment card && dot & link
-          $(`.exp-row .card`).removeClass('active');
-          $(`.exp-row .dot`).removeClass('active');
-          $('.card-link').removeClass('active');
-          $('.exp-cards .card').css({'display': 'none'});
-          _.each(self.experiments(), exp => {
-            if (exp.pipeline === cdata.name) {
-              $(`.exp-cards .card[name=${exp.id}]`).css({'display': 'block'}).addClass('active');
-              $(`.dot[name=${exp.id}]`).addClass('active');
-              $(`.card-link[name=${exp.id}]`).addClass('active');
+          const element =  $(`.pipe-row .card[name=${cdata.id}]`);
+
+          // highlight pipeline card
+          $('.pipe-row .card').each((index, el) => {
+            if ($(el).attr('name') !== cdata.id) {
+              $(el).removeClass('active');
+            } else {
+              $(el).toggleClass('active');
             }
           });
+
+          if ($(element).hasClass('active')) {
+            $('.exp-cards .card').css({'display': 'none'});
+            _.each(self.experiments(), exp => {
+              if (exp.pipeline === cdata.name) {
+                $(`.exp-cards .card[name=${exp.id}]`).css({'display': 'block'}).addClass('active');
+              }
+            });
+          } else {
+              $('.exp-cards .card').css({'display': 'block'}).removeClass('active');
+            }
         }
         break;
     }
   }
-
   /**
    * KO: click event handler.
    *
    * Invoked after clicking a card dot.
+   * @TODO - investigate if we still need this function
    */
   public onSelectDot(type, data) {
     let self = this;
@@ -222,6 +217,9 @@ class PageLanding {
     });
   }
 
+  /**
+   * @TODO - do we still need this one?
+   */
   private initDotLinks() {
     let self = this;
     let exps = self.experiments();
@@ -334,9 +332,9 @@ class PageLanding {
         let activeExperimentID = $(`.exp-row .card.active`).attr('name');
         self.activeProject(selectedProject);
         $(`.exp-row .card`).removeClass('active');
-        $(`.exp-row .dot`).removeClass('active');
+        $(`.exp-row .dot`).removeClass('active'); // @TODO - still needed?
         $(`.pipe-row .card`).removeClass('active');
-        $(`.pipe-row .dot`).removeClass('active');
+        $(`.pipe-row .dot`).removeClass('active'); // @TODO - still needed?
         self.experiments(selectedProject.experiments);
         // self.initDotLinks();
         self.visualize();
@@ -356,9 +354,9 @@ class PageLanding {
     } // do nothing if select the name project
     this.activeProject(project);
     $(`.exp-row .card`).removeClass('active');
-    $(`.exp-row .dot`).removeClass('active');
+    $(`.exp-row .dot`).removeClass('active'); // @TODO - still needed?
     $(`.pipe-row .card`).removeClass('active');
-    $(`.pipe-row .dot`).removeClass('active');
+    $(`.pipe-row .dot`).removeClass('active'); // @TODO - still needed?
     this.experiments(project.experiments);
 
     let pipelines = project.pipelines;
