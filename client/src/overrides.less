@@ -85,10 +85,10 @@
             color: #fff;
         }
 
-        div{
+        div {
             display: inline-block;
             margin-right: 25px;
-            &:last-child{
+            &:last-child, &.last{
                 margin-right: 0;
             }
 
@@ -441,4 +441,12 @@
             
         }
     }
+}
+
+.clear {
+    width: 100%;
+    height: 0;
+    clear: both;
+    font-size: 0;
+    line-height: 0;
 }

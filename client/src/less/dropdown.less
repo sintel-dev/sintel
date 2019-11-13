@@ -31,6 +31,24 @@
         height: 0;;
         transform: translateX(-50%);
     }
+
+    ul{
+        &.select2-selection__rendered {
+            li {
+                display: inline-block;
+            }
+        }
+    }
+
+    .select2-search{
+        input {
+            background: transparent;
+            border: none;
+            outline: none;
+            margin: 0;
+            padding: 0;
+        }
+    }
 }
 
 .select2-search--dropdown.select2-search--hide{
@@ -66,10 +84,10 @@
     background-color: #26282D;
     font-size:13px;
     z-index: 99;
-    span{
-        outline: none;
-    }
-
+    display: block;
+    width: auto !important;
+    min-width: 175px;
+    max-width: 300px;
 
     &, &.select2-container--open{
         border: none;
@@ -167,5 +185,63 @@
                 background: #45F642;
             }
         }
+    }
+}
+
+.select-multiple {
+    .select2 {
+        border: 1px solid #979797;
+        min-height: 33px;
+        border-radius: 2px;
+        
+    }
+    input {
+        background: transparent;
+        height: 33px;
+        &::placeholder{
+            color: #fff;
+        }
+    }
+}
+
+.multiple-dropdown {
+    .select2-results__options{
+        label {
+            display: block;
+            cursor: pointer;
+        }
+        input {
+            width: 0;
+            height: 0;
+            opacity: 0;
+
+            + span {
+                width: 10px;
+                height: 10px;
+                display: inline-block;
+                margin-right: 3px;
+                vertical-align: middle;
+                border: 1px solid #fff;
+                position: relative;
+
+                &:before{
+                    content: '';
+                    transition: all .2s ease-in-out;
+                    position: absolute;
+                    display: block;
+                    width: 10px;
+                    height: 10px;
+                    top: -7px;
+                }
+            }
+            &:checked {
+                + span {
+                    &:before {
+                        content: '\2713';
+                    }
+                }
+            }
+        }
+        
     }
 }
