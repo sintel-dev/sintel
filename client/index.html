@@ -142,7 +142,7 @@
 													<div class="chart-ctx-container scroll-style">
 														<div data-bind="foreach: ctxs" id="sortable" class="sortable">
 															<div class="chart-ctx" data-bind="attr: {id: 'item_' + $index()}">
-																		<i class="fa fa-ellipsis-v" data-bind="click: $parent.selectCtx.bind($parent, $data)"></i>
+																		<i class="icon-lines-vertical" data-bind="click: $parent.selectCtx.bind($parent, $data)"></i>
 																		<span class="title" data-bind="text: $data, attr: {name: 'title-' + $data, title: $data}, click: $parent.selectCtx.bind($parent, $data)"></span>
 																	<div class="plot" data-bind="attr: {name: $data}"></div>
 															</div>
