@@ -112,7 +112,51 @@ class PageExp {
       'id': 6,
       'text': '<span><i class="select normal"></i>normal</span>',
       'title': 'normal'
-  }]
+  },
+  {
+    'id': 7,
+    'text': '<span><i class="select untagged"></i>untagged</span>',
+    'title': 'untagged'
+  }
+]
+
+private filterTagDatass = [
+  {
+    'id': 1,
+    'text': 'investigate',
+    'title': 'investigate'
+  },
+  {
+    'id': 2,
+    'text': 'do not investigate',
+    'title': 'do not investigate'
+  },
+  {
+    'id': 3,
+    'text': 'postpone',
+    'title': 'postpone'
+  },
+  {
+    'id': 4,
+    'text': 'problem',
+    'title': 'problem'
+  },
+  {
+    'id': 5,
+    'text': 'previously seen',
+    'title': 'previously seen'
+  },
+  {
+    'id': 6,
+    'text': 'normal',
+    'title': 'normal'
+},
+{
+  'id': 7,
+  'text': 'untagged',
+  'title': 'untagged'
+}
+]
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -362,6 +406,8 @@ class PageExp {
         return 'previously seen';
       case '6':
         return 'normal';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -381,6 +427,8 @@ class PageExp {
         return '5';
       case 'normal':
         return '6';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -462,17 +510,43 @@ class PageExp {
   }
 
   private filterEventByTags() {
-    let filterDropDown = $('select#filterByTag').select2({
-        minimumResultsForSearch: Infinity,
-        placeholder: 'Filter by tag',
-        data: this.filterTagData,
-        closeOnSelect : false,
-        escapeMarkup: markup => markup,
-        tags: true,
-        allowClear: true,
-        multiple: true,
-        dropdownCssClass: 'multiple-dropdown'
+    const self = this;
+    const selectedTags = [];
+    const selectOptions = {
+      minimumResultsForSearch: Infinity,
+      placeholder: 'Filter by tag',
+      data: this.filterTagData,
+      closeOnSelect : false,
+      escapeMarkup: markup => markup,
+      tags: true,
+      allowClear: true,
+      multiple: true,
+      dropdownCssClass: 'multiple-dropdown'
+    };
+
+    $('select#filterByTag').select2(selectOptions)
+    .on('select2:select', (element) => {
+      const target = (element.target as HTMLSelectElement).options;
+      
+      const targetValues = Object.keys(target).map(key => target[key])//.filter((option, index) => option[index])
+      const currentTags = targetValues.filter(options => options.selected && options.value);
+      // const currentTags = targetValues.filter((option, index) => {
+      //   debugger;
+      // })
+      // const currentTags = Object.keys(target).filter((option, index) => {
+      //   debugger;
+      //   return option[index].selected && index;
+      // });
+      const filterValue = self.fromSelectionIDtoTag(String(currentTags));
+      selectedTags.push(filterValue);
+      self.focusChart.trigger('event:filter', selectedTags);
     })
+    .on('select2:unselecting', function (element) {
+      const removedTag = (element.target as HTMLSelectElement).value;
+      const filterValue = self.fromSelectionIDtoTag(removedTag);
+      selectedTags.splice(selectedTags.indexOf(filterValue), 1);
+      self.focusChart.trigger('event:filter', selectedTags);
+    });
   }
 
   /**

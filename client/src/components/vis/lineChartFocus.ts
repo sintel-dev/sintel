@@ -186,7 +186,7 @@ export class LineChartFocus extends pip.Events {
     // ************  events  ************
     let savedZoom = d3.zoomIdentity;
     self.on('data:update', dataUpdateHandler);
-
+    self.on('event:filter', filterEventsHandler);
     self.on('brush:update', brushUpdateHandler);
 
     self.on('zoomPanMode', (zoomMode = false) => {
@@ -364,6 +364,17 @@ export class LineChartFocus extends pip.Events {
       );
     }
 
+    function filterEventsHandler(tags){
+      self.svg.selectAll('.window').remove();
+      _.each(self.data, (data, index) => {
+        const filteredEvents = data.eventWindows.filter(event => {
+          return tags.indexOf(String(event[4])) > -1;
+        });
+        const eventData = tags.length ? filteredEvents : data.eventWindows;
+        highlightUpdate(eventData, data.timeseries, x, 'dname', index, data.datarun);
+      });
+    }
+
     async function eventUpdateHandler() {
       if (self.data.length > 1) { return; }
       // only execute when there is only one timeseries
@@ -377,8 +388,8 @@ export class LineChartFocus extends pip.Events {
 
       self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
-      _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
+      _.each(self.data, (data, i) => {
+        highlightUpdate(data.eventWindows, data.timeseries, x, 'dname', i, data.datarun);
       });
     }
 
@@ -620,8 +631,8 @@ export class LineChartFocus extends pip.Events {
       // .attr('filter', 'url(#blurMe)')
       .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
-    _.each(self.data, (d, i) => {
-      update(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
+    _.each(self.data, (data, index) => {
+      update(data.eventWindows, data.timeseries, x, 'dname', index, data.datarun);
     });
 
     return {
