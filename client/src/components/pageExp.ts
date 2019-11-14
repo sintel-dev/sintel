@@ -85,49 +85,34 @@ class PageExp {
   private filterTagData = [
     {
       'id': 1,
-      'text': '<label for="investigate"><input type="checkbox" id="investigate"><span></span> <i class="select investigate"></i> investigate</label>',
-      // 'text': 'investigate',
-      'mode': 'investigate',
-      "element": HTMLOptionElement
+      'text': '<span><i class="select investigate"></i> investigate</span>',
+      'title': 'investigate'
     },
     {
       'id': 2,
-      'text': 'do not investigate',
-      'mode': 'not_investigate'
-
+      'text': '<span><i class="select not_investigate"></i>do not investigate</span>',
+      'title': 'do not investigate'
     },
     {
       'id': 3,
-      'text': 'postpone',
-      'mode': 'postpone'
+      'text': '<span><i class="select postpone"></i>postpone</span>',
+      'title': 'postpone'
     },
     {
       'id': 4,
-      'text': 'problem',
-      'mode': 'problem'
+      'text': '<span><i class="select problem"></i>problem</span>',
+      'title': 'problem'
     },
     {
       'id': 5,
-      'text': 'previously seen',
-      'mode': 'seen'
+      'text': '<span><i class="select seen"></i>previously seen</span>',
+      'title': 'previously seen'
     },
     {
       'id': 6,
-      'text': 'normal',
-      'mode': 'normal'
+      'text': '<span><i class="select normal"></i>normal</span>',
+      'title': 'normal'
   }]
-
-
-  private filterTagOptions(){
-    let tags = [];
-    this.filterTagData.map(tag => {
-      const {mode} = tag;
-      const markup =`<label for="${mode}"><input type="checkbox" name="${mode}" id="${mode}" /><span></span> <i class="select ${mode}"></i>${tag.text}</label>`
-      tags.push(markup);
-    });
-    
-    return tags;
-  }
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -477,27 +462,17 @@ class PageExp {
   }
 
   private filterEventByTags() {
-    const self = this;
-    const tags = this.filterTagOptions();
-
     let filterDropDown = $('select#filterByTag').select2({
         minimumResultsForSearch: Infinity,
         placeholder: 'Filter by tag',
-        // data: this.filterTagData,
         data: this.filterTagData,
         closeOnSelect : false,
         escapeMarkup: markup => markup,
         tags: true,
         allowClear: true,
-        tokenSeparators: [',', ' '],
         multiple: true,
         dropdownCssClass: 'multiple-dropdown'
     })
-    
-    // filterDropDown.on('change', function(){
-    //   debugger;
-    // })
-    
   }
 
   /**

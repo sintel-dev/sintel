@@ -87,7 +87,7 @@
     display: block;
     width: auto !important;
     min-width: 175px;
-    max-width: 300px;
+    max-width: 630px;
 
     &, &.select2-container--open{
         border: none;
@@ -98,6 +98,12 @@
         max-height: 200px;
         overflow-y: auto;
         margin-top: -4px;
+    }
+
+    .multiple-dropdown {
+        .select2-results > .select2-results__options{
+            margin-top: 0;
+        }
     }
 
     .select2-results__option[aria-selected=true]{
@@ -193,8 +199,8 @@
         border: 1px solid #979797;
         min-height: 33px;
         border-radius: 2px;
-        
     }
+
     input {
         background: transparent;
         height: 33px;
@@ -202,46 +208,51 @@
             color: #fff;
         }
     }
+
+    .select2-selection__choice {
+        display: inline-block;
+        padding: 1px 6px 1px 3px;
+        background: #23242B;
+        border-radius: 12px;
+        margin: 1px 6px 1px 0px;
+        span{
+            &.select2-selection__choice__remove {
+                margin: 0 3px;
+            }
+        }
+    }
+
+    .select2-selection__clear{
+        float: right;
+        line-height: 33px;
+        margin-right: 6px;
+        font-weight: bold;
+        color: #fff;
+    }
 }
 
 .multiple-dropdown {
-    .select2-results__options{
-        label {
-            display: block;
-            cursor: pointer;
+    .select2-results__option {
+        &:before{
+            content: '';
+            transition: all .2s ease-in-out;
+            position: relative;
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #fff;
+            color: #fff;
+            margin-right: 6px;
+            font-size: 9px;
+            vertical-align: middle;
+            font-family: 'FontAwesome';
+            line-height: 7px;
         }
-        input {
-            width: 0;
-            height: 0;
-            opacity: 0;
 
-            + span {
-                width: 10px;
-                height: 10px;
-                display: inline-block;
-                margin-right: 3px;
-                vertical-align: middle;
-                border: 1px solid #fff;
-                position: relative;
-
-                &:before{
-                    content: '';
-                    transition: all .2s ease-in-out;
-                    position: absolute;
-                    display: block;
-                    width: 10px;
-                    height: 10px;
-                    top: -7px;
-                }
-            }
-            &:checked {
-                + span {
-                    &:before {
-                        content: '\2713';
-                    }
-                }
+        &[aria-selected=true]{
+            &:before{
+                content: "\f00c";
             }
         }
-        
     }
 }
