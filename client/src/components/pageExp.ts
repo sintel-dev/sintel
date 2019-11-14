@@ -527,18 +527,8 @@ private filterTagDatass = [
     $('select#filterByTag').select2(selectOptions)
     .on('select2:select', (element) => {
       const target = (element.target as HTMLSelectElement).options;
-      
-      const targetValues = Object.keys(target).map(key => target[key])//.filter((option, index) => option[index])
-      const currentTags = targetValues.filter(options => options.selected && options.value);
-      // const currentTags = targetValues.filter((option, index) => {
-      //   debugger;
-      // })
-      // const currentTags = Object.keys(target).filter((option, index) => {
-      //   debugger;
-      //   return option[index].selected && index;
-      // });
-      const filterValue = self.fromSelectionIDtoTag(String(currentTags));
-      selectedTags.push(filterValue);
+      const targetValues = Object.keys(target).filter(key => target[key].selected)
+      const selectedTags = targetValues.map(option => self.fromSelectionIDtoTag(option));
       self.focusChart.trigger('event:filter', selectedTags);
     })
     .on('select2:unselecting', function (element) {
