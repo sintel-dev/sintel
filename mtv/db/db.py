@@ -105,7 +105,8 @@ def update_db(fs, utc=True):
                 if nm_range[1] - nm_range[0] == 0:
                     raw_es = 0
                 else:
-                    raw_es = v['es'][i] / (nm_range[1] - nm_range[0]) * (raw_range[1] - raw_range[0])
+                    raw_es = v['es'][i] / (nm_range[1] - nm_range[0]) * \
+                        (raw_range[1] - raw_range[0])
                 data.append([
                     float(idx),
                     _inverse_scale_transform(v['y'][i][0], *nm_range, *raw_range),
@@ -120,7 +121,7 @@ def update_db(fs, utc=True):
                 'signal': datarun.signal.id,
                 'datarun': datarun.id,
                 'names': ['timestamp', 'y_raw', 'y_raw_hat', 'es_raw',
-                        'y', 'y_hat', 'es'],
+                          'y', 'y_hat', 'es'],
                 'data': data
             }
 
@@ -133,7 +134,7 @@ def update_db(fs, utc=True):
             else:
                 year_start = datetime.fromtimestamp(v['raw_index'][0]).year
                 year_end = datetime.fromtimestamp(v['raw_index'][-1]).year
-            
+
             # construct dataframe from ndarrays
             data = pd.DataFrame(data=v['X_raw'], index=v['raw_index'])
 
@@ -144,7 +145,7 @@ def update_db(fs, utc=True):
                 if diff <= interval:
                     my_interval = interval
                     break
-            
+
             day_bin_num = 24 * 60 // my_interval
 
             docs = []
@@ -190,7 +191,7 @@ def update_db(fs, utc=True):
                     docs[-1]['data'][m - 1] = days
                 # end of month
             # end of year
-            
+
             model.Raw.insert_many(docs)
 
         except Exception as e:

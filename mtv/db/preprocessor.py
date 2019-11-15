@@ -38,6 +38,7 @@ def classify_files(dir):
 
     return classes
 
+
 def nasa_to_csv():
     # test single file
     # path_to_file = 'data/train/A-1.npy'

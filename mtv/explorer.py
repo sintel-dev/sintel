@@ -2,18 +2,17 @@ import logging
 import os
 import sys
 
-import pandas as pd
 from flask import Flask
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
-from pymongo import MongoClient
 from gridfs import GridFS
 from mongoengine import connect
+from pymongo import MongoClient
 from termcolor import colored
 
 from mtv.db import db
 from mtv.routes import add_routes
-from mtv.utils import get_files, import_object
+from mtv.utils import import_object
 
 LOGGER = logging.getLogger(__name__)
 
