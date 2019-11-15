@@ -3,8 +3,14 @@ import json
 import logging
 import os
 
-import yaml
 from bson import ObjectId
+from yaml import load
+
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +36,7 @@ def read_config(path_to_config):
 
     try:
         with open(path_to_config, "r") as f:
-            dictionary = yaml.load(f.read())
+            dictionary = load(f.read(), Loader=Loader)
     except Exception:
         LOGGER.exception('Error loading config file {}'.format(path_to_config))
         raise Exception

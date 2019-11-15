@@ -16,7 +16,7 @@ requirements = [
 
     # General
     'termcolor==1.1.0',
-    'PyYAML==3.12',
+    'PyYAML==5.1',
 
     # Math
     'numpy>=1.15.4,<1.17',
@@ -26,7 +26,7 @@ requirements = [
     'Flask==1.0.2',
     'Flask-Cors==3.0.7',
     'Flask-RESTful==0.3.7',
-    'Werkzeug==0.14.1',
+    'Werkzeug==0.15.3',
     'gevent==1.2.2',
 
     # Database

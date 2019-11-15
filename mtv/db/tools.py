@@ -10,6 +10,26 @@ def merge_databases():
     pass
 
 
+def delete_datasets():
+    cli = MongoClient('localhost', port=27017)
+    db = cli['mtv']
+
+    for datarun_doc in db['datarun'].find():
+        experiment_id = datarun_doc['experiment']
+        experiment_doc = db['experiment'].find_one({'_id': experiment_id})
+        if (experiment_doc['project'] == 'SES'):
+            # delete datarun
+            db['datarun'].delete_one({'_id': datarun_doc['_id']})
+            # delete raw
+            db['raw'].delete_many({'datarun': datarun_doc['_id']})
+            # delete prediction
+            db['prediction'].delete_many({'datarun': datarun_doc['_id']})
+
+    for experiment_doc in db['experiment'].find():
+        if (experiment_doc['project'] == 'SES'):
+            db['experiment'].delete_one({'_id': experiment_doc['_id']})
+
+
 def prune_dataruns():
     cli = MongoClient('localhost', port=27017)
     db = cli['mtv-nasa-lstm']
@@ -44,4 +64,5 @@ def test_area():
 def main():
     # test_area()
 
-    prune_dataruns()
+    # prune_dataruns()
+    delete_datasets()
