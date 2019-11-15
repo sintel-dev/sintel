@@ -53,7 +53,7 @@
     }
 
     .sortable {
-        background: #000;
+        background: #23242B;
     }
 
     .chart-ctx {
@@ -65,13 +65,14 @@
         align-items: center;
         background: #2C3034;
         margin-bottom: 1px;
+        border: 1px solid #2C3034;
         i {
-            &.fa-ellipsis-v {
+            &.icon-lines-vertical {
                 margin-left: 14px;
-                width: 10px;
-                height: 18px;
-                color: #8A9097;
-                font-size: 20px;
+                color: #B3BBD3;
+                font-size: 14px;
+                opacity: 0;
+                transition: all .2s ease-in-out;
                 cursor: move;
             }
         }
@@ -101,6 +102,7 @@
             y: 0;
             ry: 3;
         }
+
         &.ctx-active {
             transition: all .2s ease-in-out;
             background: @second-color;
@@ -113,6 +115,16 @@
 
             .handle{
                 display: block;
+            }
+        }
+
+        &.ui-sortable-helper {
+            box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0,0,0,0.14);
+        }
+
+        &:hover, &.ui-sortable-helper {
+            i.icon-lines-vertical{
+                opacity: 1;
             }
         }
 
