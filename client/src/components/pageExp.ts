@@ -117,46 +117,7 @@ class PageExp {
     'id': 7,
     'text': '<span><i class="select untagged"></i>untagged</span>',
     'title': 'untagged'
-  }
-]
-
-private filterTagDatass = [
-  {
-    'id': 1,
-    'text': 'investigate',
-    'title': 'investigate'
-  },
-  {
-    'id': 2,
-    'text': 'do not investigate',
-    'title': 'do not investigate'
-  },
-  {
-    'id': 3,
-    'text': 'postpone',
-    'title': 'postpone'
-  },
-  {
-    'id': 4,
-    'text': 'problem',
-    'title': 'problem'
-  },
-  {
-    'id': 5,
-    'text': 'previously seen',
-    'title': 'previously seen'
-  },
-  {
-    'id': 6,
-    'text': 'normal',
-    'title': 'normal'
-},
-{
-  'id': 7,
-  'text': 'untagged',
-  'title': 'untagged'
-}
-]
+  }]
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -182,7 +143,7 @@ private filterTagDatass = [
     (<any>$('.sortable')).sortable();
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
-    this.filterEventByTags();
+    this.filterEventsByTags();
   }
 
   public getBoxSizes() {
@@ -509,7 +470,7 @@ private filterTagDatass = [
     });
   }
 
-  private filterEventByTags() {
+  private filterEventsByTags() {
     const self = this;
     const selectedTags = [];
     const selectOptions = {
@@ -525,13 +486,14 @@ private filterTagDatass = [
     };
 
     $('select#filterByTag').select2(selectOptions)
+    .prop('disabled', true)
     .on('select2:select', (element) => {
       const target = (element.target as HTMLSelectElement).options;
       const targetValues = Object.keys(target).filter(key => target[key].selected)
       const selectedTags = targetValues.map(option => self.fromSelectionIDtoTag(option));
       self.focusChart.trigger('event:filter', selectedTags);
     })
-    .on('select2:unselecting', function (element) {
+    .on('select2:unselecting', (element) => {
       const removedTag = (element.target as HTMLSelectElement).value;
       const filterValue = self.fromSelectionIDtoTag(removedTag);
       selectedTags.splice(selectedTags.indexOf(filterValue), 1);
