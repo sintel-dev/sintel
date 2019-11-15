@@ -85,10 +85,10 @@
             color: #fff;
         }
 
-        div{
+        div {
             display: inline-block;
             margin-right: 25px;
-            &:last-child{
+            &:last-child, &.last{
                 margin-right: 0;
             }
 
@@ -134,10 +134,16 @@
         }
     }
 
+    .view-btn-group{
+        margin-bottom: 25px;
+    }
+
     //input controls
     .linechart-controls{
         color: #fff;
-        margin-bottom: 15px;
+        display: inline-block;
+        margin-top: 10px;
+        margin: 10px 20px 15px 0;
     }
 
     //dataset details within the chart
@@ -441,4 +447,12 @@
             
         }
     }
+}
+
+.clear {
+    width: 100%;
+    height: 0;
+    clear: both;
+    font-size: 0;
+    line-height: 0;
 }

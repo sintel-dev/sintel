@@ -1,4 +1,4 @@
-import 'select2';
+import 'select2/dist/js/select2.full.js';
 import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
@@ -45,6 +45,7 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
+  private filterTags: Array<string>;
   private period = {
     year: 0,
     month: ''
@@ -82,6 +83,43 @@ class PageExp {
   }
 ];
 
+  private filterTagData = [
+    {
+      'id': 1,
+      'text': '<span><i class="select investigate"></i> investigate</span>',
+      'title': 'investigate'
+    },
+    {
+      'id': 2,
+      'text': '<span><i class="select not_investigate"></i>do not investigate</span>',
+      'title': 'do not investigate'
+    },
+    {
+      'id': 3,
+      'text': '<span><i class="select postpone"></i>postpone</span>',
+      'title': 'postpone'
+    },
+    {
+      'id': 4,
+      'text': '<span><i class="select problem"></i>problem</span>',
+      'title': 'problem'
+    },
+    {
+      'id': 5,
+      'text': '<span><i class="select seen"></i>previously seen</span>',
+      'title': 'previously seen'
+    },
+    {
+      'id': 6,
+      'text': '<span><i class="select normal"></i>normal</span>',
+      'title': 'normal'
+  },
+  {
+    'id': 7,
+    'text': '<span><i class="select untagged"></i>untagged</span>',
+    'title': 'untagged'
+  }];
+
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
 
@@ -106,6 +144,7 @@ class PageExp {
     (<any>$('.sortable')).sortable();
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
+    this.filterEventsByTags();
   }
 
   public getBoxSizes() {
@@ -214,6 +253,7 @@ class PageExp {
     $('#monthView, #dayView').attr('disabled', 'disabled');
     $('#yearView').trigger('click');
     $('#periodView').text(name);
+    self.focusChart.trigger('event:filter', self.filterTags);
   }
 
   public showMissing(content, event) {
@@ -329,6 +369,8 @@ class PageExp {
         return 'previously seen';
       case '6':
         return 'normal';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -348,6 +390,8 @@ class PageExp {
         return '5';
       case 'normal':
         return '6';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -425,6 +469,35 @@ class PageExp {
       // update indicator color
       let indicator = $('.select-line .indicator');
       indicator.attr('class', `indicator id${self.selectedTagID}`);
+    });
+  }
+
+  private filterEventsByTags() {
+    const self = this;
+    const selectOptions = {
+      minimumResultsForSearch: Infinity,
+      placeholder: 'Filter by tag',
+      data: this.filterTagData,
+      closeOnSelect : false,
+      escapeMarkup: markup => markup,
+      tags: true,
+      allowClear: true,
+      multiple: true,
+      dropdownCssClass: 'multiple-dropdown'
+    };
+
+    $('select#filterByTag').select2(selectOptions)
+    .on('select2:select', (element) => {
+      const target = (element.target as HTMLSelectElement).options;
+      const targetValues = Object.keys(target).filter(key => target[key].selected);
+      self.filterTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
+      self.focusChart.trigger('event:filter', self.filterTags);
+    })
+    .on('select2:unselecting', (element) => {
+      const removedTag = (element.target as HTMLSelectElement).value;
+      const filterValue = self.fromSelectionIDtoTag(removedTag);
+      self.filterTags.splice(self.filterTags.indexOf(filterValue), 1);
+      self.focusChart.trigger('event:filter', self.filterTags);
     });
   }
 
@@ -537,10 +610,12 @@ class PageExp {
         $('.timeseries-overview>.overlay').removeClass('hidden');
         $('.timeseries-detail>.overlay').removeClass('hidden');
         $('.period-view>.overlay').removeClass('hidden');
+        $('select#filterByTag').prop('disabled', true);
       } else {
         $('.timeseries-overview>.overlay').addClass('hidden');
         $('.timeseries-detail>.overlay').addClass('hidden');
         $('.period-view>.overlay').addClass('hidden');
+        $('select#filterByTag').prop('disabled', false);
       }
     }
   }
