@@ -45,6 +45,7 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
+  private filterTags: Array<string>;
   private period = {
     year: 0,
     month: ''
@@ -252,6 +253,7 @@ class PageExp {
     $('#monthView, #dayView').attr('disabled', 'disabled');
     $('#yearView').trigger('click');
     $('#periodView').text(name);
+    self.focusChart.trigger('event:filter', self.filterTags);
   }
 
   public showMissing(content, event) {
@@ -472,7 +474,6 @@ class PageExp {
 
   private filterEventsByTags() {
     const self = this;
-    let selectedTags = [];
     const selectOptions = {
       minimumResultsForSearch: Infinity,
       placeholder: 'Filter by tag',
@@ -489,14 +490,14 @@ class PageExp {
     .on('select2:select', (element) => {
       const target = (element.target as HTMLSelectElement).options;
       const targetValues = Object.keys(target).filter(key => target[key].selected);
-      selectedTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
-      self.focusChart.trigger('event:filter', selectedTags);
+      self.filterTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
+      self.focusChart.trigger('event:filter', self.filterTags);
     })
     .on('select2:unselecting', (element) => {
       const removedTag = (element.target as HTMLSelectElement).value;
       const filterValue = self.fromSelectionIDtoTag(removedTag);
-      selectedTags.splice(selectedTags.indexOf(filterValue), 1);
-      self.focusChart.trigger('event:filter', selectedTags);
+      self.filterTags.splice(self.filterTags.indexOf(filterValue), 1);
+      self.focusChart.trigger('event:filter', self.filterTags);
     });
   }
 
