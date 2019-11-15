@@ -117,7 +117,7 @@ class PageExp {
     'id': 7,
     'text': '<span><i class="select untagged"></i>untagged</span>',
     'title': 'untagged'
-  }]
+  }];
 
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
@@ -472,7 +472,7 @@ class PageExp {
 
   private filterEventsByTags() {
     const self = this;
-    const selectedTags = [];
+    let selectedTags = [];
     const selectOptions = {
       minimumResultsForSearch: Infinity,
       placeholder: 'Filter by tag',
@@ -486,11 +486,10 @@ class PageExp {
     };
 
     $('select#filterByTag').select2(selectOptions)
-    .prop('disabled', true)
     .on('select2:select', (element) => {
       const target = (element.target as HTMLSelectElement).options;
-      const targetValues = Object.keys(target).filter(key => target[key].selected)
-      const selectedTags = targetValues.map(option => self.fromSelectionIDtoTag(option));
+      const targetValues = Object.keys(target).filter(key => target[key].selected);
+      selectedTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
       self.focusChart.trigger('event:filter', selectedTags);
     })
     .on('select2:unselecting', (element) => {
@@ -610,10 +609,12 @@ class PageExp {
         $('.timeseries-overview>.overlay').removeClass('hidden');
         $('.timeseries-detail>.overlay').removeClass('hidden');
         $('.period-view>.overlay').removeClass('hidden');
+        $('select#filterByTag').prop('disabled', true);
       } else {
         $('.timeseries-overview>.overlay').addClass('hidden');
         $('.timeseries-detail>.overlay').addClass('hidden');
         $('.period-view>.overlay').addClass('hidden');
+        $('select#filterByTag').prop('disabled', false);
       }
     }
   }

@@ -364,7 +364,7 @@ export class LineChartFocus extends pip.Events {
       );
     }
 
-    function filterEventsHandler(tags){
+    function filterEventsHandler(tags) {
       self.svg.selectAll('.window').remove();
       _.each(self.data, (data, index) => {
         const filteredEvents = data.eventWindows.filter(event => {
