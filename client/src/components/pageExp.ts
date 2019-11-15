@@ -1,4 +1,4 @@
-import 'select2';
+import 'select2/dist/js/select2.full.js';
 import * as pip from '../services/pip';
 import * as ko from 'knockout';
 import * as _ from 'lodash';
@@ -45,6 +45,11 @@ class PageExp {
   private ctxCharts: CtxCharts = {};
   private periodCharts: PeriodCharts = {};
   private selectedTagID: string;
+  private filterTags: Array<string>;
+  private period = {
+    year: 0,
+    month: ''
+  };
   private tagSelectionData = [
   {
     'text': 'Unknown',
@@ -78,6 +83,43 @@ class PageExp {
   }
 ];
 
+  private filterTagData = [
+    {
+      'id': 1,
+      'text': '<span><i class="select investigate"></i> investigate</span>',
+      'title': 'investigate'
+    },
+    {
+      'id': 2,
+      'text': '<span><i class="select not_investigate"></i>do not investigate</span>',
+      'title': 'do not investigate'
+    },
+    {
+      'id': 3,
+      'text': '<span><i class="select postpone"></i>postpone</span>',
+      'title': 'postpone'
+    },
+    {
+      'id': 4,
+      'text': '<span><i class="select problem"></i>problem</span>',
+      'title': 'problem'
+    },
+    {
+      'id': 5,
+      'text': '<span><i class="select seen"></i>previously seen</span>',
+      'title': 'previously seen'
+    },
+    {
+      'id': 6,
+      'text': '<span><i class="select normal"></i>normal</span>',
+      'title': 'normal'
+  },
+  {
+    'id': 7,
+    'text': '<span><i class="select untagged"></i>untagged</span>',
+    'title': 'untagged'
+  }];
+
   private eventInfo: EventInfo;
   private commentInfo: DT.Comment;
 
@@ -98,9 +140,11 @@ class PageExp {
     $('.chart-focus-container').height(this.config.focusHeight);
     $('.chart-focus .plot').height(this.config.focusHeight); // - 45);
     $('.chart-ctx-container').height(this.config.ctxHeight);
-    $('.pchart').height($('.connectedSortable').height() + 'px');
+    $('.pchart').height(($('.connectedSortable.ui-sortable').height() - 40) + 'px');
+    (<any>$('.sortable')).sortable();
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
+    this.filterEventsByTags();
   }
 
   public getBoxSizes() {
@@ -206,7 +250,10 @@ class PageExp {
     );
     $(`.chart-ctx .title`).parent().removeClass('ctx-active');
     $(`.chart-ctx [name=title-${name}]`).parent().addClass('ctx-active');
+    $('#monthView, #dayView').attr('disabled', 'disabled');
+    $('#yearView').trigger('click');
     $('#periodView').text(name);
+    self.focusChart.trigger('event:filter', self.filterTags);
   }
 
   public showMissing(content, event) {
@@ -241,16 +288,6 @@ class PageExp {
     this.periodCharts['month'].trigger('showPeriod', state);
     this.periodCharts['day'].trigger('showPeriod', state);
     return true;
-  }
-
-  public backward() {
-    if ($('#year').hasClass('active')) {
-      return;
-    } else if ($('#month').hasClass('active')) {
-      ($(`a[href="#year"]`) as any).tab('show');
-    } else if ($(`#day`).hasClass('active')) {
-      ($(`a[href="#month"]`) as any).tab('show');
-    }
   }
 
   public addEventMode(content, event) {
@@ -332,6 +369,8 @@ class PageExp {
         return 'previously seen';
       case '6':
         return 'normal';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -351,6 +390,8 @@ class PageExp {
         return '5';
       case 'normal':
         return '6';
+      case '7':
+        return 'null';
       default:
         return 'untagged';
     }
@@ -431,6 +472,35 @@ class PageExp {
     });
   }
 
+  private filterEventsByTags() {
+    const self = this;
+    const selectOptions = {
+      minimumResultsForSearch: Infinity,
+      placeholder: 'Filter by tag',
+      data: this.filterTagData,
+      closeOnSelect : false,
+      escapeMarkup: markup => markup,
+      tags: true,
+      allowClear: true,
+      multiple: true,
+      dropdownCssClass: 'multiple-dropdown'
+    };
+
+    $('select#filterByTag').select2(selectOptions)
+    .on('select2:select', (element) => {
+      const target = (element.target as HTMLSelectElement).options;
+      const targetValues = Object.keys(target).filter(key => target[key].selected);
+      self.filterTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
+      self.focusChart.trigger('event:filter', self.filterTags);
+    })
+    .on('select2:unselecting', (element) => {
+      const removedTag = (element.target as HTMLSelectElement).value;
+      const filterValue = self.fromSelectionIDtoTag(removedTag);
+      self.filterTags.splice(self.filterTags.indexOf(filterValue), 1);
+      self.focusChart.trigger('event:filter', self.filterTags);
+    });
+  }
+
   /**
    * Invoked on receiving signal 'comment:new' or 'comment:start'
    * @param eventInfo eventInfo
@@ -465,6 +535,50 @@ class PageExp {
     self.showDatasetInfo(true);
   }
 
+  private updateBrushPeriod(period) {
+    let start_time = 0;
+    let stop_time = 0;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const { year, month } = this.period;
+
+    switch (period.level) {
+      case 'year':
+        start_time = new Date(period.name).getTime();
+        stop_time = new Date(period.name, 11, 31).getTime();
+      break;
+
+      case 'month':
+        start_time = new Date(period.parent.name, months.indexOf(period.name), 1).getTime();
+        stop_time = new Date(period.parent.name, months.indexOf(period.name) + 1, 0).getTime();
+      break;
+
+      case 'resetYear':
+        start_time = period.start_time;
+        stop_time = period.stop_time;
+      break;
+
+      case 'resetMonth':
+        let m_start_time = new Date(year, 0, 1).getTime();
+        let m_stop_time = new Date(year, 11, 31).getTime();
+
+        start_time = m_start_time;
+        stop_time = m_stop_time;
+      break;
+
+      case 'resetDay':
+        const daysInMonth = new Date(year, months.indexOf(month) + 1, 0).getDate();
+        let d_start_time = new Date(year, months.indexOf(month), 1).getTime();
+        let d_stop_time = new Date(year, months.indexOf(month), daysInMonth).getTime();
+
+        start_time = d_start_time;
+        stop_time = d_stop_time;
+      break;
+    }
+    _.each(this.ctxCharts, ct => {
+      ct.trigger('brush:selectedPeriod', {start_time, stop_time});
+    });
+  }
+
   /**
    * Invoked on receiving signal 'experiment:change'
    * @param exp The selected experiment
@@ -496,10 +610,12 @@ class PageExp {
         $('.timeseries-overview>.overlay').removeClass('hidden');
         $('.timeseries-detail>.overlay').removeClass('hidden');
         $('.period-view>.overlay').removeClass('hidden');
+        $('select#filterByTag').prop('disabled', true);
       } else {
         $('.timeseries-overview>.overlay').addClass('hidden');
         $('.timeseries-detail>.overlay').addClass('hidden');
         $('.period-view>.overlay').addClass('hidden');
+        $('select#filterByTag').prop('disabled', false);
       }
     }
   }
@@ -519,6 +635,19 @@ class PageExp {
     });
     let xDomain: [number, number] = [mmin, mmax];
 
+    $('.nav-tabs button').on('click', (element) => {
+      const elementID = element.currentTarget.id;
+      if (elementID === 'yearView') {
+        self.updateBrushPeriod({level: 'resetYear', start_time: xDomain[0], stop_time: xDomain[1]});
+      }
+      if (elementID === 'monthView') {
+        self.updateBrushPeriod({level: 'resetMonth'});
+      }
+      if (elementID === 'dayView') {
+        self.updateBrushPeriod({level: 'resetDay'});
+      }
+    });
+
     if (_.isUndefined(self.focusChart)) {
       // plot context chart
       for (let i = 0; i < data.length; i++) {
@@ -536,6 +665,7 @@ class PageExp {
         );
       }
 
+      $('#monthView, #dayView').attr('disabled', 'disabled');
       $('.chart-focus .plot').empty();
       // plot focused chart
       self.focusChart = new LineChartFocus(
@@ -608,7 +738,8 @@ class PageExp {
       }
 
       // update period-chart
-      ($(`a[href="#year"]`) as any).tab('show');
+      ($('#yearView') as any).tab('show');
+
       server.events.read<{events: DT.Event[]}>(
         {},
         { datarun_id: d.datarun.id }
@@ -628,34 +759,34 @@ class PageExp {
     self.periodCharts['year'].on('select', async (o) => {
       let newData = [];
       let d = _.find(data, dd => dd.datarun.signal === self.focus());
-      let edata: {events: DT.Event[]} = await server.events.read<any>(
-        {},
-        { datarun_id: d.datarun.id }
-      );
+      let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
+      self.updateBrushPeriod(o);
+
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.name) { continue; }
-
-
         newData.push({
           name: d.datarun.signal,
           info: d.period[i].children,
           events: edata.events
         });
       }
-      // switch tab
-      ($('a[href="#month"]') as any).tab('show');
+
+      ($('#monthView') as any).tab('show');
+      $('#monthView').prop('disabled', false);
 
       // update
       self.periodCharts['month'].trigger('update', newData);
+      self.period.year = Number(o.name);
     });
 
     self.periodCharts['month'].on('select', async (o) => {
       let newData = [];
       let d = _.find(self.data, dd => dd.datarun.signal === self.focus());
-      let edata: {events: DT.Event[]} = await server.events.read<any>(
-        {},
-        { datarun_id: d.datarun.id }
-      );
+      let edata: {events: DT.Event[]} = await server.events.read<any>({}, { datarun_id: d.datarun.id });
+
+      self.updateBrushPeriod(o);
+      self.period.month = o.name;
+
       for (let i = 0; i < d.period.length; i++) {
         if (d.period[i].name !== o.parent.name) { continue; }
         for (let j = 0; j < d.period[i].children.length; j++) {
@@ -668,7 +799,8 @@ class PageExp {
         }
       }
       // switch tab
-      ($('a[href="#day"]') as any).tab('show');
+      ($('#dayView') as any).tab('show');
+      $('#dayView').prop('disabled', false);
 
       // update
       self.periodCharts['day'].trigger('update', newData);

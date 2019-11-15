@@ -10,7 +10,6 @@ export interface Option {
   // svg layout
   height?: number;
   width?: number;
-  margin?: { top: number, right: number, bottom: number, left: number }; // for focus chart
   // animation
   duration?: number;
   delay?: number;
@@ -22,10 +21,11 @@ export interface Option {
   minSize?: number;
   missing?: boolean;   // whether highlight missing data
   circleStroke?: number; // used to calculate circle target stroke
-  scaleFactor?: number;
-  marginRatio?: number;
   dayLevelTranslate?: number;
   isPeriodVisible?: boolean;
+  colSpace?: number;
+  rowSpace?: number;
+  grouppedEvents?: Object;
 }
 
 export class PeriodChart extends pip.Events {
@@ -34,7 +34,6 @@ export class PeriodChart extends pip.Events {
     // svg layout
     height: null,
     width: null,
-    margin: { top: 0, right: 0, bottom: 10, left: 0 },
     // animation
     duration: 750,
     delay: 50,
@@ -45,15 +44,15 @@ export class PeriodChart extends pip.Events {
     minSize: 6,
     missing: false,
     circleStroke: 1,
-    scaleFactor: 0.9,
-    marginRatio: 0,
-    dayLevelTranslate: 40,
-    isPeriodVisible: true
+    dayLevelTranslate: 30,
+    isPeriodVisible: true,
+    colSpace: 10,
+    rowSpace: 30,
+    grouppedEvents: {}
   };
 
   private svgContainer: d3.Selection<HTMLElement, any, any, any>;
   private svg: d3.Selection<SVGElement, any, any, any>;
-  private defaultHeight = 300;
 
   constructor(
     ele: HTMLElement,
@@ -64,47 +63,48 @@ export class PeriodChart extends pip.Events {
     let self = this;
     _.extend(self.option, option);
     self.svgContainer = d3.select<HTMLElement, any>(ele);
-
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
-
-    let { nCol, width, padding, margin } = self.option;
-
-    if (nCol !== null) {
-      self.option.size = Math.floor((width - margin.left - margin.right) / nCol);
-    }
-
-    self.option.nCol = Math.floor((width - margin.left - margin.right) / (self.option.size));
-
-    self.option.marginRatio = self.option.size / 15 * self.option.scaleFactor; // each cell bottom margin
-
-    if (self.option.height === null) {
-      const rowsCount = Math.ceil(data[0].info.length / self.option.nCol);
-      self.option.height = self.option.size * rowsCount + (rowsCount - 1)
-        * self.option.marginRatio + margin.top + margin.bottom; // adding text offset height
-    } else {
-      self.option.height = self.defaultHeight;
-    }
+    $(ele).height(($('.pchart').height() - 80) + 'px'); // firefox bug
+    self.layoutGlyphs($(ele), data);
 
     // append svg to the container
-    self.svg = self.svgContainer.append<SVGElement>('svg')
-      .attr('class', 'multi-period-chart')
-      .attr('width', self.option.width)
-      .attr('height', self.option.height);
+    self.svg = self.svgContainer.append<SVGElement>('svg').attr('class', 'multi-period-chart');
     self.plot();
+  }
+
+  private layoutGlyphs(ele, data) {
+    const elementWidth = this.option.width;
+    const elementHeight = ele.height();
+    const self = this;
+    const {nCol, rowSpace, colSpace} = self.option;
+    const rowsCount = Math.ceil(data[0].info.length / nCol);
+    let diffSize = elementWidth - elementHeight;
+    let size = 0;
+    self.option.height = elementHeight;
+
+    if (diffSize > 0) { // width is bigger than height
+      size = (elementHeight - ((rowsCount * rowSpace))) / rowsCount;
+      if (self.data[0].info[0].level === 'day') { // day level needs an additional top space
+        size = (elementHeight - ((rowsCount * rowSpace) + self.option.dayLevelTranslate + (diffSize / rowsCount))) / rowsCount;
+      }
+    } else {
+      size = (elementWidth - 2 - ((nCol - 1) * colSpace)) / nCol;
+      if (size * rowsCount * rowSpace > elementHeight) {
+        size = size - (elementHeight / (rowsCount * rowSpace));
+      }
+    }
+    self.option.size = size;
   }
 
   private plot() {
     let self = this;
     const option = self.option;
-    const { width, height, margin, padding, size, nCol } = self.option;
-
-    const [w, h] = [
-      width - margin.left - margin.right,
-      height - margin.top - margin.bottom,
-    ];
+    const { width, height, padding, size, nCol } = self.option;
 
     let outerRadius = (size / 2) - (padding / 2);
     let innerRadius = Math.max(outerRadius / 8, option.minSize);
+
+    self.groupEvents();
 
     // layout setting
     _.each(self.data, d => {
@@ -118,19 +118,17 @@ export class PeriodChart extends pip.Events {
     let { angle, radius, area, area0 } = self.getScale(innerRadius, outerRadius);
 
     // zoom
-    let { zoom, zoomRect } = self.addZoom(w, h);
+    let { zoom, zoomRect } = self.addZoom(width, height);
     zoom.on('zoom', zoomHandler);
     let zoomG = self.svg.append('g');
 
-    let g = zoomG.append('g')
-      .attr('transform', `translate(${option.margin.left}, ${option.margin.top})`);
-
+    let g = zoomG.append('g');
     self.normalize();
     // add glyphs
     let { featurePlot } = self.addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius);
 
     // add labels
-    let { label1, label2 } = self.addLabels(g, size);
+    let { label1 } = self.addLabels(g, size);
 
     // ************  events  ************
     self.on('update', update);
@@ -145,12 +143,10 @@ export class PeriodChart extends pip.Events {
         o = self.data;
       }
       self.normalize();
+      self.groupEvents();
 
       if (o[0].info[0].level === 'year') {
-        let newHeight = size
-          * Math.ceil((o[0].info.length) / nCol)
-          + margin.top + margin.bottom + self.option.marginRatio;
-
+        let newHeight = size * Math.ceil((o[0].info.length) / nCol);
         self.svg.attr('height', newHeight);
         zoomRect.attr('height', newHeight).call(zoom);
       }
@@ -166,15 +162,11 @@ export class PeriodChart extends pip.Events {
           o[0].info[0].parent.parent.name
         ];
         let offset = new Date(`${mm} 1, ${yy} 00:00:00`).getDay();
-        let newHeight = size
-          * Math.ceil((o[0].info.length + offset) / nCol)
-          + margin.top + margin.bottom + self.option.marginRatio + self.option.dayLevelTranslate;
+        let newHeight = size * Math.ceil((o[0].info.length + offset) / nCol) + self.option.dayLevelTranslate;
+        self.svg.attr('height', newHeight);
 
-        let nh = newHeight + margin.top + margin.bottom + self.option.marginRatio;
-        self.svg.attr('height', nh);
-
-        zoom.translateExtent([[0, 0], [w, nh]]).extent([[0, 0], [w, nh]]);
-        zoomRect.attr('height', nh).call(zoom);
+        zoom.translateExtent([[0, 0], [width, newHeight]]).extent([[0, 0], [width, newHeight]]);
+        zoomRect.attr('height', newHeight).call(zoom);
         _.each(self.data, d => {
           _.each(d.info, (dd, i) => {
             let dt = new Date(`${mm} ${i + 1}, ${yy} 00:00:00`);
@@ -200,16 +192,22 @@ export class PeriodChart extends pip.Events {
           .merge(_g as any)
           .attr('class', `feature-cell feature-cell-${data.name}`)
           .attr('transform', d => {
+            let translateCoords = [];
             if (d.level === 'day') {
-              return `
-                translate(
-                    ${d.col * size + size / 2},
-                    ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}),
-                scale(${self.option.scaleFactor})`;
+              translateCoords = [
+                d.col !== 0 ? (d.col * (size + self.option.colSpace) + size / 2) : (size + 2) / 2,
+                d.row !== 0 ?
+                  (d.row * (size + self.option.rowSpace) + size / 2 + self.option.dayLevelTranslate + self.option.rowSpace) :
+                size / 2 + self.option.rowSpace + self.option.dayLevelTranslate
+              ];
+            } else {
+              translateCoords = [
+                d.col !== 0 ? (d.col * (size + self.option.colSpace) + size / 2) : size / 2,
+                d.row !== 0 ? (d.row * (size + self.option.rowSpace) + size / 2) : ((size + 2) / 2)
+              ];
             }
-            return `
-              translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}),
-              scale(${self.option.scaleFactor})`;
+
+            return `translate(${translateCoords})`;
           })
           .each(function (d, count) {
             const randomID = self.generateRandomID();
@@ -266,21 +264,19 @@ export class PeriodChart extends pip.Events {
     self.data = clones;
   }
 
-  private addZoom(w, h) {
+  private addZoom(width, height) {
     let self = this;
-    let option = self.option;
 
     let zoom = d3.zoom()
       .scaleExtent([1, 6])
-      .translateExtent([[0, 0], [w, h]])
-      .extent([[0, 0], [w, h]]);
+      .translateExtent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height]]);
 
     let zoomRect;
     zoomRect = self.svg.append('rect')
       .attr('class', 'zoom')
-      .attr('transform', `translate(${option.margin.left},${option.margin.top})`)
-      .attr('width', w)
-      .attr('height', h)
+      .attr('width', width)
+      .attr('height', height)
       .call(zoom);
 
     return { zoom, zoomRect };
@@ -310,6 +306,7 @@ export class PeriodChart extends pip.Events {
   }
 
   private addLabels(g, size) {
+    const textOffset = 10;
     let self = this;
     if (self.data[0].info[0].level === 'day') {
       let names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -321,7 +318,7 @@ export class PeriodChart extends pip.Events {
         .enter()
         .append('text')
         .attr('class', 'radial-text-md weekday-text')
-        .attr('x', d => d * size + size / 2)
+        .attr('x', d => d * (size + self.option.colSpace) + size / 2 - textOffset)
         .attr('y', 0)
         .text(d => names[d]);
     }
@@ -350,128 +347,224 @@ export class PeriodChart extends pip.Events {
     return datum / 1000;
   };
 
-  /**
-   * @TODO - if possible, make a single function out of those three
-  * (groupEventPerYear, groupEventsPerMonth, groupEventsPerDay)
-  * should be something like groupEvents(criteria) where criteria = year or month or day
-  */
-  private groupEventsPerYear(year) {
-    const self = this;
-    const events = self.data[0].events;
-    const eventsPerYear = [];
+  private groupEvents() {
+      const result = {};
+      const self = this;
+      const events = self.data[0].events;
+      events.forEach(event => {
+          const {start_time, stop_time} = event;
+          const eventStartYear = new Date(start_time * 1000).getFullYear();
+          const eventStopYear = new Date(stop_time * 1000).getFullYear();
+          let currentYear = eventStartYear;
 
-    events.forEach(evt => {
-      const startYear = new Date(evt.start_time * 1000).getFullYear();
-      const endYear = new Date(evt.stop_time * 1000).getFullYear();
+          while (currentYear <= eventStopYear) {
+            const yearStartDate = self.toTimestamp(`01/01/${currentYear} 00:00:00`);
+            const yearStopDate = self.toTimestamp(`12/31/${currentYear} 23:59:59`);
+            const eventProps = {
+              id: event.id,
+              start_time: start_time >= yearStartDate ? start_time : yearStartDate,
+              stop_time: stop_time <= yearStopDate ? stop_time : yearStopDate,
+              tag: event.tag,
+              score: event.score
+            };
 
-      const eventPeriod = {
-        startDate: new Date(evt.start_time * 1000).toDateString(),
-        stopDate: new Date(evt.stop_time * 1000).toDateString()
-      };
+            if (result[currentYear]) {
+              result[currentYear]['events'][event.id] = eventProps;
+            } else {
+              result[currentYear] = {
+                events: {[event.id]: eventProps},
+                months: {}
+              };
+            }
 
-      let currentYear = startYear;
+            const eventStartMonth = new Date(result[currentYear].events[event.id].start_time * 1000).getMonth() + 1;
+            const eventStopMonth = new Date(result[currentYear].events[event.id].stop_time * 1000).getMonth() + 1;
+            let currentMonth = eventStartMonth;
 
-      while (currentYear <= endYear) {
-        const maxYearDate = self.toTimestamp(`12/31/${currentYear} 23:59:59`);
-        const minYearDate = self.toTimestamp(`01/01/${currentYear} 00:00:00`);
+            while (currentMonth <= eventStopMonth) {
+                const maxDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+                const monthDateStart = self.toTimestamp(`${currentMonth}/01/${currentYear} 00:00:00`);
+                const monthDateStop = self.toTimestamp(`${currentMonth }/${maxDaysInMonth}/${currentYear} 23:59:59`);
 
-        eventsPerYear.push({
-          [currentYear]: {
-            id: evt.id,
-            score: evt.score,
-            start_time: startYear === currentYear ? evt.start_time : minYearDate,
-            stop_time: endYear === currentYear ? evt.stop_time : maxYearDate,
-            tag: evt.tag,
-            eventPeriod
-          }
-        });
-        currentYear++;
-      }
-    });
+                let month = {
+                  id: event.id,
+                  start_time: start_time >= monthDateStart ? start_time : monthDateStart,
+                  stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
+                  tag: event.tag,
+                  score: event.score,
+                  days: {}
+                };
 
-    return eventsPerYear.filter(event => event[year]);
+                const eventStartDay = new Date(month.start_time * 1000).getDate();
+                const eventStopDay = new Date(month.stop_time * 1000).getDate();
+                let currentDay = eventStartDay;
+
+                result[currentYear].months[currentMonth] = month;
+
+                while (currentDay <= eventStopDay) {
+                    const dayDateStart = self.toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 00:00:00`);
+                    const dayDateStop = self.toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 23:59:59`);
+
+                    let day = {
+                      id: event.id,
+                      start_time: start_time >= dayDateStart ? start_time : dayDateStart,
+                      stop_time: stop_time <= dayDateStop ? stop_time : dayDateStop,
+                      tag: event.tag,
+                      score: event.score,
+                    };
+
+                    result[currentYear].months[currentMonth].days[currentDay] = day;
+                    currentDay++;
+                }
+                currentMonth++;
+            }
+            currentYear++;
+        }
+      });
+      self.option.grouppedEvents = result;
   }
 
-  private groupEventsPerMonth(monthName, year) {
+  private drawArc = (eventProps, interval, arc, target) => {
     const self = this;
-    const eventsPerMonth = [];
+
+    const PI = Math.PI;
+    const secondsInMonth = 2629743.83;
+    const circleMonths = (2 * PI) / 12;
+    const {start_time, stop_time, tag, score} = eventProps;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const eventsPerYear = self.groupEventsPerYear(year);
+    const monthNumber = months.indexOf(interval.period.month);
+    const daysInMonth = new Date(Number(interval.period.year), monthNumber, 0).getDate();
+    const circleDays = (2 * PI) / daysInMonth;
+    const secondsInDay = 86400;
+    const circleHours = (2 * PI) / 24;
+    const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
+    const rootEvent = self.data[0].events.filter(event => event.id === eventProps.id)[0];
+    const startDate = new Date(rootEvent.start_time * 1000).toDateString();
+    const stopDate = new Date(rootEvent.stop_time * 1000).toDateString();
+    const arcClassName = `${startDate.replace(/ /g, '_')}`;
 
-    eventsPerYear.forEach(event => {
-      const startMonth = new Date(event[year].start_time * 1000).getMonth();
-      const endMonth = new Date(event[year].stop_time * 1000).getMonth();
+    let arcStart = 0;
+    let arcStop = 0;
+    let base = 0;
 
-      const eventPeriod = {
-        startDate: event[year].eventPeriod.startDate,
-        stopDate: event[year].eventPeriod.stopDate
-      };
+    if (interval.level === 'year') {
+      base = new Date(Number(interval.period.year)).getTime() / 1000;
+      arcStart = ((start_time - base) / secondsInMonth) * circleMonths;
+      arcStop = ((stop_time - base) / secondsInMonth) * circleMonths;
+    }
 
-      let currentMonth = startMonth;
+    if (interval.level === 'month') {
+      base = new Date(Number(interval.period.year), monthNumber).getTime() / 1000;
+      arcStart = ((start_time - base) / secondsInDay) * circleDays;
+      arcStop = ((stop_time - base) / secondsInDay) * circleDays;
+    }
 
-      while (currentMonth <= endMonth) {
-        const maxDaysInMonth = new Date(year, months.indexOf(monthName) + 1, 0).getDate();
-        const maxMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${maxDaysInMonth}/${year} 23:59:59`);
-        const minMonthDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/01/${year} 00:00:00`);
+    if (interval.level === 'day') {
+      base = new Date(Number(interval.period.year), monthNumber, interval.period.day).getTime() / 1000;
+      arcStart = ((start_time - base) / 3600) * circleHours;
+      arcStop = ((stop_time - base) / 3600) * circleHours;
+    }
 
-        eventsPerMonth.push({
-          [currentMonth]: {
-            id: event[year].id,
-            score: event[year].score,
-            start_time: startMonth === currentMonth ? event[year].start_time : minMonthDate,
-            stop_time: endMonth === currentMonth ? event[year].stop_time : maxMonthDate,
-            tag: event[year].tag,
-            eventPeriod
-          }
-        });
-        currentMonth++;
+    const getTagColor = (tagType: string): string => {
+      let colorIdx = 0;
+      for (let i = 0; i < tagSeq.length; i += 1) {
+        if (tagSeq[i] === tagType) {
+          colorIdx = i;
+        }
+      }
+      return colorSchemes.tag[colorIdx];
+    };
+
+    arc
+      .startAngle(arcStart)
+      .endAngle(arcStop);
+
+    target
+      .append('path')
+      .attr('class' , () =>
+        self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
+      )
+      .attr('d', arc)
+      .attr('fill', getTagColor(tag || 'untagged'))
+      .attr('stroke', 3)
+      .on('mouseover', function() {
+        $(`.${arcClassName}`).addClass('active');
+      })
+      .on('mouseout', function() {
+        $(`.${arcClassName}`).removeClass('active');
+      });
+
+    $('.circle-arc').tooltipster({
+      'maxWidth': 170,
+      contentAsHTML: true,
+      arrow: false,
+      side: 'right',
+      trigger: 'custom',
+      debug: false,
+      triggerOpen: {
+        click: true,
+        tap: true,
+        mouseenter: true
+      },
+      triggerClose: {
+        click: true,
+        scroll: false,
+        tap: true,
+        mouseleave: true
+      },
+
+      functionInit: function (instance) {
+        let tooltipContent = `
+            <ul class="tooltip-events">
+              <li class="events">${tag || 'untagged'} </li>
+              <li>
+                <span>START</span>
+                <span>${startDate} </span>
+              </li>
+              <li>
+                <span>END</span>
+                <span>${stopDate}</span>
+              </li>
+            </ul>`;
+        instance.content(tooltipContent);
       }
     });
-    return eventsPerMonth.filter(event => event[months.indexOf(monthName)]);
   }
 
-  private groupEventsPerDay(day, monthName, year) {
+  private drawEvents(level, period, arc, target) {
+    let filteredEvents = {};
     const self = this;
-    const eventsPerDay = [];
+    const grouppedEvents = self.option.grouppedEvents;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthNumber = months.indexOf(monthName);
-    const eventsPerMonth = self.groupEventsPerMonth(monthName, year);
-    eventsPerMonth.forEach(event => {
-      const startDay = new Date(event[monthNumber].start_time * 1000).getDate();
-      const endDay = new Date(event[monthNumber].stop_time * 1000).getDate();
-      let currentDay = startDay;
-      const month = months.indexOf(monthName);
+    const month = level === 'month' || level === 'day' ? months.indexOf(period.month) + 1 : null;
 
-      const eventPeriod = {
-        startDate: event[month].eventPeriod.startDate,
-        stopDate: event[month].eventPeriod.stopDate
-      };
+    if (level === 'year') {
+      filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].events : null;
+      filteredEvents &&
+      Object.keys(filteredEvents).forEach((eventKey) =>
+        self.drawArc(filteredEvents[eventKey], {level, period}, arc, target)
+      );
+    }
 
-      while (currentDay <= endDay) {
-        const maxDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 23:59:59`);
-        const minDayDate = self.toTimestamp(`${months.indexOf(monthName) + 1}/${currentDay}/${year} 00:00:00`);
+    if (level === 'month') {
+      filteredEvents = grouppedEvents[period.year] !== undefined ? grouppedEvents[period.year].months[month] : null;
+      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target);
+    }
 
-        eventsPerDay.push({
-          [currentDay]: {
-            id: event[month].id,
-            score: event[month].score,
-            start_time: startDay === currentDay ? event[month].start_time : minDayDate,
-            stop_time: endDay === currentDay ? event[month].stop_time : maxDayDate,
-            tag: event[month].tag,
-            eventPeriod
-          }
-        });
-        currentDay++;
-      }
-    });
-    return eventsPerDay.filter(event => event[day]);
+    if (level === 'day') {
+      const eventExist = grouppedEvents[period.year] !== undefined &&
+                        grouppedEvents[period.year].months !== undefined &&
+                        grouppedEvents[period.year].months[month] !== undefined || null;
+
+      filteredEvents = eventExist &&  grouppedEvents[period.year].months[month].days[period.day];
+      filteredEvents && self.drawArc(filteredEvents, {level, period}, arc, target);
+    }
   }
 
   private addGlyphs(g, angle, radius, area, area0, size, innerRadius, outerRadius) {
     let self = this;
     let option = self.option;
 
-    // let cell = g.append('g').attr('class', `${self.data[0].info[0].level }_level`);
     // plot data on each station
     _.each(self.data, (data, count) => {
       let cell = g
@@ -481,22 +574,30 @@ export class PeriodChart extends pip.Events {
         .append('g')
         .attr('class', `feature-cell feature-cell-${data.name}`)
         .attr('transform', d => {
-          if (d.level === 'day') {
-            return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.dayLevelTranslate + self.option.marginRatio * d.row}), scale(${self.option.scaleFactor})`;
-          }
-          return `translate(${d.col * size + size / 2}, ${d.row * size + size / 2 + self.option.marginRatio * d.row}), scale(${self.option.scaleFactor})`;
+          let translateCoords = [
+            d.col !== 0 ? (d.col * (size + self.option.colSpace) + size / 2) : size / 2,
+            d.row !== 0 ? (d.row * (size + self.option.rowSpace) + size / 2) : (size + 2) / 2
+          ];
+
+          return `translate(${translateCoords})`;
         })
         .each(function (d) {
           const randomID = self.generateRandomID();
           featurePlot(d3.select(this), d, data.name, randomID);
         });
-
     });
 
     return { featurePlot };
 
     function featurePlot(_cell, o: dataDP.ChartDataEleInfoEle, stationName: string, id: any) {
       const { circleStroke } = self.option;
+
+      // create the 'target' svg circles
+      let target = _cell.append('g').attr('class', 'target').on('click', () => self.trigger('select', o));
+      const ratio = size / 3 - circleStroke / 2;
+      const targetRadius = size / 2 - circleStroke / 2;
+      const strokeWidth = size / 2;
+      const arc = d3.arc().innerRadius(targetRadius - 2).outerRadius(targetRadius + 2);
 
       // Extend the domain slightly to match the range of [0, 2π].
       angle.domain([0, o.bins.length - 0.05]);
@@ -510,7 +611,7 @@ export class PeriodChart extends pip.Events {
         .attr('class', 'feature-area radial-cursor')
         .attr('id', `path_${id}`)
         .attr('d', area0)
-        .on('click', (d) => {
+        .on('click', () => {
           if (o.children) {
             self.trigger('select', o);
           }
@@ -529,15 +630,6 @@ export class PeriodChart extends pip.Events {
       path.append('title')
         .text(o.name);
 
-
-      // create the 'target' svg circles
-      let target = _cell.append('g')
-        .attr('class', 'target');
-
-      const ratio = size / 3 - circleStroke / 2;
-      const targetRadius = size / 2 - circleStroke / 2;
-      const strokeWidth = size / 2;
-
       target.append('circle')
         .attr('r', targetRadius)
         .attr('stroke-width', circleStroke);
@@ -548,7 +640,6 @@ export class PeriodChart extends pip.Events {
       target.append('circle')
         .attr('r', targetRadius - ratio)
         .attr('stroke-width', circleStroke);
-
 
       // vertical/horizontal lines for the 'target'
       target.append('line')
@@ -565,12 +656,12 @@ export class PeriodChart extends pip.Events {
         .attr('y1', -(strokeWidth))
         .attr('y2', strokeWidth);
 
-
       _cell.append('circle')
         .attr('clip-path', `url(#clip_${id})`)
         .attr('class', 'wrapper')
         .attr('r', strokeWidth)
-        .attr('fill', 'url(#blueGradient)');
+        .attr('fill', 'url(#blueGradient)')
+        .on('click', () => self.trigger('select', o));
 
       _cell.append('circle')
         .attr('class', 'radial-cursor svg-tooltip')
@@ -579,250 +670,42 @@ export class PeriodChart extends pip.Events {
         .attr('r', innerRadius)
         .style('fill', 'white')
         .style('stroke-width', 0)
-        .on('click', (d) => {
-          self.trigger('select', o);
-        })
+        .on('click', () => self.trigger('select', o))
         .attr('title',
           '["investigate", "do not investigate", "postpone", "problem", "previously seen", "normal", "untagged"]'
         ); // should be gathered from API
 
-      // @TODO - refactor
       if (self.data[0].events.length) {
-        const PI = Math.PI;
-        const secondsInMonth = 2629743.83;
-        const secondsInDay = 86400;
-        const circleMonths = (2 * PI) / 12;
-        const circleHours = (2 * PI) / 24;
-        colorSchemes.tag.push('#fff');
-        const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal', 'untagged'];
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-        const getTagColor = (tag: string): string => {
-          let colorIdx = 0;
-          for (let i = 0; i < tagSeq.length; i += 1) {
-            if (tagSeq[i] === tag) {
-              colorIdx = i;
-            }
-          }
-          return colorSchemes.tag[colorIdx];
-        };
-
-        const arc = d3.arc()
-          .innerRadius(targetRadius - 2)
-          .outerRadius(targetRadius + 2);
 
         if (o.level === 'year') {
-          const events = self.groupEventsPerYear(Number(o.name));
-          events.length && events.forEach(event => {
-            const base = new Date(Number(o.name)).getTime() / 1000;
-            const startTime = ((event[Number(o.name)].start_time - base) / secondsInMonth) * circleMonths;
-            const stopTime = ((event[Number(o.name)].stop_time - base) / secondsInMonth) * circleMonths;
-            const { startDate, stopDate } = event[Number(o.name)].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-            // @TODO - find a way to remove repetitive code
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                      <ul class="tooltip-events">
-                        <li class="events">${event[o.name].tag || 'untagged'} </li>
-                        <li>
-                          <span>START</span>
-                          <span>${startDate} </span>
-                        </li>
-                        <li>
-                          <span>END</span>
-                          <span> ${stopDate}</span>
-                        </li>
-                      </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.name;
+          self.drawEvents('year', {year}, arc, target);
         }
 
         if (o.level === 'month') {
-          const events = self.groupEventsPerMonth(o.name, o.parent.name); // month name and year
-          events.length && events.forEach(event => {
-            const base = new Date(Number(o.parent.name), monthNames.indexOf(o.name)).getTime() / 1000;
-            const daysInMonth = o.children.length;
-            const circleDays = (2 * PI) / daysInMonth;
-            const startTime = ((event[monthNames.indexOf(o.name)].start_time - base) / secondsInDay) * circleDays;
-            const stopTime = ((event[monthNames.indexOf(o.name)].stop_time - base) / secondsInDay) * circleDays;
-            const { startDate, stopDate } = event[monthNames.indexOf(o.name)].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .innerRadius(targetRadius - 2)
-              .outerRadius(targetRadius + 2)
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[monthNames.indexOf(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                      <ul class="tooltip-events">
-                        <li class="events">${event[monthNames.indexOf(o.name)].tag || 'untagged'} </li>
-                        <li>
-                          <span>START</span>
-                          <span>${startDate} </span>
-                        </li>
-                        <li>
-                          <span>END</span>
-                          <span> ${stopDate}</span>
-                        </li>
-                      </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.parent.name;
+          const month = o.name;
+          self.drawEvents('month', {year, month}, arc, target);
         }
 
         if (o.level === 'day') {
-          const dayEvents = self.groupEventsPerDay(o.name, o.parent.name, o.parent.parent.name);
-          dayEvents.length && dayEvents.forEach(event => {
-            const base = new Date(Number(o.parent.parent.name), monthNames.indexOf(o.parent.name), Number(o.name)).getTime() / 1000;
-            const startTime = ((event[o.name].start_time - base) / 3600) * circleHours;
-            const stopTime = ((event[o.name].stop_time - base) / 3600) * circleHours;
-            const { startDate, stopDate } = event[o.name].eventPeriod;
-            const arcClassName = `${startDate.replace(/ /g, '_')}`;
-
-            arc
-              .innerRadius(targetRadius + 1.5)
-              .outerRadius(targetRadius - 1.5)
-              .startAngle(startTime)
-              .endAngle(stopTime);
-
-            target.append('path')
-              .attr('class', () =>
-                self.option.isPeriodVisible ? `circle-arc ${arcClassName} visible` : `circle-arc ${arcClassName}`
-              )
-              .attr('d', arc)
-              .attr('fill', getTagColor(event[o.name].tag || 'untagged'))
-              .attr('stroke', getTagColor(event[Number(o.name)].tag || 'untagged'))
-              .on('mouseover', function() {
-                $(`.${arcClassName}`).addClass('active');
-              })
-              .on('mouseout', function() {
-                $(`.${arcClassName}`).removeClass('active');
-              });
-
-
-            $('.circle-arc').tooltipster({
-              'maxWidth': 170,
-              contentAsHTML: true,
-              arrow: false,
-              side: 'right',
-              trigger: 'custom',
-              debug: false,
-              triggerOpen: {
-                click: true,
-                tap: true,
-                mouseenter: true
-              },
-              triggerClose: {
-                click: true,
-                scroll: false,
-                tap: true,
-                mouseleave: true
-              },
-
-              functionInit: function (instance) {
-                let tooltipContent = `
-                        <ul class="tooltip-events">
-                          <li class="events">${event[o.name].tag || 'untagged'} </li>
-                          <li>
-                            <span>START</span>
-                            <span>${startDate} </span>
-                          </li>
-                          <li>
-                            <span>END</span>
-                            <span> ${stopDate}</span>
-                          </li>
-                        </ul>`;
-                instance.content(tooltipContent);
-              }
-            });
-          });
+          const year = o.parent.parent.name;
+          const month = o.parent.name;
+          const day = o.name;
+          self.drawEvents('day', {year, month, day}, arc, target);
         }
 
         _cell.append('text')
           .attr('class', 'radial-text-md')
           .text(o.name)
           .attr('x', function (data, arg, svgEls) {
-            const textOffset = svgEls[0].clientWidth;
+            // tslint:disable-next-line
+            const textOffset = ~~(svgEls[0].getBBox().width);
             return -(textOffset / 2);
           })
           .attr('y', (data, arg, svgEls) => {
-            const textOffset = svgEls[0].getBBox().height;
+            // tslint:disable-next-line
+            const textOffset = ~~(svgEls[0].getBBox().height);
             return size / 2 + textOffset;
           });
 

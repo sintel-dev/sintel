@@ -20,6 +20,26 @@
         box-shadow: none;
     }
 
+    .nav-tabs-custom {
+        .tab-pane {
+            position: absolute;
+            width: 0;
+            right: -3000px;
+            display: block;
+            opacity: 0;
+            svg{
+                width: 100%;
+                height: 100%;
+            }
+
+            &.active{
+                position: static;
+                width: 100%;
+                opacity: 1;
+            }
+        }
+    }
+
     .fa-size-lg {
         font-size: 20px;
     }
@@ -32,39 +52,44 @@
         overflow-y: scroll;
     }
 
+    .sortable {
+        background: #23242B;
+    }
+
     .chart-ctx {
         position: relative;
         width: 100%;
-        height: 40px;
-        .title {
-            position: absolute;
-            width: 100px;
-            cursor: pointer;
-            text-align: center;
-            line-height: 40px;
-            background-color: white;
-            transition: background-color 1s;
-        }
-        .plot {
-            position: absolute;
-            left: 101px;
-            width: calc(100% - 101px);
-            height: 40px;
-        }
-    }
-
-    .chart-ctx{
         height: 60px;
-        .title{
-            background: none;
-            color: #fff;
+        
+        display: flex;
+        align-items: center;
+        background: #2C3034;
+        margin-bottom: 1px;
+        border: 1px solid #2C3034;
+        i {
+            &.icon-lines-vertical {
+                margin-left: 14px;
+                color: #B3BBD3;
+                font-size: 14px;
+                opacity: 0;
+                transition: all .2s ease-in-out;
+                cursor: move;
+            }
+        }
+
+        .title {
             line-height: 60px;
             font-size: 15px;
             color: #8A9097;
-            width: 70px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 1s;
+            white-space: nowrap;
+            width: 34px;
         }
-
-        .plot{
+        
+        .plot {
+            position: absolute;
             height: 60px;
             left: auto;
             right: 0;
@@ -73,13 +98,12 @@
 
         .handle{
             display: none;
-            // height: 18px;
             height: 42px;
             y: 0;
             ry: 3;
         }
 
-        &.ctx-active{
+        &.ctx-active {
             transition: all .2s ease-in-out;
             background: @second-color;
             box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);
@@ -91,6 +115,16 @@
 
             .handle{
                 display: block;
+            }
+        }
+
+        &.ui-sortable-helper {
+            box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0,0,0,0.14);
+        }
+
+        &:hover, &.ui-sortable-helper {
+            i.icon-lines-vertical{
+                opacity: 1;
             }
         }
 
