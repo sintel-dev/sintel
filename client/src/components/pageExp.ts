@@ -486,18 +486,27 @@ class PageExp {
       dropdownCssClass: 'multiple-dropdown'
     };
 
+    const focusChartFilter = (tags) => {
+      Object.keys(self.ctxCharts).forEach(key => {
+        self.ctxCharts[key].trigger('event:filter', tags);
+      });
+    }
+
     $('select#filterByTag').select2(selectOptions)
     .on('select2:select', (element) => {
       const target = (element.target as HTMLSelectElement).options;
       const targetValues = Object.keys(target).filter(key => target[key].selected);
       self.filterTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
       self.focusChart.trigger('event:filter', self.filterTags);
+
+      focusChartFilter(self.filterTags)
     })
     .on('select2:unselecting', (element) => {
       const removedTag = (element.target as HTMLSelectElement).value;
       const filterValue = self.fromSelectionIDtoTag(removedTag);
       self.filterTags.splice(self.filterTags.indexOf(filterValue), 1);
       self.focusChart.trigger('event:filter', self.filterTags);
+      focusChartFilter(self.filterTags)
     });
   }
 

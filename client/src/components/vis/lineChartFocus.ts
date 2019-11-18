@@ -678,6 +678,13 @@ export class LineChartFocus extends pip.Events {
               });
             });
 
+          // @TODO yet to be investigated
+          // d[0] should never be greather than lineData.length
+          // select E-9 and then A-9
+          if(d[0] > lineData.length) {
+            return;
+          }
+
           bgRect.append('title')
             .text(`tag: ${d[4]}` + '\n' +
               'from ' + new Date(lineData[d[0]][0]).toString() + '\n' +

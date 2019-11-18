@@ -27,6 +27,8 @@ export interface Option {
   xAxis?: boolean;
   yAxis?: boolean;
   buffer?: number;
+  filteredEvents?: Array<[number, number, number, string, string]>;
+  filterTags?: Array<[]>;
 }
 
 export class LineChartCtx extends pip.Events {
@@ -77,7 +79,8 @@ export class LineChartCtx extends pip.Events {
 
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
     self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
-
+    self.option.filteredEvents = [];
+    self.option.filterTags = [];
     // scroll style inside <div> container
     self.container
       // .classed('scroll-style-0', true)
@@ -174,6 +177,7 @@ export class LineChartCtx extends pip.Events {
     });
 
     self.on('data:update', dataUpdateHandler);
+    self.on('event:filter', filterEventsHandler);
 
     self.on('event:update', eventUpdateHandler);
 
@@ -187,6 +191,19 @@ export class LineChartCtx extends pip.Events {
         xMove: [s[0], s[1]],
         xDomain: [x.invert(s[0]), x.invert(s[1])],
         transform: d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
+      });
+    }
+
+    function filterEventsHandler(tags) {
+      if (tags === undefined ) { return; }
+
+      self.option.filterTags.push(tags);
+      _.each(self.data, (data, index) => {
+        const filteredEvents = data.eventWindows.filter(event => {
+          return tags.indexOf(String(event[4])) > -1;
+        });
+        self.option.filteredEvents = tags.length ? filteredEvents : data.eventWindows;
+        highlightUpdate(self.option.filteredEvents, data.timeseries, 'dname');
       });
     }
 
