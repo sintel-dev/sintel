@@ -29,7 +29,7 @@ export interface Option {
   yAxis?: boolean;
   buffer?: number;
   flags?: { accessMode: boolean, zoomMode: boolean, eventMode: boolean };
-  // flags
+  filteredEvents?: Array<[number, number, number, string, string]>;
 }
 
 export class LineChartFocus extends pip.Events {
@@ -82,6 +82,7 @@ export class LineChartFocus extends pip.Events {
 
     self.option.width = self.option.width === null ? $(ele).innerWidth() - mltseriesTitleWidth : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
+    self.option.filteredEvents = [];
 
     self.svgContainer
       .style('overflow-x', 'hidden')
@@ -297,7 +298,9 @@ export class LineChartFocus extends pip.Events {
 
       // update highlighted windows
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
+        const { filteredEvents } = self.option;
+        const data = filteredEvents.length ? filteredEvents : d.eventWindows;
+        highlightUpdate(data, d.timeseries, x, 'dname', i, d.datarun);
       });
 
       // update x axis
@@ -372,8 +375,8 @@ export class LineChartFocus extends pip.Events {
         const filteredEvents = data.eventWindows.filter(event => {
           return tags.indexOf(String(event[4])) > -1;
         });
-        const eventData = tags.length ? filteredEvents : data.eventWindows;
-        highlightUpdate(eventData, data.timeseries, x, 'dname', index, data.datarun);
+        self.option.filteredEvents = filteredEvents.length ? filteredEvents : data.eventWindows;
+        highlightUpdate(self.option.filteredEvents, data.timeseries, x, 'dname', index, data.datarun);
       });
     }
 
