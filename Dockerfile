@@ -50,7 +50,6 @@ ADD . /mtv
 WORKDIR /mtv
 
 # install application packages for python and node
-RUN make install-theme
 RUN make install
 RUN cd ./client && npm install && npm run build:prod
 
