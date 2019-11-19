@@ -196,8 +196,7 @@ export class LineChartCtx extends pip.Events {
 
     function filterEventsHandler(tags) {
       if (tags === undefined ) { return; }
-
-      self.option.filterTags.push(tags);
+      self.option.filterTags = tags;
       _.each(self.data, (data, index) => {
         const filteredEvents = data.eventWindows.filter(event => {
           return tags.indexOf(String(event[4])) > -1;
@@ -337,11 +336,10 @@ export class LineChartCtx extends pip.Events {
 
       u.exit().remove();
     };
-
+    
     _.each(self.data, d => {
       update(d.eventWindows, d.timeseries, 'dname');
     });
-
     return update;
   }
 
