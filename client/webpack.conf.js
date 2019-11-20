@@ -63,7 +63,7 @@ module.exports = (options) => {
       extensions: ['.js', '.ts', '.jsx', '.tsx']
     },
     entry: options.entryPoints,
-    externals: {jquery: 'jQuery', leaflet: 'L'},
+    externals: {jquery: 'jQuery'},
     output: {
       path: path.join(options.outputDir),
       filename: options.name
