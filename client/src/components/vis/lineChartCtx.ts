@@ -27,6 +27,8 @@ export interface Option {
   xAxis?: boolean;
   yAxis?: boolean;
   buffer?: number;
+  filteredEvents?: Array<[number, number, number, string, string]>;
+  filterTags?: Array<[]>;
 }
 
 export class LineChartCtx extends pip.Events {
@@ -77,7 +79,8 @@ export class LineChartCtx extends pip.Events {
 
     self.option.width = self.option.width === null ? $(ele).innerWidth() : self.option.width;
     self.option.height = self.option.height === null ? self.option.svgHeight : self.option.height;
-
+    self.option.filteredEvents = [];
+    self.option.filterTags = [];
     // scroll style inside <div> container
     self.container
       // .classed('scroll-style-0', true)
@@ -174,7 +177,7 @@ export class LineChartCtx extends pip.Events {
     });
 
     self.on('data:update', dataUpdateHandler);
-
+    self.on('event:filter', filterEventsHandler);
     self.on('event:update', eventUpdateHandler);
 
     // event handlers
@@ -187,6 +190,18 @@ export class LineChartCtx extends pip.Events {
         xMove: [s[0], s[1]],
         xDomain: [x.invert(s[0]), x.invert(s[1])],
         transform: d3.zoomIdentity.scale(w / (s[1] - s[0])).translate(-s[0], 0)
+      });
+    }
+
+    function filterEventsHandler(tags) {
+      if (tags === undefined) { return; }
+      self.option.filterTags = tags;
+      _.each(self.data, (data, index) => {
+        const filteredEvents = data.eventWindows.filter(event => {
+          return tags.indexOf(String(event[4])) > -1;
+        });
+        self.option.filteredEvents = tags.length ? filteredEvents : data.eventWindows;
+        highlightUpdate(self.option.filteredEvents, data.timeseries, 'dname');
       });
     }
 
@@ -237,6 +252,7 @@ export class LineChartCtx extends pip.Events {
 
     async function eventUpdateHandler() {
       if (self.data.length > 1) { return; }
+      const { filterTags } = self.option;
       // only execute when there is only one timeseries
       let newWindows = await dataPC.getEvents(
         self.data[0].datarun,
@@ -246,7 +262,11 @@ export class LineChartCtx extends pip.Events {
       self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, 'dname');
+        const filteredEvents = d.eventWindows.filter(event => {
+          return filterTags.indexOf(String(event[4]) as any) > -1;
+        });
+        const events = self.option.filterTags ? filteredEvents : d.eventWindows;
+        highlightUpdate(events, d.timeseries, 'dname');
       });
     }
   }
@@ -324,7 +344,6 @@ export class LineChartCtx extends pip.Events {
     _.each(self.data, d => {
       update(d.eventWindows, d.timeseries, 'dname');
     });
-
     return update;
   }
 

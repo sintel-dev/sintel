@@ -142,9 +142,10 @@ class PageExp {
     $('.chart-ctx-container').height(this.config.ctxHeight);
     $('.pchart').height(($('.connectedSortable.ui-sortable').height() - 40) + 'px');
     (<any>$('.sortable')).sortable();
+    this.filterTags = [];
     this.setupEventHandlers();
     this.setupOwnEventHandlers();
-    this.filterEventsByTags();
+    this.onFilterEventsByTags();
   }
 
   public getBoxSizes() {
@@ -233,10 +234,14 @@ class PageExp {
     let self = this;
     self.focus(name);
     let d = _.find(self.data, o => o.datarun.signal === name);
-    self.selectedDatarun = d.datarun;
+    const events = d.datarun.events;
+    const datarun = self.filterTags.length &&
+      events.filter(event => self.filterTags.indexOf(String(event.tag)) !== -1) || d.datarun;
+    self.selectedDatarun['datarun'] = datarun;
 
     // update focus
     self.focusChart.trigger('data:update', [d]);
+    self.focusChart.trigger('event:filter', self.filterTags);
     ($(`a[href="#year"]`) as any).tab('show');
 
     // update period
@@ -253,7 +258,6 @@ class PageExp {
     $('#monthView, #dayView').attr('disabled', 'disabled');
     $('#yearView').trigger('click');
     $('#periodView').text(name);
-    self.focusChart.trigger('event:filter', self.filterTags);
   }
 
   public showMissing(content, event) {
@@ -455,6 +459,7 @@ class PageExp {
 
     pip.pageExp.on('comment:new', self.onComment.bind(self));
     pip.pageExp.on('comment:start', self.onComment.bind(self));
+    pip.pageExp.on('filterCtxChartByTags', self.filterCtxChartByTags.bind(self));
   }
 
   /**
@@ -472,9 +477,22 @@ class PageExp {
     });
   }
 
-  private filterEventsByTags() {
+  private filterCtxChartByTags() {
     const self = this;
-    const selectOptions = {
+    Object.keys(self.ctxCharts).forEach(key => {
+      self.ctxCharts[key].trigger('event:filter', self.filterTags);
+    });
+  }
+
+  private filterFocusChartByTags() {
+    const self = this;
+    self.focusChart.trigger('event:filter', self.filterTags);
+  }
+
+  private onFilterEventsByTags() {
+    const self = this;
+
+    const filterOptions = {
       minimumResultsForSearch: Infinity,
       placeholder: 'Filter by tag',
       data: this.filterTagData,
@@ -486,18 +504,15 @@ class PageExp {
       dropdownCssClass: 'multiple-dropdown'
     };
 
-    $('select#filterByTag').select2(selectOptions)
-    .on('select2:select', (element) => {
+    $('select#filterByTag').select2(filterOptions)
+    .on('change', element => {
       const target = (element.target as HTMLSelectElement).options;
       const targetValues = Object.keys(target).filter(key => target[key].selected);
-      self.filterTags = targetValues.map(option => self.fromSelectionIDtoTag(String(parseInt(option) + 1)));
-      self.focusChart.trigger('event:filter', self.filterTags);
-    })
-    .on('select2:unselecting', (element) => {
-      const removedTag = (element.target as HTMLSelectElement).value;
-      const filterValue = self.fromSelectionIDtoTag(removedTag);
-      self.filterTags.splice(self.filterTags.indexOf(filterValue), 1);
-      self.focusChart.trigger('event:filter', self.filterTags);
+      self.filterTags = [];
+      targetValues.map(value => {
+        self.filterTags.push(self.fromSelectionIDtoTag(String(parseInt(value) + 1)));
+      });
+      self.filterFocusChartByTags();
     });
   }
 
