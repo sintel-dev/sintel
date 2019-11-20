@@ -398,7 +398,7 @@ export class LineChartFocus extends pip.Events {
 
       self.data[0].eventWindows = newWindows as any;
       filterEventsHandler(self.option.filterTags);
-      // pip.pageExp.trigger('filterEventsHandler', self.option.filterTags)
+      pip.pageExp.trigger('filterCtxChartByTags', self.option.filterTags);
 
       // self.svg.selectAll('.window').remove();
       // _.each(self.data, (data, i) => {

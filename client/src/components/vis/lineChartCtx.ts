@@ -178,7 +178,6 @@ export class LineChartCtx extends pip.Events {
 
     self.on('data:update', dataUpdateHandler);
     self.on('event:filter', filterEventsHandler);
-
     self.on('event:update', eventUpdateHandler);
 
     // event handlers
@@ -195,7 +194,7 @@ export class LineChartCtx extends pip.Events {
     }
 
     function filterEventsHandler(tags) {
-      if (tags === undefined ) { return; }
+      if (tags === undefined) { return; }
       self.option.filterTags = tags;
       _.each(self.data, (data, index) => {
         const filteredEvents = data.eventWindows.filter(event => {
@@ -253,6 +252,7 @@ export class LineChartCtx extends pip.Events {
 
     async function eventUpdateHandler() {
       if (self.data.length > 1) { return; }
+      const { filterTags } = self.option;
       // only execute when there is only one timeseries
       let newWindows = await dataPC.getEvents(
         self.data[0].datarun,
@@ -262,7 +262,11 @@ export class LineChartCtx extends pip.Events {
       self.data[0].eventWindows = newWindows as any;
       self.svg.selectAll('.window').remove();
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, 'dname');
+        const filteredEvents = d.eventWindows.filter(event => {
+          return filterTags.indexOf(String(event[4]) as any) > -1;
+        });
+        const events = self.option.filterTags ? filteredEvents : d.eventWindows;
+        highlightUpdate(events, d.timeseries, 'dname');
       });
     }
   }
@@ -336,7 +340,7 @@ export class LineChartCtx extends pip.Events {
 
       u.exit().remove();
     };
-    
+
     _.each(self.data, d => {
       update(d.eventWindows, d.timeseries, 'dname');
     });

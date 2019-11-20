@@ -237,7 +237,7 @@ class PageExp {
     const events = d.datarun.events;
     const datarun = self.filterTags.length &&
       events.filter(event => self.filterTags.indexOf(String(event.tag)) !== -1) || d.datarun;
-    self.selectedDatarun["datarun"] = datarun;
+    self.selectedDatarun['datarun'] = datarun;
 
     // update focus
     self.focusChart.trigger('data:update', [d]);
@@ -477,18 +477,6 @@ class PageExp {
     });
   }
 
-  private filterOptions = {
-    minimumResultsForSearch: Infinity,
-    placeholder: 'Filter by tag',
-    data: this.filterTagData,
-    closeOnSelect : false,
-    escapeMarkup: markup => markup,
-    tags: true,
-    allowClear: true,
-    multiple: true,
-    dropdownCssClass: 'multiple-dropdown'
-  }
-
   private filterCtxChartByTags() {
     const self = this;
     Object.keys(self.ctxCharts).forEach(key => {
@@ -504,7 +492,19 @@ class PageExp {
   private onFilterEventsByTags() {
     const self = this;
 
-    $('select#filterByTag').select2(self.filterOptions)
+    const filterOptions = {
+      minimumResultsForSearch: Infinity,
+      placeholder: 'Filter by tag',
+      data: this.filterTagData,
+      closeOnSelect : false,
+      escapeMarkup: markup => markup,
+      tags: true,
+      allowClear: true,
+      multiple: true,
+      dropdownCssClass: 'multiple-dropdown'
+    };
+
+    $('select#filterByTag').select2(filterOptions)
     .on('change', element => {
       const target = (element.target as HTMLSelectElement).options;
       const targetValues = Object.keys(target).filter(key => target[key].selected);
