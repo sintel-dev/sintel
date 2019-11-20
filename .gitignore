@@ -1,8 +1,10 @@
 # tmp files
 .DS_Store
-mtv.tar*
 tempCodeRunnerFile.ts
 tempCodeRunnerFile.py
+mtv.tar*
+.vscode/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
