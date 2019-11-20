@@ -1,7 +1,6 @@
-import * as _L_ from 'leaflet';
+import * as _ from 'lodash';
 
 declare global {
-  const L: typeof _L_;
   const math: any;
   const science: any;
 }
