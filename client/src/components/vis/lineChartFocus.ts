@@ -29,7 +29,8 @@ export interface Option {
   yAxis?: boolean;
   buffer?: number;
   flags?: { accessMode: boolean, zoomMode: boolean, eventMode: boolean };
-  // flags
+  filteredEvents?: Array<[number, number, number, string, string]>;
+  filterTags?: Array<[]>;
 }
 
 export class LineChartFocus extends pip.Events {
@@ -82,6 +83,8 @@ export class LineChartFocus extends pip.Events {
 
     self.option.width = self.option.width === null ? $(ele).innerWidth() - mltseriesTitleWidth : self.option.width;
     self.option.height = self.option.height === null ? self.defaultHeight : self.option.height;
+    self.option.filteredEvents = [];
+    self.option.filterTags = [];
 
     self.svgContainer
       .style('overflow-x', 'hidden')
@@ -297,7 +300,9 @@ export class LineChartFocus extends pip.Events {
 
       // update highlighted windows
       _.each(self.data, (d, i) => {
-        highlightUpdate(d.eventWindows, d.timeseries, x, 'dname', i, d.datarun);
+        const { filterTags, filteredEvents } = self.option;
+        const data = filterTags.length ? filteredEvents : d.eventWindows;
+        highlightUpdate(data, d.timeseries, x, 'dname', i, d.datarun);
       });
 
       // update x axis
@@ -366,15 +371,18 @@ export class LineChartFocus extends pip.Events {
 
     function filterEventsHandler(tags) {
       if (tags === undefined ) { return; }
+      self.option.filteredEvents = [];
+      self.option.filterTags = tags;
 
       self.svg.selectAll('.window').remove();
       _.each(self.data, (data, index) => {
         const filteredEvents = data.eventWindows.filter(event => {
           return tags.indexOf(String(event[4])) > -1;
         });
-        const eventData = tags.length ? filteredEvents : data.eventWindows;
-        highlightUpdate(eventData, data.timeseries, x, 'dname', index, data.datarun);
+        self.option.filteredEvents = tags.length ? filteredEvents : data.eventWindows;
+        highlightUpdate(self.option.filteredEvents, data.timeseries, x, 'dname', index, data.datarun);
       });
+      pip.pageExp.trigger('filterCtxChartByTags', self.option.filterTags);
     }
 
     async function eventUpdateHandler() {
@@ -389,10 +397,13 @@ export class LineChartFocus extends pip.Events {
       disableEditor();
 
       self.data[0].eventWindows = newWindows as any;
-      self.svg.selectAll('.window').remove();
-      _.each(self.data, (data, i) => {
-        highlightUpdate(data.eventWindows, data.timeseries, x, 'dname', i, data.datarun);
-      });
+      filterEventsHandler(self.option.filterTags);
+      pip.pageExp.trigger('filterCtxChartByTags', self.option.filterTags);
+
+      // self.svg.selectAll('.window').remove();
+      // _.each(self.data, (data, i) => {
+      //   highlightUpdate(data.eventWindows, data.timeseries, x, 'dname', i, data.datarun);
+      // });
     }
 
     function eventModifyHandler(event: DT.Event) {
@@ -633,8 +644,10 @@ export class LineChartFocus extends pip.Events {
       // .attr('filter', 'url(#blurMe)')
       .attr('transform', `translate(${option.margin.left},${option.margin.top + option.errorHeight})`);
 
-    _.each(self.data, (data, index) => {
-      update(data.eventWindows, data.timeseries, x, 'dname', index, data.datarun);
+    _.each(self.data, (d, index) => {
+      const { filterTags, filteredEvents } = self.option;
+      const data = filterTags.length ? filteredEvents : d.eventWindows;
+      update(data, d.timeseries, x, 'dname', index, d.datarun);
     });
 
     return {
@@ -642,7 +655,6 @@ export class LineChartFocus extends pip.Events {
     };
 
     function update(windows, lineData, fx, name, idx, datarun: DT.Datarun) {
-
       let u = highlightG
         .selectAll<SVGAElement, dataPC.EventWindow>(`.window-${name}`)
         .data(windows, d => d[3]);

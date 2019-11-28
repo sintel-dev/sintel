@@ -1,13 +1,16 @@
 const STATIC = './public/lib-static';               // manually installed
+const NPM = './node_modules';                       // package.json
 
 let assets = {
     css: [ 
+        // `${NPM}/bootstrap/dist/css/bootstrap.min.css`,
         `${STATIC}/tooltipster/css/tooltipster.css`
-],
+    ],
     js: [
-        `${STATIC}/jquery.min.js`,
+        `${NPM}/jquery/dist/jquery.min.js`,
         `${STATIC}/jquery-ui.js`,
-        `${STATIC}/jquery.rest.js`, 
+        `${NPM}/jquery.rest/dist/jquery.rest.min.js`,
+        // `${NPM}/bootstrap/dist/js/bootstrap.min.js`,
         `${STATIC}/bootstrap.min.js`,
     ]
 }

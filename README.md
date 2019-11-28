@@ -6,7 +6,8 @@
 <!-- [![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv) -->
 [![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)](https://travis-ci.com/dyuliu/mtv)
 [![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)](https://coveralls.io/github/dyuliu/MTV)
-
+[![Github All Releases](https://img.shields.io/github/downloads/dyuliu/MTV/total)](https://github.com/dyuliu/MTV/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dyuliu/mtv)](https://hub.docker.com/r/dyuliu/mtv)
 
 # MTV
 
@@ -19,7 +20,6 @@ The Restful APIs documentation: http://45.77.5.58/apidoc/
 ## License
 
 [The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
-
 
 
 ## Before You Begin
