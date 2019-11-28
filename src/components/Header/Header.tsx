@@ -6,7 +6,7 @@ const Header: React.FC = () => {
     return (
         <header id="header" className="main-header">
             <a href="/" className="logo"><b>MTV</b></a>
-            <a href="/" className="page-switch-btn" data-bind="click: pageSwitch" />
+            <a href="/" className="page-switch-btn" />
         </header>
     );
 }

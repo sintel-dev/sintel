@@ -1,6 +1,6 @@
 @import '../../assets/sass/colors.scss';
 
-.project-row {
+.item-row {
     width: 100%;
     margin: 0 50px;
     padding: 0 10px;
@@ -9,7 +9,7 @@
     overflow-x: auto;
     width: calc(100% - 100px);
 
-    .project-wrapper{
+    .item-wrapper{
         display: flex;
         padding: 0 0 10px 0;
     }
@@ -23,6 +23,7 @@
         margin-right: 20px;
         padding: 20px;
         color: $title-color;
+        font-size: 17px;
         cursor: pointer;
 
         &:hover, &.active{
@@ -41,11 +42,11 @@
             margin: 0 0 10px 0;
         }
 
-        .project-data{
+        .item-data{
             display: flex;
             ul{
                 flex: 1;
-                &:last-child{
+                &.last{
                     flex: 2;
                     text-align: right;
                     align-content: flex-end;
