@@ -1,5 +1,5 @@
 @import '../../assets/sass/colors.scss';
-
+@import '../../assets/sass/main.scss';
 .main-header {
     box-shadow: 0 0 14px #000;
     background: $main-color;
@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     top: 0;
-    
+
     a{
         transition: all .2s ease-in-out;
         color: #fff;

@@ -10,7 +10,7 @@ class Landing extends Component {
     }
 
     renderProject(project) {
-        
+
         return (
             <div className="cell" key={project.name}>
                 <h3>{project.name}</h3>
@@ -27,13 +27,10 @@ class Landing extends Component {
         )
     }
 
-    render(){
+    render() {
         const {projectsList} = this.props;
-
-        console.log(this.props);
-        
         return (
-            projectsList && projectsList.length ? 
+            projectsList && projectsList.length ?
             <div className="project-row">
                 <h2>Datasets</h2>
                 <div className="project-wrapper">
@@ -43,8 +40,6 @@ class Landing extends Component {
             : <p>No project found</p>
         )
     }
-
-
 }
 
 

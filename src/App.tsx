@@ -5,12 +5,11 @@ import { Provider } from 'react-redux';
 import Header from './components/Header/Header';
 import Landing from './components/Landing/Landing';
 import store from './model/store/index';
-import './App.css';
 
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-        <div className="wrapper">
+        <div id="content-wrapper">
           <Header />
           <Landing />
           {/* <Experiments /> */}

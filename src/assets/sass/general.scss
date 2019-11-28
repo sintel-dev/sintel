@@ -1,10 +1,19 @@
 @import './colors.scss';
+
 * {
     box-sizing: border-box;
 }
-body{
+
+body {
     background: $second-color;
+    color: #fff;
+    font-size: 14px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#content-wrapper {
+    margin: 0;
+    padding-top: 50px;
 }

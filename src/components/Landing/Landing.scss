@@ -1,1 +1,56 @@
-// @TODO - soon
+@import '../../assets/sass/colors.scss';
+
+.project-row {
+    width: 100%;
+    margin: 0 50px;
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: calc(100% - 100px);
+
+    .project-wrapper{
+        display: flex;
+        padding: 0 0 10px 0;
+    }
+
+    .cell{
+        background: $item-bg;
+        border: 1px solid $item-bg;
+        border-radius: 10px;
+        flex: 0 0 360px;
+        transition: all .2s ease-in-out;
+        margin-right: 20px;
+        padding: 20px;
+        color: $title-color;
+        cursor: pointer;
+
+        &:hover, &.active{
+            border: 1px solid $active-border;
+            background: $active-card-bg;
+            color: #fff;
+        }
+
+        &:hover{
+            transform: scale(1.05);
+            z-index: 9;
+        }
+
+        h3{
+            font-size: 25px;
+            margin: 0 0 10px 0;
+        }
+
+        .project-data{
+            display: flex;
+            ul{
+                flex: 1;
+                &:last-child{
+                    flex: 2;
+                    text-align: right;
+                    align-content: flex-end;
+                }
+            }
+        }
+    }
+}
