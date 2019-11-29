@@ -2,21 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { fetchProjects } from '../../model/actions/Landing';
-import {
-  isProjectsLoading,
-  getProjectsList
-} from '../../model/selectors/projects';
 
-
-import {
-  getExperiments,
-  isExperimentsLoading
-} from '../../model/selectors/experiments';
-
-import {
-  getPipelines,
-  isPipelinesLoading
-} from '../../model/selectors/pipelines';
+import { getProjectsData } from '../../model/selectors/projects';
+import { getExperimentsData } from '../../model/selectors/experiments';
+import { getPipelinesData } from '../../model/selectors/pipelines';
 
 import Projects from './Projects';
 import Pipelines from './Pipelines';
@@ -31,19 +20,16 @@ class Landing extends Component {
 
   render() {
     const {
-      projectsList,
-      isPipelinesLoading,
-      pipelines,
-      isExperimentsLoading,
-      experiments,
-      isProjectsLoading
+      projectsData,
+      pipelinesData,
+      experimentsData
     } = this.props;
-    const pipelineData = pipelines;
+
     return (
       <div>
-        <Projects data={{ projectsList, isProjectsLoading }} />
-        <Pipelines data={{pipelineData, isPipelinesLoading}} />
-        <Experiments data={{experiments, isExperimentsLoading}}  /> {/*isExperimentsLoading experiments={experiments.experiments}*/}
+        <Projects projects={projectsData} />
+        <Pipelines pipeLines={pipelinesData} />
+        <Experiments experiments={experimentsData} />
       </div>
     );
   }
@@ -51,21 +37,16 @@ class Landing extends Component {
 
 Landing.propTypes = {
     fetchProjectsList: PropTypes.func,
-    projectsList: PropTypes.array,
-    pipelines: PropTypes.object,
-    experiments: PropTypes.object
+    projectsData: PropTypes.object,
+    pipelinesData: PropTypes.object,
+    experimentsData: PropTypes.object,
+
 };
 
 export const mapStateToProps = state => ({
-  isPipelinesLoading: isPipelinesLoading(state),
-  isExperimentsLoading: isExperimentsLoading(state),
-  // isDatasetLoading: isDatasetLoading(state),
-
-
-  isProjectsLoading: isProjectsLoading(state),
-  projectsList: getProjectsList(state),
-  pipelines: getPipelines(state),
-  experiments: getExperiments(state)
+  projectsData: getProjectsData(state),
+  pipelinesData: getPipelinesData(state),
+  experimentsData: getExperimentsData(state),
 });
 
 export const mapDispatchToProps = dispatch => ({

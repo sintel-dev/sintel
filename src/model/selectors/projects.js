@@ -1,11 +1,12 @@
 import { createSelector } from 'reselect';
-import { isExperimentsLoading, getExperiments } from './experiments';
+import { getExperimentsData } from './experiments';
 import { isDatasetLoading, getDatasets } from './datasets';
-import { isPipelinesLoading, getPipelines } from './pipelines';
+import { getPipelinesData } from './pipelines';
 
-export const isProjectsLoading = createSelector(
-    [isExperimentsLoading, isDatasetLoading, isPipelinesLoading],
-    (isExperimentsLoading, isDatasetLoading, isPipelinesLoading) => isExperimentsLoading || isDatasetLoading || isPipelinesLoading);
+const isProjectsLoading = createSelector(
+    [getExperimentsData, getPipelinesData, isDatasetLoading],
+    (experimentsData, pipelinesData, isLoadingDataset) =>
+        experimentsData.ieExperimentsLoading || isLoadingDataset || pipelinesData.isPipelinesLoading);
 
 const groupExperimentsByProj = (stack, criteria) => {
     const grouppedProjects = [];
@@ -36,17 +37,31 @@ const groupExperimentsByProj = (stack, criteria) => {
 
 const addPipelines = (projectStack, pipelines) => projectStack.map(project => Object.assign(project, pipelines));
 
-export const getProjectsList = createSelector(
+const getProjectsList = createSelector(
+    [isProjectsLoading, getExperimentsData, getDatasets, getPipelinesData],
+    (isLoadingProjects, experimentsData, dataSets, pipelinesData) => {
+        if (isLoadingProjects) { return []; }
+        let projectData = {};
 
-    [isProjectsLoading, getExperiments, getDatasets, getPipelines],
-    (isProjectsLoading, experiments, dataSets, pipelines) => {
-        if (isProjectsLoading) { return []; }
+        const grouppedExpByProject = groupExperimentsByProj(experimentsData.experimentsList.experiments, 'project');
+        const projects = addPipelines(grouppedExpByProject, pipelinesData.pipelineList);
 
-        const pipeDict = [];
-        pipelines.pipelines.map(pipeline => pipeDict[pipeline.name] = pipeline);
-        const grouppedExpByProject = groupExperimentsByProj(experiments.experiments, 'project');
-        const projects = addPipelines(grouppedExpByProject, pipelines);
+         projectData = {
+            isProjectsLoading: isLoadingProjects,
+            projects
+        };
 
-        return projects;
+        return projectData;
+    }
+);
+
+export const getProjectsData = createSelector(
+    [isProjectsLoading, getProjectsList],
+    (isLoadingProjects, projectsList) => {
+        let projectData = {
+            isProjectsLoading: isLoadingProjects,
+            projectsList
+        };
+        return projectData;
     }
 );

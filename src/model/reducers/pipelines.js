@@ -1,20 +1,30 @@
 import createReducer from '../store/createReducer';
 
 function GET_PIPELINES_REQUEST(nextState) {
-    nextState.isPipelinesLoading = true;
+    nextState.pipelineData = {
+        isPipelinesLoading: true
+    };
 }
+
 function GET_PIPELINES_SUCCESS(nextState, { pipelines }) {
-    nextState.isPipelinesLoading = false;
-    nextState.pipelines = pipelines;
+    nextState.pipelineData = {
+        isPipelinesLoading: false,
+        pipelineList: pipelines
+    };
 }
+
 function GET_PIPELINES_ERROR(nextState) {
-    nextState.isPipelinesLoading = false;
-    nextState.pipelines = {};
+    nextState.pipelineData = {
+        isPipelinesLoading: false,
+        pipelineList: []
+    };
 }
 
 export default createReducer({
-    pipelines: {},
-    isPipelinesLoading: true
+    pipelineData: {
+        isPipelinesLoading: true,
+        pipelineList: []
+    }
 }, {
     GET_PIPELINES_REQUEST,
     GET_PIPELINES_SUCCESS,
