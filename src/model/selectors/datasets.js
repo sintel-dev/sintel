@@ -1,2 +1,2 @@
-export const isDatasetLoading = (state) => state.isDatasetLoading;
-export const dataSets = (state) => state.dataSets;
+export const isDatasetLoading = (state) => state.datasets.isDatasetLoading;
+export const getDatasets = (state) => state.datasets.dataSets;

@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes, { bool } from 'prop-types';
 import Loader from '../Common/Loader';
 
-const Projects = (props) => {
-  // @TODO - investigate isDatasetLoading
-  const { projects, isDatasetLoading } = props;
-  console.log(props);
-    const renderProject = (project) => (
-      <div className="cell" key={project.name}>
+const Projects = ({data}) => {
+  const { projectsList, isProjectsLoading } = data;
+
+    const renderProject = (project, index) => (
+      <div className="cell" key={index}>
         <h3>{project.name}</h3>
         <div className="item-data">
           <ul>
@@ -18,44 +17,26 @@ const Projects = (props) => {
             <li>{project.experimentNum} experiments</li>
           </ul>
         </div>
-      </div>
-    );
-    console.log(isDatasetLoading);
+      </div>);
 
     return (
-      <Loader isLoading={isDatasetLoading}>
-        {projects.length ?
-          <div className="item-row scroll-style" id="projects">
-            <h2>Datasets</h2>
-            <div className="item-wrapper">
-              {projects.map(project => renderProject(project))}
-            </div>
-          </div>
-           :
-          <div className="project-row">
-            <p>No project found</p>
-          </div>}
-      </Loader>
+      <div className="item-row scroll-style" id="projects">
+        <h2>Datasets</h2>
+        <div className="item-wrapper">
+          <Loader isLoading={isProjectsLoading}>
+              {
+                projectsList.length ? projectsList.map((project, index) => renderProject(project, index)) :
+                  <p>No projects have been found</p>
+              }
+        </Loader>
+        </div>
+      </div>
     );
 
-    // return (
-        // projects && projects.length ?
-        //   <div className="item-row scroll-style" id="projects">
-        //     <h2>Datasets</h2>
-        //     <div className="item-wrapper">
-        //       {projects.map(project => renderProject(project))}
-        //     </div>
-        //   </div>
-        //    :
-        //   <div className="project-row">
-        //     <p>No project found</p>
-        //   </div>
-    // );
 };
 
-Projects.propType = {
-  projects: PropTypes.array,
-  isDatasetLoading: bool
+Projects.propTypes = {
+  data: PropTypes.object
 };
 
 export default Projects;

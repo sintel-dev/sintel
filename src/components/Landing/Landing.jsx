@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { fetchProjects } from '../../model/actions/Landing';
-import { getProjectsList } from '../../model/selectors/projects';
-import { isDatasetLoading } from '../../model/selectors/datasets';
+import {
+  isProjectsLoading,
+  getProjectsList
+} from '../../model/selectors/projects';
+
 
 import {
   getExperiments,
@@ -27,12 +30,20 @@ class Landing extends Component {
   }
 
   render() {
-    const { projectsList, pipelines, experiments } = this.props;
+    const {
+      projectsList,
+      isPipelinesLoading,
+      pipelines,
+      isExperimentsLoading,
+      experiments,
+      isProjectsLoading
+    } = this.props;
+    const pipelineData = pipelines;
     return (
       <div>
-        <Projects projects={{ projectsList, isDatasetLoading }} />
-        <Pipelines pipelines={pipelines.pipelines} />
-        <Experiments experiments={experiments.experiments} />
+        <Projects data={{ projectsList, isProjectsLoading }} />
+        <Pipelines data={{pipelineData, isPipelinesLoading}} />
+        <Experiments data={{experiments, isExperimentsLoading}}  /> {/*isExperimentsLoading experiments={experiments.experiments}*/}
       </div>
     );
   }
@@ -48,8 +59,10 @@ Landing.propTypes = {
 export const mapStateToProps = state => ({
   isPipelinesLoading: isPipelinesLoading(state),
   isExperimentsLoading: isExperimentsLoading(state),
-  isDatasetLoading: isDatasetLoading(state),
+  // isDatasetLoading: isDatasetLoading(state),
 
+
+  isProjectsLoading: isProjectsLoading(state),
   projectsList: getProjectsList(state),
   pipelines: getPipelines(state),
   experiments: getExperiments(state)

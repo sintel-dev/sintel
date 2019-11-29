@@ -12,6 +12,10 @@
     .item-wrapper{
         display: flex;
         padding: 0 0 10px 0;
+        position: relative;
+        height: 15vh;
+        min-height: 180px;
+        max-height: 240px;
     }
 
     .cell{

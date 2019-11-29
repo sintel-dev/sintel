@@ -1,8 +1,10 @@
 import React from 'react';
+import Loader from '../Common/Loader';
 import PropTypes from 'prop-types';
 
 
-const Pipelines = ({ pipelines }) => {
+const Pipelines = ({data}) => {
+    const {pipelineData, isPipelinesLoading} = data;
     const renderPipeline = (pipeline, index) => (
       <div className="cell" key={index}>
         <h3>{pipeline.name}</h3>
@@ -12,25 +14,25 @@ const Pipelines = ({ pipelines }) => {
             <li>By: {pipeline.created_by ? pipeline.created_by : 'null' }</li>
           </ul>
         </div>
-      </div>);
+    </div>);
 
     return (
-        pipelines && pipelines.length ?
           <div className="item-row scroll-style" id="pipelines">
             <h2>Pipelines</h2>
             <div className="item-wrapper">
-              {pipelines.map((pipeline, index) => renderPipeline(pipeline, index))}
+              <Loader isLoading={isPipelinesLoading}>
+                {
+                    pipelineData.pipelines ? pipelineData.pipelines.map((project, index) => renderPipeline(project, index)) :
+                    <p>No projects have been found</p>
+                }
+              </Loader>
             </div>
-          </div>
-        :
-          <div className="item-row">
-            <h2>No pipelines found</h2>
           </div>
     );
 };
 
 Pipelines.propTypes = {
-    pipelines: PropTypes.array
+  data: PropTypes.object
 };
 
 export default Pipelines;

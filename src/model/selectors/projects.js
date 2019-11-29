@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect';
 import { isExperimentsLoading, getExperiments } from './experiments';
-import { isDatasetLoading, dataSets } from './datasets';
+import { isDatasetLoading, getDatasets } from './datasets';
 import { isPipelinesLoading, getPipelines } from './pipelines';
+
+export const isProjectsLoading = createSelector(
+    [isExperimentsLoading, isDatasetLoading, isPipelinesLoading],
+    (isExperimentsLoading, isDatasetLoading, isPipelinesLoading) => isExperimentsLoading || isDatasetLoading || isPipelinesLoading);
 
 const groupExperimentsByProj = (stack, criteria) => {
     const grouppedProjects = [];
@@ -34,9 +38,9 @@ const addPipelines = (projectStack, pipelines) => projectStack.map(project => Ob
 
 export const getProjectsList = createSelector(
 
-    [isExperimentsLoading, getExperiments, isDatasetLoading, dataSets, isPipelinesLoading, getPipelines],
-    (isExperimentsLoading, experiments, isDatasetLoading, dataSets, isPipelinesLoading, pipelines) => {
-        if (isExperimentsLoading || isPipelinesLoading) { return; }
+    [isProjectsLoading, getExperiments, getDatasets, getPipelines],
+    (isProjectsLoading, experiments, dataSets, pipelines) => {
+        if (isProjectsLoading) { return []; }
 
         const pipeDict = [];
         pipelines.pipelines.map(pipeline => pipeDict[pipeline.name] = pipeline);

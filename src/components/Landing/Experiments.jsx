@@ -1,8 +1,9 @@
 import React from 'react';
+import Loader from '../Common/Loader';
 import PropTypes from 'prop-types';
 
-
-const Experiments = ({ experiments }) => {
+const Experiments = ({ data }) => {
+  const {experiments, isExperimentsLoading} = data;
     const renderExperiment = (experiment, index) => (
       <div className="cell" key={index}>
         <h3>#{index + 1} {experiment.dataset}_{experiment.pipeline}</h3>
@@ -15,6 +16,7 @@ const Experiments = ({ experiments }) => {
       </div>
     );
 
+    console.log(experiments, isExperimentsLoading);
     return (
       experiments && experiments.length ?
         <div className="item-row scroll-style" id="experiments">
@@ -23,7 +25,7 @@ const Experiments = ({ experiments }) => {
             {experiments.map((experiment, index) => renderExperiment(experiment, index))}
           </div>
         </div>
-      :
+        :
         <div className="item-row">
           <h2>No experiments found</h2>
         </div>
