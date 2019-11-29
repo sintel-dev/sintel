@@ -1,12 +1,15 @@
 import { createSelector } from 'reselect';
-import { getExperimentsData } from './experiments';
-import { isDatasetLoading, getDatasets } from './datasets';
-import { getPipelinesData } from './pipelines';
+
+export const getExperimentsData = (state) => state.experiments;
+export const getPipelinesData = (state) => state.pipelines;
+export const getDatasets = (state) => state.datasets;
+
 
 const isProjectsLoading = createSelector(
-    [getExperimentsData, getPipelinesData, isDatasetLoading],
-    (experimentsData, pipelinesData, isLoadingDataset) =>
-        experimentsData.ieExperimentsLoading || isLoadingDataset || pipelinesData.isPipelinesLoading);
+    [getExperimentsData, getPipelinesData, getDatasets],
+    (experimentsData, pipelinesData, datasets) =>
+        experimentsData.ieExperimentsLoading || datasets.isDatasetLoading || pipelinesData.isPipelinesLoading);
+
 
 const groupExperimentsByProj = (stack, criteria) => {
     const grouppedProjects = [];
@@ -35,24 +38,23 @@ const groupExperimentsByProj = (stack, criteria) => {
     return grouppedProjects;
 };
 
-const addPipelines = (projectStack, pipelines) => projectStack.map(project => Object.assign(project, pipelines));
+const addPipelines = (projectStack, pipelines) => projectStack.map(project => Object.assign(project, { pipelines }));
 
 const getProjectsList = createSelector(
     [isProjectsLoading, getExperimentsData, getDatasets, getPipelinesData],
     (isLoadingProjects, experimentsData, dataSets, pipelinesData) => {
         if (isLoadingProjects) { return []; }
         let projectData = {};
-
-        const grouppedExpByProject = groupExperimentsByProj(experimentsData.experimentsList.experiments, 'project');
+        const grouppedExpByProject = groupExperimentsByProj(experimentsData.experimentsList, 'project');
         const projects = addPipelines(grouppedExpByProject, pipelinesData.pipelineList);
 
          projectData = {
             isProjectsLoading: isLoadingProjects,
-            projects
+            projects,
         };
 
         return projectData;
-    }
+    },
 );
 
 export const getProjectsData = createSelector(
@@ -60,8 +62,8 @@ export const getProjectsData = createSelector(
     (isLoadingProjects, projectsList) => {
         let projectData = {
             isProjectsLoading: isLoadingProjects,
-            projectsList
+            projectsList,
         };
         return projectData;
-    }
+    },
 );

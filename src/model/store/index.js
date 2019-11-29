@@ -9,8 +9,8 @@ import { api } from './middlewares';
 function configureStore(initialState = {}) {
   const composedEnhancers = composeWithDevTools(
     applyMiddleware(thunkMiddleware, api, createLogger({
-      collapsed: true
-  }))
+      collapsed: true,
+  })),
   );
   const store = createStore(rootReducer, initialState, composedEnhancers);
   return store;

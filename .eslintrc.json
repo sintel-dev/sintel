@@ -4,7 +4,7 @@
       "es6": true,
       "jest": true
     },
-    "extends": ["eslint:recommended", "airbnb"],
+    "extends": ["eslint:recommended", "react-app", "eslint-config-airbnb"],
     "globals": {
       "Atomics": "readonly",
       "SharedArrayBuffer": "readonly"
@@ -27,7 +27,7 @@
       "import/no-unresolved": "off",
       "import/prefer-default-export": "off",
       "import/named": "off",
-      "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+      "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
       "react/jsx-one-expression-per-line": "off",
       "react/jsx-wrap-multilines": "off",
       "react/prop-types": "warn",
@@ -49,7 +49,6 @@
           "object": true
         }
       ],
-      "comma-dangle": "off",
       "prefer-const": "off",
       "no-unused-expressions": "off",
       "object-curly-newline": "off",

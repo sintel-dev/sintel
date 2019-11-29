@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { fetchProjects } from '../../model/actions/Landing';
+import { fetchProjects } from '../../model/actions/landing';
 
-import { getProjectsData } from '../../model/selectors/projects';
-import { getExperimentsData } from '../../model/selectors/experiments';
-import { getPipelinesData } from '../../model/selectors/pipelines';
+import {
+  getProjectsData,
+  getPipelinesData,
+  getExperimentsData,
+} from '../../model/selectors/projects';
+
 
 import Projects from './Projects';
 import Pipelines from './Pipelines';
@@ -22,7 +25,7 @@ class Landing extends Component {
     const {
       projectsData,
       pipelinesData,
-      experimentsData
+      experimentsData,
     } = this.props;
 
     return (
@@ -50,7 +53,7 @@ export const mapStateToProps = state => ({
 });
 
 export const mapDispatchToProps = dispatch => ({
-  fetchProjectsList: () => dispatch(fetchProjects())
+  fetchProjectsList: () => dispatch(fetchProjects()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Landing);

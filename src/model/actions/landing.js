@@ -9,8 +9,8 @@ export function fetchExperiments() {
         dispatch({ type: 'GET_EXPERIMENTS_REQUEST' });
         return api
             .get('experiments')
-            .then(experiments => {
-                dispatch({ type: 'GET_EXPERIMENTS_SUCCESS', experiments });
+            .then(response => {
+                dispatch({ type: 'GET_EXPERIMENTS_SUCCESS', experiments: response.experiments });
             })
             .catch(err => {
                 dispatch({ type: 'GET_EXPERIMENTS_ERROR', err });
@@ -23,7 +23,7 @@ export function fetchPipelines() {
         dispatch({ type: 'GET_PIPELINES_REQUEST' });
         return api
             .get('pipelines')
-            .then(pipelines => dispatch({ type: 'GET_PIPELINES_SUCCESS', pipelines }))
+            .then(response => dispatch({ type: 'GET_PIPELINES_SUCCESS', pipelines: response.pipelines }))
             .catch(err => dispatch({ type: 'GET_PIPELINES_ERROR', err }));
     };
 }
@@ -33,8 +33,8 @@ export function fetchDatasets() {
         dispatch({ type: 'GET_DATASET_REQUEST' });
         return api
             .get('datasets')
-            .then(dataSets => {
-                dispatch({ type: 'GET_DATASET_SUCCESS', dataSets });
+            .then(response => {
+                dispatch({ type: 'GET_DATASET_SUCCESS', dataSets: response.datasets });
             })
             .catch(err => {
                 dispatch({ type: 'GET_DATASET_ERROR', err });
@@ -46,7 +46,7 @@ export function fetchProjects() {
     return function(dispatch) {
         return dispatch(fetchExperiments())
             .then(() => dispatch(fetchPipelines())
-                .then(() => dispatch(fetchDatasets()))
+                .then(() => dispatch(fetchDatasets())),
             );
     };
 }

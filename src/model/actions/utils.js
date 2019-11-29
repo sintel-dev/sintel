@@ -7,11 +7,8 @@ export const api = {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                // 'Content-Type': `application/${dataType}`,
-                // 'Authorization': lscache.get('authorization')
-            }
+            },
         });
-        // debugger;
         return promise.then(response => {
             if (response.status !== 204) {
                 return dataType !== 'json' ? response.text : response.json();
