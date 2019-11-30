@@ -3,7 +3,6 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import * as actions from './landing';
 import fetchMock from 'fetch-mock'
-import expect from 'expect';
 
 // importing mocks
 import * as pipelines from '../../testmocks/pipelines';
@@ -30,8 +29,8 @@ describe('async actions', () => {
       { type: 'GET_EXPERIMENTS_SUCCESS', experiments}
     ];
 
-    const store = mockStore({ experiments: [] })
-    return store.dispatch(actions.fetchExperiments()).then(() => {
+    const store = mockStore({ experiments: {} })
+    store.dispatch(actions.fetchExperiments()).then(() => {
       expect(store.getActions()).toEqual(expectedActions)
     });
   });
@@ -46,8 +45,8 @@ describe('async actions', () => {
       { type: 'GET_PIPELINES_SUCCESS', pipelines}
     ];
 
-    const store = mockStore({ pipelines: [] });
-    return store.dispatch(actions.fetchPipelines()).then(() => {
+    const store = mockStore({ pipelines: {} });
+    store.dispatch(actions.fetchPipelines()).then(() => {
       expect(store.getActions()).toEqual(expectedActions)
     })
 
@@ -63,8 +62,8 @@ describe('async actions', () => {
       { type: 'GET_DATASET_SUCCESS', datasets: datasets.datasets}
     ];
 
-    const store = mockStore({ dataSets: [] });
-    return store.dispatch(actions.fetchDatasets()).then(() => {
+    const store = mockStore({ dataSets: {} });
+    store.dispatch(actions.fetchDatasets()).then(() => {
       expect(store.getActions()).toEqual(expectedActions)
     })
   });

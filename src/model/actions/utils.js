@@ -15,7 +15,7 @@ export const api = {
             }
             return null;
         })
-        .catch(err => err);
+        .catch(err => console.log(err));
     },
 
     // post(url, data) {
