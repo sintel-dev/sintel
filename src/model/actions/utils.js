@@ -14,7 +14,8 @@ export const api = {
                 return dataType !== 'json' ? response.text : response.json();
             }
             return null;
-        });
+        })
+        .catch(err => err);
     },
 
     // post(url, data) {
