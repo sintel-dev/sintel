@@ -30,14 +30,14 @@ export function fetchPipelines() {
 
 export function fetchDatasets() {
     return function(dispatch) {
-        dispatch({ type: 'GET_DATASET_REQUEST' });
+        dispatch({ type: 'GET_DATASETS_REQUEST' });
         return api
             .get('datasets')
             .then(response => {
-                dispatch({ type: 'GET_DATASET_SUCCESS', dataSets: response.datasets });
+                dispatch({ type: 'GET_DATASETS_SUCCESS', dataSets: response.datasets });
             })
             .catch(err => {
-                dispatch({ type: 'GET_DATASET_ERROR', err });
+                dispatch({ type: 'GET_DATASETS_ERROR', err });
             });
     };
 }

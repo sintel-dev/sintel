@@ -52,14 +52,14 @@ describe('async actions', () => {
 
   });
 
-  it('creates GET_DATASET_SUCCESS when fetching datasets', () => {
+  it('creates GET_DATASETS_SUCCESS when fetching datasets', () => {
     fetchMock.getOnce('/api/v1/datasets', {
       body: {dataSets: datasets.dataSets}
     });
 
     const expectedActions = [
-      { type: 'GET_DATASET_REQUEST' },
-      { type: 'GET_DATASET_SUCCESS', datasets: datasets.datasets}
+      { type: 'GET_DATASETS_REQUEST' },
+      { type: 'GET_DATASETS_SUCCESS', datasets: datasets.datasets}
     ];
 
     const store = mockStore({ dataSets: {} });

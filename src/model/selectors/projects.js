@@ -38,7 +38,7 @@ const groupExperimentsByProj = (stack, criteria) => {
     return grouppedProjects;
 };
 
-const addPipelines = (projectStack, pipelines) => projectStack.map(project => Object.assign(project, { pipelines }));
+const addPipelines = (projectStack, pipelines) => projectStack.map(project => ({ ...project, pipelines }));
 
 const getProjectsList = createSelector(
     [isProjectsLoading, getExperimentsData, getDatasets, getPipelinesData],
