@@ -2,6 +2,7 @@ import createReducer from '../store/createReducer';
 
 function GET_PIPELINES_REQUEST(nextState) {
     nextState.isPipelinesLoading = true;
+    nextState.pipelineList = [];
 }
 
 function GET_PIPELINES_SUCCESS(nextState, { pipelines }) {

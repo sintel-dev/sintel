@@ -2,6 +2,7 @@ import createReducer from '../store/createReducer';
 
 function GET_EXPERIMENTS_REQUEST(nextState) {
     nextState.isExperimentsLoading = true;
+    nextState.experimentsList = [];
 }
 
 function GET_EXPERIMENTS_SUCCESS(nextState, { experiments }) {

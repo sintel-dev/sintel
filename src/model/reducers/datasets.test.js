@@ -1,52 +1,38 @@
-import * as datasets from './datasets';
-import * as datasetMock from '../../testmocks/datasets';
-import { fetchDatasets } from '../actions/landing';
+import datasetsReducer from './datasets';
+import { dataSets } from '../../testmocks/datasets';
 
 describe('Testing dataset reducer', () => {
     it('should handle GET_DATASET_REQUEST', () => {
-        expect(
-            datasets.default({
-            isDatasetLoading: undefined,
-        }, {
+        expect(datasetsReducer(undefined, {
             type: 'GET_DATASETS_REQUEST',
-            isDatasetLoading: true,
         })).toEqual({
             isDatasetLoading: true,
+            dataSetsList: [],
         });
     });
 
-    it('Should handle GET_DATASET_SUCCESS', () => {
-        const initialState = {
-            isDatasetLoading: false,
-            dataSetsList: {},
+    it('Should handle GET_DATASETS_SUCCESS', () => {
+        const successAction = {
+            type: 'GET_DATASETS_SUCCESS',
+            dataSets,
         };
-
-        expect(
-            datasets.default(initialState, {
-                type: 'GET_DATASETS_SUCCESS',
-                dataSetsList: datasetMock,
-                isDatasetLoading: false,
-
-            })).toEqual({
-                dataSetsList: datasetMock,
-                isDatasetLoading: false,
-            });
-        // expect(
-        //     datasets.default([{
-        //         isDatasetLoading: false,
-        //     }],
-        //     {
-        //       type: 'GET_DATASET_SUCCESS',
-        //       isDatasetLoading: false,
-        //     }),
-        //   ).toEqual([
-        //     {
-        //         isDatasetLoading: false,
-        //     },
-        //   ]);
+        expect(datasetsReducer(undefined, successAction))
+        .toEqual({
+            isDatasetLoading: false,
+            dataSetsList: dataSets,
+        });
     });
 
     it('Should handle GET_DATASET_ERROR', () => {
+        const errAction = {
+            type: 'GET_DATASETS_ERROR',
+            dataSets,
+        };
 
+        expect(datasetsReducer(undefined, errAction))
+        .toEqual({
+            isDatasetLoading: false,
+            dataSetsList: [],
+        });
     });
 });
