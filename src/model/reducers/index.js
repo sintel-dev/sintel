@@ -6,5 +6,5 @@ import pipelines from './pipelines';
 export default combineReducers({
     experiments,
     datasets,
-    pipelines
+    pipelines,
 });

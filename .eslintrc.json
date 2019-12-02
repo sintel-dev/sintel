@@ -1,0 +1,82 @@
+{
+    "env": {
+      "browser": true,
+      "es6": true,
+      "jest": true
+    },
+    "extends": ["eslint:recommended", "react-app", "eslint-config-airbnb"],
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+    },
+    "plugins": ["react", "react-hooks"],
+    "rules": {
+      "jsx-a11y/label-has-for": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+      "import/no-unresolved": "off",
+      "import/prefer-default-export": "off",
+      "import/named": "off",
+      "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
+      "react/jsx-one-expression-per-line": "off",
+      "react/jsx-wrap-multilines": "off",
+      "react/prop-types": "warn",
+      "react/forbid-prop-types": ["warn", { "forbid": ["any"] }],
+      "react/require-default-props": "off",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "react/jsx-boolean-value": "warn",
+      "react/no-unused-prop-types": "warn",
+      "react/jsx-closing-bracket-location": "warn",
+      "react/jsx-props-no-spreading": "off",
+      "react/state-in-constructor": "off",
+      "react/destructuring-assignment": "off",
+      "object-shorthand": "warn",
+      "prefer-destructuring": [
+        "warn",
+        {
+          "array": true,
+          "object": true
+        }
+      ],
+      "prefer-const": "off",
+      "no-unused-expressions": "off",
+      "object-curly-newline": "off",
+      "no-use-before-define": "off",
+      "operator-linebreak": "off",
+      "arrow-parens": "off",
+      "space-before-function-paren": "off",
+      "func-names": "off",
+      "indent": "off",
+      "implicit-arrow-linebreak": "off",
+      "function-paren-newline": "off",
+      "no-nested-ternary": "off",
+      "no-param-reassign": "off",
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-confusing-arrow": "off",
+      "no-unused-vars": "warn",
+      "no-trailing-spaces": "warn",
+      "no-debugger": "warn",
+      "arrow-body-style": "warn",
+      "max-len": "off",
+      "class-methods-use-this": "off",
+      "camelcase": "off",
+      "react/sort-comp": [
+        1,
+        {
+          "order": ["static-methods", "lifecycle", "everything-else", "render"]
+        }
+      ]
+    }
+  }
+  
