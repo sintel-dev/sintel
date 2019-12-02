@@ -2,6 +2,7 @@ import createReducer from '../store/createReducer';
 
 function GET_DATASETS_REQUEST(nextState) {
     nextState.isDatasetLoading = true;
+    nextState.dataSetsList = {};
 }
 function GET_DATASETS_SUCCESS(nextState, { dataSets }) {
     nextState.isDatasetLoading = false;
