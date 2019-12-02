@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Loader from '../Common/Loader';
 
-const renderPipeline = (pipeline, index) => (
-  <div className="cell" key={index}>
+const renderPipeline = (pipeline, index, onPipelineSelect) => (
+  <div className="cell" key={index} onClick={() => onPipelineSelect(pipeline.name)}>
     <h3>{pipeline.name}</h3>
     <div className="item-data">
       <ul>
@@ -13,15 +13,16 @@ const renderPipeline = (pipeline, index) => (
     </div>
   </div>);
 
-const Pipelines = ({ pipeLines }) => {
+const Pipelines = ({ pipeLines, onPipelineSelect }) => {
   const { isPipelinesLoading, pipelineList } = pipeLines;
+
   return (
     <div className="item-row scroll-style" id="pipelines">
       <h2>Pipelines</h2>
       <div className="item-wrapper">
         <Loader isLoading={isPipelinesLoading}>
           {
-            pipelineList.length ? pipelineList.map(renderPipeline) :
+            pipelineList.length ? pipelineList.map((pipeline, index) => renderPipeline(pipeline, index, onPipelineSelect)) :
             <p>No pipelines have been found</p>
           }
         </Loader>
@@ -32,6 +33,7 @@ const Pipelines = ({ pipeLines }) => {
 
 Pipelines.propTypes = {
   pipeLines: PropTypes.object,
+  onPipelineSelect: PropTypes.func,
 };
 
 export default Pipelines;

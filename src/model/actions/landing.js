@@ -1,5 +1,6 @@
 import { api } from './utils';
 
+
 // http://127.0.0.1:3000/api/v1/experiments/
 // http://127.0.0.1:3000/api/v1/pipelines/
 // http://127.0.0.1:3000/api/v1/datasets/
@@ -48,5 +49,11 @@ export function fetchProjects() {
             .then(() => dispatch(fetchPipelines())
                 .then(() => dispatch(fetchDatasets())),
             );
+    };
+}
+
+export function selectPipeline(pipelineName) {
+    return function(dispatch) {
+        dispatch({ type: 'SELECT_PIPELINE', pipelineName });
     };
 }

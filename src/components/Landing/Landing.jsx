@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { fetchProjects } from '../../model/actions/landing';
+import {
+  fetchProjects,
+  selectPipeline,
+ } from '../../model/actions/landing';
 
 import {
   getProjectsData,
   getPipelinesData,
-  getExperimentsData,
+  getFilteredExperiments,
 } from '../../model/selectors/projects';
 
 
@@ -25,14 +28,15 @@ class Landing extends Component {
     const {
       projectsData,
       pipelinesData,
-      experimentsData,
+      filteredExperiments,
+      onSelectPipeline,
     } = this.props;
 
     return (
       <div>
         <Projects projects={projectsData} />
-        <Pipelines pipeLines={pipelinesData} />
-        <Experiments experiments={experimentsData} />
+        <Pipelines pipeLines={pipelinesData} onPipelineSelect={onSelectPipeline} />
+        <Experiments experiments={filteredExperiments} isLoading={false} />
       </div>
     );
   }
@@ -42,18 +46,19 @@ Landing.propTypes = {
     fetchProjectsList: PropTypes.func,
     projectsData: PropTypes.object,
     pipelinesData: PropTypes.object,
-    experimentsData: PropTypes.object,
-
+    filteredExperiments: PropTypes.array,
+    onSelectPipeline: PropTypes.func,
 };
 
 export const mapStateToProps = state => ({
   projectsData: getProjectsData(state),
   pipelinesData: getPipelinesData(state),
-  experimentsData: getExperimentsData(state),
+  filteredExperiments: getFilteredExperiments(state),
 });
 
 export const mapDispatchToProps = dispatch => ({
   fetchProjectsList: () => dispatch(fetchProjects()),
+  onSelectPipeline: (pipelineName) => dispatch(selectPipeline(pipelineName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Landing);

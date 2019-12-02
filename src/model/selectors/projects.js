@@ -4,6 +4,8 @@ export const getExperimentsData = (state) => state.experiments;
 export const getPipelinesData = (state) => state.pipelines;
 export const getDatasets = (state) => state.datasets;
 
+const addPipelines = (projectStack, pipelines) => projectStack.map(project => ({ ...project, pipelines }));
+const getSelectedPipeline = (state) => state.pipelines.pipelineName;
 
 const isProjectsLoading = createSelector(
     [getExperimentsData, getPipelinesData, getDatasets],
@@ -38,7 +40,10 @@ const groupExperimentsByProj = (stack, criteria) => {
     return grouppedProjects;
 };
 
-const addPipelines = (projectStack, pipelines) => projectStack.map(project => ({ ...project, pipelines }));
+export const getFilteredExperiments = createSelector(
+    [getExperimentsData, getSelectedPipeline],
+    (experimentsData, selectedPipeline) =>
+        experimentsData.experimentsList.filter(experiment => !selectedPipeline || experiment.pipeline === selectedPipeline));
 
 const getProjectsList = createSelector(
     [isProjectsLoading, getExperimentsData, getDatasets, getPipelinesData],

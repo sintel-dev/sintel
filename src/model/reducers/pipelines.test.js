@@ -7,6 +7,7 @@ describe('Testing pipelines reducers', () => {
         .toEqual({
             isPipelinesLoading: true,
             pipelineList: [],
+            pipelineName: null,
         });
     });
 
@@ -19,6 +20,7 @@ describe('Testing pipelines reducers', () => {
         .toEqual({
             isPipelinesLoading: false,
             pipelineList: pipelines,
+            pipelineName: null,
         });
     });
 
@@ -32,6 +34,23 @@ describe('Testing pipelines reducers', () => {
         expect(pipelinesReducer(undefined, errAction))
         .toEqual({
             isPipelinesLoading: false,
+            pipelineList: [],
+            pipelineName: null,
+        });
+    });
+
+    it('Should handle SELECT_PIPELINE', () => {
+        const action = {
+            type: 'SELECT_PIPELINE',
+            isPipelinesLoading: true,
+            pipelineList: [],
+            pipelineName: 'cyclegan',
+        };
+
+        expect(pipelinesReducer(undefined, action))
+        .toEqual({
+            pipelineName: 'cyclegan',
+            isPipelinesLoading: true,
             pipelineList: [],
         });
     });
