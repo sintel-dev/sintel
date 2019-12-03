@@ -6,13 +6,13 @@ function GET_PIPELINES_REQUEST(nextState) {
     nextState.pipelineName = null;
 }
 
-function GET_PIPELINES_SUCCESS(nextState, { pipelines }) {
+function GET_PIPELINES_SUCCESS(nextState, { result }) {
     nextState.isPipelinesLoading = false;
-    nextState.pipelineList = pipelines;
+    nextState.pipelineList = result.pipelines;
     nextState.pipelineName = null;
 }
 
-function GET_PIPELINES_ERROR(nextState) {
+function GET_PIPELINES_FAILURE(nextState) {
     nextState.isPipelinesLoading = false;
     nextState.pipelineList = [];
     nextState.pipelineName = null;
@@ -29,6 +29,6 @@ export default createReducer({
 }, {
     GET_PIPELINES_REQUEST,
     GET_PIPELINES_SUCCESS,
-    GET_PIPELINES_ERROR,
+    GET_PIPELINES_FAILURE,
     SELECT_PIPELINE,
 });

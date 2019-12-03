@@ -29,6 +29,6 @@ Landing.propTypes = {
     fetchProjectsList: PropTypes.func,
 };
 
-export default connect(state => ({}), dispatch => ({ // @TODO state should be removed, how?
+export default connect(null, dispatch => ({
   fetchProjectsList: () => dispatch(fetchProjects()),
 }))(Landing);

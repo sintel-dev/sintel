@@ -5,12 +5,12 @@ function GET_EXPERIMENTS_REQUEST(nextState) {
     nextState.experimentsList = [];
 }
 
-function GET_EXPERIMENTS_SUCCESS(nextState, { experiments }) {
+function GET_EXPERIMENTS_SUCCESS(nextState, { result }) {
     nextState.isExperimentsLoading = false;
-    nextState.experimentsList = experiments;
+    nextState.experimentsList = result.experiments;
 }
 
-function GET_EXPERIMENTS_ERROR(nextState) {
+function GET_EXPERIMENTS_FAILURE(nextState) {
     nextState.isExperimentsLoading = false;
     nextState.experimentsList = [];
 }
@@ -21,5 +21,5 @@ export default createReducer({
 }, {
     GET_EXPERIMENTS_REQUEST,
     GET_EXPERIMENTS_SUCCESS,
-    GET_EXPERIMENTS_ERROR,
+    GET_EXPERIMENTS_FAILURE,
 });
