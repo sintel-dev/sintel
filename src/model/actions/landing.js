@@ -52,8 +52,20 @@ export function fetchProjects() {
     };
 }
 
+export function selectProject(project) {
+    return function(dispatch) {
+        dispatch({ type: 'SELECT_PROJECT', project });
+    };
+}
+
 export function selectPipeline(pipelineName) {
     return function(dispatch) {
         dispatch({ type: 'SELECT_PIPELINE', pipelineName });
+    };
+}
+
+export function selectExperiment (experimentName) {
+    return function(dispatch) {
+        dispatch({ type: 'SELECT_EXPERIMENT', experimentName });
     };
 }

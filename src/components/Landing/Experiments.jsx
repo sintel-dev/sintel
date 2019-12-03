@@ -1,10 +1,12 @@
 import React from 'react';
-import PropTypes, { bool } from 'prop-types';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Loader from '../Common/Loader';
+import { getFilteredExperiments } from '../../model/selectors/projects';
+import { selectExperiment } from '../../model/actions/landing';
 
-const renderExperiment = (experiment, index) => (
-
-  <div className="cell" key={index}>
+const renderExperiment = (experiment, index, onSelectExperiment) => (
+  <div className="cell" key={index} onClick={() => onSelectExperiment(experiment)}>
     <h3>#{index + 1} {experiment.dataset}_{experiment.pipeline}</h3>
     <div className="item-data">
       <ul>
@@ -15,23 +17,31 @@ const renderExperiment = (experiment, index) => (
   </div>
 );
 
-const Experiments = ({ experiments, isLoading }) => (
-  <div className="item-row scroll-style" id="experiments">
-    <h2>Experiments</h2>
-    <div className="item-wrapper">
-      <Loader isLoading={isLoading}>
-        {
-            experiments.length ? experiments.map(renderExperiment) :
-            <h2>No experiments found</h2>
+const Experiments = (props) => {
+  const { filteredExperiments, onSelectExperiment } = props;
+  return (
+    <div className="item-row scroll-style" id="experiments">
+      <h2>Experiments</h2>
+      <div className="item-wrapper">
+        <Loader isLoading={false}> {/* temporary loading false */}
+          {
+            filteredExperiments.length ?
+              filteredExperiments.map((experiment, index) =>
+              renderExperiment(experiment, index, onSelectExperiment)) :
+              <h2>No experiments found</h2>
           }
-      </Loader>
-    </div>
-  </div>
-  );
+        </Loader>
+      </div>
+    </div>);
+  };
 
 Experiments.propTypes = {
-  experiments: PropTypes.array,
-  isLoading: PropTypes.bool,
+  filteredExperiments: PropTypes.array,
+  onSelectExperiment: PropTypes.func,
 };
 
-export default Experiments;
+export default connect(state => ({
+  filteredExperiments: getFilteredExperiments(state),
+}), dispatch => ({
+  onSelectExperiment: (experiment) => dispatch(selectExperiment(experiment)),
+}))(Experiments);

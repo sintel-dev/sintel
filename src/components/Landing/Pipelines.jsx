@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Loader from '../Common/Loader';
+import { getPipelinesData } from '../../model/selectors/projects';
+import { selectPipeline } from '../../model/actions/landing';
 
 const renderPipeline = (pipeline, index, onPipelineSelect) => (
   <div className="cell" key={index} onClick={() => onPipelineSelect(pipeline.name)}>
@@ -13,17 +16,19 @@ const renderPipeline = (pipeline, index, onPipelineSelect) => (
     </div>
   </div>);
 
-const Pipelines = ({ pipeLines, onPipelineSelect }) => {
-  const { isPipelinesLoading, pipelineList } = pipeLines;
-
+const Pipelines = (props) => {
+  const { pipelineList, isPipelinesLoading } = props.pipelinesData;
+  const { onSelectPipeline } = props;
   return (
     <div className="item-row scroll-style" id="pipelines">
       <h2>Pipelines</h2>
       <div className="item-wrapper">
         <Loader isLoading={isPipelinesLoading}>
           {
-            pipelineList.length ? pipelineList.map((pipeline, index) => renderPipeline(pipeline, index, onPipelineSelect)) :
-            <p>No pipelines have been found</p>
+            pipelineList.length ?
+              pipelineList.map((pipeline, index) =>
+              renderPipeline(pipeline, index, onSelectPipeline)) :
+              <p>No pipelines have been found</p>
           }
         </Loader>
       </div>
@@ -32,8 +37,14 @@ const Pipelines = ({ pipeLines, onPipelineSelect }) => {
 };
 
 Pipelines.propTypes = {
-  pipeLines: PropTypes.object,
-  onPipelineSelect: PropTypes.func,
+  pipelinesData: PropTypes.object,
+  onSelectPipeline: PropTypes.func,
 };
 
-export default Pipelines;
+export default connect(state => ({
+  pipelinesData: getPipelinesData(state),
+}), dispatch => ({
+  onSelectPipeline: (pipelineName) => dispatch(selectPipeline(pipelineName)),
+}))(Pipelines);
+
+// export default Pipelines;
