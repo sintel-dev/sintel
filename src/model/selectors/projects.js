@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 export const getExperimentsData = (state) => state.experiments;
 export const getPipelinesData = (state) => state.pipelines;
 export const getDatasets = (state) => state.datasets;
-export const getSelectedPipeline = (state) => state.pipelines.pipelineName;
+export const getSelectedPipeline = (state) => state.pipelines.selectedPipelineName;
 export const getSelectedProjectName = (state) => state.projects.selectedProject;
 export const getIsExperimentsLoading = state => state.experiments.isExperimentsLoading;
 
@@ -36,6 +36,7 @@ export const getProjectsList = createSelector(
             experimentNum: groupedExperiments[projectName].length,
             experiments: groupedExperiments[projectName],
             name: projectName,
+            // @TODO - investigate if it's really needed
             // uniquePipelineNum: countPipelines(projectName),
             signalNum: getSignalNum(projectName),
         }), []);

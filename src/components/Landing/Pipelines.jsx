@@ -10,10 +10,9 @@ import { selectPipeline } from '../../model/actions/landing';
 
 const renderPipeline = (pipeline, index, onPipelineSelect, selectedPipeline) => {
   const activeClass = selectedPipeline === pipeline.name ? 'active' : '';
-  const switchPipeline = (pipelineName) => pipelineName !== selectedPipeline ? onPipelineSelect(pipelineName) : onPipelineSelect(null);
 
   return (
-    <div className={`cell ${activeClass}`} key={index} onClick={() => switchPipeline(pipeline.name)}>
+    <div className={`cell ${activeClass}`} key={index} onClick={() => onPipelineSelect(pipeline.name)}>
       <h3>{pipeline.name}</h3>
       <div className="item-data">
         <ul>
@@ -58,5 +57,3 @@ export default connect(state => ({
 }), dispatch => ({
   onSelectPipeline: (pipelineName) => dispatch(selectPipeline(pipelineName)),
 }))(Pipelines);
-
-// export default Pipelines;

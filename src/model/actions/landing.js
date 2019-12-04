@@ -1,9 +1,5 @@
 import { api } from './utils';
-
-
-// http://127.0.0.1:3000/api/v1/experiments/
-// http://127.0.0.1:3000/api/v1/pipelines/
-// http://127.0.0.1:3000/api/v1/datasets/
+import { getSelectedPipeline } from '../selectors/projects';
 
 export function fetchExperiments() {
     return function(dispatch) {
@@ -49,9 +45,12 @@ export function selectProject(activeProject) {
     };
 }
 
-export function selectPipeline(pipelineName) {
-    return function(dispatch) {
-        dispatch({ type: 'SELECT_PIPELINE', pipelineName });
+export function selectPipeline(selectedPipelineName) {
+    return function(dispatch, getState) {
+        const currentSelectedPipeline = getSelectedPipeline(getState());
+        selectedPipelineName !== currentSelectedPipeline ?
+            dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName }) :
+            dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName: null });
     };
 }
 
