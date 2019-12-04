@@ -48,9 +48,8 @@ export function selectProject(activeProject) {
 export function selectPipeline(selectedPipelineName) {
     return function(dispatch, getState) {
         const currentSelectedPipeline = getSelectedPipeline(getState());
-        selectedPipelineName !== currentSelectedPipeline ?
-            dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName }) :
-            dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName: null });
+        selectedPipelineName = selectedPipelineName !== currentSelectedPipeline ? selectedPipelineName : null;
+        dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName });
     };
 }
 
