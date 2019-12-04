@@ -4,11 +4,11 @@ function GET_DATASETS_REQUEST(nextState) {
     nextState.isDatasetLoading = true;
     nextState.dataSetsList = [];
 }
-function GET_DATASETS_SUCCESS(nextState, { dataSets }) {
+function GET_DATASETS_SUCCESS(nextState, { result }) {
     nextState.isDatasetLoading = false;
-    nextState.dataSetsList = dataSets;
+    nextState.dataSetsList = result.datasets;
 }
-function GET_DATASETS_ERROR(nextState) {
+function GET_DATASETS_FAILURE(nextState) {
     nextState.isDatasetLoading = false;
     nextState.dataSetsList = [];
 }
@@ -19,5 +19,5 @@ export default createReducer({
 }, {
     GET_DATASETS_REQUEST,
     GET_DATASETS_SUCCESS,
-    GET_DATASETS_ERROR,
+    GET_DATASETS_FAILURE,
 });

@@ -39,6 +39,7 @@
       "react/no-unused-prop-types": "warn",
       "react/jsx-closing-bracket-location": "warn",
       "react/jsx-props-no-spreading": "off",
+      "react/jsx-indent": "warn",
       "react/state-in-constructor": "off",
       "react/destructuring-assignment": "off",
       "object-shorthand": "warn",

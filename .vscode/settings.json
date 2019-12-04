@@ -1,6 +1,6 @@
 {
     "editor.renderWhitespace": "all",
-    "window.zoomLevel": -1,
+    "window.zoomLevel": 0,
     "terminal.integrated.shell.linux": "/bin/bash",
     "typescript.updateImportsOnFileMove.enabled": "always",
     "tslint.jsEnable": true,

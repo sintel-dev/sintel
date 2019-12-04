@@ -1,52 +1,60 @@
 import { api } from './utils';
-
-// http://127.0.0.1:3000/api/v1/experiments/
-// http://127.0.0.1:3000/api/v1/pipelines/
-// http://127.0.0.1:3000/api/v1/datasets/
+import { getSelectedPipeline } from '../selectors/projects';
 
 export function fetchExperiments() {
     return function(dispatch) {
-        dispatch({ type: 'GET_EXPERIMENTS_REQUEST' });
-        return api
-            .get('experiments')
-            .then(response => {
-                dispatch({ type: 'GET_EXPERIMENTS_SUCCESS', experiments: response.experiments });
-            })
-            .catch(err => {
-                dispatch({ type: 'GET_EXPERIMENTS_ERROR', err });
-            });
+        const promise = api.get('experiments');
+        dispatch({ type: 'GET_EXPERIMENTS', promise });
+        return promise;
     };
 }
 
 export function fetchPipelines() {
     return function (dispatch) {
-        dispatch({ type: 'GET_PIPELINES_REQUEST' });
-        return api
-            .get('pipelines')
-            .then(response => dispatch({ type: 'GET_PIPELINES_SUCCESS', pipelines: response.pipelines }))
-            .catch(err => dispatch({ type: 'GET_PIPELINES_ERROR', err }));
+        const promise = api.get('pipelines');
+        dispatch({ type: 'GET_PIPELINES', promise });
+        return promise;
     };
 }
 
 export function fetchDatasets() {
     return function(dispatch) {
-        dispatch({ type: 'GET_DATASETS_REQUEST' });
-        return api
-            .get('datasets')
-            .then(response => {
-                dispatch({ type: 'GET_DATASETS_SUCCESS', dataSets: response.datasets });
-            })
-            .catch(err => {
-                dispatch({ type: 'GET_DATASETS_ERROR', err });
-            });
+        const promise = api.get('datasets');
+        dispatch({ type: 'GET_DATASETS', promise });
+        return promise;
     };
 }
 
 export function fetchProjects() {
     return function(dispatch) {
-        return dispatch(fetchExperiments())
-            .then(() => dispatch(fetchPipelines())
-                .then(() => dispatch(fetchDatasets())),
-            );
+        const promise = Promise.all([
+            dispatch(fetchExperiments()),
+            dispatch(fetchPipelines()),
+            dispatch(fetchDatasets()),
+        ]);
+        dispatch({
+            type: 'FETCH_PROJECTS',
+            promise,
+        });
+    };
+}
+
+export function selectProject(activeProject) {
+    return function(dispatch) {
+        dispatch({ type: 'SELECT_PROJECT', activeProject });
+    };
+}
+
+export function selectPipeline(selectedPipelineName) {
+    return function(dispatch, getState) {
+        const currentSelectedPipeline = getSelectedPipeline(getState());
+        selectedPipelineName = selectedPipelineName !== currentSelectedPipeline ? selectedPipelineName : null;
+        dispatch({ type: 'SELECT_PIPELINE', selectedPipelineName });
+    };
+}
+
+export function selectExperiment (experimentName) {
+    return function(dispatch) {
+        dispatch({ type: 'SELECT_EXPERIMENT', experimentName });
     };
 }
