@@ -16,7 +16,7 @@ describe('Testing experiments reducer', () => {
     it('Should handle GET_EXPERIMENTS_SUCCESS', () => {
         const successAction = {
             type: 'GET_EXPERIMENTS_SUCCESS',
-            experiments,
+            result: { experiments },
         };
 
         expect(experimentsReducer(undefined, successAction))
@@ -26,10 +26,11 @@ describe('Testing experiments reducer', () => {
         });
     });
 
-    it('Should handle GET_EXPERIMENTS_ERROR', () => {
+    it('Should handle GET_EXPERIMENTS_FAILURE', () => {
         const errAction = {
-            type: 'GET_EXPERIMENTS_ERROR',
-            experimentsList: experiments,
+            type: 'GET_EXPERIMENTS_FAILURE',
+            isExperimentsLoading: false,
+            result: [],
         };
         expect(experimentsReducer(undefined, errAction))
         .toEqual({

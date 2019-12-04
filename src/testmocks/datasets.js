@@ -1,4 +1,4 @@
-export const dataSets = [
+export const datasets = [
     {
         id: '5da7cc308c5ceceb9f28901e',
         insert_time: '2019-10-17T02:04:32.203000',
