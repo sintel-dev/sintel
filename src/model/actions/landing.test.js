@@ -1,67 +1,68 @@
-
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import * as actions from './landing';
+import { configureStore } from '../store';
 
 // importing mocks
 import * as pipelines from '../../testmocks/pipelines';
 import * as experiments from '../../testmocks/experiments';
 import * as datasets from '../../testmocks/datasets';
 
-const middlewares = [thunk];
-const mockStore = configureMockStore(middlewares);
-
 describe('async actions', () => {
+  const store = configureStore();
   afterEach(() => {
     fetchMock.restore();
   });
 
-  it('creates GET_EXPERIMENTS_SUCCESS when fetching experiments', () => {
-    fetchMock.getOnce('/api/v1/experiments', {
-      body: { experiments },
-    });
-
-    const expectedActions = [
-      { type: 'GET_EXPERIMENTS_REQUEST' },
-      { type: 'GET_EXPERIMENTS_SUCCESS', experiments },
-    ];
-
-    const store = mockStore({ experiments: {} });
-    store.dispatch(actions.fetchExperiments()).then(() => {
-      expect(store.getActions()).toEqual(expectedActions);
-    });
-  });
-
-  it('creates GET_PIPELINES_SUCCESS when fetching pipelines', () => {
+  it('Creates GET_PIPELINES when fetching pipelines', async () => {
     fetchMock.getOnce('/api/v1/pipelines', {
       body: { pipelines },
     });
 
-    const expectedActions = [
-      { type: 'GET_PIPELINES_REQUEST' },
-      { type: 'GET_PIPELINES_SUCCESS', pipelines },
-    ];
+    const promise = store.dispatch(actions.fetchPipelines());
+    let storeState = store.getState().pipelines;
+    expect(storeState.isPipelinesLoading).toEqual(true);
 
-    const store = mockStore({ pipelines: {} });
-    store.dispatch(actions.fetchPipelines()).then(() => {
-      expect(store.getActions()).toEqual(expectedActions);
-    });
+    const response = await promise;
+    storeState = store.getState().pipelines;
+    expect(storeState.pipelineList).toEqual(response.pipelines);
   });
 
-  it('creates GET_DATASETS_SUCCESS when fetching datasets', () => {
+  it('Creates GET_EXPERIMENTS when fetching experiments', async () => {
+    fetchMock.getOnce('/api/v1/experiments', {
+      body: { experiments },
+      headers: { 'content-type': 'application/json' },
+    });
+
+    const promise = store.dispatch(actions.fetchExperiments());
+    let storeState = store.getState().experiments;
+    expect(storeState.isExperimentsLoading).toEqual(true);
+
+    const response = await promise;
+    storeState = store.getState().experiments;
+    expect(storeState.experimentsList).toEqual(response.experiments);
+  });
+
+  it('creates GET_DATASETS when fetching datasets', async () => {
     fetchMock.getOnce('/api/v1/datasets', {
-      body: { dataSets: datasets.dataSets },
+      body: { datasets: datasets.datasets },
+      headers: { 'content-type': 'application/json' },
     });
 
-    const expectedActions = [
-      { type: 'GET_DATASETS_REQUEST' },
-      { type: 'GET_DATASETS_SUCCESS', datasets: datasets.datasets },
-    ];
+    const promise = store.dispatch(actions.fetchDatasets());
+    let storeState = store.getState().datasets;
+    expect(storeState.isDatasetLoading).toEqual(true);
 
-    const store = mockStore({ dataSets: {} });
-    store.dispatch(actions.fetchDatasets()).then(() => {
-      expect(store.getActions()).toEqual(expectedActions);
-    });
+    const response = await promise;
+    storeState = store.getState().datasets;
+    expect(storeState.dataSetsList).toEqual(response.datasets);
+    expect(storeState.isDatasetLoading).toEqual(false);
+  });
+
+  it('Should handle selectPipeline when there is a previously selected pipeline', () => {
+    store.dispatch(actions.selectPipeline('cyclegan'));
+    expect(store.getState().pipelines.selectedPipelineName).toEqual('cyclegan');
+
+    store.dispatch(actions.selectPipeline('lstm'));
+    expect(store.getState().pipelines.selectedPipelineName).toEqual('lstm');
   });
 });

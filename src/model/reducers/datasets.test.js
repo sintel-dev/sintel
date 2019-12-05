@@ -1,5 +1,5 @@
 import datasetsReducer from './datasets';
-import { dataSets } from '../../testmocks/datasets';
+import { datasets } from '../../testmocks/datasets';
 
 describe('Testing dataset reducer', () => {
     it('should handle GET_DATASET_REQUEST', () => {
@@ -14,19 +14,19 @@ describe('Testing dataset reducer', () => {
     it('Should handle GET_DATASETS_SUCCESS', () => {
         const successAction = {
             type: 'GET_DATASETS_SUCCESS',
-            dataSets,
+            result: { datasets },
         };
         expect(datasetsReducer(undefined, successAction))
         .toEqual({
             isDatasetLoading: false,
-            dataSetsList: dataSets,
+            dataSetsList: datasets,
         });
     });
 
-    it('Should handle GET_DATASET_ERROR', () => {
+    it('Should handle GET_DATASETS_FAILURE', () => {
         const errAction = {
-            type: 'GET_DATASETS_ERROR',
-            dataSets,
+            type: 'GET_DATASETS_FAILURE',
+            datasets,
         };
 
         expect(datasetsReducer(undefined, errAction))
