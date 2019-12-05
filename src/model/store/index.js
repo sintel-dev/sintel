@@ -6,12 +6,14 @@ import { createLogger } from 'redux-logger';
 import rootReducer from '../reducers';
 import { api } from './middlewares';
 
-function configureStore(initialState = {}) {
-  const composedEnhancers = composeWithDevTools(
-    applyMiddleware(thunkMiddleware, api, createLogger({
+export function configureStore(initialState = {}) {
+  const middlewares = [thunkMiddleware, api];
+  if (process.env.NODE_ENV !== 'test') {
+    middlewares.push(createLogger({
       collapsed: true,
-  })),
-  );
+    }));
+  }
+  const composedEnhancers = composeWithDevTools(applyMiddleware(...middlewares));
   const store = createStore(rootReducer, initialState, composedEnhancers);
   return store;
 }
