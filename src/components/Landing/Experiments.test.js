@@ -1,32 +1,39 @@
 import React from 'react';
-import Enzyme, { mount } from 'enzyme';
-import { Provider } from 'react-redux';
-import Adapter from 'enzyme-adapter-react-16';
 import Experiments from './Experiments';
-import { configureStore } from '../../model/store';
-
-Enzyme.configure({ adapter: new Adapter() });
-const store = configureStore();
-
-function setup() {
-      const experimentsWrapper = mount(
-        <Provider store={store}>
-          <Experiments />
-        </Provider>,
-      );
-    return {
-      experimentsWrapper,
-    };
-  }
+import { experiments } from '../../tests/testmocks/experiments';
+import { renderWithStore } from '../../tests/utils';
+import { selectExperiment } from '../../model/actions/landing';
 
 describe('Testing experiments component', () => {
-    const { experimentsWrapper } = setup();
+  const currentState = {
+    experiments: {
+      isExperimentsLoading: false,
+      experimentsList: experiments,
+    },
+  };
 
-    it('should render experiments component', () => {
-        expect(experimentsWrapper).toHaveLength(1);
-    });
 
-    it('Should render experiment title', () => {
-      expect(experimentsWrapper.find('h2').text()).toBe('Experiments');
+    const expComponent = renderWithStore(currentState, <Experiments />);
+    const expItem = expComponent.find('.cell').first();
+    it('Should render experiment container', () =>
+       expect(expComponent).toHaveLength(1));
+    it('Should render experiment heading', () =>
+      expect(expComponent.find('h2').text())
+      .toBe('Experiments'));
+
+    it('Should render pipeline name ', () => expect(expItem.find('h3').text()).toContain('lstm'));
+
+    it('Should handle onSelectExperiment', () => { // @TODO implement this test
+
+
+      // const handleClick = jest.fn();
+
+      // expItem.getDOMNode()
+      // expItem.prop('className')
+      // expItem.simulate('click');
+
+      // expect(handleClick.mock.calls.length).toEqual(1);
+      // expect(selectExperiment).toBe;
+      // expect(expItem.hasClass('active')).toBe(true);
     });
 });

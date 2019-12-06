@@ -1,5 +1,5 @@
 import pipelinesReducer from './pipelines';
-import { pipelines } from '../../testmocks/pipelines';
+import { pipelines } from '../../tests/testmocks/pipelines';
 
 describe('Testing pipelines reducers', () => {
     it('Should handle GET_PIPELINES_REQUEST', () => {

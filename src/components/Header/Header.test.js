@@ -1,10 +1,9 @@
 import React from 'react';
-import { shallow } from 'enzyme';
 import Header from './Header';
 
 describe('Should render header', () => {
     it('Renders <Header /> with enzyme', () => {
-        const header = shallow(<Header />);
+        const header = global.shallow(<Header />);
         expect(header).toMatchSnapshot();
 
         const logo = header.find('a.logo');

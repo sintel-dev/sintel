@@ -1,5 +1,5 @@
 import experimentsReducer from './experiments';
-import { experiments } from '../../testmocks/experiments';
+import { experiments } from '../../tests/testmocks/experiments';
 
 
 describe('Testing experiments reducer', () => {
@@ -8,6 +8,7 @@ describe('Testing experiments reducer', () => {
             type: 'GET_EXPERIMENTS_REQUEST',
         }))
         .toEqual({
+            experimentID: null,
             isExperimentsLoading: true,
             experimentsList: [],
         });
@@ -21,6 +22,7 @@ describe('Testing experiments reducer', () => {
 
         expect(experimentsReducer(undefined, successAction))
         .toEqual({
+            experimentID: null,
             isExperimentsLoading: false,
             experimentsList: experiments,
         });
@@ -34,6 +36,7 @@ describe('Testing experiments reducer', () => {
         };
         expect(experimentsReducer(undefined, errAction))
         .toEqual({
+            experimentID: null,
             isExperimentsLoading: false,
             experimentsList: [],
         });

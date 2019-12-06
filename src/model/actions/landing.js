@@ -53,8 +53,8 @@ export function selectPipeline(selectedPipelineName) {
     };
 }
 
-export function selectExperiment (experimentName) {
+export function selectExperiment (experimentID) {
     return function(dispatch) {
-        dispatch({ type: 'SELECT_EXPERIMENT', experimentName });
+        dispatch({ type: 'SELECT_EXPERIMENT', experimentID });
     };
 }

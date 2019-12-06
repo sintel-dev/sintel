@@ -1,5 +1,5 @@
 import datasetsReducer from './datasets';
-import { datasets } from '../../testmocks/datasets';
+import { datasets } from '../../tests/testmocks/datasets';
 
 describe('Testing dataset reducer', () => {
     it('should handle GET_DATASET_REQUEST', () => {

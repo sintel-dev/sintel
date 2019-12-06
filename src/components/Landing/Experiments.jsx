@@ -6,12 +6,13 @@ import {
   getFilteredExperiments,
   getIsExperimentsLoading,
   getSelectedPipeline,
+  getSelectedExperiment,
 } from '../../model/selectors/projects';
 import { selectExperiment } from '../../model/actions/landing';
 
 
-const renderExperiment = (experiment, index, onSelectExperiment, selectedPipeline) => {
-  const activeClass = selectedPipeline ? 'active' : '';
+const renderExperiment = (experiment, index, onSelectExperiment, selectedPipeline, selectedExperiment) => {
+  const activeClass = selectedPipeline || selectedExperiment === experiment.id ? 'active' : '';
   return (
     <div className={`cell ${activeClass}`} key={index} onClick={() => onSelectExperiment(experiment.id)}>
       <h3>#{index + 1} {experiment.dataset}_{experiment.pipeline}</h3>
@@ -24,7 +25,13 @@ const renderExperiment = (experiment, index, onSelectExperiment, selectedPipelin
     </div>);
 };
 
-const Experiments = ({ isExperimentsLoading, filteredExperiments, onSelectExperiment, selectedPipeline }) => (
+const Experiments = ({
+  isExperimentsLoading,
+  filteredExperiments,
+  onSelectExperiment,
+  selectedPipeline,
+  selectedExperiment,
+}) => (
   <div className="item-row scroll-style" id="experiments">
     <h2>Experiments</h2>
     <div className="item-wrapper">
@@ -32,7 +39,7 @@ const Experiments = ({ isExperimentsLoading, filteredExperiments, onSelectExperi
         {
           filteredExperiments.length ?
             filteredExperiments.map((experiment, index) =>
-            renderExperiment(experiment, index, onSelectExperiment, selectedPipeline)) :
+            renderExperiment(experiment, index, onSelectExperiment, selectedPipeline, selectedExperiment)) :
             <h2>No experiments found</h2>
           }
       </Loader>
@@ -44,12 +51,14 @@ Experiments.propTypes = {
   isExperimentsLoading: PropTypes.bool,
   onSelectExperiment: PropTypes.func,
   selectedPipeline: PropTypes.string,
+  selectedExperiment: PropTypes.string,
 };
 
 export default connect(state => ({
   filteredExperiments: getFilteredExperiments(state),
   isExperimentsLoading: getIsExperimentsLoading(state),
   selectedPipeline: getSelectedPipeline(state),
+  selectedExperiment: getSelectedExperiment(state),
 }), dispatch => ({
   onSelectExperiment: (experiment) => dispatch(selectExperiment(experiment)),
 }))(Experiments);

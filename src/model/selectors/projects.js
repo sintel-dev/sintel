@@ -6,6 +6,7 @@ export const getDatasets = (state) => state.datasets;
 export const getSelectedPipeline = (state) => state.pipelines.selectedPipelineName;
 export const getSelectedProjectName = (state) => state.projects.selectedProject;
 export const getIsExperimentsLoading = state => state.experiments.isExperimentsLoading;
+export const getSelectedExperiment = state => state.experiments.experimentID;
 
 
 export const getIsProjectsLoading = createSelector(
@@ -46,8 +47,8 @@ export const getProjectsList = createSelector(
 export const getFilteredExperiments = createSelector(
     [getSelectedProjectName, getExperimentsData, getSelectedPipeline],
     (selectedProjectName, experimentsData, selectedPipeline) => experimentsData.experimentsList.filter(experiment => {
-        const isFromCurrentProject = experiment.project === selectedProjectName;
-        const isPipelineMatch = (!selectedPipeline || experiment.pipeline === selectedPipeline);
-        return isFromCurrentProject && isPipelineMatch;
+        const isProjectMatch = !selectedProjectName || experiment.project === selectedProjectName;
+        const isPipelineMatch = !selectedPipeline || experiment.pipeline === selectedPipeline;
+        return isProjectMatch && isPipelineMatch;
     }),
 );
