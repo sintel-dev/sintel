@@ -1,5 +1,5 @@
 import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
+import Enzyme, { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import Adapter from 'enzyme-adapter-react-16';
 import Experiments from './Experiments';
@@ -9,29 +9,24 @@ Enzyme.configure({ adapter: new Adapter() });
 const store = configureStore();
 
 function setup() {
-    const props = {
-        addTodo: jest.fn(),
-        isExperimentsLoading: false,
-        filteredExperiments: jest.fn(),
-        onSelectExperiment: jest.fn(),
-        selectedPipeline: jest.fn(),
-    };
-
-      const experimentsWrapper = shallow(
+      const experimentsWrapper = mount(
         <Provider store={store}>
           <Experiments />
         </Provider>,
       );
-
     return {
-      props,
       experimentsWrapper,
     };
   }
 
 describe('Testing experiments component', () => {
+    const { experimentsWrapper } = setup();
+
     it('should render experiments component', () => {
-        const { experimentsWrapper } = setup();
         expect(experimentsWrapper).toHaveLength(1);
+    });
+
+    it('Should render experiment title', () => {
+      expect(experimentsWrapper.find('h2').text()).toBe('Experiments');
     });
 });

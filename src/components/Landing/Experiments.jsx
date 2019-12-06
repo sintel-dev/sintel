@@ -30,10 +30,10 @@ const Experiments = ({ isExperimentsLoading, filteredExperiments, onSelectExperi
     <div className="item-wrapper">
       <Loader isLoading={isExperimentsLoading}>
         {
-            filteredExperiments.length ?
-              filteredExperiments.map((experiment, index) =>
-              renderExperiment(experiment, index, onSelectExperiment, selectedPipeline)) :
-              <h2>No experiments found</h2>
+          filteredExperiments.length ?
+            filteredExperiments.map((experiment, index) =>
+            renderExperiment(experiment, index, onSelectExperiment, selectedPipeline)) :
+            <h2>No experiments found</h2>
           }
       </Loader>
     </div>
