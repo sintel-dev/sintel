@@ -1,3 +1,3 @@
 module.exports = {
-    setupFiles: ['jest-canvas-mock', './src/setupTests.js'],
+    setupFiles: ['./src/setupTests.js'],
 };
