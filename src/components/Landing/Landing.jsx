@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { fetchProjects } from '../../model/actions/landing';
+import RenderOverview from '../Timeseries/Overview';
 
 import Projects from './Projects';
 import Pipelines from './Pipelines';
@@ -20,6 +21,7 @@ class Landing extends Component {
         <Projects />
         <Pipelines />
         <Experiments />
+        <RenderOverview />
       </div>
     );
   }
