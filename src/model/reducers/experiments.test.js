@@ -8,7 +8,7 @@ describe('Testing experiments reducer', () => {
             type: 'GET_EXPERIMENTS_REQUEST',
         }))
         .toEqual({
-            experimentID: null,
+            selectedExperimentID: null,
             isExperimentsLoading: true,
             experimentsList: [],
         });
@@ -22,7 +22,7 @@ describe('Testing experiments reducer', () => {
 
         expect(experimentsReducer(undefined, successAction))
         .toEqual({
-            experimentID: null,
+            selectedExperimentID: null,
             isExperimentsLoading: false,
             experimentsList: experiments,
         });
@@ -36,7 +36,7 @@ describe('Testing experiments reducer', () => {
         };
         expect(experimentsReducer(undefined, errAction))
         .toEqual({
-            experimentID: null,
+            selectedExperimentID: null,
             isExperimentsLoading: false,
             experimentsList: [],
         });

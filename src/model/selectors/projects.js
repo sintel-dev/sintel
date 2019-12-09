@@ -6,7 +6,7 @@ export const getDatasets = (state) => state.datasets;
 export const getSelectedPipeline = (state) => state.pipelines.selectedPipelineName;
 export const getSelectedProjectName = (state) => state.projects.selectedProject;
 export const getIsExperimentsLoading = state => state.experiments.isExperimentsLoading;
-export const getSelectedExperiment = state => state.experiments.experimentID;
+export const getSelectedExperiment = state => state.experiments.selectedExperimentID;
 
 
 export const getIsProjectsLoading = createSelector(

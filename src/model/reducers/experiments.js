@@ -15,14 +15,14 @@ function GET_EXPERIMENTS_FAILURE(nextState) {
     nextState.experimentsList = [];
 }
 
-function SELECT_EXPERIMENT(nextState, { experimentID }) {
-    nextState.experimentID = experimentID;
+function SELECT_EXPERIMENT(nextState, { selectedExperimentID }) {
+    nextState.selectedExperimentID = selectedExperimentID;
 }
 
 export default createReducer({
     isExperimentsLoading: true,
     experimentsList: [],
-    experimentID: null,
+    selectedExperimentID: null,
 }, {
     GET_EXPERIMENTS_REQUEST,
     GET_EXPERIMENTS_SUCCESS,

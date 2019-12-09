@@ -52,6 +52,7 @@
   "devDependencies": {
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
+    "enzyme-to-json": "^3.4.3",
     "eslint": "^6.6.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.18.2",
@@ -61,5 +62,8 @@
     "eslint-plugin-react-hooks": "^2.3.0",
     "fetch-mock": "^8.0.0",
     "redux-mock-store": "^1.5.3"
+  },
+  "jest": {
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"]
   }
 }

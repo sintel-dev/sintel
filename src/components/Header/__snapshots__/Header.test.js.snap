@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Should render header Renders <Header /> with enzyme 1`] = `ShallowWrapper {}`;
-
-exports[`Should render header Renders <Header /> with enzyme 2`] = `ShallowWrapper {}`;
+exports[`Should render header Renders <Header /> with enzyme 1`] = `
+<header
+  class="main-header"
+  id="header"
+>
+  <a
+    class="logo"
+    href="/"
+  >
+    <b>
+      MTV
+    </b>
+  </a>
+  <a
+    class="page-switch-btn"
+    href="/"
+  >
+    Switch
+  </a>
+</header>
+`;

@@ -1,7 +1,7 @@
 import React from 'react';
 import Experiments from './Experiments';
 import { experiments } from '../../tests/testmocks/experiments';
-import { renderWithStore } from '../../tests/utils';
+import { mountWithStore, renderWithStore } from '../../tests/utils';
 import * as actions from '../../model/actions/landing';
 
 describe('Testing experiments component', () => {
@@ -12,7 +12,7 @@ describe('Testing experiments component', () => {
     },
   };
 
-  const expComponent = renderWithStore(currentState, <Experiments />);
+  const expComponent = mountWithStore(currentState, <Experiments />);
   const expItem = expComponent.find('.cell').first();
 
   it('Should render experiment container', () => expect(expComponent).toHaveLength(1));
@@ -26,5 +26,11 @@ describe('Testing experiments component', () => {
     expItem.simulate('click');
     expect(spy).toHaveBeenCalled();
     expect(expItem.getDOMNode().classList.contains('active')).toBe(true);
+    expect(expComponent).toMatchSnapshot;
+  });
+
+  it('Should render experiments component', () => {
+    const renderExpComponent = renderWithStore(currentState, <Experiments />);
+    expect(renderExpComponent).toMatchSnapshot();
   });
 });
