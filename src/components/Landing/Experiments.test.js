@@ -14,9 +14,6 @@ describe('Testing experiments component', () => {
 
   const mountedExpWrapper = mountWithStore(currentState, <Experiments />);
   const expItem = mountedExpWrapper.find('.cell').first();
-  it('Should render experiment heading', () => expect(mountedExpWrapper.find('h2').text()).toBe('Experiments'));
-  it('Should render pipeline name ', () => expect(expItem.find('h3').text()).toContain('lstm'));
-
   it('Should handle onSelectExperiment', () => {
     const spy = jest.spyOn(actions, 'selectExperiment');
 
