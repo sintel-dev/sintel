@@ -12,11 +12,9 @@ describe('Testing experiments component', () => {
     },
   };
 
-  const expComponent = mountWithStore(currentState, <Experiments />);
-  const expItem = expComponent.find('.cell').first();
-
-  it('Should render experiment container', () => expect(expComponent).toHaveLength(1));
-  it('Should render experiment heading', () => expect(expComponent.find('h2').text()).toBe('Experiments'));
+  const mountedExpWrapper = mountWithStore(currentState, <Experiments />);
+  const expItem = mountedExpWrapper.find('.cell').first();
+  it('Should render experiment heading', () => expect(mountedExpWrapper.find('h2').text()).toBe('Experiments'));
   it('Should render pipeline name ', () => expect(expItem.find('h3').text()).toContain('lstm'));
 
   it('Should handle onSelectExperiment', () => {
@@ -26,11 +24,10 @@ describe('Testing experiments component', () => {
     expItem.simulate('click');
     expect(spy).toHaveBeenCalled();
     expect(expItem.getDOMNode().classList.contains('active')).toBe(true);
-    expect(expComponent).toMatchSnapshot;
   });
 
   it('Should render experiments component', () => {
-    const renderExpComponent = renderWithStore(currentState, <Experiments />);
-    expect(renderExpComponent).toMatchSnapshot();
+    const renderedExpWrapper = renderWithStore(currentState, <Experiments />);
+    expect(renderedExpWrapper).toMatchSnapshot();
   });
 });
