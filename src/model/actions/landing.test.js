@@ -3,9 +3,9 @@ import * as actions from './landing';
 import { configureStore } from '../store';
 
 // importing mocks
-import * as pipelines from '../../testmocks/pipelines';
-import * as experiments from '../../testmocks/experiments';
-import * as datasets from '../../testmocks/datasets';
+import * as pipelines from '../../tests/testmocks/pipelines';
+import * as experiments from '../../tests/testmocks/experiments';
+import * as datasets from '../../tests/testmocks/datasets';
 
 describe('async actions', () => {
   const store = configureStore();

@@ -33,10 +33,10 @@ const Projects = ({ projects, isProjectsLoading, onSelectProject, selectedProjec
     <div className="item-wrapper">
       <Loader isLoading={isProjectsLoading}>
         {
-              projects && projects.length ?
-                projects.map((project, index) => renderProject(project, index, onSelectProject, selectedProjectName)) :
-                <p>No datasets have been found</p>
-            }
+          projects && projects.length ?
+            projects.map((project, index) => renderProject(project, index, onSelectProject, selectedProjectName)) :
+            <p>No datasets have been found</p>
+        }
       </Loader>
     </div>
   </div>);
