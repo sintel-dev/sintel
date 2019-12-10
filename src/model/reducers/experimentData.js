@@ -2,23 +2,23 @@ import createReducer from '../store/createReducer';
 
 function GET_EXPERIMENTDATA_REQUEST(nextState) {
     nextState.isExperimentDataLoading = true;
-    nextState.dataruns = [];
+    nextState.data = {};
 }
 
 function GET_EXPERIMENTDATA_SUCCESS(nextState, { result }) {
     nextState.isExperimentDataLoading = false;
-    nextState.dataruns = result;
+    nextState.data = result;
 }
 
 function GET_EXPERIMENTDATA_FAILURE(nextState) {
     nextState.isExperimentDataLoading = false;
-    nextState.experimentData = [];
+    nextState.experimentData = {};
 }
 
 
 export default createReducer({
     isExperimentDataLoading: true,
-    dataruns: [],
+    data: {},
 }, {
     GET_EXPERIMENTDATA_REQUEST,
     GET_EXPERIMENTDATA_SUCCESS,
