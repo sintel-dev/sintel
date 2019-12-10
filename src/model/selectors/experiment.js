@@ -1,19 +1,30 @@
 import { createSelector } from 'reselect';
-import { getIsExperimentsLoading, getExperimentsData, getSelectedExperiment } from './projects';
-
-export const getExperimentDataRun = (state) => state.experimentData.dataruns;
-
-// export const getSelectedExperimentData = createSelector(
-//     [getIsExperimentsLoading, getExperimentsData, getSelectedExperiment, getExperimentDataRun],
-//     (isExperimentsLoading, experiments, selectedExperimentID, dataRun) => {
-//         // if (isExperimentsLoading) { return null; }
-//         const { experimentsList } = experiments;
-//         const experimentData = experimentsList.filter(experiment => experiment.id === selectedExperimentID);
-//         return experimentData;
-//     },
-// );
 
 export const getSelectedExperimentData = (state) => state.experimentData;
 
+const groupDataBy = (datarun, option) => {
+    const indexValue = datarun.names.indexOf(option);
+    return datarun.data.map(value => [
+        Math.trunc(value[0]) * 1000,
+        value[indexValue],
+    ]);
+};
 
-// export const getExperimentDataRun = (state) => state.experimentData.dataruns;
+
+export const getProcessedDataRun = createSelector(
+    [getSelectedExperimentData],
+    (experimentData) => {
+        if (experimentData.isExperimentDataLoading) { return []; }
+        return experimentData.data.dataruns.map(datarun => {
+            const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
+            let timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');
+            let timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
+            return {
+                ...datarun,
+                timeSeries,
+                timeseriesPred,
+                timeseriesErr,
+            };
+        });
+    },
+);

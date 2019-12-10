@@ -3,24 +3,28 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './Overview.scss';
 
-import { fetchExperiment } from '../../../model/actions/experiment';
-import { getSelectedExperimentData } from '../../../model/selectors/experiment';
+import { getSelectedExperimentData, getProcessedDataRun } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
+import DrawChart from './DrawChart';
 
-const renderDatarun = (datarun, key) => (
-  <div key={key}>
-    <p>{datarun.signal}</p>
-  </div>
-      );
-function Experiment({ experimentData }) {
+
+const renderDatarun = (datarun, key, isLoading) => (
+  <div key={key} className="time-row">
+    <ul>
+      <li>{datarun.signal}</li>
+      <li><DrawChart dataRun={datarun} isLoading={isLoading} /></li>
+    </ul>
+  </div>);
+
+function Experiment({ experimentData, processedDatarun }) {
     return (
-      <div className="overview-wrapper">
+      <div className="overview-wrapper scroll-style">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           {
-            !experimentData.isExperimentDataLoading ?
-             experimentData.data.dataruns.map((datarun, key) => renderDatarun(datarun, key)) :
-             <p>soon</p>
-        }
+            !experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ?
+              processedDatarun.map((datarun, key) => renderDatarun(datarun, key, experimentData.isExperimentDataLoading)) :
+              <p>No datarun for this experiment</p>
+          }
         </Loader>
       </div>
     );
@@ -28,10 +32,10 @@ function Experiment({ experimentData }) {
 
 Experiment.propTypes = {
     experimentData: PropTypes.object,
+    processedDatarun: PropTypes.array,
 };
 
 export default connect(state => ({
     experimentData: getSelectedExperimentData(state),
-}), dispatch => ({
-    fetchExperimentData: () => dispatch(fetchExperiment()),
-}))(Experiment);
+    processedDatarun: getProcessedDataRun(state),
+}), null)(Experiment);
