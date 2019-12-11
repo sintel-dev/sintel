@@ -8,6 +8,7 @@ import DrawChart from './DrawChart';
 
 const Datarun = ({ datarun, isLoading, onSelectDatarun, selectedDatarunID }) => {
     const activeClass = datarun.id === selectedDatarunID ? 'active' : '';
+
     return (
       <div className={`time-row ${activeClass}`} onClick={() => onSelectDatarun(datarun.id)}>
         <ul>

@@ -1,14 +1,14 @@
 import { createSelector } from 'reselect';
 
-export const getSelectedExperimentData = (state) => state.experimentData;
+export const getSelectedExperimentData = (state) => state.selectedExperimentData;
 
-const groupDataBy = (datarun, option) => datarun.data.map(value => [
-        Math.trunc(value[0]) * 1000,
-        value[datarun.names.indexOf(option)],
+const groupDataBy = (prediction, option) => prediction.data.map(predData => [
+        Math.trunc(predData[0]) * 1000,
+        predData[prediction.names.indexOf(option)],
     ]);
 
-const groupByEventWindows = (data, timestamps) =>
-     data.map(event => [
+const groupByEventWindows = (events, timestamps) =>
+     events.map(event => [
         timestamps.indexOf(Math.trunc(event.start_time) * 1000),
         timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
         event.score,

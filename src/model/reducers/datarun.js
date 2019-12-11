@@ -5,7 +5,7 @@ function SELECT_DATARUN(nextState, { datarunID }) {
 }
 
 export default createReducer({
-    dataSetsList: [],
+    selectedDatarunID: null,
 }, {
     SELECT_DATARUN,
 });

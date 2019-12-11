@@ -33,8 +33,7 @@ class DrawChart extends Component {
         .x(d => x(d[0]))
         .y(d => y(d[1]));
 
-      const highlithedEvents = () =>
-        eventWindows.map(event => timeSeries.slice(event[0], event[1] + 2));
+      const highlightedEvents = eventWindows.map(event => timeSeries.slice(event[0], event[1] + 2));
 
       const svg = d3.select(`._${this.props.dataRun.id}`)
         .append('svg')
@@ -44,7 +43,7 @@ class DrawChart extends Component {
         .attr('class', 'wave-data')
         .attr('d', line(timeSeries));
 
-      highlithedEvents().map(event =>
+      highlightedEvents.map(event =>
         svg.append('path')
           .attr('class', 'wave-event')
           .attr('d', line(event)),
@@ -53,7 +52,7 @@ class DrawChart extends Component {
 
     render() {
       return (
-        <div className={`_${this.props.dataRun.id}`} />
+        <div className={`_${this.props.dataRun.id}`} /> // @TODO - find a better way to target this element
       );
     }
 }

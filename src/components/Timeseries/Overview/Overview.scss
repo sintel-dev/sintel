@@ -36,13 +36,13 @@
             transition: all 0.2s ease-in-out;
 
             &:first-child{
-                width: 10%;
+                width: 60px;
                 text-align: center;
                 line-height: 55px;
             }
 
             &:last-child{
-                width: 90%;
+                width: calc(100% - 70px);
             }
         }
 

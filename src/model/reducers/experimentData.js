@@ -12,7 +12,7 @@ function GET_EXPERIMENTDATA_SUCCESS(nextState, { result }) {
 
 function GET_EXPERIMENTDATA_FAILURE(nextState) {
     nextState.isExperimentDataLoading = false;
-    nextState.experimentData = {};
+    nextState.data = {};
 }
 
 
