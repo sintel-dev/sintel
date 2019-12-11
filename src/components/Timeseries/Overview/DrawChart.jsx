@@ -4,7 +4,6 @@ import * as d3 from 'd3';
 
 class DrawChart extends Component {
     componentDidMount() {
-        this.svgRoot = React.createRef();
         this.drawChart();
     }
 
@@ -26,9 +25,10 @@ class DrawChart extends Component {
     }
 
     drawChart() {
-      const { timeSeries } = this.props.dataRun;
+      const { timeSeries, eventWindows } = this.props.dataRun;
       const stroke = 'rgb(36, 116, 241, 0.7)';
-      const strokeWidth = 0.5;
+      const eventStroke = '#FFCD00';
+      const strokeWidth = 0.7;
 
       const h = 50;
       const { x, y } = this.getScale(900, h);
@@ -36,6 +36,8 @@ class DrawChart extends Component {
         .x(d => x(d[0]))
         .y(d => y(d[1]));
 
+      const highlithedEvents = () =>
+        eventWindows.map(event => timeSeries.slice(event[0], event[1] + 2));
 
       const svg = d3.select(`._${this.props.dataRun.id}`)
         .append('svg')
@@ -46,8 +48,17 @@ class DrawChart extends Component {
         .attr('stroke', stroke)
         .attr('fill', 'transparent')
         .attr('stroke-width', strokeWidth)
-        .attr('class', 'line-data')
+        .attr('class', 'wave-data')
         .attr('d', line(timeSeries));
+
+      highlithedEvents().map(event =>
+        svg.append('path')
+          .attr('stroke', eventStroke)
+          .attr('fill', 'transparent')
+          .attr('stroke-width', strokeWidth)
+          .attr('class', 'wave-event')
+          .attr('d', line(event)),
+        );
     }
 
     render() {
