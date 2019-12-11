@@ -25,13 +25,10 @@ class DrawChart extends Component {
     }
 
     drawChart() {
+      const width = document.querySelector('.time-row').offsetWidth;
+      const height = 50;
       const { timeSeries, eventWindows } = this.props.dataRun;
-      const stroke = 'rgb(36, 116, 241, 0.7)';
-      const eventStroke = '#FFCD00';
-      const strokeWidth = 0.7;
-
-      const h = 50;
-      const { x, y } = this.getScale(900, h);
+      const { x, y } = this.getScale(width, height);
       const line = d3.line()
         .x(d => x(d[0]))
         .y(d => y(d[1]));
@@ -41,21 +38,14 @@ class DrawChart extends Component {
 
       const svg = d3.select(`._${this.props.dataRun.id}`)
         .append('svg')
-        .attr('width', '100%')
-        .attr('height', h);
+        .attr('class', 'wave-chart');
 
       svg.append('path')
-        .attr('stroke', stroke)
-        .attr('fill', 'transparent')
-        .attr('stroke-width', strokeWidth)
         .attr('class', 'wave-data')
         .attr('d', line(timeSeries));
 
       highlithedEvents().map(event =>
         svg.append('path')
-          .attr('stroke', eventStroke)
-          .attr('fill', 'transparent')
-          .attr('stroke-width', strokeWidth)
           .attr('class', 'wave-event')
           .attr('d', line(event)),
         );

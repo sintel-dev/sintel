@@ -15,7 +15,7 @@ const groupByEventWindows = (data, timestamps) =>
         event.tag,
     ]);
 
-export const getProcessedDataRun = createSelector(
+export const getProcessedDataRuns = createSelector(
     [getSelectedExperimentData],
     (experimentData) => {
         if (experimentData.isExperimentDataLoading) { return []; }

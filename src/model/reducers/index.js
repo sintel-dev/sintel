@@ -4,6 +4,7 @@ import experiments from './experiments';
 import pipelines from './pipelines';
 import projects from './projects';
 import experimentData from './experimentData';
+import datarun from './datarun';
 
 export default combineReducers({
     projects,
@@ -11,4 +12,5 @@ export default combineReducers({
     pipelines,
     experiments,
     experimentData,
+    datarun,
 });

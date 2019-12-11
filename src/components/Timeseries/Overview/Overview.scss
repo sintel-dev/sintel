@@ -10,12 +10,23 @@
     border-top-right-radius: 10px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    background: $second-color;
+    border: 1px solid #2C3034;
 
     .time-row{
+        border: 1px solid #2C3034;
+        background: $main-color;
+        margin-bottom: 1px;
+        border-bottom: 1px solid $second-color;
+        cursor: pointer;
+
+        &:first-child{
+            border-top-left-radius: 10px;
+        }
+
         ul{
             display: flex;
         }
+
         li{
             display: inline-block;
             height: 60px;
@@ -23,12 +34,11 @@
             box-sizing: border-box;;
             vertical-align: top;
             transition: all 0.2s ease-in-out;
-            background: $main-color;
-            margin-bottom: 1px;
 
             &:first-child{
                 width: 10%;
                 text-align: center;
+                line-height: 55px;
             }
 
             &:last-child{
@@ -37,9 +47,29 @@
         }
 
         &.active{
-            background: #23242B;
-            border: 1px solid #B2C1FF
+            transition: all .2s ease-in-out;
+            background: $second-color;
+            box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);
+            border: 1px solid #B2C1FF;
         }
+    }
+
+    .wave-chart {
+        width: 100%;
+        height: 50px;
+    }
+    
+    .wave-data, .wave-event {
+        stroke-width: 0.7;
+        fill: transparent;
+    }
+
+    .wave-data {
+        stroke: rgba(36, 116, 241, 0.7);
+    }
+
+    .wave-event {
+        stroke: #FFCD00
     }
 
     .single-ctx-chart{

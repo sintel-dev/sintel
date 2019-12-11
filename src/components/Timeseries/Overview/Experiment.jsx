@@ -3,27 +3,22 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './Overview.scss';
 
-import { getSelectedExperimentData, getProcessedDataRun } from '../../../model/selectors/experiment';
+import {
+  getSelectedExperimentData,
+  getProcessedDataRuns,
+} from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
-import DrawChart from './DrawChart';
+import Datarun from './Datarun';
 
-
-const renderDatarun = (datarun, key, isLoading) => (
-  <div key={key} className="time-row">
-    <ul>
-      <li>{datarun.signal}</li>
-      <li><DrawChart dataRun={datarun} isLoading={isLoading} /></li>
-    </ul>
-  </div>);
-
-function Experiment({ experimentData, processedDatarun }) {
+function Experiment({ experimentData, processedDataruns }) {
     return (
       <div className="overview-wrapper scroll-style">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           {
             !experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ?
-              processedDatarun.map((datarun, key) => renderDatarun(datarun, key, experimentData.isExperimentDataLoading)) :
-              <p>No datarun for this experiment</p>
+              processedDataruns.map(datarun =>
+                <Datarun datarun={datarun} key={datarun.id} isLoading={experimentData.isExperimentDataLoading} />) :
+              <p>No datarun for current experiment</p>
           }
         </Loader>
       </div>
@@ -32,10 +27,10 @@ function Experiment({ experimentData, processedDatarun }) {
 
 Experiment.propTypes = {
     experimentData: PropTypes.object,
-    processedDatarun: PropTypes.array,
+    processedDataruns: PropTypes.array,
 };
 
 export default connect(state => ({
     experimentData: getSelectedExperimentData(state),
-    processedDatarun: getProcessedDataRun(state),
+    processedDataruns: getProcessedDataRuns(state),
 }), null)(Experiment);
