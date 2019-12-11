@@ -1,5 +1,6 @@
 import { api } from './utils';
-import { getSelectedPipeline } from '../selectors/projects';
+import { getSelectedPipeline, getSelectedExperiment } from '../selectors/projects';
+import { fetchExperiment } from './experiment';
 
 export function fetchExperiments() {
     return function(dispatch) {
@@ -53,8 +54,12 @@ export function selectPipeline(selectedPipelineName) {
     };
 }
 
-export function selectExperiment (experimentID) {
-    return function(dispatch) {
+export function selectExperiment(experimentID) {
+    return function(dispatch, getState) {
+        const selectedExperiment = getSelectedExperiment(getState());
+        if (experimentID === selectedExperiment) return;
+
         dispatch({ type: 'SELECT_EXPERIMENT', selectedExperimentID: experimentID });
+        dispatch(fetchExperiment());
     };
 }
