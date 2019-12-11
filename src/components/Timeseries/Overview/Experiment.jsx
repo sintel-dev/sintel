@@ -17,7 +17,7 @@ function Experiment({ experimentData, processedDataruns }) {
           {
             !experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ?
               processedDataruns.map(datarun =>
-                <Datarun datarun={datarun} key={datarun.id} isLoading={experimentData.isExperimentDataLoading} />) :
+                <Datarun datarun={datarun} key={datarun.id} />) :
               <p>No datarun for current experiment</p>
           }
         </Loader>
