@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 
+let brush = null;
+let brushContext = null;
 function getScale(width, height, dataRun) {
   let minValue = Number.MAX_SAFE_INTEGER;
   let maxValue = Number.MIN_SAFE_INTEGER;
@@ -17,12 +19,13 @@ function getScale(width, height, dataRun) {
   return { x, y };
 }
 
-function drawBrush(element, width, onPeriodTimeChange) {
+export function drawBrush(element, width, onPeriodTimeChange) {
   width -= 25;
   const brushHeight = 43;
   const xRange = d3.scaleTime().range([0, width]);
-  const brush = d3.brushX().extent([[0, 0], [width, brushHeight]]);
-  const brushContext = element.append('g').attr('class', 'brushContext');
+  brush = d3.brushX().extent([[0, 0], [width, brushHeight]]);
+  brushContext = element.append('g').attr('class', 'brushContext');
+
   brushContext
     .append('g')
     .attr('class', 'brush')
@@ -30,11 +33,18 @@ function drawBrush(element, width, onPeriodTimeChange) {
     .call(brush)
     .call(brush.move, xRange.range());
 
-  const onBrushChange = () => {
-    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return;
+  brush.on('brush end', () => {
     onPeriodTimeChange(d3.event.selection);
-  };
-  brush.on('brush end', onBrushChange);
+  });
+}
+
+export function updateBrushPeriod(eventRange) {
+  const existingBrushes = d3.selectAll('.brush');
+
+  brush.on('brush end', null);
+  existingBrushes
+    .call(brush.move, eventRange)
+    .on('brush end', null);
 }
 
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
@@ -66,5 +76,6 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
       .attr('transform', 'translate(10, 6)')
       .attr('d', line(event)),
   );
+
   drawBrush(svg, width, onPeriodTimeChange);
 }
