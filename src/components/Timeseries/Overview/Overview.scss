@@ -42,7 +42,7 @@
             }
 
             &:last-child{
-                width: 90%;
+                width: calc(100% - 60px);
             }
         }
 
@@ -64,7 +64,7 @@
         width: 100%;
         height: 50px;
     }
-    
+
     .wave-data, .wave-event {
         stroke-width: 0.7;
         fill: transparent;
@@ -90,6 +90,6 @@
 
     .handle {
         fill: #B3BBD3;
-        ry: 3; 
+        ry: 3;
     }
 }

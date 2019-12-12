@@ -5,16 +5,14 @@ import { drawChart } from './chartUtils';
 
 const DrawChart = ({ dataRun, onPeriodTimeChange }) => {
   useEffect(() => {
-    // const width = document.querySelector('.overview-wrapper').offsetWidth - 60;
-    const width = 1000;
+    const width = document.querySelector('.overview-wrapper').offsetWidth - 65;
     const height = 36;
-
     drawChart(width, height, dataRun, onPeriodTimeChange);
   }, [dataRun, onPeriodTimeChange]);
 
-    return (
-      <div className={`_${dataRun.id}`} /> // @TODO - find a better way to target this element
-    );
+  return (
+    <div className={`_${dataRun.id}`} /> // @TODO - find a better way to target this element
+  );
 };
 
 DrawChart.propTypes = {
