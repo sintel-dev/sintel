@@ -15,7 +15,8 @@ class DrawChart extends Component {
     const [currentPeriodStart, currentPeriodEnd] = this.props.selectedPeriod;
 
     if (nextPeriodStart !== currentPeriodStart || nextPeriodEnd !== currentPeriodEnd) {
-      updateBrushPeriod(nextProps.selectedPeriod);
+      // updateBrushPeriod(nextProps.selectedPeriod);
+      updateBrushPeriod();
      }
   }
 

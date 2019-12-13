@@ -33,18 +33,27 @@ export function drawBrush(element, width, onPeriodTimeChange) {
     .call(brush)
     .call(brush.move, xRange.range());
 
+
   brush.on('brush end', () => {
     onPeriodTimeChange(d3.event.selection);
+    // console.log(this);
+    // updateBrushPeriod();
   });
 }
 
-export function updateBrushPeriod(eventRange) {
+export function updateBrushPeriod() {
+  const eventRange = d3.event.selection;
+  if (!d3.event.sourceEvent || !eventRange) return;
+  brush.on('brush end', null);
   const existingBrushes = d3.selectAll('.brush');
 
-  brush.on('brush end', null);
+  // d3.select(this).transition().call(brush.move, eventRange);
+
+  // brush.on('brush end', null);
   existingBrushes
+    // .transition()
     .call(brush.move, eventRange)
-    .on('brush end', null);
+    .on('end', null);
 }
 
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
