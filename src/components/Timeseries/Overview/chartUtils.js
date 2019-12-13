@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 
 let brush = null;
 let brushContext = null;
+
 function getScale(width, height, dataRun) {
   let minValue = Number.MAX_SAFE_INTEGER;
   let maxValue = Number.MIN_SAFE_INTEGER;
@@ -33,27 +34,33 @@ export function drawBrush(element, width, onPeriodTimeChange) {
     .call(brush)
     .call(brush.move, xRange.range());
 
-
-  brush.on('brush end', () => {
-    onPeriodTimeChange(d3.event.selection);
-    // console.log(this);
-    // updateBrushPeriod();
-  });
+    brush
+      .on('brush', updateBrushPeriod)
+      .on('end', () => { d3.event.selection && onPeriodTimeChange(d3.event.selection); });
 }
 
 export function updateBrushPeriod() {
-  const eventRange = d3.event.selection;
-  if (!d3.event.sourceEvent || !eventRange) return;
-  brush.on('brush end', null);
-  const existingBrushes = d3.selectAll('.brush');
+  if (!d3.event.sourceEvent || !d3.event.selection) return;
+  let currentBrush = d3.select(this);
 
-  // d3.select(this).transition().call(brush.move, eventRange);
+  if (currentBrush.attr('simulate')) {
+    return;
+  }
 
-  // brush.on('brush end', null);
-  existingBrushes
-    // .transition()
-    .call(brush.move, eventRange)
-    .on('end', null);
+  let selection = d3.selectAll('.brush:not([active])');
+  currentBrush.attr('active', true);
+  selection.attr('simulate', true);
+
+  selection
+    .call(brush.move, d3.event.selection)
+    .on('end', (function() {
+        selection.attr('simulate', null);
+        currentBrush.attr('active', null);
+      }()),
+);
+
+  currentBrush.attr('active', null);
+  selection.attr('simulate', null);
 }
 
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
