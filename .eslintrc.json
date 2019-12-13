@@ -49,7 +49,6 @@
       "prefer-destructuring": [
         "warn",
         {
-          "array": true,
           "object": true
         }
       ],
