@@ -1,0 +1,95 @@
+@import '../../../assets/sass/colors.scss';
+.overview-wrapper {
+    position: relative;
+    max-height: 260.75px;
+    min-height: 260.75px;
+    margin: 0 50px;
+    overflow-y: auto;
+    background:$main-color;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid #2C3034;
+
+    .time-row{
+        border: 1px solid #2C3034;
+        background: $main-color;
+        margin-bottom: 1px;
+        border-bottom: 1px solid $second-color;
+        cursor: pointer;
+
+        &:first-child{
+            border-top-left-radius: 10px;
+        }
+
+        ul{
+            display: flex;
+        }
+
+        li{
+            display: inline-block;
+            height: 60px;
+            padding: 5px;
+            box-sizing: border-box;;
+            vertical-align: top;
+            transition: all 0.2s ease-in-out;
+
+            &:first-child{
+                width: 60px;
+                text-align: center;
+                line-height: 55px;
+            }
+
+            &:last-child{
+                width: calc(100% - 60px);
+            }
+        }
+
+        &.active{
+            transition: all .2s ease-in-out;
+            background: $second-color;
+            box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 4px 0 rgba(0,0,0,0.5);
+            border: 1px solid #B2C1FF;
+
+            rect.selection {
+                .handle {
+                    display: block;
+                }
+            }
+        }
+    }
+
+    .wave-chart {
+        width: 100%;
+        height: 50px;
+    }
+
+    .wave-data, .wave-event {
+        stroke-width: 0.7;
+        fill: transparent;
+    }
+
+    .wave-data {
+        stroke: rgba(36, 116, 241, 0.7);
+    }
+
+    .wave-event {
+        stroke: #FFCD00
+    }
+
+    .single-ctx-chart{
+        width: 100%;
+        height: 60px;
+    }
+
+    rect.selection {
+        fill: rgba(90, 98, 124, 0.8);
+        stroke: none;
+    }
+
+    .handle {
+        fill: #B3BBD3;
+        ry: 3;
+    }
+}
