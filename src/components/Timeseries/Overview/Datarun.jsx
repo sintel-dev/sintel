@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { selectDatarun, onPeriodChange } from '../../../model/actions/datarun';
+import { selectDatarun, setTimeseriesPeriod } from '../../../model/actions/datarun';
 import { getSelectedDatarunID, getSelectedTimePeriod } from '../../../model/selectors/datarun';
 import DrawChart from './DrawChart';
 
@@ -32,5 +32,5 @@ export default connect(state => ({
   selectedTimePeriod: getSelectedTimePeriod(state),
 }), dispatch => ({
   onSelectDatarun: (datarunID) => dispatch(selectDatarun(datarunID)),
-  onChangePeriod: (period) => dispatch(onPeriodChange(period)),
+  onChangePeriod: (period) => dispatch(setTimeseriesPeriod(period)),
 }))(Datarun);

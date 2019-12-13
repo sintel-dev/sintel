@@ -12,8 +12,9 @@ function getScale(width, height, dataRun) {
   const x = d3.scaleTime().range([0, width]);
   const y = d3.scaleLinear().range([height, 0]);
 
-  minValue = minValue > timeSeriesMin ? timeSeriesMin : minValue;
-  maxValue = maxValue < timeSeriesMax ? timeSeriesMax : maxValue;
+  minValue = Math.min(minValue, timeSeriesMin);
+  maxValue = Math.max(maxValue, timeSeriesMax);
+
   x.domain([minValue, maxValue]);
   y.domain([-1, 1]);
 
@@ -53,11 +54,10 @@ export function updateBrushPeriod() {
 
   selection
     .call(brush.move, d3.event.selection)
-    .on('end', (function() {
+    .on('end', () => {
         selection.attr('simulate', null);
         currentBrush.attr('active', null);
-      }()),
-);
+      });
 
   currentBrush.attr('active', null);
   selection.attr('simulate', null);
@@ -85,13 +85,13 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
     .attr('d', line(timeSeries))
     .attr('transform', 'translate(10, 6)');
 
-  highlightedEvents.map(event =>
+  highlightedEvents.forEach(event => {
     svg
       .append('path')
       .attr('class', 'wave-event')
       .attr('transform', 'translate(10, 6)')
-      .attr('d', line(event)),
-  );
+      .attr('d', line(event));
+  });
 
   drawBrush(svg, width, onPeriodTimeChange);
 }
