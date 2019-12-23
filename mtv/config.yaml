@@ -1,0 +1,31 @@
+# MongoDB params
+#===================================
+
+# mtv
+host: 'localhost' # mongodb server address
+port: 27017  # mongodb server port
+db: 'mtv'  # database name
+username:  # for auth
+password:  # for auth
+
+# orion
+or_host: 'localhost'   # mongodb server address
+or_port: 27017  # mongodb server port
+or_db: 'orion'  # database name
+or_username:  # for auth
+or_password:  # for auth
+
+# docker
+dk_host: 'db'   # mongodb server address
+dk_port: 27017  # mongodb server port
+dk_db: 'mtv'  # database name
+dk_username:  # for auth
+dk_password:  # for auth
+
+
+# FLASK ENV
+#===================================
+server_port: 3000   # the port that flask application is running on
+ENV: 'production'  # development, production, testing
+DEBUG:  False
+TESTING:  False

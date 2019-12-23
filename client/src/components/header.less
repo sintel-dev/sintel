@@ -1,0 +1,46 @@
+@import '../less/colors.less';
+
+
+.main-header {
+    box-shadow: 0 0 14px #000;
+    background: @main-color;
+    padding-left: 20px;
+
+    a{
+        transition: all .2s ease-in-out;
+        color: #fff;
+        &.logo {
+            background: @main-color;
+            text-align: left;
+            font-size: 28px;
+            line-height: 50px;
+            padding: 0;
+            height: 50px;
+            float: left;
+            width: 110px;
+            font-weight: 300;
+            overflow: hidden;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            transition: width 0.3s ease-in-out;
+        }
+
+        &:hover, &:focus {
+            text-decoration: none;
+        }
+    }
+
+    .page-switch-btn {
+        float: left;
+        background-color: transparent;
+        background-image: none;
+        padding: 15px;
+        display: none;
+        font-family: fontAwesome;
+        &.left::after {
+            content: "\f053";
+        }
+        &.right::after {
+            content: "\f054";
+        }
+    }
+}
