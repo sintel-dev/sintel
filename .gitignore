@@ -130,3 +130,5 @@ ENV/
 
 # mypy
 .mypy_cache/
+mtv-client/coverage
+mtv-client/node_modules
