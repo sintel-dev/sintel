@@ -1,0 +1,62 @@
+@import '../../assets/sass/colors.scss';
+@import '../../assets/sass/animations.scss';
+
+.item-row {
+    margin: 0 50px;
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: calc(100% - 100px);
+
+    .item-wrapper{
+        display: flex;
+        padding: 0 0 10px 0;
+        position: relative;
+        height: 15vh;
+        min-height: 180px;
+        max-height: 240px;
+    }
+
+    .cell{
+        background: $item-bg;
+        border: 1px solid $item-bg;
+        border-radius: 10px;
+        flex: 0 0 360px;
+        transition: all .2s ease-in-out;
+        margin-right: 20px;
+        padding: 20px;
+        color: $title-color;
+        font-size: 17px;
+        cursor: pointer;
+        animation: slide-up 1s ease;
+
+        &:hover, &.active{
+            border: 1px solid $active-border;
+            background: $active-card-bg;
+            color: #fff;
+        }
+
+        &:hover{
+            transform: scale(1.05);
+            z-index: 1;
+        }
+
+        h3{
+            font-size: 25px;
+            margin: 0 0 10px 0;
+        }
+
+        .item-data{
+            display: flex;
+            ul{
+                flex: 1;
+                &.last{
+                    flex: 2;
+                    text-align: right;
+                    align-content: flex-end;
+                }
+            }
+        }
+    }
+}
