@@ -46,5 +46,8 @@
         &.right::after {
             content: "\f054";
         }
+        &.active{
+            display: inline-block;
+        }
     }
 }

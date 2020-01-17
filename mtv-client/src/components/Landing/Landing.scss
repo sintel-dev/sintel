@@ -1,6 +1,63 @@
 @import '../../assets/sass/colors.scss';
 @import '../../assets/sass/animations.scss';
 
+.page-landing{
+    margin-top: 100px;
+    position: relative;
+    // display: flex;
+    // -webkit-box-flex: 1;
+    // flex: 1 1 100%;
+    // align-items: flex-end;
+    overflow: hidden;
+
+    .page-wrapper{
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: calc(100vh - 110px);
+    }
+
+    .projects-wrapper {
+        background: $second-color;
+        z-index: 10;
+        transition: transform 1s cubic-bezier(0.694, 0, 0.335, 1), -webkit-transform 1s cubic-bezier(0.694, 0, 0.335, 1); 
+
+        &:not(.active) {
+            transform: translate3d(-100%, 0, 0);
+        }
+
+        &.active {
+            animation-name: homepage;
+            animation-duration: 1s;
+        }
+    }
+
+    .projects-wrapper, .experiments-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .experiments-wrapper{
+        opacity: 0;
+        &.active{
+            opacity: 1;
+        }
+    }
+}
+
+@keyframes homepage {
+    0% { 
+        transform: translate3d(100%, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+
 .item-row {
     margin: 0 50px;
     padding: 0 10px;

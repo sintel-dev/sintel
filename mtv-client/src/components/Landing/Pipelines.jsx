@@ -32,14 +32,14 @@ const Pipelines = (props) => {
     <div className="item-row scroll-style" id="pipelines">
       <h2>Pipelines</h2>
       <div className="item-wrapper">
-        <Loader isLoading={isPipelinesLoading}>
-          {
+        {/* <Loader isLoading={isPipelinesLoading}> */}
+        {
             pipelineList.length ?
               pipelineList.map((pipeline, index) =>
               renderPipeline(pipeline, index, onSelectPipeline, selectedPipeline)) :
               <p>No pipelines have been found</p>
           }
-        </Loader>
+        {/* </Loader> */}
       </div>
     </div>
   );
