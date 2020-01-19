@@ -5,16 +5,17 @@ import PropTypes from 'prop-types';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 
 export interface HeaderProps {
-  isExperimentSelected?: any
+  isExperimentSelected?: null | string
 }
 
 const Header: React.FC<HeaderProps> = (props) => {
-  const isSwitchActive = props.isExperimentSelected ? 'active left' : '';
+  const isSwitchActive = props.isExperimentSelected ? 'active' : '';
   return (
     <header id="header" className="main-header">
       <a href="/" className="logo"><b>MTV</b></a>
-      <a href="/" className={`page-switch-btn ${isSwitchActive}`}>Switch</a>
-      <i className="fa fa-caret-right">Switch test</i>
+      <a href="/" className={`page-switch-btn ${isSwitchActive}`}>
+        <i className="fas fa-angle-left"></i>
+      </a>
     </header>);
 };
 
