@@ -15,7 +15,7 @@ function Experiment({ experimentData, processedDataruns }) {
   return (
     <div>
       <Loader isLoading={experimentData.isExperimentDataLoading}>
-        <div className="overview-wrapper scroll-style">
+        <div className="overview-wrapper scroll-style" id="overview-wrapper">
           {
             !experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ?
               processedDataruns.map(datarun =>

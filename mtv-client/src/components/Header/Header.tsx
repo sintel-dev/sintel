@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = (props) => {
     <header id="header" className="main-header">
       <a href="/" className="logo"><b>MTV</b></a>
       <a href="/" className={`page-switch-btn ${isSwitchActive}`}>
-        <i className="fas fa-angle-left"></i>
+        <i className="fas fa-angle-left" />
       </a>
     </header>);
 };
