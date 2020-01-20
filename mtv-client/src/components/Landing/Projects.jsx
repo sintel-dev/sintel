@@ -31,13 +31,13 @@ const Projects = ({ projects, isProjectsLoading, onSelectProject, selectedProjec
   <div className="item-row scroll-style" id="projects">
     <h2>Datasets</h2>
     <div className="item-wrapper">
-      {/* <Loader isLoading={isProjectsLoading}> */}
-      {
+      <Loader isLoading={isProjectsLoading}>
+        {
           projects && projects.length ?
             projects.map((project, index) => renderProject(project, index, onSelectProject, selectedProjectName)) :
             <p>No datasets have been found</p>
         }
-      {/* </Loader> */}
+      </Loader>
     </div>
   </div>);
 

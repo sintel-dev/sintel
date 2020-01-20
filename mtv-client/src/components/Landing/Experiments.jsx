@@ -35,14 +35,14 @@ const Experiments = ({
   <div className="item-row scroll-style" id="experiments">
     <h2>Experiments</h2>
     <div className="item-wrapper">
-      {/* <Loader isLoading={isExperimentsLoading}> */}
-      {
+      <Loader isLoading={isExperimentsLoading}>
+        {
           filteredExperiments.length ?
             filteredExperiments.map((experiment, index) =>
             renderExperiment(experiment, index, onSelectExperiment, selectedPipeline, selectedExperiment)) :
             <h2>No experiments found</h2>
           }
-      {/* </Loader> */}
+      </Loader>
     </div>
   </div>);
 
