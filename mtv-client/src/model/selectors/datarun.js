@@ -12,5 +12,5 @@ export const getSelectedTimePeriod = (state) => state.datarun.selectedTimePeriod
 
 export const getDatarunDetails = createSelector(
     [getSelectedDatarunID, getProcessedDataRuns], (selectedDatarundID, processedDataruns) =>
-        processedDataruns.filter(datarun => datarun.id === selectedDatarundID)[0],
+        processedDataruns.find(datarun => datarun.id === selectedDatarundID),
 );

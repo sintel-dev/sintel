@@ -7,9 +7,14 @@ const offset = {
   maxValue: Number.MIN_SAFE_INTEGER,
 };
 
-function getScale(width, height, dataRun) {
-  const { offsetWidth, offsetHeight, minValue, maxValue } = offset;
+const pageCoords = {
+  width: 0,
+  height: 0,
+};
 
+function getScale(dataRun) {
+  const { offsetWidth, offsetHeight, minValue, maxValue } = offset;
+  const { width, height } = pageCoords;
   const { timeSeries } = dataRun;
 
   const [minTX, maxTX] = d3.extent(timeSeries, time => time[0]);
@@ -30,55 +35,53 @@ function getScale(width, height, dataRun) {
   return { xCoord, yCoord };
 }
 
-const drawChartAxis = (chartID, width, height, datarun) => {
-  const chart = d3.select(chartID)
-      .append('svg')
-      .attr('id', 'focusGraph')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('class', 'focus-chart');
-
-  const { xCoord, yCoord } = getScale(width, height, datarun);
-
-  let xAxis = d3.axisBottom(xCoord);
-  let yAxis = d3.axisLeft(yCoord);
-  let axisG = chart
-    .append('g')
-    .attr('class', 'chart-axis')
-    .attr('transform', 'translate(38, 0)');
-
-  axisG.append('g')
-    .attr('transform', `translate(0, ${height - 22})`)
-    .attr('class', 'axis axis--x')
-    .call(xAxis);
-
-  axisG.append('g')
-    .attr('class', 'axis axis--y')
-    .attr('transform', 'translate(0, 88)')
-    .call(yAxis.ticks(5, ',f'));
-};
-
-const updateChartAxis = (width, height, datarun) => {
+const drawChartAxis = (chartID, datarun) => {
   const transition = d3.transition().duration(500);
-  const chart = d3.select('#focusGraph');
-  const { xCoord, yCoord } = getScale(width, height, datarun);
+  const graph = document.querySelector('#focusGraph');
+  const { width, height } = pageCoords;
+  const { xCoord, yCoord } = getScale(datarun);
+  const xAxis = d3.axisBottom(xCoord);
+  const yAxis = d3.axisLeft(yCoord);
 
-  let xAxis = d3.axisBottom(xCoord);
-  let yAxis = d3.axisLeft(yCoord);
+  const chart = d3.select(chartID)
+    .append('svg')
+    .attr('id', 'focusGraph')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('class', 'focus-chart');
 
-  chart
-    .select('.axis.axis--x')
-    .transition(transition)
-    .call(xAxis);
+  if (!graph) {
+    const axisG = chart
+      .append('g')
+      .attr('class', 'chart-axis')
+      .attr('transform', 'translate(38, 0)');
 
-  chart
-    .select('.axis.axis--y')
-    .transition(transition)
-    .call(yAxis.ticks(5, ',f'));
+    axisG.append('g')
+      .attr('transform', `translate(0, ${height - 22})`)
+      .attr('class', 'axis axis--x')
+      .call(xAxis);
+
+    axisG.append('g')
+      .attr('class', 'axis axis--y')
+      .attr('transform', 'translate(0, 88)')
+      .call(yAxis.ticks(5, ',f'));
+  } else {
+    const focusGraph = d3.select('#focusGraph');
+    focusGraph
+      .select('.axis.axis--x')
+      .transition(transition)
+      .call(xAxis);
+
+      focusGraph
+        .select('.axis.axis--y')
+        .transition(transition)
+        .call(yAxis.ticks(5, ',f'));
+    }
 };
 
-export function drawChart(width, height, datarun, mode = null) {
-  mode ?
-    updateChartAxis(width, height, datarun) :
-    drawChartAxis('#focusChart', width, height, datarun);
+
+export function drawChart(width, height, datarun) {
+  pageCoords.width = width;
+  pageCoords.height = height;
+  drawChartAxis('#focusChart', datarun);
 }
