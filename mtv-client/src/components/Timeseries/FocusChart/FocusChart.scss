@@ -11,4 +11,12 @@
             fill: $gray-text-color;
         }
     }
+
+    .chart-data{
+        path{
+            fill: transparent;
+            stroke-width: 1;
+            stroke: $blue-color;
+        }
+    }
 }
