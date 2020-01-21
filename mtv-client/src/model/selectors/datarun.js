@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getSelectedExperimentData } from './experiment';
+import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 
 export const isDatarunIDSelected = (state) => state.datarun.selectedDatarunID;
 
@@ -9,3 +9,8 @@ export const getSelectedDatarunID = createSelector(
 );
 
 export const getSelectedTimePeriod = (state) => state.datarun.selectedTimePeriod;
+
+export const getDatarunDetails = createSelector(
+    [getSelectedDatarunID, getProcessedDataRuns], (selectedDatarundID, processedDataruns) =>
+        processedDataruns.filter(datarun => datarun.id === selectedDatarundID)[0],
+);
