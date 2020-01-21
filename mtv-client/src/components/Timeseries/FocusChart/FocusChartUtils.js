@@ -39,15 +39,14 @@ function getScale(dataRun) {
   return { xCoord, yCoord };
 }
 
-const drawChartAxis = (chartID, datarun) => {
+const drawChartWithAxis = (chartID, datarun) => {
   const graph = document.querySelector('#focusGraph');
   const { width, height, translateTop, translateLeft } = pageCoords;
   const { xCoord, yCoord } = getScale(datarun);
   const xAxis = d3.axisBottom(xCoord);
   const yAxis = d3.axisLeft(yCoord);
 
-
-  if (!graph) {
+  const createChart = () => {
     const chart = d3.select(chartID)
       .append('svg')
       .attr('id', 'focusGraph')
@@ -55,7 +54,8 @@ const drawChartAxis = (chartID, datarun) => {
       .attr('height', height)
       .attr('class', 'focus-chart');
 
-    drawChartData(datarun); // Should reside here, it's drawing data first and axes after (z-index)
+    drawChartData(datarun);
+
     const axisG = chart
       .append('g')
       .attr('class', 'chart-axis')
@@ -70,7 +70,9 @@ const drawChartAxis = (chartID, datarun) => {
       .attr('class', 'axis axis--y')
       .attr('transform', `translate(0, ${translateTop})`)
       .call(yAxis.ticks(5, ',f'));
-  } else {
+  };
+
+  const updateChart = () => {
     drawChartData(datarun); // Should reside here, it's drawing data first and axes after (z-index)
     const focusGraph = d3.select('#focusGraph');
     focusGraph
@@ -84,16 +86,16 @@ const drawChartAxis = (chartID, datarun) => {
         .attr('transform', `translate(0, ${translateTop})`)
         .transition(transition)
         .call(yAxis.ticks(5, ',f'));
-    }
-};
+  };
 
+  graph ? updateChart() : createChart();
+};
 
 const drawChartData = (datarun) => {
   const { xCoord, yCoord } = getScale(datarun);
   const { width, height, translateTop, translateLeft } = pageCoords;
   const path = d3.select('.chart-data');
   const chart = d3.select('#focusGraph');
-
 
   const line = d3
     .line()
@@ -111,11 +113,11 @@ const drawChartData = (datarun) => {
 
     chartLine.append('path')
       .attr('class', 'chart-waves')
-      .transition().duration(500)
+      .transition(transition)
       .attr('d', () => line(datarun.timeSeries));
   } else {
     d3.select('.chart-waves')
-      .transition().duration(500)
+      .transition(transition)
       .attr('d', () => line(datarun.timeSeries));
   }
 };
@@ -123,5 +125,5 @@ const drawChartData = (datarun) => {
 export function drawChart(width, height, datarun) {
   pageCoords.width = width;
   pageCoords.height = height;
-  drawChartAxis('#focusChart', datarun);
+  drawChartWithAxis('#focusChart', datarun);
 }
