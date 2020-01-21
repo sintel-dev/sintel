@@ -1,7 +1,7 @@
 import React from 'react';
 import './Loader.scss';
 
-const Loader = (props) => {
+const Loader = props => {
   const { isLoading } = props;
 
   const loadingOverlay = () => (
@@ -10,7 +10,7 @@ const Loader = (props) => {
         <i className="fa fa-refresh fa-spin" />
       </div>
     </div>
-    );
+  );
 
   return isLoading ? loadingOverlay() : props.children;
 };

@@ -12,6 +12,6 @@ const App: React.FC = () => (
       <Landing />
     </div>
   </Provider>
-  );
+);
 
 export default App;

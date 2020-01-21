@@ -25,7 +25,10 @@ export function drawBrush(element, width, onPeriodTimeChange) {
   width -= 25;
   const brushHeight = 43;
   const xRange = d3.scaleTime().range([0, width]);
-  brush = d3.brushX().extent([[0, 0], [width, brushHeight]]);
+  brush = d3.brushX().extent([
+    [0, 0],
+    [width, brushHeight],
+  ]);
   brushContext = element.append('g').attr('class', 'brushContext');
 
   brushContext
@@ -35,9 +38,9 @@ export function drawBrush(element, width, onPeriodTimeChange) {
     .call(brush)
     .call(brush.move, xRange.range());
 
-    brush
-      .on('brush', updateBrushPeriod)
-      .on('end', () => { d3.event.selection && onPeriodTimeChange(d3.event.selection); });
+  brush.on('brush', updateBrushPeriod).on('end', () => {
+    d3.event.selection && onPeriodTimeChange(d3.event.selection);
+  });
 }
 
 export function updateBrushPeriod() {
@@ -52,12 +55,10 @@ export function updateBrushPeriod() {
   currentBrush.attr('active', true);
   selection.attr('simulate', true);
 
-  selection
-    .call(brush.move, d3.event.selection)
-    .on('end', () => {
-        selection.attr('simulate', null);
-        currentBrush.attr('active', null);
-      });
+  selection.call(brush.move, d3.event.selection).on('end', () => {
+    selection.attr('simulate', null);
+    currentBrush.attr('active', null);
+  });
 
   currentBrush.attr('active', null);
   selection.attr('simulate', null);

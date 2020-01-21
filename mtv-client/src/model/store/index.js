@@ -9,9 +9,11 @@ import { api } from './middlewares';
 export function configureStore(initialState = {}) {
   const middlewares = [thunkMiddleware, api];
   if (process.env.NODE_ENV !== 'test') {
-    middlewares.push(createLogger({
-      collapsed: true,
-    }));
+    middlewares.push(
+      createLogger({
+        collapsed: true,
+      }),
+    );
   }
   const composedEnhancers = composeWithDevTools(applyMiddleware(...middlewares));
   const store = createStore(rootReducer, initialState, composedEnhancers);

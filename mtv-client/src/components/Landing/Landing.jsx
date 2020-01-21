@@ -28,7 +28,7 @@ class Landing extends Component {
 }
 
 Landing.propTypes = {
-    fetchProjectsList: PropTypes.func,
+  fetchProjectsList: PropTypes.func,
 };
 
 export default connect(null, dispatch => ({
