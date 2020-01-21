@@ -1,0 +1,14 @@
+@import '../../../assets/sass/colors.scss';
+.focus-chart{
+    background: $main-color;
+    border-radius: 10px;
+    .axis{
+        font-size: 14px;
+        .domain{
+            stroke: $gray-text-color;
+        }
+        line, text{
+            fill: $gray-text-color;
+        }
+    }
+}
