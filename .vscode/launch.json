@@ -1,30 +1,25 @@
 {
     "version": "0.2.0",
     "configurations": [
-      {
-        "type": "chrome",
-        "request": "launch",
-        "name": "Launch Chrome against localhost",
-        "url": "http://localhost:3001",
-        "webRoot": "${workspaceFolder}/mtv-client"
-      },
-      {
-        "name": "Debug CRA Tests",
-        "type": "node",
-        "request": "launch",
-        "runtimeExecutable": "${workspaceRoot}/mtv-client/node_modules/.bin/react-scripts",
-        "args": [
-          "test",
-          "--runInBand",
-          "--no-cache",
-          "--watchAll=false"
-        ],
-        "cwd": "${workspaceRoot}/mtv-client",
-        "protocol": "inspector",
-        "console": "integratedTerminal",
-        "internalConsoleOptions": "neverOpen",
-        "env": { "CI": "true" },
-        "disableOptimisticBPs": true
-      }
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:3001",
+            "webRoot": "${workspaceFolder}/mtv-client"
+        },
+        {
+            "name": "Debug CRA Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/mtv-client/node_modules/.bin/react-scripts",
+            "args": ["test", "--runInBand", "--no-cache", "--watchAll=false"],
+            "cwd": "${workspaceRoot}/mtv-client",
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": { "CI": "true" },
+            "disableOptimisticBPs": true
+        }
     ]
-  }
+}
