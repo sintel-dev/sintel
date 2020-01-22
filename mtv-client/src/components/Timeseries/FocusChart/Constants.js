@@ -7,4 +7,5 @@ export const FocusChartConstants = {
     CHART_HEIGHT: 0,
     TRANSLATE_TOP: 88,
     TRANSLATE_LEFT: 38,
+    DRAW_EVENTS_TIMEOUT: 400,
 };

@@ -8,22 +8,23 @@ const {
     MAX_VALUE,
     TRANSLATE_TOP,
     TRANSLATE_LEFT,
+    DRAW_EVENTS_TIMEOUT,
 } = FocusChartConstants;
 
 class FocusChart {
-    constructor(chartNode, width, height, datarun) {
+    constructor(chartNodeID, width, height, datarun) {
         this.width = width;
         this.height = height;
         this.datarun = datarun;
-        const { xCoord, yCoord } = this.GetScale();
+        const { xCoord, yCoord } = this.getScale();
 
         this.xCoord = xCoord;
         this.yCoord = yCoord;
-        this.chart = d3.select(`#${chartNode}`);
-        this.transition = d3.transition().duration(500);
+        this.chart = d3.select(`#${chartNodeID}`);
+        this.transition = d3.transition().duration(DRAW_EVENTS_TIMEOUT);
     }
 
-    GetScale() {
+    getScale() {
         const { width, height, datarun } = this;
         const { timeSeries } = datarun;
 
@@ -45,7 +46,7 @@ class FocusChart {
         return { xCoord, yCoord };
     }
 
-    DrawAxis() {
+    drawAxis() {
         const { xCoord, yCoord, width, height, transition, chart } = this;
         const xAxis = d3.axisBottom(xCoord);
         const yAxis = d3.axisLeft(yCoord);
@@ -93,7 +94,7 @@ class FocusChart {
         }
     }
 
-    DrawData() {
+    drawData() {
         const { datarun, chart, xCoord, yCoord, transition, width, height } = this;
         const isChartDataReady = document.querySelector('.chart-data');
 
@@ -130,7 +131,7 @@ class FocusChart {
         }
     }
 
-    DrawEvents() {
+    drawEvents() {
         const { chart, xCoord, yCoord, datarun, transition } = this;
         const { timeSeries, eventWindows } = datarun;
 
@@ -152,13 +153,13 @@ class FocusChart {
 
         setTimeout(() => {
             eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
-        }, 400);
+        }, DRAW_EVENTS_TIMEOUT);
     }
 
     Draw() {
-        this.DrawData();
-        this.DrawEvents();
-        this.DrawAxis();
+        this.drawData();
+        this.drawEvents();
+        this.drawAxis();
     }
 }
 

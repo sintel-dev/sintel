@@ -18,8 +18,7 @@ const getWrapperSize = () => {
 const DrawChart = ({ datarun }) => {
     useEffect(() => {
         const { width, height } = getWrapperSize();
-        const chartParams = ['focusChart', width, height, datarun];
-        const chart = new FocusChart(...chartParams);
+        const chart = new FocusChart('focusChart', width, height, datarun);
         chart.Draw();
     }, [datarun]);
 
