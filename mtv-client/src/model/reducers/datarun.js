@@ -5,7 +5,7 @@ function SELECT_DATARUN(nextState, { datarunID }) {
 }
 
 function SET_TIMESERIES_PERIOD(nextState, { period }) {
-    nextState.selectedTimePeriod = period;
+    nextState.selectedPeriodRange = period;
 }
 
 export default createReducer({

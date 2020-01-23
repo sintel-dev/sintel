@@ -8,7 +8,7 @@ export const getSelectedDatarunID = createSelector(
     (selectedExperimentData, selectedDatarunID) => selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
 
-export const getSelectedTimePeriod = (state) => state.datarun.selectedTimePeriod;
+export const getSelectedPeriodRange = (state) => state.datarun.selectedPeriodRange;
 
 export const getDatarunDetails = createSelector(
     [getSelectedDatarunID, getProcessedDataRuns], (selectedDatarundID, processedDataruns) =>
