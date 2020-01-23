@@ -194,6 +194,7 @@ class FocusChart extends Component {
 
         setTimeout(() => {
             eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
+            this.addZoom();
         }, DRAW_EVENTS_TIMEOUT);
     }
 
@@ -234,7 +235,6 @@ class FocusChart extends Component {
 
     zoomHandler () {
         if (d3.event && d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return null; }
-
         let zoomValue = d3.event.transform;
         const { chart } = this.state;
         const { datarun } = this.props;
@@ -243,7 +243,6 @@ class FocusChart extends Component {
         const xAxis = d3.axisBottom(xCoord);
         const xCoordCopy = xCoord.copy();
         let events = [];
-        let hghtPath = [];
 
         const line = d3
             .line()
@@ -262,14 +261,10 @@ class FocusChart extends Component {
         eventWindows.forEach(event => events.push(timeSeries.slice(event[0], event[1] + 1)));
 
         chart.selectAll('.evt-highlight')
-            .each(function() {
-                hghtPath.push(this);
+            .each(function(value, index) {
+                d3.select(this)
+                    .attr('d', line(events[index]));
             });
-
-        hghtPath.forEach((path, index) => {
-            d3.select(path)
-                .attr('d', () => line(events[index]));
-        });
 
         return { zoomValue };
     }
@@ -278,11 +273,6 @@ class FocusChart extends Component {
         this.drawData();
         this.drawAxis();
         this.drawEvents();
-
-        // Zoom has to be drawn last
-        setTimeout(() => {
-            this.addZoom();
-        }, DRAW_EVENTS_TIMEOUT);
     }
 
     render() {
@@ -301,4 +291,4 @@ FocusChart.propTypes = {
 export default connect(state => ({
     datarun: getDatarunDetails(state),
     selectedPeriodRange: getSelectedPeriodRange(state),
-}), null)(FocusChart);
+}))(FocusChart);
