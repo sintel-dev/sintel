@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger';
 
 import rootReducer from '../reducers';
 import { api } from './middlewares';
+import { monitorReducerEnhancer } from './enhancers';
 
 export function configureStore(initialState = {}) {
   const middlewares = [thunkMiddleware, api];
@@ -15,7 +16,10 @@ export function configureStore(initialState = {}) {
       }),
     );
   }
-  const composedEnhancers = composeWithDevTools(applyMiddleware(...middlewares));
+  const middlewareEnhancer = applyMiddleware(...middlewares);
+
+  const enhancers = [middlewareEnhancer, monitorReducerEnhancer];
+  const composedEnhancers = composeWithDevTools(middlewareEnhancer);
   const store = createStore(rootReducer, initialState, composedEnhancers);
   return store;
 }
