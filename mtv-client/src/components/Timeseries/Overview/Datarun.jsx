@@ -24,7 +24,7 @@ Datarun.propTypes = {
   onSelectDatarun: PropTypes.func,
   selectedDatarunID: PropTypes.string,
   onChangePeriod: PropTypes.func,
-  selectedPeriodRange: PropTypes.array,
+  selectedPeriodRange: PropTypes.object,
 };
 
 export default connect(state => ({
