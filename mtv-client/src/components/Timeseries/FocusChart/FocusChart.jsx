@@ -48,7 +48,7 @@ class FocusChart extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.datarun !== this.props.datarun) {
+        if (prevProps.datarun && prevProps.datarun.id !== this.props.datarun.id) {
             this.drawChart();
         }
 
@@ -201,11 +201,12 @@ class FocusChart extends Component {
 
         setTimeout(() => {
             eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
+            const { zoom } = this.addZoom();
+            this.zoom = zoom;
         }, DRAW_EVENTS_TIMEOUT);
     }
 
     addZoom() {
-        const isZoomCreated = document.querySelector('.zoom');
         const { width, height, chart } = this.state;
         let zoomRect;
         const zoom = d3.zoom()
@@ -214,13 +215,12 @@ class FocusChart extends Component {
             .extent([[0, 0], [width, height]])
             .on('zoom', this.zoomHandler);
 
-        if (!isZoomCreated) {
-            zoomRect = chart
+        chart.selectAll('.zoom').remove();
+        zoomRect = chart
                 .append('rect')
                 .attr('width', width)
                 .attr('height', height)
                 .attr('class', 'zoom');
-        }
 
         zoomRect = d3.select('.zoom')
             .call(zoom);
@@ -288,10 +288,6 @@ class FocusChart extends Component {
         this.drawData();
         this.drawAxis();
         this.drawEvents();
-        setTimeout(() => {
-            const { zoom } = this.addZoom();
-            this.zoom = zoom;
-        }, 400);
     }
 
     render() {

@@ -13,6 +13,7 @@ class DrawChart extends Component {
   componentDidUpdate(prevProps) {
     const { selectedPeriod } = this.props;
 
+    // @TODO - investigate how this can be set in immerJS as a compound object
     if (JSON.stringify(prevProps.selectedPeriod) !== JSON.stringify(selectedPeriod)) {
       updateBrushPeriod(selectedPeriod);
     }
