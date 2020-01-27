@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FocusChartConstants } from './Constants';
+import { setTimeseriesPeriod } from '../../../model/actions/datarun';
 import {
     getDatarunDetails,
     getSelectedPeriodRange,
@@ -29,6 +30,8 @@ class FocusChart extends Component {
             width: 0,
             height: 0,
         };
+
+        this.zoomHandler = this.zoomHandler.bind(this);
     }
 
     componentDidMount() {
@@ -48,14 +51,18 @@ class FocusChart extends Component {
         if (prevProps.datarun !== this.props.datarun) {
             this.drawChart();
         }
+
+        if (prevProps.periodRange.zoomValue !== this.props.periodRange.zoomValue) {
+            this.updateChartOnBrush();
+        }
     }
 
     getWrapperSize() {
-        const wrapperOffset = 110;
+        const wrapperOffset = 40;
         const wrapperHeight = document.querySelector('#content-wrapper').clientHeight - wrapperOffset;
         const overViewHeight = document.querySelector('#overview-wrapper').clientHeight - wrapperOffset;
         const height = wrapperHeight - overViewHeight - wrapperOffset;
-        const width = document.querySelector('#overview-wrapper').clientWidth - wrapperOffset / 4;
+        const width = document.querySelector('#overview-wrapper').clientWidth - wrapperOffset;
 
         return { width, height };
     }
@@ -194,7 +201,6 @@ class FocusChart extends Component {
 
         setTimeout(() => {
             eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
-            this.addZoom();
         }, DRAW_EVENTS_TIMEOUT);
     }
 
@@ -202,12 +208,11 @@ class FocusChart extends Component {
         const isZoomCreated = document.querySelector('.zoom');
         const { width, height, chart } = this.state;
         let zoomRect;
-
         const zoom = d3.zoom()
             .scaleExtent([1, Infinity])
             .translateExtent([[0, 0], [width, height]])
             .extent([[0, 0], [width, height]])
-            .on('zoom', () => this.zoomHandler());
+            .on('zoom', this.zoomHandler);
 
         if (!isZoomCreated) {
             zoomRect = chart
@@ -233,23 +238,35 @@ class FocusChart extends Component {
         return { zoom, enableZoom, disableZoom };
     }
 
-    zoomHandler () {
-        if (d3.event && d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return null; }
-        let zoomValue = d3.event.transform;
-        const { chart } = this.state;
-        const { datarun } = this.props;
-        const { xCoord, yCoord } = this.getScale();
-        const { timeSeries, eventWindows } = datarun;
-        const xAxis = d3.axisBottom(xCoord);
-        const xCoordCopy = xCoord.copy();
-        let events = [];
 
+    zoomHandler() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') { return; }
+        const { xCoord } = this.getScale();
+        let zoomValue = d3.event.transform;
+        const periodValue = xCoord.range().map(zoomValue.invertX, zoomValue);
+        const periodRange = {
+            eventRange: periodValue,
+            zoomValue,
+        };
+
+        this.props.setPeriodRange(periodRange);
+    }
+
+    updateChartOnBrush() {
+        const { chart } = this.state;
+        const { xCoord, yCoord } = this.getScale();
+        const { periodRange, datarun } = this.props;
+        const { zoomValue } = periodRange;
+        const { timeSeries, eventWindows } = datarun;
+        const xCoordCopy = xCoord.copy();
+        const xAxis = d3.axisBottom(xCoord);
+        let events = [];
         const line = d3
             .line()
             .x(d => xCoord(d[0]))
             .y(d => yCoord(d[1]));
 
-
+        d3.select('.zoom').call(this.zoom.transform, zoomValue);
         xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
 
         d3.select('.axis.axis--x').call(xAxis);
@@ -265,14 +282,16 @@ class FocusChart extends Component {
                 d3.select(this)
                     .attr('d', line(events[index]));
             });
-
-        return { zoomValue };
     }
 
     drawChart() {
         this.drawData();
         this.drawAxis();
         this.drawEvents();
+        setTimeout(() => {
+            const { zoom } = this.addZoom();
+            this.zoom = zoom;
+        }, 400);
     }
 
     render() {
@@ -286,9 +305,13 @@ class FocusChart extends Component {
 
 FocusChart.propTypes = {
     datarun: PropTypes.object,
+    setPeriodRange: PropTypes.func,
+    periodRange: PropTypes.object,
 };
 
 export default connect(state => ({
     datarun: getDatarunDetails(state),
-    selectedPeriodRange: getSelectedPeriodRange(state),
+    periodRange: getSelectedPeriodRange(state),
+}), dispatch => ({
+    setPeriodRange: (period) => dispatch(setTimeseriesPeriod(period)),
 }))(FocusChart);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { drawChart } from './chartUtils';
+import { drawChart, updateBrushPeriod } from './chartUtils';
 
 class DrawChart extends Component {
   componentDidMount() {
@@ -8,6 +8,14 @@ class DrawChart extends Component {
     const width = document.querySelector('.overview-wrapper').offsetWidth - 65;
     const height = 36;
     drawChart(width, height, dataRun, onPeriodTimeChange, selectedPeriod);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { selectedPeriod } = this.props;
+
+    if (JSON.stringify(prevProps.selectedPeriod) !== JSON.stringify(selectedPeriod)) {
+      updateBrushPeriod(selectedPeriod);
+    }
   }
 
   render() {
@@ -18,7 +26,7 @@ class DrawChart extends Component {
 DrawChart.propTypes = {
   dataRun: PropTypes.object,
   onPeriodTimeChange: PropTypes.func,
-  selectedPeriod: PropTypes.array,
+  selectedPeriod: PropTypes.object,
 };
 
 export default DrawChart;
