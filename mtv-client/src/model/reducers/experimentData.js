@@ -1,26 +1,28 @@
 import createReducer from '../store/createReducer';
 
 function GET_EXPERIMENTDATA_REQUEST(nextState) {
-    nextState.isExperimentDataLoading = true;
-    nextState.data = {};
+  nextState.isExperimentDataLoading = true;
+  nextState.data = {};
 }
 
 function GET_EXPERIMENTDATA_SUCCESS(nextState, { result }) {
-    nextState.isExperimentDataLoading = false;
-    nextState.data = result;
+  nextState.isExperimentDataLoading = false;
+  nextState.data = result;
 }
 
 function GET_EXPERIMENTDATA_FAILURE(nextState) {
-    nextState.isExperimentDataLoading = false;
-    nextState.data = {};
+  nextState.isExperimentDataLoading = false;
+  nextState.data = {};
 }
 
-
-export default createReducer({
+export default createReducer(
+  {
     isExperimentDataLoading: true,
     data: {},
-}, {
+  },
+  {
     GET_EXPERIMENTDATA_REQUEST,
     GET_EXPERIMENTDATA_SUCCESS,
     GET_EXPERIMENTDATA_FAILURE,
-});
+  },
+);

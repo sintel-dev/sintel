@@ -7,10 +7,10 @@ import selectedExperimentData from './experimentData';
 import datarun from './datarun';
 
 export default combineReducers({
-    projects,
-    datasets,
-    pipelines,
-    experiments,
-    selectedExperimentData,
-    datarun,
+  projects,
+  datasets,
+  pipelines,
+  experiments,
+  selectedExperimentData,
+  datarun,
 });

@@ -13,7 +13,9 @@ const Datarun = ({ datarun, onSelectDatarun, selectedDatarunID, onChangePeriod, 
     <div className={`time-row ${activeClass}`} onClick={() => onSelectDatarun(datarun.id)}>
       <ul>
         <li>{datarun.signal}</li>
-        <li><DrawChart dataRun={datarun} onPeriodTimeChange={onChangePeriod} selectedPeriod={selectedPeriodRange} /></li>
+        <li>
+          <DrawChart dataRun={datarun} onPeriodTimeChange={onChangePeriod} selectedPeriod={selectedPeriodRange} />
+        </li>
       </ul>
     </div>
   );
@@ -27,10 +29,13 @@ Datarun.propTypes = {
   selectedPeriodRange: PropTypes.object,
 };
 
-export default connect(state => ({
-  selectedDatarunID: getSelectedDatarunID(state),
-  selectedPeriodRange: getSelectedPeriodRange(state),
-}), dispatch => ({
-  onSelectDatarun: (datarunID) => dispatch(selectDatarun(datarunID)),
-  onChangePeriod: (period) => dispatch(setTimeseriesPeriod(period)),
-}))(Datarun);
+export default connect(
+  state => ({
+    selectedDatarunID: getSelectedDatarunID(state),
+    selectedPeriodRange: getSelectedPeriodRange(state),
+  }),
+  dispatch => ({
+    onSelectDatarun: datarunID => dispatch(selectDatarun(datarunID)),
+    onChangePeriod: period => dispatch(setTimeseriesPeriod(period)),
+  }),
+)(Datarun);

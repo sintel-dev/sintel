@@ -10,8 +10,8 @@
     top: 0;
     z-index: 2;
 
-    a{
-        transition: all .2s ease-in-out;
+    a {
+        transition: all 0.2s ease-in-out;
         color: #fff;
         &.logo {
             background: $main-color;
@@ -24,11 +24,12 @@
             width: 110px;
             font-weight: 300;
             overflow: hidden;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             transition: width 0.3s ease-in-out;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             text-decoration: none;
         }
     }

@@ -2,11 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Loader from '../Common/Loader';
-import {
-  getProjectsList,
-  getIsProjectsLoading,
-  getSelectedProjectName,
-} from '../../model/selectors/projects';
+import { getProjectsList, getIsProjectsLoading, getSelectedProjectName } from '../../model/selectors/projects';
 import { selectProject } from '../../model/actions/landing';
 
 const renderProject = (project, index, onSelectProject, selectedProjectName) => {
@@ -32,14 +28,15 @@ const Projects = ({ projects, isProjectsLoading, onSelectProject, selectedProjec
     <h2>Datasets</h2>
     <div className="item-wrapper">
       <Loader isLoading={isProjectsLoading}>
-        {
-          projects && projects.length ?
-            projects.map((project, index) => renderProject(project, index, onSelectProject, selectedProjectName)) :
-            <p>No datasets have been found</p>
-        }
+        {projects && projects.length ? (
+          projects.map((project, index) => renderProject(project, index, onSelectProject, selectedProjectName))
+        ) : (
+          <p>No datasets have been found</p>
+        )}
       </Loader>
     </div>
-  </div>);
+  </div>
+);
 
 Projects.propTypes = {
   projects: PropTypes.array,
@@ -48,10 +45,13 @@ Projects.propTypes = {
   selectedProjectName: PropTypes.string,
 };
 
-export default connect(state => ({
-  projects: getProjectsList(state),
-  isProjectsLoading: getIsProjectsLoading(state),
-  selectedProjectName: getSelectedProjectName(state),
-}), dispatch => ({
-  onSelectProject: (projectName) => dispatch(selectProject(projectName)),
-}))(Projects);
+export default connect(
+  state => ({
+    projects: getProjectsList(state),
+    isProjectsLoading: getIsProjectsLoading(state),
+    selectedProjectName: getSelectedProjectName(state),
+  }),
+  dispatch => ({
+    onSelectProject: projectName => dispatch(selectProject(projectName)),
+  }),
+)(Projects);

@@ -24,11 +24,14 @@ function getScale(width, height, dataRun) {
 export function drawBrush(element, width, onPeriodTimeChange, selectedPeriod) {
   width -= 25;
   const brushHeight = 43;
-  const xRange = selectedPeriod.length ?
-    d3.scaleTime().range(selectedPeriod.eventRange) :
-      d3.scaleTime().range([0, width]);
+  const xRange = selectedPeriod.length
+    ? d3.scaleTime().range(selectedPeriod.eventRange)
+    : d3.scaleTime().range([0, width]);
 
-  brush = d3.brushX().extent([[0, 0], [width, brushHeight]]);
+  brush = d3.brushX().extent([
+    [0, 0],
+    [width, brushHeight],
+  ]);
   brushContext = element.append('g').attr('class', 'brushContext');
   brushContext
     .append('g')
@@ -37,16 +40,15 @@ export function drawBrush(element, width, onPeriodTimeChange, selectedPeriod) {
     .call(brush)
     .call(brush.move, xRange.range());
 
-    brush
-      .on('brush', () => {
-        const eventRange = d3.event.selection && d3.event.selection;
-        const zoomValue = d3.zoomIdentity.scale(width / (eventRange[1] - eventRange[0])).translate(-eventRange[0], 0);
-        const periodRange = {
-          eventRange,
-          zoomValue,
-        };
-        eventRange && onPeriodTimeChange(periodRange);
-      });
+  brush.on('brush', () => {
+    const eventRange = d3.event.selection && d3.event.selection;
+    const zoomValue = d3.zoomIdentity.scale(width / (eventRange[1] - eventRange[0])).translate(-eventRange[0], 0);
+    const periodRange = {
+      eventRange,
+      zoomValue,
+    };
+    eventRange && onPeriodTimeChange(periodRange);
+  });
 }
 
 export function updateBrushPeriod(selectedPeriod) {
@@ -61,12 +63,10 @@ export function updateBrushPeriod(selectedPeriod) {
   currentBrush.attr('active', true);
   selection.attr('simulate', true);
 
-  selection
-    .call(brush.move, selectedPeriod.eventRange)
-    .on('end', () => {
-        selection.attr('simulate', null);
-        currentBrush.attr('active', null);
-      });
+  selection.call(brush.move, selectedPeriod.eventRange).on('end', () => {
+    selection.attr('simulate', null);
+    currentBrush.attr('active', null);
+  });
 
   currentBrush.attr('active', null);
   selection.attr('simulate', null);
