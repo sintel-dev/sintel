@@ -1,0 +1,37 @@
+@import '../../../assets/sass/colors.scss';
+.focus-chart{
+    background: $main-color;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .chart-data path,
+    .line-highlight,
+    .zoom{
+        fill: transparent;
+    }
+
+    .axis{
+        font-size: 14px;
+        .domain{
+            stroke: $gray-text-color;
+        }
+        line, text{
+            fill: $gray-text-color;
+        }
+    }
+
+    .chart-data{
+        path{
+            stroke-width: 1;
+            stroke: $blue-color;
+        }
+    }
+
+    .line-highlight{
+        fill: transparent;
+        stroke: $yellow-color;
+    }
+    .zoom{
+        cursor: move;
+    }
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './Overview.scss';
+import FocusChart from '../FocusChart';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
@@ -9,13 +10,16 @@ import Datarun from './Datarun';
 
 function Experiment({ experimentData, processedDataruns }) {
   return (
-    <div className="overview-wrapper scroll-style">
+    <div>
       <Loader isLoading={experimentData.isExperimentDataLoading}>
-        {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
-          processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
-        ) : (
-          <p>No datarun for current experiment</p>
-        )}
+        <div className="overview-wrapper scroll-style" id="overview-wrapper">
+          {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
+            processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
+          ) : (
+            <p>No datarun for current experiment</p>
+          )}
+        </div>
+        <FocusChart />
       </Loader>
     </div>
   );

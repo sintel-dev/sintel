@@ -41,11 +41,9 @@
         padding: 15px;
         display: none;
         font-family: fontAwesome;
-        &.left::after {
-            content: '\f053';
-        }
-        &.right::after {
-            content: '\f054';
+
+        &.active{
+            display: inline-block;
         }
     }
 }
