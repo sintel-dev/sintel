@@ -8,13 +8,17 @@ import DrawChart from './DrawChart';
 
 const Datarun = ({ datarun, onSelectDatarun, selectedDatarunID, onChangePeriod, selectedPeriodRange }) => {
   const activeClass = datarun.id === selectedDatarunID ? 'active' : '';
-
   return (
     <div className={`time-row ${activeClass}`} onClick={() => onSelectDatarun(datarun.id)}>
       <ul>
         <li>{datarun.signal}</li>
         <li>
-          <DrawChart dataRun={datarun} onPeriodTimeChange={onChangePeriod} selectedPeriod={selectedPeriodRange} />
+          <DrawChart
+            dataRun={datarun}
+            onPeriodTimeChange={onChangePeriod}
+            selectedPeriod={selectedPeriodRange}
+            selectedDatarunID={selectedDatarunID}
+          />
         </li>
       </ul>
     </div>

@@ -52,13 +52,13 @@ export function drawBrush(element, width, onPeriodTimeChange, selectedPeriod) {
 }
 
 export function updateBrushPeriod(selectedPeriod) {
-  let currentBrush = d3.select(document.querySelector('.time-row.active g.brush'));
+  let currentBrush = d3.select('.time-row.active g.brush');
 
   if (currentBrush.attr('simulate')) {
     return;
   }
 
-  let selection = d3.selectAll(document.querySelectorAll('g.brush'));
+  let selection = d3.selectAll('g.brush');
 
   currentBrush.attr('active', true);
   selection.attr('simulate', true);

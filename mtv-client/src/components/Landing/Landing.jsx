@@ -8,9 +8,7 @@ import Projects from './Projects';
 import Pipelines from './Pipelines';
 import Experiments from './Experiments';
 
-import {
-  getSelectedExperiment,
-} from '../../model/selectors/projects';
+import { getSelectedExperiment } from '../../model/selectors/projects';
 
 import './Landing.scss';
 
@@ -45,8 +43,11 @@ Landing.propTypes = {
   isExperimentSelected: PropTypes.string,
 };
 
-export default connect(state => ({
-  isExperimentSelected: getSelectedExperiment(state),
-}), dispatch => ({
-  fetchProjectsList: () => dispatch(fetchProjects()),
-}))(Landing);
+export default connect(
+  state => ({
+    isExperimentSelected: getSelectedExperiment(state),
+  }),
+  dispatch => ({
+    fetchProjectsList: () => dispatch(fetchProjects()),
+  }),
+)(Landing);
