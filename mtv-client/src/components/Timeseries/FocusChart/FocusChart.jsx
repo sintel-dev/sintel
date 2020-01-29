@@ -176,21 +176,6 @@ class FocusChart extends Component {
     }
   }
 
-  getTagColor(tagName) {
-    const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal'];
-    let colorIdx;
-    for (let colorIndex = 0; colorIndex < tagSeq.length; colorIndex += 1) {
-      if (tagSeq[colorIndex] === tagName) {
-        colorIdx = colorIndex;
-      }
-    }
-
-    if (typeof colorIdx === 'undefined') {
-      colorIdx = 6;
-    }
-    return colorSchemes.tag[colorIdx];
-  }
-
   drawEvents() {
     const { height } = this.state;
     const { datarun } = this.props;
@@ -203,8 +188,7 @@ class FocusChart extends Component {
       const lineData = chartData.append('g').attr('class', 'line-highlight');
       const startIndex = eventWindows[index][0];
       const stopIndex = eventWindows[index][1];
-
-      const tagColor = this.getTagColor(eventWindows[index][3]);
+      const tagColor = colorSchemes[eventWindows[index][3]] || colorSchemes.untagged;
 
       // append event highlight
       lineData
