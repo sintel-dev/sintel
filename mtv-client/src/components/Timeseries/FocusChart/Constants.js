@@ -10,11 +10,11 @@ export const FocusChartConstants = {
 };
 
 export const colorSchemes = {
-  investigate: '#FFCD00', // investigate
-  'do not investigate': '#7CA8FF', // do not investigate
-  postpone: '#A042FF', // postpone
-  problem: '#F64242', // problem
-  'previously seen': '#F5FF00', // previously seen
-  normal: '#45F642', // normal
-  untagged: '#C7C7C7', // untagged
+  investigate: '#FFCD00',
+  'do not investigate': '#7CA8FF',
+  postpone: '#A042FF',
+  problem: '#F64242',
+  'previously seen': '#F5FF00',
+  normal: '#45F642',
+  untagged: '#C7C7C7',
 };
