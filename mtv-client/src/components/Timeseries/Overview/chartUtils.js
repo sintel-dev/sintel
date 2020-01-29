@@ -2,6 +2,16 @@ import * as d3 from 'd3';
 
 let brush = null;
 let brushContext = null;
+let chartWidth = 0;
+
+const offset = {
+  left: 10,
+  top: 6,
+  handlersWidth: 6,
+  infoWidth: 60,
+};
+let focusChartWidth = 0;
+let ratio = 0;
 
 function getScale(width, height, dataRun) {
   let minValue = Number.MAX_SAFE_INTEGER;
@@ -21,12 +31,9 @@ function getScale(width, height, dataRun) {
   return { xCoord, yCoord };
 }
 
-export function drawBrush(element, width, onPeriodTimeChange, selectedPeriod) {
-  width -= 25;
+export function drawBrush(element, width, onPeriodTimeChange) {
   const brushHeight = 43;
-  const xRange = selectedPeriod.length
-    ? d3.scaleTime().range(selectedPeriod.eventRange)
-    : d3.scaleTime().range([0, width]);
+  const xRange = d3.scaleTime().range([0, width]);
 
   brush = d3.brushX().extent([
     [0, 0],
@@ -36,22 +43,36 @@ export function drawBrush(element, width, onPeriodTimeChange, selectedPeriod) {
   brushContext
     .append('g')
     .attr('class', 'brush')
-    .attr('transform', 'translate(5, 3)')
+    .attr('transform', `translate(${offset.left}, ${offset.top / 2})`)
     .call(brush)
     .call(brush.move, xRange.range());
 
   brush.on('brush', () => {
-    const eventRange = d3.event.selection && d3.event.selection;
-    const zoomValue = d3.zoomIdentity.scale(width / (eventRange[1] - eventRange[0])).translate(-eventRange[0], 0);
+    const eventRangeSelection = d3.event.selection && d3.event.selection;
+    const eventRange = [eventRangeSelection[0] / ratio, eventRangeSelection[1] / ratio];
+    const zoomValue = d3.zoomIdentity
+      .scale(focusChartWidth / (eventRange[1] - eventRange[0]))
+      .translate(-eventRange[0], 0);
+
     const periodRange = {
       eventRange,
       zoomValue,
     };
-    eventRange && onPeriodTimeChange(periodRange);
+
+    eventRangeSelection && onPeriodTimeChange(periodRange);
   });
 }
 
-export function updateBrushPeriod(selectedPeriod) {
+const getRatio = eventRange => {
+  focusChartWidth = parseInt(document.querySelector('.focus').attributes.width.value, 10);
+  ratio = chartWidth / focusChartWidth;
+  const start = eventRange[0] * ratio;
+  const end = eventRange[1] * ratio;
+
+  return { start, end };
+};
+
+export function updateBrushPeriod(event) {
   let currentBrush = d3.select('.time-row.active g.brush');
 
   if (currentBrush.attr('simulate')) {
@@ -62,8 +83,9 @@ export function updateBrushPeriod(selectedPeriod) {
 
   currentBrush.attr('active', true);
   selection.attr('simulate', true);
+  const { start, end } = getRatio(event.eventRange);
 
-  selection.call(brush.move, selectedPeriod.eventRange).on('end', () => {
+  selection.call(brush.move, [start, end]).on('end', () => {
     selection.attr('simulate', null);
     currentBrush.attr('active', null);
   });
@@ -72,8 +94,8 @@ export function updateBrushPeriod(selectedPeriod) {
   selection.attr('simulate', null);
 }
 
-export function drawChart(width, height, dataRun, onPeriodTimeChange, selectedPeriod) {
-  const chartWidth = width - 35;
+export function drawChart(width, height, dataRun, onPeriodTimeChange) {
+  chartWidth = width - offset.infoWidth - 2 * offset.left;
   const { timeSeries, eventWindows } = dataRun;
   const { xCoord, yCoord } = getScale(chartWidth, height, dataRun);
   const line = d3
@@ -85,21 +107,21 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange, selectedPe
   const svg = d3
     .select(`._${dataRun.id}`)
     .append('svg')
-    .attr('width', chartWidth)
+    .attr('width', width)
     .attr('class', 'wave-chart');
 
   svg
     .append('path')
     .attr('class', 'wave-data')
     .attr('d', line(timeSeries))
-    .attr('transform', 'translate(10, 6)');
+    .attr('transform', `translate(${offset.left}, ${offset.top})`);
 
   highlightedEvents.forEach(event => {
     svg
       .append('path')
       .attr('class', 'wave-event')
-      .attr('transform', 'translate(10, 6)')
+      .attr('transform', `translate(${offset.left}, ${offset.top})`)
       .attr('d', line(event));
   });
-  drawBrush(svg, width, onPeriodTimeChange, selectedPeriod);
+  drawBrush(svg, chartWidth, onPeriodTimeChange);
 }

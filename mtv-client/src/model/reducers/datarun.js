@@ -4,8 +4,8 @@ function SELECT_DATARUN(nextState, { datarunID }) {
   nextState.selectedDatarunID = datarunID;
 }
 
-function SET_TIMESERIES_PERIOD(nextState, { periodRange }) {
-  nextState.selectedPeriodRange = periodRange;
+function SET_TIMESERIES_PERIOD(nextState, { eventRange }) {
+  nextState.selectedPeriodRange = eventRange;
 }
 
 export default createReducer(
