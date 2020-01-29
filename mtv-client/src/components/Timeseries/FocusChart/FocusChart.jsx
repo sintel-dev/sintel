@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { FocusChartConstants } from './Constants';
+import { FocusChartConstants, colorSchemes } from './Constants';
 import { setTimeseriesPeriod } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
@@ -129,17 +129,17 @@ class FocusChart extends Component {
   drawData() {
     const { width, height, chart } = this.state;
     const { datarun } = this.props;
-    const isChartDataReady = document.querySelector('.chart-data');
+    const isChartDataReady = document.querySelector('.focus');
 
     chart.attr('width', width).attr('height', height);
 
-    const focusGroup = chart
-      .append('g')
-      .attr('class', 'focus')
-      .attr('width', width - TRANSLATE_LEFT - 2 * CHART_MARGIN)
-      .attr('transform', `translate(${TRANSLATE_LEFT}, ${CHART_MARGIN})`);
-
     const createChart = () => {
+      const focusGroup = chart
+        .append('g')
+        .attr('class', 'focus')
+        .attr('width', width - TRANSLATE_LEFT - 2 * CHART_MARGIN)
+        .attr('transform', `translate(${TRANSLATE_LEFT}, ${CHART_MARGIN})`);
+
       const clipPath = focusGroup.append('defs');
       clipPath
         .append('clipPath')
@@ -176,34 +176,88 @@ class FocusChart extends Component {
     }
   }
 
+  getTagColor(tagName) {
+    const tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal'];
+    let colorIdx;
+    for (let colorIndex = 0; colorIndex < tagSeq.length; colorIndex += 1) {
+      if (tagSeq[colorIndex] === tagName) {
+        colorIdx = colorIndex;
+      }
+    }
+
+    if (typeof colorIdx === 'undefined') {
+      colorIdx = 6;
+    }
+    return colorSchemes.tag[colorIdx];
+  }
+
   drawEvents() {
+    const { height } = this.state;
     const { datarun } = this.props;
+    const { xCoord } = this.getScale();
     const { timeSeries, eventWindows } = datarun;
     const chartData = d3.select('g.chart-data');
     chartData.selectAll('.line-highlight').remove();
-    const drawHlEvent = event => {
-      chartData
-        .append('g')
-        .attr('class', 'line-highlight')
+
+    const drawHlEvent = (event, index) => {
+      const lineData = chartData.append('g').attr('class', 'line-highlight');
+      const startIndex = eventWindows[index][0];
+      const stopIndex = eventWindows[index][1];
+
+      const tagColor = this.getTagColor(eventWindows[index][3]);
+
+      // append event highlight
+      lineData
         .append('path')
         .attr('class', 'evt-highlight')
         .transition()
         .duration(DRAW_EVENTS_TIMEOUT)
         .attr('d', this.drawLine(event));
+
+      const comment = lineData.append('g').attr('class', 'event-comment');
+
+      // append event area
+      comment
+        .append('rect')
+        .attr('class', 'evt-area')
+        .attr('height', height - 3.5 * CHART_MARGIN)
+        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])), 10)
+        .attr('y', 0)
+        .attr('x', xCoord(timeSeries[startIndex][0]))
+        .on('click', () => {
+          // @TODO - will be handled soon
+        });
+
+      comment
+        .append('rect')
+        .attr('class', 'evt-comment')
+        .attr('height', 10)
+        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])), 10)
+        .attr('y', 0)
+        .attr('x', xCoord(timeSeries[startIndex][0]))
+        .attr('fill', tagColor)
+        .append('title')
+        .text(
+          `tag: ${eventWindows[index][3]}
+          from ${new Date(timeSeries[eventWindows[index][0]][0]).toUTCString()}
+          to ${new Date(timeSeries[eventWindows[index][1]][0]).toUTCString()}`,
+        );
     };
 
     setTimeout(() => {
-      chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
-      eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
       const { zoom, resetZoom } = this.addZoom();
       this.zoom = zoom;
       this.resetZoom = resetZoom;
+
+      chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
+      eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
     }, DRAW_EVENTS_TIMEOUT);
   }
 
   addZoom() {
     const { width, height, chart } = this.state;
     let zoomRect;
+    const chartData = d3.select('.chart-data');
     const zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
@@ -218,7 +272,7 @@ class FocusChart extends Component {
       .on('zoom', this.zoomHandler);
 
     chart.selectAll('.zoom').remove();
-    zoomRect = chart
+    zoomRect = chartData
       .append('rect')
       .attr('width', width)
       .attr('height', height)
@@ -282,6 +336,26 @@ class FocusChart extends Component {
 
     chart.selectAll('.evt-highlight').each(function(value, index) {
       d3.select(this).attr('d', line(events[index]));
+    });
+
+    chart.selectAll('.event-comment').each(function(value, index) {
+      const startIndex = eventWindows[index][0];
+      const stopIndex = eventWindows[index][1];
+      const commentArea = this.children[0];
+      const commentText = this.children[1];
+
+      const commentAttr = {
+        width: Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])),
+        xMove: xCoord(timeSeries[startIndex][0]),
+      };
+
+      d3.select(commentArea)
+        .attr('width', commentAttr.width)
+        .attr('x', commentAttr.xMove);
+
+      d3.select(commentText)
+        .attr('width', commentAttr.width)
+        .attr('x', commentAttr.xMove);
     });
   }
 
