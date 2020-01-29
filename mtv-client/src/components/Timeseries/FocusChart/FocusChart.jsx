@@ -7,17 +7,7 @@ import { setTimeseriesPeriod } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
-const {
-  OFFSET_WIDTH,
-  OFFSET_HEIGHT,
-  MIN_VALUE,
-  MAX_VALUE,
-  TRANSLATE_TOP,
-  TRANSLATE_LEFT,
-  DRAW_EVENTS_TIMEOUT,
-} = FocusChartConstants;
-
-const transition = d3.transition().duration(DRAW_EVENTS_TIMEOUT);
+const { MIN_VALUE, MAX_VALUE, TRANSLATE_TOP, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
 
 class FocusChart extends Component {
   constructor(...args) {
@@ -58,12 +48,11 @@ class FocusChart extends Component {
   }
 
   getWrapperSize() {
-    const wrapperOffset = 40;
-    const wrapperHeight = document.querySelector('#content-wrapper').clientHeight - wrapperOffset;
-    const overViewHeight = document.querySelector('#overview-wrapper').clientHeight - wrapperOffset;
-    const height = wrapperHeight - overViewHeight - wrapperOffset;
-    const width = document.querySelector('#overview-wrapper').clientWidth - wrapperOffset;
-
+    const wrapperOffsetMargin = 40;
+    const wrapperHeight = document.querySelector('#content-wrapper').clientHeight;
+    const overViewHeight = document.querySelector('#overview-wrapper').clientHeight;
+    const height = wrapperHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin);
+    const width = document.querySelector('.focus-chart').clientWidth;
     return { width, height };
   }
 
@@ -73,9 +62,11 @@ class FocusChart extends Component {
 
     const [minTX, maxTX] = d3.extent(timeSeries, time => time[0]);
     const [minTY, maxTY] = d3.extent(timeSeries, time => time[1]);
+    const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
+    const drawableHeight = height - 3.5 * CHART_MARGIN;
 
-    const xCoord = d3.scaleTime().range([0, width - OFFSET_WIDTH]);
-    const yCoord = d3.scaleLinear().range([height - OFFSET_HEIGHT, 0]);
+    const xCoord = d3.scaleTime().range([0, drawableWidth]);
+    const yCoord = d3.scaleLinear().range([drawableHeight, 0]);
 
     const minX = Math.min(MIN_VALUE, minTX);
     const maxX = Math.max(MAX_VALUE, maxTX);
@@ -101,43 +92,31 @@ class FocusChart extends Component {
   }
 
   drawAxis() {
-    const { width, height, chart } = this.state;
+    const { height } = this.state;
     const { xCoord, yCoord } = this.getScale();
     const isChartReady = document.querySelector('.chart-axis');
     const xAxis = d3.axisBottom(xCoord);
     const yAxis = d3.axisLeft(yCoord);
 
-    chart.attr('width', width).attr('height', height);
+    const focusGroup = d3.select('.focus');
 
     const createAxis = () => {
-      const axisG = chart
-        .append('g')
-        .attr('class', 'chart-axis')
-        .attr('transform', `translate(${TRANSLATE_LEFT}, 0)`);
+      const axisG = focusGroup.append('g').attr('class', 'chart-axis');
       axisG
         .append('g')
-        .attr('transform', `translate(0, ${height - 22})`)
+        .attr('transform', `translate(0, ${height - 3.5 * CHART_MARGIN})`)
         .attr('class', 'axis axis--x')
         .call(xAxis);
       axisG
         .append('g')
         .attr('class', 'axis axis--y')
-        .attr('transform', `translate(0, ${TRANSLATE_TOP})`)
         .call(yAxis.ticks(5, ',f'));
     };
 
     const updateAxis = () => {
-      chart
-        .select('.axis.axis--x')
-        .attr('transform', `translate(0, ${height - 22})`)
-        .transition(transition)
-        .call(xAxis);
+      focusGroup.select('.axis.axis--x').call(xAxis);
 
-      chart
-        .select('.axis.axis--y')
-        .attr('transform', `translate(0, ${TRANSLATE_TOP})`)
-        .transition(transition)
-        .call(yAxis.ticks(5, ',f'));
+      focusGroup.select('.axis.axis--y').call(yAxis.ticks(5, ',f'));
     };
 
     if (isChartReady) {
@@ -152,24 +131,40 @@ class FocusChart extends Component {
     const { datarun } = this.props;
     const isChartDataReady = document.querySelector('.chart-data');
 
+    chart.attr('width', width).attr('height', height);
+
+    const focusGroup = chart
+      .append('g')
+      .attr('class', 'focus')
+      .attr('width', width - TRANSLATE_LEFT - 2 * CHART_MARGIN)
+      .attr('transform', `translate(${TRANSLATE_LEFT}, ${CHART_MARGIN})`);
+
     const createChart = () => {
-      const chartLine = chart
+      const clipPath = focusGroup.append('defs');
+      clipPath
+        .append('clipPath')
+        .attr('id', 'focusClip')
+        .append('rect')
+        .attr('width', width - TRANSLATE_LEFT - 2 * CHART_MARGIN)
+        .attr('height', height);
+
+      const chartLine = focusGroup
         .append('g')
         .attr('class', 'chart-data')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('transform', `translate(${TRANSLATE_LEFT}, ${TRANSLATE_TOP})`);
+        .attr('clip-path', 'url(#focusClip)');
 
       chartLine
         .append('path')
         .attr('class', 'chart-waves')
-        .transition(transition)
+        .transition()
+        .duration(DRAW_EVENTS_TIMEOUT)
         .attr('d', () => this.drawLine(datarun.timeSeries));
     };
 
     const updateChart = () => {
       d3.select('.chart-waves')
-        .transition(transition)
+        .transition()
+        .duration(DRAW_EVENTS_TIMEOUT)
         .attr('d', () => this.drawLine(datarun.timeSeries));
       this.resetZoom();
     };
@@ -182,23 +177,23 @@ class FocusChart extends Component {
   }
 
   drawEvents() {
-    const { chart } = this.state;
     const { datarun } = this.props;
     const { timeSeries, eventWindows } = datarun;
-
-    chart.selectAll('.line-highlight').remove();
+    const chartData = d3.select('g.chart-data');
+    chartData.selectAll('.line-highlight').remove();
     const drawHlEvent = event => {
-      chart
+      chartData
         .append('g')
-        .attr('class', 'line-highlight ')
-        .attr('transform', `translate(${TRANSLATE_LEFT}, ${TRANSLATE_TOP})`)
+        .attr('class', 'line-highlight')
         .append('path')
         .attr('class', 'evt-highlight')
-        .transition(transition)
+        .transition()
+        .duration(DRAW_EVENTS_TIMEOUT)
         .attr('d', this.drawLine(event));
     };
 
     setTimeout(() => {
+      chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach(event => drawHlEvent(timeSeries.slice(event[0], event[1] + 1)));
       const { zoom, resetZoom } = this.addZoom();
       this.zoom = zoom;
@@ -254,9 +249,9 @@ class FocusChart extends Component {
     }
     const { xCoord } = this.getScale();
     let zoomValue = d3.event.transform;
-    const periodValue = xCoord.range().map(zoomValue.invertX, zoomValue);
+    const eventRange = xCoord.range().map(zoomValue.invertX, zoomValue);
     const periodRange = {
-      eventRange: periodValue,
+      eventRange,
       zoomValue,
     };
     this.props.setPeriodRange(periodRange);
@@ -299,6 +294,7 @@ class FocusChart extends Component {
   render() {
     return (
       <div className="focus-chart">
+        <div style={{ height: '90px' }} /> {/** will be used soon */}
         <svg id="focusChart" />
       </div>
     );

@@ -4,8 +4,8 @@ export function selectDatarun(datarunID) {
   };
 }
 
-export function setTimeseriesPeriod(periodRange) {
+export function setTimeseriesPeriod(eventRange) {
   return function(dispatch) {
-    dispatch({ type: 'SET_TIMESERIES_PERIOD', periodRange });
+    dispatch({ type: 'SET_TIMESERIES_PERIOD', eventRange });
   };
 }

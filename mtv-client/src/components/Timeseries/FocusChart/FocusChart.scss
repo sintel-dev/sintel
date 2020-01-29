@@ -24,13 +24,12 @@
         path{
             stroke-width: 1;
             stroke: $blue-color;
+            &.evt-highlight{
+                stroke: $yellow-color;
+            }
         }
     }
 
-    .line-highlight{
-        fill: transparent;
-        stroke: $yellow-color;
-    }
     .zoom{
         cursor: move;
     }

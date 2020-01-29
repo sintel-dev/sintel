@@ -5,7 +5,7 @@ import { drawChart, updateBrushPeriod } from './chartUtils';
 class DrawChart extends Component {
   componentDidMount() {
     const { dataRun, onPeriodTimeChange, selectedPeriod } = this.props;
-    const width = document.querySelector('.overview-wrapper').offsetWidth - 65;
+    const width = document.querySelector('.time-row').clientWidth;
     const height = 36;
     drawChart(width, height, dataRun, onPeriodTimeChange, selectedPeriod);
   }

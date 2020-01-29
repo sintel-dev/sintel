@@ -3,7 +3,6 @@
     position: relative;
     max-height: 260.75px;
     min-height: 260.75px;
-    // margin: 0 50px;
     overflow-y: auto;
     background: $main-color;
     border-top-left-radius: 10px;
@@ -26,18 +25,14 @@
             border-top-right-radius: 10px;
         }
 
-        ul {
-            display: flex;
-        }
-
         li {
             display: inline-block;
             height: 60px;
-            padding: 5px;
+            padding: 5px 0;
             box-sizing: border-box;
             vertical-align: top;
             transition: all 0.2s ease-in-out;
-
+            width: 100%;
             &:first-child {
                 width: 60px;
                 text-align: center;
@@ -54,11 +49,8 @@
             background: $second-color;
             box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.5);
             border: 1px solid #b2c1ff;
-
-            rect.selection {
-                .handle {
-                    display: block;
-                }
+            .handle {
+                display: block;
             }
         }
     }
@@ -94,5 +86,6 @@
     .handle {
         fill: #b3bbd3;
         ry: 3;
+        display: none;
     }
 }
