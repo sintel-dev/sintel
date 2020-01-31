@@ -1,4 +1,4 @@
-export function selectDatarun(datarunID) {
+export function selectDatarun(datarunID: string) {
   return function(dispatch) {
     dispatch({ type: 'SELECT_DATARUN', datarunID });
   };

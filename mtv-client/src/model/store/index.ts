@@ -5,8 +5,10 @@ import { createLogger } from 'redux-logger';
 
 import rootReducer from '../reducers';
 import { api } from './middlewares';
+import { monitorReducerEnhancer } from './enhancers';
+import { State } from '../reducers/index';
 
-export function configureStore(initialState = {}) {
+export function configureStore(initialState: State = {} as any) {
   const middlewares = [thunkMiddleware, api];
   if (process.env.NODE_ENV !== 'test') {
     middlewares.push(
@@ -15,7 +17,11 @@ export function configureStore(initialState = {}) {
       }),
     );
   }
-  const composedEnhancers = composeWithDevTools(applyMiddleware(...middlewares));
+  const middlewareEnhancer = applyMiddleware(...middlewares);
+
+  // add more Redux enhancers here if needed
+  // const enhancers = [middlewareEnhancer, monitorReducerEnhancer];
+  const composedEnhancers = composeWithDevTools(middlewareEnhancer);
   const store = createStore(rootReducer, initialState, composedEnhancers);
   return store;
 }
