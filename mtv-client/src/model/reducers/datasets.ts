@@ -1,5 +1,15 @@
 import createReducer from '../store/createReducer';
 
+export type DatasetsState = {
+  isDatasetLoading: boolean;
+  dataSetsList: Array<any>;
+};
+
+let initialState: DatasetsState = {
+  isDatasetLoading: true,
+  dataSetsList: [],
+};
+
 function GET_DATASETS_REQUEST(nextState) {
   nextState.isDatasetLoading = true;
   nextState.dataSetsList = [];
@@ -15,14 +25,8 @@ function GET_DATASETS_FAILURE(nextState) {
   nextState.dataSetsList = [];
 }
 
-export default createReducer(
-  {
-    isDatasetLoading: true,
-    dataSetsList: [],
-  },
-  {
-    GET_DATASETS_REQUEST,
-    GET_DATASETS_SUCCESS,
-    GET_DATASETS_FAILURE,
-  },
-);
+export default createReducer(initialState, {
+  GET_DATASETS_REQUEST,
+  GET_DATASETS_SUCCESS,
+  GET_DATASETS_FAILURE,
+});
