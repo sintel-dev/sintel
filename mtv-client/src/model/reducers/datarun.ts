@@ -1,34 +1,26 @@
+import { SelectDatarunAction, SetTimeseriesPeriodAction, DatarunState } from '../types/datarun';
 import createReducer from '../store/createReducer';
 
-export type DatarunState = {
-  selectedDatarunID: string | null;
-  selectedTimePeriod: number[];
-  selectedPeriodRange: Object; // what is the format?
+const initialState: DatarunState = {
+  selectedDatarunID: '',
+  selectedPeriodRange: [0, 0],
 };
 
-let initialState: DatarunState = {
-  selectedDatarunID: null,
-  selectedTimePeriod: [],
-  selectedPeriodRange: {},
-};
-
-// reducer 1
-type AC_SELECT_DATARUN = {
-  datarunID: string | null;
-};
-function SELECT_DATARUN(nextState: DatarunState, { datarunID }: AC_SELECT_DATARUN) {
-  nextState.selectedDatarunID = datarunID;
+/**
+ * update the currently selected datarunID to state
+ */
+function SELECT_DATARUN(nextState: DatarunState, action: SelectDatarunAction) {
+  nextState.selectedDatarunID = action.datarunID;
 }
 
-// reducer 2
-type AC_SET_TIMESERIES_PERIOD = {
-  eventRange: Object; // what is the format?
-};
-function SET_TIMESERIES_PERIOD(nextState: DatarunState, { eventRange }: AC_SET_TIMESERIES_PERIOD) {
-  nextState.selectedPeriodRange = eventRange;
+/**
+ * set the selectedPeriodRange
+ */
+function SET_TIMESERIES_PERIOD(nextState: DatarunState, action: SetTimeseriesPeriodAction) {
+  nextState.selectedPeriodRange = action.eventRange;
 }
 
-export default createReducer(initialState, {
+export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
 });

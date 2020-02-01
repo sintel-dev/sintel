@@ -91,7 +91,7 @@ module.exports = {
     'arrow-body-style': 'warn',
     'max-len': 'off',
     'class-methods-use-this': 'off',
-    camelcase: 'warn',
+    camelcase: 'off',
     'react/sort-comp': [
       1,
       {

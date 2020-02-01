@@ -5,11 +5,6 @@ import pipelines from './pipelines';
 import projects from './projects';
 import selectedExperimentData from './experimentData';
 import datarun from './datarun';
-import { DatarunState } from './datarun';
-
-export type State = {
-  datarun: DatarunState;
-};
 
 export default combineReducers({
   projects,

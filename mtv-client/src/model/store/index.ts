@@ -5,10 +5,10 @@ import { createLogger } from 'redux-logger';
 
 import rootReducer from '../reducers';
 import { api } from './middlewares';
-import { monitorReducerEnhancer } from './enhancers';
-import { State } from '../reducers/index';
+// import { monitorReducerEnhancer } from './enhancers';
+import { RootState } from '../types/index';
 
-export function configureStore(initialState: State = {} as any) {
+export function configureStore(initialState: RootState = {} as any) {
   const middlewares = [thunkMiddleware, api];
   if (process.env.NODE_ENV !== 'test') {
     middlewares.push(
