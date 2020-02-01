@@ -1,11 +1,15 @@
-import produce from 'immer';
+import produce, { Draft } from 'immer';
 
 function DEFAULT(state) {
   return state;
 }
 
-export default function createReducer(initialState = {}, reducers) {
-  return function(state = initialState, action) {
+export interface PartialReducer<T> {
+  (state: Draft<T> | T, action, state2?: T);
+}
+
+export default function createReducer<T>(initialState: T, reducers: { [type: string]: PartialReducer<T> }) {
+  return function(state: T = initialState, action): T {
     const { type } = action;
 
     if (!type) {
@@ -24,6 +28,7 @@ export default function createReducer(initialState = {}, reducers) {
       return DEFAULT(state);
     }
 
-    return produce(state, nextState => reducer(nextState, action, state));
+    // Create the next immutable state tree by simply modifying the current tree
+    return produce(state, nextState => reducer(nextState, action, state)) as T;
   };
 }

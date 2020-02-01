@@ -1,11 +1,26 @@
+import {
+  SELECT_DATARUN,
+  SET_TIMESERIES_PERIOD,
+  SelectDatarunAction,
+  SetTimeseriesPeriodAction,
+} from '../types/datarun';
+
 export function selectDatarun(datarunID: string) {
   return function(dispatch) {
-    dispatch({ type: 'SELECT_DATARUN', datarunID });
+    const action: SelectDatarunAction = {
+      type: SELECT_DATARUN,
+      datarunID,
+    };
+    dispatch(action);
   };
 }
 
-export function setTimeseriesPeriod(eventRange) {
+export function setTimeseriesPeriod(eventRange: [number, number]) {
   return function(dispatch) {
-    dispatch({ type: 'SET_TIMESERIES_PERIOD', eventRange });
+    const action: SetTimeseriesPeriodAction = {
+      type: SET_TIMESERIES_PERIOD,
+      eventRange,
+    };
+    dispatch(action);
   };
 }
