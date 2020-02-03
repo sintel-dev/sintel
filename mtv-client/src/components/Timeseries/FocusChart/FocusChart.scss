@@ -33,4 +33,13 @@
     .zoom{
         cursor: move;
     }
+
+    .event-comment{
+        cursor: pointer;
+        .evt-area{
+            fill: #777;
+            stroke-width: 0;
+            fill-opacity: 0.5;
+        }
+    }
 }
