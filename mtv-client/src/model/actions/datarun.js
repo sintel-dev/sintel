@@ -3,6 +3,8 @@ import { api } from './utils';
 
 export function selectDatarun(datarunID) {
   return function(dispatch) {
+    dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: {} });
+    dispatch({ type: 'SET_CURRENT_EVENT', eventIndex: null });
     dispatch({ type: 'SELECT_DATARUN', datarunID });
   };
 }
@@ -15,6 +17,7 @@ export function setTimeseriesPeriod(eventRange) {
 
 export function setCurrentEventAction(eventIndex) {
   return function(dispatch) {
+    dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: {} });
     dispatch({ type: 'SET_CURRENT_EVENT', eventIndex });
     dispatch(getEventComments());
   };
@@ -38,5 +41,12 @@ export function updateEventDetailsAction(newDetails) {
     const eventTag = newDetails.label.toLowerCase();
 
     dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: { ...currentEventDetails, tag: eventTag } });
+  };
+}
+
+export function togglePredictionsAction(event) {
+  return function(dispatch) {
+    const isPredictionEnabled = event.target.checked;
+    dispatch({ type: 'TOGGLE_PREDICTION_MODE', isPredictionEnabled });
   };
 }

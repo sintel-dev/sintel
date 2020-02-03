@@ -7,6 +7,7 @@ import FocusChart from '../FocusChart';
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Datarun from './Datarun';
+import FocusChartControls from '../FocusChartControls';
 
 function Experiment({ experimentData, processedDataruns }) {
   return (
@@ -19,6 +20,7 @@ function Experiment({ experimentData, processedDataruns }) {
             <p>No datarun for current experiment</p>
           )}
         </div>
+        <FocusChartControls />
         <FocusChart />
       </Loader>
     </div>

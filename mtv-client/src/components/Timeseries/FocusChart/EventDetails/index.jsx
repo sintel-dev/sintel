@@ -8,13 +8,13 @@ import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
 
-const EventDetails = ({ eventDetails, setCurrentEvent, updateEventDetails }) => {
+const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails }) => {
   const isActive = eventDetails ? 'active' : '';
   return (
     <div className={`events-wrapper ${isActive}`}>
       {eventDetails && (
         <div>
-          <button type="button" className="close" onClick={setCurrentEvent}>
+          <button type="button" className="close" onClick={closeEventDetails}>
             x
           </button>
           <div className="row">
@@ -78,7 +78,7 @@ const EventDetails = ({ eventDetails, setCurrentEvent, updateEventDetails }) => 
 
 EventDetails.propTypes = {
   eventDetails: PropTypes.object,
-  setCurrentEvent: PropTypes.func,
+  closeEventDetails: PropTypes.func,
   updateEventDetails: PropTypes.func,
 };
 
@@ -87,7 +87,7 @@ export default connect(
     eventDetails: getCurrentEventDetails(state),
   }),
   dispatch => ({
-    setCurrentEvent: () => dispatch(setCurrentEventAction(null)),
+    closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
   }),
 )(EventDetails);

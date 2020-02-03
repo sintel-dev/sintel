@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
-import { getDatarunDetails, getSelectedPeriodRange } from '../../../model/selectors/datarun';
+import { getDatarunDetails, getSelectedPeriodRange, isPredictionEnabled } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
 const { MIN_VALUE, MAX_VALUE, TRANSLATE_TOP, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
@@ -46,13 +46,18 @@ class FocusChart extends Component {
     if (prevProps.periodRange.zoomValue !== this.props.periodRange.zoomValue) {
       this.updateChartOnBrush();
     }
+
+    if (prevProps.isPredictionVisible !== this.props.isPredictionVisible) {
+      this.togglePredictions();
+    }
   }
 
   getWrapperSize() {
     const wrapperOffsetMargin = 40;
     const wrapperHeight = document.querySelector('#content-wrapper').clientHeight;
     const overViewHeight = document.querySelector('#overview-wrapper').clientHeight;
-    const height = wrapperHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin);
+    const chartControlsHeight = document.querySelector('#chartControls').clientHeight + 20;
+    const height = wrapperHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin + chartControlsHeight);
     const width = document.querySelector('.focus-chart').clientWidth;
     return { width, height };
   }
@@ -154,7 +159,8 @@ class FocusChart extends Component {
         .attr('class', 'chart-data')
         .attr('clip-path', 'url(#focusClip)');
 
-      chartLine
+      const chartGroups = chartLine.append('g').attr('class', 'wawe-data');
+      chartGroups
         .append('path')
         .attr('class', 'chart-waves')
         .transition()
@@ -240,6 +246,27 @@ class FocusChart extends Component {
     }, DRAW_EVENTS_TIMEOUT);
   }
 
+  togglePredictions() {
+    const { isPredictionVisible, datarun } = this.props;
+    const waweData = d3.select('.wawe-data');
+    const { xCoord, yCoord } = this.getScale();
+    const xCoordCopy = xCoord.copy();
+    const line = d3
+      .line()
+      .x(d => xCoord(d[0]))
+      .y(d => yCoord(d[1]));
+
+    // drawing predictions at zoom level coords, if there's such
+    this.state.zoomValue && xCoord.domain(this.state.zoomValue.rescaleX(xCoordCopy).domain());
+    d3.select('.predictions').remove();
+
+    isPredictionVisible &&
+      waweData
+        .append('path')
+        .attr('class', 'predictions')
+        .attr('d', () => line(datarun.timeseriesPred));
+  }
+
   addZoom() {
     const { width, height, chart } = this.state;
     let zoomRect;
@@ -302,7 +329,7 @@ class FocusChart extends Component {
     const { xCoord, yCoord } = this.getScale();
     const { periodRange, datarun } = this.props;
     const { zoomValue } = periodRange;
-    const { timeSeries, eventWindows } = datarun;
+    const { timeSeries, eventWindows, timeseriesPred } = datarun;
     const xCoordCopy = xCoord.copy();
     const xAxis = d3.axisBottom(xCoord);
     let events = [];
@@ -316,7 +343,9 @@ class FocusChart extends Component {
 
     d3.select('.axis.axis--x').call(xAxis);
 
+    // updating main chart and predictions lines
     chart.select('.chart-waves').attr('d', () => line(timeSeries));
+    chart.select('.predictions').attr('d', () => line(timeseriesPred));
 
     eventWindows.forEach(event => events.push(timeSeries.slice(event[0], event[1] + 1)));
 
@@ -343,12 +372,15 @@ class FocusChart extends Component {
         .attr('width', commentAttr.width)
         .attr('x', commentAttr.xMove);
     });
+
+    this.setState({ zoomValue });
   }
 
   drawChart() {
     this.drawData();
     this.drawAxis();
     this.drawEvents();
+    this.togglePredictions();
   }
 
   render() {
@@ -367,12 +399,14 @@ FocusChart.propTypes = {
   setPeriodRange: PropTypes.func,
   periodRange: PropTypes.object,
   setCurrentEvent: PropTypes.func,
+  isPredictionVisible: PropTypes.bool,
 };
 
 export default connect(
   state => ({
     datarun: getDatarunDetails(state),
     periodRange: getSelectedPeriodRange(state),
+    isPredictionVisible: isPredictionEnabled(state),
   }),
   dispatch => ({
     setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),

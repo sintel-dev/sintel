@@ -1,6 +1,12 @@
 import { createSelector } from 'reselect';
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 
+const getEventIndex = state => state.datarun.eventIndex;
+const getEventComments = state => state.datarun.eventComments;
+const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
+const getUpdatedEventsDetails = state => state.datarun.eventDetails;
+
+export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = state => state.datarun.selectedDatarunID;
 
 export const getSelectedDatarunID = createSelector(
@@ -15,11 +21,6 @@ export const getDatarunDetails = createSelector(
   (selectedDatarundID, processedDataruns) => processedDataruns.find(datarun => datarun.id === selectedDatarundID),
 );
 
-const getEventIndex = state => state.datarun.eventIndex;
-const getEventComments = state => state.datarun.eventComments;
-const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
-const getUpdatedEventsDetails = state => state.datarun.eventDetails;
-
 export const getCurrentEventDetails = createSelector(
   [getDatarunDetails, getEventIndex, isEventCommentsLoading, getEventComments, getUpdatedEventsDetails],
   (datarun, eventIndex, isCommentsLoading, eventComments, updatedDetails) => {
@@ -31,7 +32,7 @@ export const getCurrentEventDetails = createSelector(
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],
-      tag: updatedDetails && updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
+      tag: updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
       start_time: new Date(datarun.timeSeries[currentEvent[0]][0]).toUTCString(),
       stop_time: new Date(datarun.timeSeries[currentEvent[1]][0]).toUTCString(),
       datarun: datarun.id,
