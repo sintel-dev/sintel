@@ -1,6 +1,7 @@
 import { api } from './utils';
 import { getSelectedPipeline, getSelectedExperiment } from '../selectors/projects';
 import { fetchExperiment } from './experiment';
+import { GET_DATASETS, FetchDatasetPromise } from '../types/index';
 
 export function fetchExperiments() {
   return function(dispatch) {
@@ -20,8 +21,8 @@ export function fetchPipelines() {
 
 export function fetchDatasets() {
   return function(dispatch) {
-    const promise = api.get('datasets');
-    dispatch({ type: 'GET_DATASETS', promise });
+    const promise: FetchDatasetPromise = api.get('datasets');
+    dispatch({ type: GET_DATASETS, promise });
     return promise;
   };
 }

@@ -1,31 +1,38 @@
 import createReducer from '../store/createReducer';
+import { DatasetsState, FetchDatasetAction } from '../types/dataset';
 
-export type DatasetsState = {
-  isDatasetLoading: boolean;
-  dataSetsList: Array<any>;
-};
-
-let initialState: DatasetsState = {
+const initialState: DatasetsState = {
   isDatasetLoading: true,
   dataSetsList: [],
 };
 
+/**
+ * Initialize state when send GET_DATASETS_REQUEST
+ */
 function GET_DATASETS_REQUEST(nextState) {
   nextState.isDatasetLoading = true;
   nextState.dataSetsList = [];
 }
 
-function GET_DATASETS_SUCCESS(nextState, { result }) {
+/**
+ * Update state when send GET_DATASETS_REQUEST and receive response successfully
+ */
+function GET_DATASETS_SUCCESS(nextState, action: FetchDatasetAction) {
   nextState.isDatasetLoading = false;
-  nextState.dataSetsList = result.datasets;
+  if (action.result) {
+    nextState.dataSetsList = action.result.datasets;
+  }
 }
 
+/**
+ * Update state when send GET_DATASETS_REQUEST but failed to receive response
+ */
 function GET_DATASETS_FAILURE(nextState) {
   nextState.isDatasetLoading = false;
   nextState.dataSetsList = [];
 }
 
-export default createReducer(initialState, {
+export default createReducer<DatasetsState>(initialState, {
   GET_DATASETS_REQUEST,
   GET_DATASETS_SUCCESS,
   GET_DATASETS_FAILURE,
