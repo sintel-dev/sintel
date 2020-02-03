@@ -217,16 +217,25 @@
         border: 1px solid #fff;
         border-radius: 0;
     }
-    .tag-options__option--is-focused {
-        background-color: #26282D !important;
-    }
 
     .tag-options__option--is-selected{
-        color: #B5B5B5;
+        color: #fff;
         background: transparent;
+        
     }
+
+    .tag-options__option--is-focused {
+        color: #fff;
+        &.tag-options__option--is-selected {
+            color: #B5B5B5;
+        }
+    }
+
     .tag-options__option {
         padding: 0 0 0 10px;
+        &, &:hover {
+            background: transparent;
+        }
     }
 
     .tag-options__group-heading {

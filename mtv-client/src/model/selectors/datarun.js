@@ -18,10 +18,11 @@ export const getDatarunDetails = createSelector(
 const getEventIndex = state => state.datarun.eventIndex;
 const getEventComments = state => state.datarun.eventComments;
 const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
+const getUpdatedEventsDetails = state => state.datarun.eventDetails;
 
 export const getCurrentEventDetails = createSelector(
-  [getDatarunDetails, getEventIndex, isEventCommentsLoading, getEventComments],
-  (datarun, eventIndex, isCommentsLoading, eventComments) => {
+  [getDatarunDetails, getEventIndex, isEventCommentsLoading, getEventComments, getUpdatedEventsDetails],
+  (datarun, eventIndex, isCommentsLoading, eventComments, updatedDetails) => {
     if (eventIndex === null) {
       return null;
     }
@@ -30,7 +31,7 @@ export const getCurrentEventDetails = createSelector(
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],
-      tag: currentEvent[4],
+      tag: updatedDetails && updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
       start_time: new Date(datarun.timeSeries[currentEvent[0]][0]).toUTCString(),
       stop_time: new Date(datarun.timeSeries[currentEvent[1]][0]).toUTCString(),
       datarun: datarun.id,

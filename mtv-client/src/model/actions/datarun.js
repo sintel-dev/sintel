@@ -35,6 +35,8 @@ export function getEventComments() {
 export function updateEventDetailsAction(newDetails) {
   return function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
-    dispatch({ type: 'CHANGE_EVENT_DETAILS', newDetails });
+    const eventTag = newDetails.label.toLowerCase();
+
+    dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: { ...currentEventDetails, tag: eventTag } });
   };
 }
