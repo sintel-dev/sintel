@@ -16,7 +16,9 @@ export const api = {
         }
         return null;
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        throw err; // can be captured by ACTION_FAILURE
+      });
   },
 
   // post(url, data) {

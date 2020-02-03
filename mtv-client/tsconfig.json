@@ -6,6 +6,7 @@
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "strictNullChecks": true,
     "experimentalDecorators": true,
     "removeComments": true,
     "strict": true,
