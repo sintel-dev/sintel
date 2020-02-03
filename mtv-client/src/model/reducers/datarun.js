@@ -11,8 +11,8 @@ function SET_TIMESERIES_PERIOD(nextState, { eventRange }) {
 function SET_CURRENT_EVENT(nextState, { eventIndex }) {
   nextState.eventIndex = eventIndex;
 }
-function CHANGE_EVENT_DETAILS(nextState, { newDetails }) {
-  nextState.eventDetails = newDetails;
+function UPDATE_EVENT_DETAILS(nextState, { eventDetails }) {
+  nextState.eventDetails = eventDetails;
 }
 
 function GET_EVENT_COMMENT_SUCCESS(nextState, { evtComments }) {
@@ -38,7 +38,7 @@ export default createReducer(
     SELECT_DATARUN,
     SET_TIMESERIES_PERIOD,
     SET_CURRENT_EVENT,
-    CHANGE_EVENT_DETAILS,
+    UPDATE_EVENT_DETAILS,
     GET_EVENT_COMMENT_SUCCESS,
     TOGGLE_PREDICTION_MODE,
   },

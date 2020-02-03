@@ -44,6 +44,8 @@ export const RenderComments = eventComments =>
   );
 
 export const selectedOption = selectedLabel =>
-  grouppedOptions
-    .reduce((known, unknown) => [...known.options, ...unknown.options])
-    .find(({ label }) => label.toLowerCase() === selectedLabel);
+  selectedLabel === null
+    ? ''
+    : grouppedOptions
+        .reduce((known, unknown) => [...known.options, ...unknown.options])
+        .find(({ label }) => label.toLowerCase() === selectedLabel);
