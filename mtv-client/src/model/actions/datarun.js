@@ -38,3 +38,10 @@ export function updateEventDetailsAction(newDetails) {
     dispatch({ type: 'CHANGE_EVENT_DETAILS', newDetails });
   };
 }
+
+export function togglePredictionsAction(event) {
+  return function(dispatch) {
+    const isPredictionEnabled = event.target.checked;
+    dispatch({ type: 'TOGGLE_PREDICTION_MODE', isPredictionEnabled });
+  };
+}

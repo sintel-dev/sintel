@@ -20,6 +20,10 @@ function GET_EVENT_COMMENT_SUCCESS(nextState, { evtComments }) {
   nextState.isEventCommentsLoading = false;
 }
 
+function TOGGLE_PREDICTION_MODE(nextState, { isPredictionEnabled }) {
+  nextState.isPredictionEnabled = isPredictionEnabled;
+}
+
 export default createReducer(
   {
     selectedDatarunID: null,
@@ -28,6 +32,7 @@ export default createReducer(
     eventIndex: null,
     isEventCommentsLoading: true,
     eventComments: [],
+    isPredictionEnabled: false,
   },
   {
     SELECT_DATARUN,
@@ -35,5 +40,6 @@ export default createReducer(
     SET_CURRENT_EVENT,
     CHANGE_EVENT_DETAILS,
     GET_EVENT_COMMENT_SUCCESS,
+    TOGGLE_PREDICTION_MODE,
   },
 );

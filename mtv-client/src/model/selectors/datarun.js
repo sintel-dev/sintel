@@ -18,6 +18,7 @@ export const getDatarunDetails = createSelector(
 const getEventIndex = state => state.datarun.eventIndex;
 const getEventComments = state => state.datarun.eventComments;
 const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
+export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 
 export const getCurrentEventDetails = createSelector(
   [getDatarunDetails, getEventIndex, isEventCommentsLoading, getEventComments],

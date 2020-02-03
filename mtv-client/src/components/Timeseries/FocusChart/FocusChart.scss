@@ -28,6 +28,10 @@
             &.evt-highlight{
                 stroke: $yellow-color;
             }
+            &.predictions{
+                stroke: #b9782d;
+                fill: none;
+            }
         }
     }
 
