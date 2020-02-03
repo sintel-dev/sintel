@@ -2,8 +2,9 @@ import * as d3 from 'd3';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
-import { setTimeseriesPeriod } from '../../../model/actions/datarun';
+import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -178,17 +179,18 @@ class FocusChart extends Component {
 
   drawEvents() {
     const { height } = this.state;
-    const { datarun } = this.props;
+    const { datarun, setCurrentEvent } = this.props;
     const { xCoord } = this.getScale();
     const { timeSeries, eventWindows } = datarun;
     const chartData = d3.select('g.chart-data');
     chartData.selectAll('.line-highlight').remove();
 
-    const drawHlEvent = (event, index) => {
+    const drawHlEvent = (event, eventIndex) => {
       const lineData = chartData.append('g').attr('class', 'line-highlight');
-      const startIndex = eventWindows[index][0];
-      const stopIndex = eventWindows[index][1];
-      const tagColor = colorSchemes[eventWindows[index][3]] || colorSchemes.untagged;
+      const currentEvent = eventWindows[eventIndex];
+      const startIndex = currentEvent[0];
+      const stopIndex = currentEvent[1];
+      const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.untagged;
 
       // append event highlight
       lineData
@@ -205,26 +207,26 @@ class FocusChart extends Component {
         .append('rect')
         .attr('class', 'evt-area')
         .attr('height', height - 3.5 * CHART_MARGIN)
-        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])), 10)
+        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])))
         .attr('y', 0)
         .attr('x', xCoord(timeSeries[startIndex][0]))
         .on('click', () => {
-          // @TODO - will be handled soon
+          setCurrentEvent(eventIndex);
         });
 
       comment
         .append('rect')
         .attr('class', 'evt-comment')
         .attr('height', 10)
-        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])), 10)
+        .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])))
         .attr('y', 0)
         .attr('x', xCoord(timeSeries[startIndex][0]))
         .attr('fill', tagColor)
         .append('title')
         .text(
-          `tag: ${eventWindows[index][3]}
-          from ${new Date(timeSeries[eventWindows[index][0]][0]).toUTCString()}
-          to ${new Date(timeSeries[eventWindows[index][1]][0]).toUTCString()}`,
+          `tag: ${currentEvent[3]}
+          from ${new Date(timeSeries[currentEvent[0]][0]).toUTCString()}
+          to ${new Date(timeSeries[currentEvent[1]][0]).toUTCString()}`,
         );
     };
 
@@ -353,6 +355,7 @@ class FocusChart extends Component {
     return (
       <div className="focus-chart">
         <div style={{ height: '90px' }} /> {/** will be used soon */}
+        <EventDetails />
         <svg id="focusChart" />
       </div>
     );
@@ -363,6 +366,7 @@ FocusChart.propTypes = {
   datarun: PropTypes.object,
   setPeriodRange: PropTypes.func,
   periodRange: PropTypes.object,
+  setCurrentEvent: PropTypes.func,
 };
 
 export default connect(
@@ -372,5 +376,6 @@ export default connect(
   }),
   dispatch => ({
     setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
+    setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
   }),
 )(FocusChart);
