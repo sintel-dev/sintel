@@ -8,8 +8,7 @@ import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
 
-const EventDetails = props => {
-  const { eventDetails, setCurrentEvent, updateEventDetails } = props;
+const EventDetails = ({ eventDetails, setCurrentEvent, updateEventDetails }) => {
   const isActive = eventDetails ? 'active' : '';
   return (
     <div className={`events-wrapper ${isActive}`}>
