@@ -3,6 +3,7 @@
     background: $main-color;
     border-radius: 10px;
     overflow: hidden;
+    position: relative;
 
     .chart-data path,
     .line-highlight,
