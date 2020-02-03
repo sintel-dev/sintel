@@ -304,7 +304,7 @@ class FocusChart extends Component {
 FocusChart.propTypes = {
   datarun: PropTypes.object,
   setPeriodRange: PropTypes.func,
-  periodRange: PropTypes.object,
+  periodRange: PropTypes.array,
 };
 
 export default connect(

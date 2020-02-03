@@ -27,7 +27,7 @@ class DrawChart extends Component {
 DrawChart.propTypes = {
   dataRun: PropTypes.object,
   onPeriodTimeChange: PropTypes.func,
-  selectedPeriod: PropTypes.object,
+  selectedPeriod: PropTypes.array,
 };
 
 export default DrawChart;
