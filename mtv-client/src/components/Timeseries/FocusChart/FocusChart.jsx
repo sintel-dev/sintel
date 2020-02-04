@@ -6,9 +6,11 @@ import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange, isPredictionEnabled } from '../../../model/selectors/datarun';
+import { getWrapperSize } from './FocusChartUtils';
+import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
 
-const { MIN_VALUE, MAX_VALUE, TRANSLATE_TOP, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
+const { MIN_VALUE, MAX_VALUE, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
 
 class FocusChart extends Component {
   constructor(...args) {
@@ -23,7 +25,7 @@ class FocusChart extends Component {
   }
 
   componentDidMount() {
-    const { width, height } = this.getWrapperSize();
+    const { width, height } = getWrapperSize();
     const chart = d3.select('#focusChart');
 
     this.setState(
@@ -50,16 +52,6 @@ class FocusChart extends Component {
     if (prevProps.isPredictionVisible !== this.props.isPredictionVisible) {
       this.togglePredictions();
     }
-  }
-
-  getWrapperSize() {
-    const wrapperOffsetMargin = 40;
-    const wrapperHeight = document.querySelector('#content-wrapper').clientHeight;
-    const overViewHeight = document.querySelector('#overview-wrapper').clientHeight;
-    const chartControlsHeight = document.querySelector('#chartControls').clientHeight + 20;
-    const height = wrapperHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin + chartControlsHeight);
-    const width = document.querySelector('.focus-chart').clientWidth;
-    return { width, height };
   }
 
   getScale() {
@@ -386,7 +378,7 @@ class FocusChart extends Component {
   render() {
     return (
       <div className="focus-chart">
-        <div style={{ height: '90px' }} /> {/** will be used soon */}
+        <ShowErrors isOpen datarun={this.props.datarun} />
         <EventDetails />
         <svg id="focusChart" />
       </div>
