@@ -141,7 +141,6 @@ class Event(Resource):
             else:
                 if attr in request.form:
                     d[attr] = request.form[attr]
-
         # validate data type
         try:
             for i, attr in enumerate(attrs):
