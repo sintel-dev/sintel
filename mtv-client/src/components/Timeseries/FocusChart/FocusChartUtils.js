@@ -1,9 +1,8 @@
 import * as d3 from 'd3';
 import { FocusChartConstants } from './Constants';
 
-const { CHART_MARGIN, TRANSLATE_LEFT, MAX_VALUE, MIN_VALUE } = FocusChartConstants;
+const { TRANSLATE_TOP, CHART_MARGIN, TRANSLATE_LEFT, MAX_VALUE, MIN_VALUE } = FocusChartConstants;
 
-const { TRANSLATE_TOP } = FocusChartConstants;
 export const getWrapperSize = () => {
   const wrapperOffsetMargin = 40;
   const wrapperHeight = document.querySelector('#content-wrapper').clientHeight;

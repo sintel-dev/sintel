@@ -1,6 +1,26 @@
 .show-errors{
     height: 90px;
-    .error{
+
+    .err-data{
         transform: translate(32px, 47px);
+        fill: #767E8B;
+    }
+
+    .err-bg{
+        background: #1A1B20;
+        width: 100%;
+        height: 90px;
+    }
+
+    .err-zoom{
+        fill: transparent;
+    }
+
+    svg{
+        opacity: 0;
+        transition: all .2s ease-in-out;
+        &.active{
+            opacity: 1;
+        }
     }
 }

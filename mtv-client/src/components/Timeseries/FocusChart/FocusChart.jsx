@@ -6,11 +6,11 @@ import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange, isPredictionEnabled } from '../../../model/selectors/datarun';
-import { getWrapperSize } from './FocusChartUtils';
+import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
 
-const { MIN_VALUE, MAX_VALUE, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
+const { TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
 
 class FocusChart extends Component {
   constructor(...args) {
@@ -54,32 +54,10 @@ class FocusChart extends Component {
     }
   }
 
-  getScale() {
+  drawLine(data) {
     const { width, height } = this.state;
     const { timeSeries } = this.props.datarun;
-
-    const [minTX, maxTX] = d3.extent(timeSeries, time => time[0]);
-    const [minTY, maxTY] = d3.extent(timeSeries, time => time[1]);
-    const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
-    const drawableHeight = height - 3.5 * CHART_MARGIN;
-
-    const xCoord = d3.scaleTime().range([0, drawableWidth]);
-    const yCoord = d3.scaleLinear().range([drawableHeight, 0]);
-
-    const minX = Math.min(MIN_VALUE, minTX);
-    const maxX = Math.max(MAX_VALUE, maxTX);
-
-    const minY = Math.min(MIN_VALUE, minTY);
-    const maxY = Math.max(MAX_VALUE, maxTY);
-
-    xCoord.domain([minX, maxX]);
-    yCoord.domain([minY, maxY]);
-
-    return { xCoord, yCoord };
-  }
-
-  drawLine(data) {
-    const { xCoord, yCoord } = this.getScale();
+    const { xCoord, yCoord } = getScale(width, height, timeSeries);
 
     const line = d3
       .line()
@@ -90,8 +68,9 @@ class FocusChart extends Component {
   }
 
   drawAxis() {
-    const { height } = this.state;
-    const { xCoord, yCoord } = this.getScale();
+    const { width, height } = this.state;
+    const { timeSeries } = this.props.datarun;
+    const { xCoord, yCoord } = getScale(width, height, timeSeries);
     const isChartReady = document.querySelector('.chart-axis');
     const xAxis = d3.axisBottom(xCoord);
     const yAxis = d3.axisLeft(yCoord);
@@ -176,10 +155,10 @@ class FocusChart extends Component {
   }
 
   drawEvents() {
-    const { height } = this.state;
+    const { width, height } = this.state;
     const { datarun, setCurrentEvent } = this.props;
-    const { xCoord } = this.getScale();
     const { timeSeries, eventWindows } = datarun;
+    const { xCoord } = getScale(width, height, timeSeries);
     const chartData = d3.select('g.chart-data');
     chartData.selectAll('.line-highlight').remove();
 
@@ -240,9 +219,10 @@ class FocusChart extends Component {
 
   togglePredictions() {
     const { isPredictionVisible, datarun } = this.props;
-    const waweData = d3.select('.wawe-data');
-    const { xCoord, yCoord } = this.getScale();
+    const { width, height } = this.state;
+    const { xCoord, yCoord } = getScale(width, height, datarun.timeSeries);
     const xCoordCopy = xCoord.copy();
+    const waweData = d3.select('.wawe-data');
     const line = d3
       .line()
       .x(d => xCoord(d[0]))
@@ -306,7 +286,8 @@ class FocusChart extends Component {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
       return;
     }
-    const { xCoord } = this.getScale();
+    const { width, height } = this.state;
+    const { xCoord } = getScale(width, height, this.props.datarun.timeSeries);
     let zoomValue = d3.event.transform;
     const eventRange = xCoord.range().map(zoomValue.invertX, zoomValue);
     const periodRange = {
@@ -317,11 +298,11 @@ class FocusChart extends Component {
   }
 
   updateChartOnBrush() {
-    const { chart } = this.state;
-    const { xCoord, yCoord } = this.getScale();
+    const { chart, width, height } = this.state;
     const { periodRange, datarun } = this.props;
     const { zoomValue } = periodRange;
     const { timeSeries, eventWindows, timeseriesPred } = datarun;
+    const { xCoord, yCoord } = getScale(width, height, timeSeries);
     const xCoordCopy = xCoord.copy();
     const xAxis = d3.axisBottom(xCoord);
     let events = [];
@@ -378,7 +359,7 @@ class FocusChart extends Component {
   render() {
     return (
       <div className="focus-chart">
-        <ShowErrors isOpen datarun={this.props.datarun} />
+        <ShowErrors isOpen={this.props.isPredictionVisible} />
         <EventDetails />
         <svg id="focusChart" />
       </div>
