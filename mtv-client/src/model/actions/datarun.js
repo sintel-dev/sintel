@@ -35,12 +35,11 @@ export function getEventComments() {
   };
 }
 
-export function updateEventDetailsAction(newDetails) {
+export function updateEventDetailsAction(updatedEventDetails) {
   return function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
-    const eventTag = newDetails.label.toLowerCase();
-
-    dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: { ...currentEventDetails, tag: eventTag } });
+    dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
+    // dispatch({ type: 'UPDATE_EVENT_DETAILS', eventDetails: { currentEventDetails, updatedEventDetails } });
   };
 }
 

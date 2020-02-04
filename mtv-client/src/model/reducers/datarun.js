@@ -33,6 +33,7 @@ export default createReducer(
     isEventCommentsLoading: true,
     eventComments: [],
     isPredictionEnabled: false,
+    eventDetails: {},
   },
   {
     SELECT_DATARUN,
