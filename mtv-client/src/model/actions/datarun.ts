@@ -1,9 +1,4 @@
-import {
-  SELECT_DATARUN,
-  SET_TIMESERIES_PERIOD,
-  SelectDatarunAction,
-  SetTimeseriesPeriodAction,
-} from '../types/datarun';
+import { SELECT_DATARUN, SET_TIMESERIES_PERIOD, SelectDatarunAction, SetTimeseriesPeriodAction } from '../types';
 
 export function selectDatarun(datarunID: string) {
   return function(dispatch) {
@@ -15,7 +10,7 @@ export function selectDatarun(datarunID: string) {
   };
 }
 
-export function setTimeseriesPeriod(eventRange: [number, number]) {
+export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: any }) {
   return function(dispatch) {
     const action: SetTimeseriesPeriodAction = {
       type: SET_TIMESERIES_PERIOD,

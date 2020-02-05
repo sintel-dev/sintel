@@ -1,3 +1,5 @@
+import { EventDataType } from './event';
+
 export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
 
@@ -8,7 +10,10 @@ export type SelectDatarunAction = {
 
 export type SetTimeseriesPeriodAction = {
   type: typeof SET_TIMESERIES_PERIOD;
-  eventRange: [number, number];
+  eventRange: {
+    eventRange: any;
+    zoomValue: any;
+  };
 };
 
 /**
@@ -16,11 +21,16 @@ export type SetTimeseriesPeriodAction = {
  */
 export type DatarunState = {
   selectedDatarunID: string;
-  selectedPeriodRange: [number, number];
+  // selectedPeriodRange: [number, number];
+  selectedPeriodRange: {
+    eventRange: any;
+    zoomValue: any;
+  };
 };
 
 /**
- * The data fetched from server with RESTAPI
+ * The single datarun item fetched from server with RESTAPI
+ * API: find | delete | create | update
  */
 export type DatarunDataType = {
   id: string;
@@ -29,7 +39,7 @@ export type DatarunDataType = {
   start_time?: string;
   end_time?: string;
   status?: string;
-  events?: Event[];
+  events?: EventDataType[];
   prediction?: {
     names: string[];
     data: number[][];
@@ -39,4 +49,12 @@ export type DatarunDataType = {
     timestamp: number;
     data: { means: number[]; counts: number[] }[][];
   }[];
+};
+
+/**
+ * The array of datarun items fetched from server with RESTAPI
+ * API: all
+ */
+export type DatarunsResponse = {
+  dataruns: DatarunDataType[];
 };

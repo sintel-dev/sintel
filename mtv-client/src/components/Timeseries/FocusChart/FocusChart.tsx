@@ -1,17 +1,42 @@
 import * as d3 from 'd3';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { FocusChartConstants } from './Constants';
 import { setTimeseriesPeriod } from '../../../model/actions/datarun';
 import { getDatarunDetails, getSelectedPeriodRange } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
+import { RootState } from '../../../model/types';
 
 const { MIN_VALUE, MAX_VALUE, TRANSLATE_TOP, TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
 
-class FocusChart extends Component {
-  constructor(...args) {
-    super(...args);
+const mapState = (state: RootState) => ({
+  datarun: getDatarunDetails(state),
+  periodRange: getSelectedPeriodRange(state),
+});
+
+const mapDispatch = (dispatch: Function) => ({
+  setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
+});
+
+type StateProps = ReturnType<typeof mapState>;
+type DispatchProps = ReturnType<typeof mapDispatch>;
+type Props = StateProps & DispatchProps;
+
+type State = {
+  width?: number;
+  height?: number;
+  chart?: any;
+};
+
+class FocusChart extends Component<Props, State> {
+  private zoom: any;
+
+  private resetZoom: any;
+
+  // TO be checked
+  // previously use ...args here
+  constructor(props) {
+    super(props);
 
     this.state = {
       width: 0,
@@ -257,10 +282,11 @@ class FocusChart extends Component {
     this.props.setPeriodRange(periodRange);
   }
 
-  updateChartOnBrush() {
-    const { chart } = this.state;
-    const { xCoord, yCoord } = this.getScale();
-    const { periodRange, datarun } = this.props;
+  public updateChartOnBrush() {
+    let self = this;
+    const { chart } = self.state;
+    const { xCoord, yCoord } = self.getScale();
+    const { periodRange, datarun } = self.props;
     const { zoomValue } = periodRange;
     const { timeSeries, eventWindows } = datarun;
     const xCoordCopy = xCoord.copy();
@@ -271,7 +297,7 @@ class FocusChart extends Component {
       .x(d => xCoord(d[0]))
       .y(d => yCoord(d[1]));
 
-    d3.select('.zoom').call(this.zoom.transform, zoomValue);
+    d3.select('.zoom').call(self.zoom.transform, zoomValue);
     xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
 
     d3.select('.axis.axis--x').call(xAxis);
@@ -301,18 +327,4 @@ class FocusChart extends Component {
   }
 }
 
-FocusChart.propTypes = {
-  datarun: PropTypes.object,
-  setPeriodRange: PropTypes.func,
-  periodRange: PropTypes.array,
-};
-
-export default connect(
-  state => ({
-    datarun: getDatarunDetails(state),
-    periodRange: getSelectedPeriodRange(state),
-  }),
-  dispatch => ({
-    setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
-  }),
-)(FocusChart);
+export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);

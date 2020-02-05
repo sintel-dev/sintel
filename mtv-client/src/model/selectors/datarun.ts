@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { RootState, DatarunDataType } from '../types/index';
+import { RootState, DatarunDataType } from '../types';
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;

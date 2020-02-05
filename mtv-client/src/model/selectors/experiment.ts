@@ -1,17 +1,26 @@
 import { createSelector } from 'reselect';
+import { RootState, EventDataType } from '../types';
 
-export const getSelectedExperimentData = state => state.selectedExperimentData;
+export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
 
-const groupDataBy = (prediction, option) =>
-  prediction.data.map(predData => [Math.trunc(predData[0]) * 1000, predData[prediction.names.indexOf(option)]]);
+const groupDataBy = (
+  prediction: {
+    names: string[];
+    data: number[][];
+  },
+  option: string,
+) => prediction.data.map(predData => [Math.trunc(predData[0]) * 1000, predData[prediction.names.indexOf(option)]]);
 
-const groupByEventWindows = (events, timestamps) =>
-  events.map(event => [
-    timestamps.indexOf(Math.trunc(event.start_time) * 1000),
-    timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
-    event.score,
-    event.tag,
-  ]);
+const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
+  events.map(
+    event =>
+      [
+        timestamps.indexOf(Math.trunc(event.start_time) * 1000),
+        timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
+        event.score,
+        event.tag,
+      ] as [number, number, number, string],
+  );
 
 export const getProcessedDataRuns = createSelector([getSelectedExperimentData], experimentData => {
   if (experimentData.isExperimentDataLoading) {
