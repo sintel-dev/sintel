@@ -1,9 +1,12 @@
-import { SelectDatarunAction, SetTimeseriesPeriodAction, DatarunState } from '../types/datarun';
+import { SelectDatarunAction, SetTimeseriesPeriodAction, DatarunState } from '../types';
 import createReducer from '../store/createReducer';
 
 const initialState: DatarunState = {
   selectedDatarunID: '',
-  selectedPeriodRange: [0, 0],
+  selectedPeriodRange: {
+    zoomValue: 1,
+    eventRange: [0, 0],
+  },
 };
 
 /**

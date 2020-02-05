@@ -1,14 +1,17 @@
 import React from 'react';
 import './header.scss';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { getSelectedExperiment } from '../../model/selectors/projects';
+import { RootState } from '../../model/types';
 
-export interface HeaderProps {
-  isExperimentSelected?: null | string;
-}
+const mapState = (state: RootState) => ({
+  isExperimentSelected: getSelectedExperiment(state),
+});
 
-const Header: React.FC<HeaderProps> = props => {
+type StateProps = ReturnType<typeof mapState>;
+type Props = StateProps;
+
+const Header: React.FC<Props> = props => {
   const isSwitchActive = props.isExperimentSelected ? 'active' : '';
   return (
     <header id="header" className="main-header">
@@ -22,10 +25,4 @@ const Header: React.FC<HeaderProps> = props => {
   );
 };
 
-Header.propTypes = {
-  isExperimentSelected: PropTypes.string,
-};
-
-export default connect(state => ({
-  isExperimentSelected: getSelectedExperiment(state),
-}))(Header);
+export default connect<StateProps, {}, {}, RootState>(mapState)(Header);

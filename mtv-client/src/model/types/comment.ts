@@ -8,3 +8,7 @@ export type CommentDataType = {
   insert_time: string;
   event?: string;
 };
+
+export type CommentsResponse = {
+  comments: CommentDataType[];
+};

@@ -1,14 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import './Overview.scss';
 import FocusChart from '../FocusChart';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Datarun from './Datarun';
+import { RootState } from '../../../model/types';
 
-function Experiment({ experimentData, processedDataruns }) {
+const mapState = (state: RootState) => ({
+  experimentData: getSelectedExperimentData(state),
+  processedDataruns: getProcessedDataRuns(state),
+});
+
+type StateProps = ReturnType<typeof mapState>;
+type Props = StateProps;
+
+const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => {
   return (
     <div>
       <Loader isLoading={experimentData.isExperimentDataLoading}>
@@ -23,17 +31,6 @@ function Experiment({ experimentData, processedDataruns }) {
       </Loader>
     </div>
   );
-}
-
-Experiment.propTypes = {
-  experimentData: PropTypes.object,
-  processedDataruns: PropTypes.array,
 };
 
-export default connect(
-  state => ({
-    experimentData: getSelectedExperimentData(state),
-    processedDataruns: getProcessedDataRuns(state),
-  }),
-  null,
-)(Experiment);
+export default connect<StateProps, {}, {}, RootState>(mapState)(Experiment);

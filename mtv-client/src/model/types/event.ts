@@ -1,3 +1,5 @@
+import { CommentDataType } from './comment';
+
 /**
  * The data fetched from server with RESTAPI
  */
@@ -9,5 +11,9 @@ export type EventDataType = {
   stop_time: number;
   insert_time?: string;
   datarun?: string;
-  comments?: Comment[];
+  comments?: CommentDataType[];
+};
+
+export type EventsResponse = {
+  events: EventDataType[];
 };

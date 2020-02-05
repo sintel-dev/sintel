@@ -1,14 +1,32 @@
 import { DatarunDataType } from './datarun';
 
-export const GET_EXPERIMENTDATA = 'GET_EXPERIMENTDATA';
+export const FETCH_EXPERIMENTS = 'FETCH_EXPERIMENTS';
+export const SELECT_EXPERIMENT = 'SELECT_EXPERIMENT';
 
-export type FetchExperimentAction = {
-  type: typeof GET_EXPERIMENTDATA;
-  promise: Promise<ExperimentDataType>;
+export type FetchExperimentsAction = {
+  type: typeof FETCH_EXPERIMENTS;
+  promise: Promise<ExperimentsResponse>;
+  result?: ExperimentsResponse; // only exist when promise gets resolved
+  error?: string; // only exist when promise gets rejected
+};
+
+export type SelectExperimentAction = {
+  type: typeof SELECT_EXPERIMENT;
+  selectedExperimentID: string;
 };
 
 /**
- * The data fetched from server with RESTAPI
+ * Experiment State format
+ */
+export type ExperimentState = {
+  isExperimentsLoading: boolean;
+  experimentsList: ExperimentDataType[];
+  selectedExperimentID: string;
+};
+
+/**
+ * The single experiment item fetched from server with RESTAPI
+ * API: find | delete | create | update
  */
 export type ExperimentDataType = {
   id: string;
@@ -18,4 +36,12 @@ export type ExperimentDataType = {
   created_by: string;
   pipeline: string;
   dataruns: DatarunDataType[];
+};
+
+/**
+ * The array of experiment items fetched from server with RESTAPI
+ * API: all
+ */
+export type ExperimentsResponse = {
+  experiments: ExperimentDataType[];
 };
