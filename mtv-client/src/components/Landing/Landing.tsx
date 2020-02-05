@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { fetchProjects } from '../../model/actions/landing';
 import Experiment from '../Timeseries/Overview/Experiment';
 
@@ -9,10 +8,15 @@ import Pipelines from './Pipelines';
 import Experiments from './Experiments';
 
 import { getSelectedExperiment } from '../../model/selectors/projects';
+import { RootState } from '../../model/types';
 
 import './Landing.scss';
 
-class Landing extends Component {
+type StateProps = ReturnType<typeof mapState>;
+type DispatchProps = ReturnType<typeof mapDispatch>;
+type Props = StateProps & DispatchProps;
+
+class Landing extends React.Component<Props> {
   componentDidMount() {
     this.props.fetchProjectsList();
   }
@@ -38,16 +42,12 @@ class Landing extends Component {
   }
 }
 
-Landing.propTypes = {
-  fetchProjectsList: PropTypes.func,
-  isExperimentSelected: PropTypes.string,
-};
+const mapState = (state: RootState) => ({
+  isExperimentSelected: getSelectedExperiment(state),
+});
 
-export default connect(
-  state => ({
-    isExperimentSelected: getSelectedExperiment(state),
-  }),
-  dispatch => ({
-    fetchProjectsList: () => dispatch(fetchProjects()),
-  }),
-)(Landing);
+const mapDispatch = (dispatch: Function) => ({
+  fetchProjectsList: () => dispatch(fetchProjects()),
+});
+
+export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Landing);

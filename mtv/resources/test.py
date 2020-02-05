@@ -13,7 +13,7 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
-        return {'message': 'get'}, 201, {'username': 'dyu'}
+        return {'message': 'get'}, 200, {'username': 'dyu'}
 
     def post(self):
         """

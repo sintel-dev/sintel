@@ -7,7 +7,7 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    .page-wrapper{
+    .page-wrapper {
         left: 0;
         top: 0;
         width: 100%;
@@ -29,7 +29,8 @@
         }
     }
 
-    .projects-wrapper, .experiments-wrapper {
+    .projects-wrapper,
+    .experiments-wrapper {
         position: absolute;
         left: 0;
         top: 0;
@@ -37,10 +38,10 @@
         height: 100%;
     }
 
-    .experiments-wrapper{
+    .experiments-wrapper {
         opacity: 0;
         padding: 0 25px;
-        &.active{
+        &.active {
             opacity: 1;
         }
     }
@@ -54,7 +55,6 @@
         transform: translate3d(0, 0, 0);
     }
 }
-
 
 .item-row {
     margin: 0 50px;

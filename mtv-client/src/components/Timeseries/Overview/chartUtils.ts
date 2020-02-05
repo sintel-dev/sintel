@@ -64,7 +64,8 @@ export function drawBrush(element, width, onPeriodTimeChange) {
 }
 
 const getRatio = eventRange => {
-  focusChartWidth = parseInt(document.querySelector('.focus').attributes.width.value, 10);
+  let node: any = document.querySelector('.focus');
+  focusChartWidth = parseInt(node.attributes.width.value, 10);
   ratio = chartWidth / focusChartWidth;
   const start = eventRange[0] * ratio;
   const end = eventRange[1] * ratio;

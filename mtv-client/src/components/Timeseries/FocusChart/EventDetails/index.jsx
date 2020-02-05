@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {
   setCurrentEventAction,
   updateEventDetailsAction,
-  saveEventDetailsAction,
+  // saveEventDetailsAction,
 } from '../../../../model/actions/datarun';
 import { getCurrentEventDetails } from '../../../../model/selectors/datarun';
 import Loader from '../../../Common/Loader';
@@ -56,7 +56,7 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
             <div className="comment-area">
               <div className="comment-wrapper scroll-style">
                 <Loader isLoading={eventDetails.isCommentsLoading}>
-                  <RenderComments comments={eventDetails.eventComments} />
+                  <RenderComments comments={eventDetails.eventComments.comments} />
                 </Loader>
               </div>
               <textarea
@@ -74,9 +74,7 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
                 </button>
               </li>
               <li>
-                <button type="button" onClick={saveEventDetails}>
-                  Save
-                </button>
+                <button type="button">Save</button>
               </li>
             </ul>
           </div>
@@ -100,6 +98,6 @@ export default connect(
   dispatch => ({
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
-    saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    // saveEventDetails: () => dispatch(saveEventDetailsAction()),
   }),
 )(EventDetails);

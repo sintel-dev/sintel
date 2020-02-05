@@ -1,9 +1,11 @@
 import React from 'react';
 import './Loader.scss';
 
-const Loader = props => {
-  const { isLoading } = props;
+type Props = {
+  isLoading: boolean;
+};
 
+const Loader: React.FC<Props> = ({ isLoading, children }) => {
   const loadingOverlay = () => (
     <div className="loading">
       <div className="loader-overlay">
@@ -12,7 +14,7 @@ const Loader = props => {
     </div>
   );
 
-  return isLoading ? loadingOverlay() : props.children;
+  return isLoading ? loadingOverlay() : (children as JSX.Element);
 };
 
 export default Loader;

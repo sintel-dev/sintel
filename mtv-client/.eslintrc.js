@@ -51,7 +51,7 @@ module.exports = {
     'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx', '.tsx'] }],
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-wrap-multilines': 'off',
-    'react/prop-types': 'warn',
+    'react/prop-types': 'off',
     'react/forbid-prop-types': ['warn', { forbid: ['any'] }],
     'react/require-default-props': 'off',
     'react-hooks/rules-of-hooks': 'error',
@@ -91,7 +91,9 @@ module.exports = {
     'arrow-body-style': 'warn',
     'max-len': 'off',
     'class-methods-use-this': 'off',
-    camelcase: 'warn',
+    camelcase: 'off',
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-this-alias': 'off',
     'react/sort-comp': [
       1,
       {
