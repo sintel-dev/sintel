@@ -10,20 +10,17 @@ import {
 import { selectExperiment } from '../../model/actions/landing';
 import { RootState, ExperimentDataType } from '../../model/types';
 
-const mapState = (state: RootState) => ({
-  filteredExperiments: getFilteredExperiments(state),
-  isExperimentsLoading: getIsExperimentsLoading(state),
-  selectedPipeline: getSelectedPipeline(state),
-  selectedExperiment: getSelectedExperiment(state),
-});
-
-const mapDispatch = (dispatch: Function) => ({
-  onSelectExperiment: (experiment: string) => dispatch(selectExperiment(experiment)),
-});
-
+let props: Props;
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
+type renderExperimentProps = {
+  experiment: ExperimentDataType;
+  index: number;
+  selectedPipeline: typeof props.selectedExperiment;
+  selectedExperiment: typeof props.selectedExperiment;
+  onSelectExperiment: typeof props.onSelectExperiment;
+};
 
 const Experiments: React.FC<Props> = ({
   isExperimentsLoading,
@@ -48,15 +45,6 @@ const Experiments: React.FC<Props> = ({
   </div>
 );
 
-let props: Props;
-type renderExperimentProps = {
-  experiment: ExperimentDataType;
-  index: number;
-  selectedPipeline: typeof props.selectedExperiment;
-  selectedExperiment: typeof props.selectedExperiment;
-  onSelectExperiment: typeof props.onSelectExperiment;
-};
-
 const renderExperiment: React.FC<renderExperimentProps> = ({
   experiment,
   index,
@@ -79,5 +67,16 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
     </div>
   );
 };
+
+const mapState = (state: RootState) => ({
+  filteredExperiments: getFilteredExperiments(state),
+  isExperimentsLoading: getIsExperimentsLoading(state),
+  selectedPipeline: getSelectedPipeline(state),
+  selectedExperiment: getSelectedExperiment(state),
+});
+
+const mapDispatch = (dispatch: Function) => ({
+  onSelectExperiment: (experiment: string) => dispatch(selectExperiment(experiment)),
+});
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiments);

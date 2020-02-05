@@ -1,27 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Loader from '../Common/Loader';
 import { getPipelinesData, getSelectedPipeline } from '../../model/selectors/projects';
 import { selectPipeline } from '../../model/actions/landing';
 import { RootState, PipelineDataType } from '../../model/types';
 
-const mapState = (state: RootState) => ({
-  pipelinesData: getPipelinesData(state),
-  selectedPipeline: getSelectedPipeline(state),
-});
-
-const mapDispatch = (dispatch: Function) => ({
-  onSelectPipeline: pipelineName => dispatch(selectPipeline(pipelineName)),
-});
-
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
 
 const Pipelines: React.FC<Props> = props => {
-  const { pipelineList, isPipelinesLoading } = props.pipelinesData;
-  const { onSelectPipeline, selectedPipeline } = props;
+  const { onSelectPipeline, selectedPipeline, pipelinesData } = props;
+  const { pipelineList, isPipelinesLoading } = pipelinesData;
 
   return (
     <div className="item-row scroll-style" id="pipelines">
@@ -64,5 +54,14 @@ const renderPipeline: React.FC<renderPipelineProps> = ({ pipeline, index, onSele
     </div>
   );
 };
+
+const mapState = (state: RootState) => ({
+  pipelinesData: getPipelinesData(state),
+  selectedPipeline: getSelectedPipeline(state),
+});
+
+const mapDispatch = (dispatch: Function) => ({
+  onSelectPipeline: pipelineName => dispatch(selectPipeline(pipelineName)),
+});
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Pipelines);

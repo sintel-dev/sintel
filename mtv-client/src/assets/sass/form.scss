@@ -1,0 +1,54 @@
+@import './colors.scss';
+.switch-control {
+    label{
+        cursor: pointer;
+    }
+
+    div{
+        display: inline-block;
+        margin-right: 25px;
+        &:last-child{
+            margin-right: 0;
+        }
+
+        input[type="checkbox"]{
+            display: none;
+        }
+
+        input[type="checkbox"]:checked + .switch {
+            background: $green-color;
+
+            &:before{
+                -webkit-transform: translateX(30px);
+                -ms-transform: translateX(30px);
+                transform: translateX(30px);
+            }
+        }
+
+        .switch {
+            position: relative;
+            padding-left: 50px;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            background: #000;
+            border-radius: 15px;
+            margin-right: 13px;
+            transition: all .4s ease-in-out;
+            vertical-align: middle;
+
+            &:before{
+                content: '';
+                position: absolute;
+                box-shadow: 0 2px 4px 0 rgba(0,0,0,0.5);
+                left:0;
+                top: 0;
+                width: 20px;
+                height: 20px;
+                border-radius: 100%;
+                background: #fff;
+                transition: all .4s ease-in-out;
+            }
+        }
+    }
+}

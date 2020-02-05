@@ -12,11 +12,10 @@ type Props = {
 
 class DrawChart extends Component<Props> {
   componentDidMount() {
-    const { dataRun, onPeriodTimeChange, selectedPeriod } = this.props;
+    const { dataRun, onPeriodTimeChange } = this.props;
     const width = document.querySelector('.time-row').clientWidth;
     const height = 36;
     drawChart(width, height, dataRun, onPeriodTimeChange);
-    // drawChart(width, height, dataRun, onPeriodTimeChange, selectedPeriod);
   }
 
   componentDidUpdate(prevProps) {

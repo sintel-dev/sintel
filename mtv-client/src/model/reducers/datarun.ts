@@ -7,6 +7,11 @@ const initialState: DatarunState = {
     zoomValue: 1,
     eventRange: [0, 0],
   },
+  eventIndex: null,
+  isEventCommentsLoading: true,
+  eventComments: [],
+  isPredictionEnabled: false,
+  eventDetails: {},
 };
 
 /**
@@ -23,7 +28,28 @@ function SET_TIMESERIES_PERIOD(nextState: DatarunState, action: SetTimeseriesPer
   nextState.selectedPeriodRange = action.eventRange;
 }
 
+function SET_CURRENT_EVENT(nextState, { eventIndex }) {
+  nextState.eventIndex = eventIndex;
+}
+
+function UPDATE_EVENT_DETAILS(nextState, { eventDetails }) {
+  nextState.eventDetails = eventDetails;
+}
+
+function GET_EVENT_COMMENTS_SUCCESS(nextState, { eventComments }) {
+  nextState.eventComments = eventComments;
+  nextState.isEventCommentsLoading = false;
+}
+
+function TOGGLE_PREDICTION_MODE(nextState, { isPredictionEnabled }) {
+  nextState.isPredictionEnabled = isPredictionEnabled;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
+  SET_CURRENT_EVENT,
+  UPDATE_EVENT_DETAILS,
+  TOGGLE_PREDICTION_MODE,
+  GET_EVENT_COMMENTS_SUCCESS,
 });

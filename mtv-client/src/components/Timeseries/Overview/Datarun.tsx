@@ -10,16 +10,6 @@ type OwnProps = {
   datarun: DatarunDataType;
 };
 
-const mapState = (state: RootState, ownProps: OwnProps) => ({
-  selectedDatarunID: getSelectedDatarunID(state),
-  selectedPeriodRange: getSelectedPeriodRange(state),
-});
-
-const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
-  onSelectDatarun: (datarunID: string) => dispatch(selectDatarun(datarunID)),
-  onChangePeriod: (period: { eventRange: any; zoomValue: any }) => dispatch(setTimeseriesPeriod(period)),
-});
-
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 export type Props = StateProps & DispatchProps & OwnProps;
@@ -48,5 +38,15 @@ const Datarun: React.FC<Props> = ({
     </div>
   );
 };
+
+const mapState = (state: RootState, ownProps: OwnProps) => ({
+  selectedDatarunID: getSelectedDatarunID(state),
+  selectedPeriodRange: getSelectedPeriodRange(state),
+});
+
+const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
+  onSelectDatarun: (datarunID: string) => dispatch(selectDatarun(datarunID)),
+  onChangePeriod: (period: { eventRange: any; zoomValue: any }) => dispatch(setTimeseriesPeriod(period)),
+});
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapState, mapDispatch)(Datarun);

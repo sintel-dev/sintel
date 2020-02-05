@@ -12,14 +12,6 @@ import { RootState } from '../../model/types';
 
 import './Landing.scss';
 
-const mapState = (state: RootState) => ({
-  isExperimentSelected: getSelectedExperiment(state),
-});
-
-const mapDispatch = (dispatch: Function) => ({
-  fetchProjectsList: () => dispatch(fetchProjects()),
-});
-
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
@@ -49,5 +41,13 @@ class Landing extends React.Component<Props> {
     );
   }
 }
+
+const mapState = (state: RootState) => ({
+  isExperimentSelected: getSelectedExperiment(state),
+});
+
+const mapDispatch = (dispatch: Function) => ({
+  fetchProjectsList: () => dispatch(fetchProjects()),
+});
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Landing);

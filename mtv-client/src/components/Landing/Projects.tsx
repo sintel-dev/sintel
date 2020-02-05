@@ -1,20 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Loader from '../Common/Loader';
 import { getProjectsList, getIsProjectsLoading, getSelectedProjectName } from '../../model/selectors/projects';
 import { selectProject } from '../../model/actions/landing';
 import { RootState } from '../../model/types';
-
-const mapState = (state: RootState) => ({
-  projects: getProjectsList(state),
-  isProjectsLoading: getIsProjectsLoading(state),
-  selectedProjectName: getSelectedProjectName(state),
-});
-
-const mapDispatch = (dispatch: Function) => ({
-  onSelectProject: (projectName: string) => dispatch(selectProject(projectName)),
-});
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -60,5 +49,15 @@ const renderProject: React.FC<renderProjectProps> = ({ project, index, onSelectP
     </div>
   );
 };
+
+const mapState = (state: RootState) => ({
+  projects: getProjectsList(state),
+  isProjectsLoading: getIsProjectsLoading(state),
+  selectedProjectName: getSelectedProjectName(state),
+});
+
+const mapDispatch = (dispatch: Function) => ({
+  onSelectProject: (projectName: string) => dispatch(selectProject(projectName)),
+});
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Projects);

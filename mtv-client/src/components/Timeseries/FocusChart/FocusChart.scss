@@ -3,6 +3,7 @@
     background: $main-color;
     border-radius: 10px;
     overflow: hidden;
+    position: relative;
 
     .chart-data path,
     .line-highlight,
@@ -28,10 +29,23 @@
             &.evt-highlight {
                 stroke: $yellow-color;
             }
+            &.predictions{
+                stroke: #b9782d;
+                fill: none;
+            }
         }
     }
 
     .zoom {
         cursor: move;
+    }
+
+    .event-comment{
+        cursor: pointer;
+        .evt-area{
+            fill: #777;
+            stroke-width: 0;
+            fill-opacity: 0.5;
+        }
     }
 }

@@ -2,6 +2,9 @@ import { EventDataType } from './event';
 
 export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
+export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
+export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
+export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -26,6 +29,11 @@ export type DatarunState = {
     eventRange: any;
     zoomValue: any;
   };
+  eventIndex: string | null;
+  isEventCommentsLoading: boolean;
+  eventComments: Array<any>;
+  isPredictionEnabled: boolean;
+  eventDetails: object;
 };
 
 /**

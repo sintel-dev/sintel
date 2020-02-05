@@ -1,8 +1,8 @@
 @import '../../assets/sass/colors.scss';
 @import '../../assets/sass/animations.scss';
 
-.page-landing {
-    margin-top: 100px;
+.page-landing{
+    margin-top: 65px;
     position: relative;
     overflow-x: hidden;
     overflow-y: auto;
@@ -11,7 +11,7 @@
         left: 0;
         top: 0;
         width: 100%;
-        height: calc(100vh - 110px);
+        height: calc(100vh - 70px);
     }
 
     .projects-wrapper {

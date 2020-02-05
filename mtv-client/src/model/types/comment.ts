@@ -1,3 +1,4 @@
+export const GET_EVENT_COMMENTS_SUCCESS = 'GET_EVENT_COMMENTS_SUCCESS';
 /**
  * The data fetched from server with RESTAPI
  */

@@ -18,8 +18,9 @@ const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
         timestamps.indexOf(Math.trunc(event.start_time) * 1000),
         timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
         event.score,
+        event.id,
         event.tag,
-      ] as [number, number, number, string],
+      ] as [number, number, number, string, string],
   );
 
 export const getProcessedDataRuns = createSelector([getSelectedExperimentData], experimentData => {

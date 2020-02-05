@@ -8,3 +8,13 @@ export const FocusChartConstants = {
   DRAW_EVENTS_TIMEOUT: 400,
   CHART_MARGIN: 10,
 };
+
+export const colorSchemes = {
+  investigate: '#FFCD00',
+  'do not investigate': '#7CA8FF',
+  postpone: '#A042FF',
+  problem: '#F64242',
+  'previously seen': '#F5FF00',
+  normal: '#45F642',
+  untagged: '#C7C7C7',
+};
