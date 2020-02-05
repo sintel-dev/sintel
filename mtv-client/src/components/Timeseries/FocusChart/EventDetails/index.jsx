@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {
   setCurrentEventAction,
   updateEventDetailsAction,
-  // saveEventDetailsAction,
+  saveEventDetailsAction,
 } from '../../../../model/actions/datarun';
 import { getCurrentEventDetails } from '../../../../model/selectors/datarun';
 import Loader from '../../../Common/Loader';
@@ -62,7 +62,7 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
               <textarea
                 id="comment"
                 placeholder="Enter your comment..."
-                onChange={event => updateEventDetails({ comment: event.target.value })}
+                onChange={event => updateEventDetails({ comments: event.target.value })}
               />
             </div>
           </div>
@@ -74,7 +74,9 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
                 </button>
               </li>
               <li>
-                <button type="button">Save</button>
+                <button type="button" onClick={saveEventDetails}>
+                  Save
+                </button>
               </li>
             </ul>
           </div>
@@ -98,6 +100,6 @@ export default connect(
   dispatch => ({
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
-    // saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    saveEventDetails: () => dispatch(saveEventDetailsAction()),
   }),
 )(EventDetails);

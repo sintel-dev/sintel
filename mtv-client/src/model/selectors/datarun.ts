@@ -6,18 +6,17 @@ import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 const getEventIndex = state => state.datarun.eventIndex;
 const getEventComments = state => state.datarun.eventComments;
 const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
-const getUpdatedEventsDetails = state => state.datarun.eventDetails;
 
+export const getUpdatedEventsDetails = state => state.datarun.eventDetails;
 export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
+export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
   (selectedExperimentData, selectedDatarunID): string =>
     selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
-
-export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
 
 export const getDatarunDetails = createSelector(
   [getSelectedDatarunID, getProcessedDataRuns],

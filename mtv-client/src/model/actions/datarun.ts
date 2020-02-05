@@ -1,4 +1,4 @@
-import { getCurrentEventDetails } from '../selectors/datarun';
+import { getCurrentEventDetails, getUpdatedEventsDetails } from '../selectors/datarun';
 import API from '../utils/api';
 import {
   SELECT_DATARUN,
@@ -50,6 +50,12 @@ export function getEventComments() {
   };
 }
 
+export function togglePredictionsAction(event) {
+  return function(dispatch) {
+    dispatch({ type: TOGGLE_PREDICTION_MODE, isPredictionEnabled: event });
+  };
+}
+
 export function updateEventDetailsAction(updatedEventDetails) {
   return function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
@@ -57,8 +63,20 @@ export function updateEventDetailsAction(updatedEventDetails) {
   };
 }
 
-export function togglePredictionsAction(event) {
-  return function(dispatch) {
-    dispatch({ type: TOGGLE_PREDICTION_MODE, isPredictionEnabled: event });
+export function saveEventDetailsAction() {
+  return function(dispatch, getState) {
+    const currentEventDetails = getCurrentEventDetails(getState());
+    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const { comments } = updatedEventDetails;
+
+    if (comments) {
+      const commentData = {
+        event: currentEventDetails.id,
+        text: comments,
+        created_by: null,
+      };
+    }
+
+    // @TODO - close the popup on save success
   };
 }
