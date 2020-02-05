@@ -375,7 +375,7 @@ class FocusChart extends Component<Props, State> {
 
   render() {
     return (
-      <div className="focus-chart">
+      <div className="focus-chart" id="focusChartWrapper">
         <ShowErrors isOpen={this.props.isPredictionVisible} />
         <EventDetails />
         <svg id="focusChart" />

@@ -1,4 +1,7 @@
 import * as d3 from 'd3';
+import { FocusChartConstants } from '../FocusChart/Constants';
+
+const { TRANSLATE_LEFT, CHART_MARGIN } = FocusChartConstants;
 
 let brush = null;
 let brushContext = null;
@@ -13,7 +16,7 @@ const offset = {
 let focusChartWidth = 0;
 let ratio = 0;
 
-function getScale(width, height, dataRun) {
+const getScale = (width, height, dataRun) => {
   let minValue = Number.MAX_SAFE_INTEGER;
   let maxValue = Number.MIN_SAFE_INTEGER;
   const { timeSeries } = dataRun;
@@ -29,7 +32,20 @@ function getScale(width, height, dataRun) {
   yCoord.domain([-1, 1]);
 
   return { xCoord, yCoord };
-}
+};
+
+const drawRange = eventRange => {
+  const chartStart = eventRange[0] * ratio;
+  const chartEnd = eventRange[1] * ratio;
+
+  return { chartStart, chartEnd };
+};
+
+const setRatio = width => {
+  chartWidth = width - offset.infoWidth - 2 * offset.left;
+  focusChartWidth = document.querySelector('#focusChartWrapper').clientWidth - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+  ratio = chartWidth / focusChartWidth;
+};
 
 export function drawBrush(element, width, onPeriodTimeChange) {
   const brushHeight = 43;
@@ -63,16 +79,6 @@ export function drawBrush(element, width, onPeriodTimeChange) {
   });
 }
 
-const getRatio = eventRange => {
-  let node: any = document.querySelector('.focus');
-  focusChartWidth = parseInt(node.attributes.width.value, 10);
-  ratio = chartWidth / focusChartWidth;
-  const start = eventRange[0] * ratio;
-  const end = eventRange[1] * ratio;
-
-  return { start, end };
-};
-
 export function updateBrushPeriod(event) {
   let currentBrush = d3.select('.time-row.active g.brush');
 
@@ -84,9 +90,9 @@ export function updateBrushPeriod(event) {
 
   currentBrush.attr('active', true);
   selection.attr('simulate', true);
-  const { start, end } = getRatio(event.eventRange);
+  const { chartStart, chartEnd } = drawRange(event.eventRange);
 
-  selection.call(brush.move, [start, end]).on('end', () => {
+  selection.call(brush.move, [chartStart, chartEnd]).on('end', () => {
     selection.attr('simulate', null);
     currentBrush.attr('active', null);
   });
@@ -96,7 +102,7 @@ export function updateBrushPeriod(event) {
 }
 
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
-  chartWidth = width - offset.infoWidth - 2 * offset.left;
+  setRatio(width);
   const { timeSeries, eventWindows } = dataRun;
   const { xCoord, yCoord } = getScale(chartWidth, height, dataRun);
   const line = d3
@@ -124,5 +130,6 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
       .attr('transform', `translate(${offset.left}, ${offset.top})`)
       .attr('d', line(event));
   });
+
   drawBrush(svg, chartWidth, onPeriodTimeChange);
 }
