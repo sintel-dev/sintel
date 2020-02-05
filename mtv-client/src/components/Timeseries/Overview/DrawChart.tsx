@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { drawChart, updateBrushPeriod } from './chartUtils';
+import { Props as DatarunProps } from './Datarun';
 
-class DrawChart extends Component {
+let props: DatarunProps;
+type Props = {
+  dataRun: typeof props.datarun;
+  onPeriodTimeChange: typeof props.onChangePeriod;
+  selectedPeriod: typeof props.selectedPeriodRange;
+  selectedDatarunID: typeof props.selectedDatarunID;
+};
+
+class DrawChart extends Component<Props> {
   componentDidMount() {
-    const { dataRun, onPeriodTimeChange, selectedPeriod } = this.props;
+    const { dataRun, onPeriodTimeChange } = this.props;
     const width = document.querySelector('.time-row').clientWidth;
     const height = 36;
-    drawChart(width, height, dataRun, onPeriodTimeChange, selectedPeriod);
+    drawChart(width, height, dataRun, onPeriodTimeChange);
   }
 
   componentDidUpdate(prevProps) {
@@ -23,11 +31,5 @@ class DrawChart extends Component {
     return <div className={`_${this.props.dataRun.id}`} />; // @TODO - find a better way to target this element
   }
 }
-
-DrawChart.propTypes = {
-  dataRun: PropTypes.object,
-  onPeriodTimeChange: PropTypes.func,
-  selectedPeriod: PropTypes.object,
-};
 
 export default DrawChart;

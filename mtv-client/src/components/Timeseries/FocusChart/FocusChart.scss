@@ -1,5 +1,5 @@
 @import '../../../assets/sass/colors.scss';
-.focus-chart{
+.focus-chart {
     background: $main-color;
     border-radius: 10px;
     overflow: hidden;
@@ -7,25 +7,26 @@
 
     .chart-data path,
     .line-highlight,
-    .zoom{
+    .zoom {
         fill: transparent;
     }
 
-    .axis{
+    .axis {
         font-size: 14px;
-        .domain{
+        .domain {
             stroke: $gray-text-color;
         }
-        line, text{
+        line,
+        text {
             fill: $gray-text-color;
         }
     }
 
-    .chart-data{
-        path{
+    .chart-data {
+        path {
             stroke-width: 1;
             stroke: $blue-color;
-            &.evt-highlight{
+            &.evt-highlight {
                 stroke: $yellow-color;
             }
             &.predictions{
@@ -35,7 +36,7 @@
         }
     }
 
-    .zoom{
+    .zoom {
         cursor: move;
     }
 

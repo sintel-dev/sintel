@@ -14,7 +14,7 @@ const FocusChartControls = props => (
             type="checkbox"
             id="showPredictions"
             checked={props.isPredictionEnabled}
-            onChange={(content, event) => props.togglePredictions(content, event)}
+            onChange={event => props.togglePredictions(event.target.checked)}
           />
           <span className="switch" />
           Show Predictions
@@ -41,6 +41,6 @@ export default connect(
     isPredictionEnabled: isPredictionEnabled(state),
   }),
   dispatch => ({
-    togglePredictions: (content, event) => dispatch(togglePredictionsAction(content, event)),
+    togglePredictions: event => dispatch(togglePredictionsAction(event)),
   }),
 )(FocusChartControls);

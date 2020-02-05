@@ -2,13 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
-import { setCurrentEventAction, updateEventDetailsAction } from '../../../../model/actions/datarun';
+import {
+  setCurrentEventAction,
+  updateEventDetailsAction,
+  // saveEventDetailsAction,
+} from '../../../../model/actions/datarun';
 import { getCurrentEventDetails } from '../../../../model/selectors/datarun';
 import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
 
-const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails }) => {
+const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, saveEventDetails }) => {
   const isActive = eventDetails ? 'active' : '';
   return (
     <div className={`events-wrapper ${isActive}`}>
@@ -38,7 +42,7 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails }) =
           </div>
           <div className="row select-holder">
             <Select
-              onChange={updateEventDetails}
+              onChange={tag => updateEventDetails({ tag: tag.label })}
               formatOptionLabel={formatOptionLabel}
               options={grouppedOptions}
               className="tag-select"
@@ -52,10 +56,14 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails }) =
             <div className="comment-area">
               <div className="comment-wrapper scroll-style">
                 <Loader isLoading={eventDetails.isCommentsLoading}>
-                  <RenderComments comments={eventDetails.eventComments} />
+                  <RenderComments comments={eventDetails.eventComments.comments} />
                 </Loader>
               </div>
-              <textarea id="comment" placeholder="Enter your comment..." />
+              <textarea
+                id="comment"
+                placeholder="Enter your comment..."
+                onChange={event => updateEventDetails({ comment: event.target.value })}
+              />
             </div>
           </div>
           <div className="row ">
@@ -80,6 +88,7 @@ EventDetails.propTypes = {
   eventDetails: PropTypes.object,
   closeEventDetails: PropTypes.func,
   updateEventDetails: PropTypes.func,
+  saveEventDetails: PropTypes.func,
 };
 
 export default connect(
@@ -89,5 +98,6 @@ export default connect(
   dispatch => ({
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
+    // saveEventDetails: () => dispatch(saveEventDetailsAction()),
   }),
 )(EventDetails);

@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
@@ -9,12 +8,30 @@ import { getDatarunDetails, getSelectedPeriodRange, isPredictionEnabled } from '
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
+import { RootState } from '../../../model/types';
 
 const { TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
 
-class FocusChart extends Component {
-  constructor(...args) {
-    super(...args);
+type StateProps = ReturnType<typeof mapState>;
+type DispatchProps = ReturnType<typeof mapDispatch>;
+type Props = StateProps & DispatchProps;
+
+type State = {
+  width?: number;
+  height?: number;
+  chart?: any;
+  zoomValue?: any;
+};
+
+class FocusChart extends Component<Props, State> {
+  private zoom: any;
+
+  private resetZoom: any;
+
+  // TO be checked
+  // previously use ...args here
+  constructor(props) {
+    super(props);
 
     this.state = {
       width: 0,
@@ -367,22 +384,15 @@ class FocusChart extends Component {
   }
 }
 
-FocusChart.propTypes = {
-  datarun: PropTypes.object,
-  setPeriodRange: PropTypes.func,
-  periodRange: PropTypes.object,
-  setCurrentEvent: PropTypes.func,
-  isPredictionVisible: PropTypes.bool,
-};
+const mapState = (state: RootState) => ({
+  datarun: getDatarunDetails(state),
+  periodRange: getSelectedPeriodRange(state),
+  isPredictionVisible: isPredictionEnabled(state),
+});
 
-export default connect(
-  state => ({
-    datarun: getDatarunDetails(state),
-    periodRange: getSelectedPeriodRange(state),
-    isPredictionVisible: isPredictionEnabled(state),
-  }),
-  dispatch => ({
-    setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
-    setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
-  }),
-)(FocusChart);
+const mapDispatch = (dispatch: Function) => ({
+  setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
+  setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
+});
+
+export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);

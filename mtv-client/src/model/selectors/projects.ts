@@ -1,20 +1,21 @@
 import { createSelector } from 'reselect';
+import { RootState } from '../types';
 
-export const getExperimentsData = state => state.experiments;
-export const getPipelinesData = state => state.pipelines;
-export const getDatasets = state => state.datasets;
-export const getSelectedPipeline = state => state.pipelines.selectedPipelineName;
-export const getSelectedProjectName = state => state.projects.selectedProject;
-export const getIsExperimentsLoading = state => state.experiments.isExperimentsLoading;
-export const getSelectedExperiment = state => state.experiments.selectedExperimentID;
+export const getExperimentsData = (state: RootState) => state.experiments;
+export const getPipelinesData = (state: RootState) => state.pipelines;
+export const getDatasets = (state: RootState) => state.datasets;
+export const getSelectedPipeline = (state: RootState) => state.pipelines.selectedPipelineName;
+export const getSelectedProjectName = (state: RootState) => state.projects.selectedProject;
+export const getIsExperimentsLoading = (state: RootState) => state.experiments.isExperimentsLoading;
+export const getSelectedExperiment = (state: RootState) => state.experiments.selectedExperimentID;
 
 export const getIsProjectsLoading = createSelector(
   [getExperimentsData, getPipelinesData, getDatasets],
   (experimentsData, pipelinesData, datasets) =>
-    experimentsData.ieExperimentsLoading || datasets.isDatasetLoading || pipelinesData.isPipelinesLoading,
+    experimentsData.isExperimentsLoading || datasets.isDatasetLoading || pipelinesData.isPipelinesLoading,
 );
 
-const getSignalNum = projectName => {
+const getSignalNum = (projectName: string) => {
   switch (projectName) {
     case 'SMAP':
       return 55;

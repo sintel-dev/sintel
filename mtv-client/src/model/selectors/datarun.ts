@@ -1,24 +1,28 @@
 import { createSelector } from 'reselect';
+import { RootState, DatarunDataType } from '../types';
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 
+// @TODO - set state: RootState
 const getEventIndex = state => state.datarun.eventIndex;
 const getEventComments = state => state.datarun.eventComments;
 const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
 const getUpdatedEventsDetails = state => state.datarun.eventDetails;
 
 export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
-export const isDatarunIDSelected = state => state.datarun.selectedDatarunID;
+export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
-  (selectedExperimentData, selectedDatarunID) => selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
+  (selectedExperimentData, selectedDatarunID): string =>
+    selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
 
-export const getSelectedPeriodRange = state => state.datarun.selectedPeriodRange;
+export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
 
 export const getDatarunDetails = createSelector(
   [getSelectedDatarunID, getProcessedDataRuns],
-  (selectedDatarundID, processedDataruns) => processedDataruns.find(datarun => datarun.id === selectedDatarundID),
+  (selectedDatarundID, processedDataruns) =>
+    processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID),
 );
 
 export const getCurrentEventDetails = createSelector(

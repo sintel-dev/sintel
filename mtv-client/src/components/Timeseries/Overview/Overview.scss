@@ -9,8 +9,8 @@
     border-top-right-radius: 10px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    border: 1px solid #2C3034;
-    transition: all .2s ease-in-out;
+    border: 1px solid #2c3034;
+    transition: all 0.2s ease-in-out;
     margin-bottom: 20px;
 
     .time-row {
@@ -60,7 +60,8 @@
         height: 50px;
     }
 
-    .wave-data, .wave-event {
+    .wave-data,
+    .wave-event {
         stroke-width: 1;
         fill: transparent;
     }
