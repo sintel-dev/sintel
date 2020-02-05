@@ -2,7 +2,7 @@ import { ExperimentsResponse } from './experiment';
 import { PipelinesResponse } from './pipeline';
 import { DatasetsResponse } from './dataset';
 
-export const FETCH_PROJECTS = 'FETCH_PROEJCTS';
+export const FETCH_PROJECTS = 'FETCH_PROJECTS';
 export const SELECT_PROJECT = 'SELECT_PROJECT';
 
 export type FetchProjectsAction = {
