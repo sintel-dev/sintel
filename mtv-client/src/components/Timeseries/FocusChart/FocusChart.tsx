@@ -3,8 +3,20 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
-import { setTimeseriesPeriod, setCurrentEventAction } from '../../../model/actions/datarun';
-import { getDatarunDetails, getSelectedPeriodRange, isPredictionEnabled } from '../../../model/selectors/datarun';
+import {
+  setTimeseriesPeriod,
+  setCurrentEventAction,
+  isEditingEventRangeAction,
+  updateEventDetailsAction,
+} from '../../../model/actions/datarun';
+import {
+  getDatarunDetails,
+  getSelectedPeriodRange,
+  isPredictionEnabled,
+  getCurrentEventDetails,
+  getIsEditingEventRange,
+  getUpdatedEventsDetails,
+} from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
@@ -21,6 +33,8 @@ type State = {
   height?: number;
   chart?: any;
   zoomValue?: any;
+  brushInstance?: any;
+  brushContext?: any;
 };
 
 class FocusChart extends Component<Props, State> {
@@ -68,6 +82,10 @@ class FocusChart extends Component<Props, State> {
 
     if (prevProps.isPredictionVisible !== this.props.isPredictionVisible) {
       this.togglePredictions();
+    }
+
+    if (prevProps.isEditingEventRange !== this.props.isEditingEventRange) {
+      this.changeEventRange();
     }
   }
 
@@ -231,6 +249,11 @@ class FocusChart extends Component<Props, State> {
 
       chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
+      const { brushInstance, brushContext } = this.addEventEditor();
+      this.setState({
+        brushInstance,
+        brushContext,
+      });
     }, DRAW_EVENTS_TIMEOUT);
   }
 
@@ -367,26 +390,170 @@ class FocusChart extends Component<Props, State> {
   }
 
   addEventEditor() {
-    const { width, height } = this.state;
-    const brush = d3.brushX().extent([
+    const { height } = this.state;
+    const brushInstance = d3.brushX().extent([
       [0, 0],
-      [0, 0],
+      [0, height - 3.5 * CHART_MARGIN],
     ]);
-    const xRange = d3.scaleTime().range([0, width]);
-    const chartData = d3.select('g.chart-data');
-    const eventEditor = chartData
+
+    const brushContext = d3.select('g.chart-data');
+    brushContext
       .append('g')
-      .attr('class', 'brushContext')
-      .call(brush)
-      .call(brush.move, xRange.range());
+      .attr('class', 'focuschart-brush')
+      .call(brushInstance);
+
+    return { brushInstance, brushContext };
+  }
+
+  changeEventRange() {
+    const { width, height, brushInstance, brushContext } = this.state;
+    const { currentEventDetails, editEventRangeDone, datarun, updateEventDetails, updatedEventDetails } = this.props;
+    const { xCoord } = getScale(width, height, datarun.timeSeries);
+    const brushStart = new Date(updatedEventDetails.start_time && updatedEventDetails.start_time || currentEventDetails.start_time).getTime();
+    const brushEnd = new Date(updatedEventDetails.start_time && updatedEventDetails.stop_time ||currentEventDetails.stop_time).getTime();
+
+    brushInstance
+      .extent([
+        [0, 0],
+        [width, height - 3.5 * CHART_MARGIN],
+      ])
+      .on('brush', () => {
+        const [selection_start, selection_end] = d3.event.selection;
+        updateEventDetails({
+          start_time: new Date(xCoord.invert(selection_start)).getTime(),
+          stop_time: new Date(xCoord.invert(selection_end)).getTime(),
+        });
+      });
+
+    brushContext.call(brushInstance).call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
+
+    const brushOverlay = document.querySelector('.focuschart-brush .selection');
+    d3.select('.focuschart-brush .selection').attr('pointer-events', 'all');
+    document.querySelector('.focuschart-brush .selection');
+
+    brushOverlay.addEventListener('dblclick', editEventRangeDone);
+  }
+
+  addEventEditorOld() {
+    // finish this method and instantiate it at the begining, otherwise, there's thwo brush contexts
+    const { width, height } = this.state;
+
+    const brushInstance = d3.brushX().extent([
+      [0, 0],
+      [200, height - 3.5 * CHART_MARGIN],
+    ]);
+    // .on('brush', () => console.log('handle brush events here'));
+
+    const brushContext = d3.select('g.chart-data');
+    brushContext
+      .append('g')
+      .attr('class', 'focuschart-brush')
+      .call(brushInstance);
+    // .call(brushInstance.move, [0, 0]);
+
+    return { brushInstance, brushContext };
+  }
+
+  changeEventRangeOld() {
+    const { width, height } = this.state;
+    // brushInstance, brushContext
+    // const brushContext = d3.select('g.chart-data');
+
+    const { currentEventDetails, editEventRangeDone, datarun, updateEventDetails } = this.props;
+    const { xCoord } = getScale(width, height, datarun.timeSeries);
+
+    const brushStart = new Date(currentEventDetails.start_time).getTime();
+    const brushEnd = new Date(currentEventDetails.stop_time).getTime();
+
+    // brushInstance.on('brush', () => console.log('brushing here'));
+    // const chartData = d3.select('g.chart-data');
+
+    // chartData.call(brushInstance).call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
+    //   .on('brush', () => {
+    //     const [selection_start, selection_end] = d3.event.selection;
+    //     debugger;
+    //     updateEventDetails({
+    //       start_time: new Date(xCoord.invert(selection_start)).getTime(),
+    //       stop_time: new Date(xCoord.invert(selection_end)).getTime(),
+    //     });
+    //   });
+    // brushContext.on('brush', () => console.log('brushing'));
+
+    // brushContext.call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
+
+    // working version
+    //= =======
+    const brushContext = d3.select('g.chart-data');
+    const brushInstance = d3
+      .brushX()
+      .extent([
+        [0, 0],
+        [width, height - 3.5 * CHART_MARGIN],
+      ])
+      .on('brush', () => {
+        const [selection_start, selection_end] = d3.event.selection;
+        updateEventDetails({
+          start_time: new Date(xCoord.invert(selection_start)).getTime(),
+          stop_time: new Date(xCoord.invert(selection_end)).getTime(),
+        });
+      });
+
+    brushContext
+      .append('g')
+      .attr('class', 'focuschart-brush')
+      .call(brushInstance)
+      .call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
+
+    const brushOverlay = document.querySelector('.chart-data .focuschart-brush .selection');
+    d3.select('.chart-data .focuschart-brush .selection').attr('pointer-events', 'all');
+    document.querySelector('.chart-data .focuschart-brush .selection');
+
+    brushOverlay.addEventListener('dblclick', function(event) {
+      event.preventDefault();
+      // debugger;
+      editEventRangeDone();
+    });
+    //= =======
+
+    // brushContext.call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
+
+    // const brush = d3
+    //   .brushX()
+    //   .extent([
+    //     [0, 0],
+    //     [width, height - 3.5 * CHART_MARGIN],
+    //   ])
+    // .on('brush', () => {
+    // const [selection_start, selection_end] = d3.event.selection;
+    // d3.event.sourceEvent && d3.event.sourceEvent.type === 'mouseup' && editEventRange();
+    // updateEventDetails({
+    //   start_time: new Date(xCoord.invert(selection_start)).getTime(),
+    //   stop_time: new Date(xCoord.invert(selection_end)).getTime(),
+    // });
+    // });
+    // .on('brush end', () => {
+    //   d3.event.sourceEvent && d3.event.sourceEvent.type === 'mouseup' && editEventRange();
+    // });
+
+    // const chartData = d3.select('g.chart-data');
+    // chartData
+    //   .append('g')
+    //   .attr('class', 'brushContext')
+    //   .call(brush)
+    //   .call(brush.move, [xCoord(brushStart), xCoord(brushEnd)]);
   }
 
   drawChart() {
     this.drawData();
     this.drawAxis();
     this.drawEvents();
-    this.addEventEditor();
+    // this.addEventEditor();
     this.togglePredictions();
+    // const { brushInstance, brushContext } = this.addEventEditor();
+    // this.setState({
+    //   brushInstance,
+    //   brushContext,
+    // });
   }
 
   render() {
@@ -404,11 +571,16 @@ const mapState = (state: RootState) => ({
   datarun: getDatarunDetails(state),
   periodRange: getSelectedPeriodRange(state),
   isPredictionVisible: isPredictionEnabled(state),
+  currentEventDetails: getCurrentEventDetails(state),
+  isEditingEventRange: getIsEditingEventRange(state),
+  updatedEventDetails: getUpdatedEventsDetails(state)
 });
 
 const mapDispatch = (dispatch: Function) => ({
   setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
   setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
+  editEventRangeDone: () => dispatch(isEditingEventRangeAction(false)),
+  updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);
