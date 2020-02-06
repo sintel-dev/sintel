@@ -2,12 +2,20 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
+
 import {
   setCurrentEventAction,
   updateEventDetailsAction,
   saveEventDetailsAction,
+  isEditingEventRangeAction,
 } from '../../../../model/actions/datarun';
-import { getCurrentEventDetails, getUpdatedEventsDetails } from '../../../../model/selectors/datarun';
+
+import {
+  getCurrentEventDetails,
+  getUpdatedEventsDetails,
+  getIsEditingEventRange,
+} from '../../../../model/selectors/datarun';
+
 import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
@@ -15,11 +23,14 @@ import './EventDetails.scss';
 const EventDetails = ({
   eventDetails,
   updatedEventDetails,
-  closeEventDetails,
   updateEventDetails,
+  closeEventDetails,
   saveEventDetails,
+  editEventRangeDone,
+  isEditingEventRange,
 }) => {
-  const isActive = eventDetails ? 'active' : '';
+  const isActive = eventDetails && !isEditingEventRange ? 'active' : '';
+
   return (
     <div className={`events-wrapper ${isActive}`}>
       {eventDetails && (
@@ -42,7 +53,7 @@ const EventDetails = ({
           <div className="row">
             <label>To:</label>
             <span>{eventDetails.stop_time}</span>
-            <button type="button" className="edit danger">
+            <button type="button" className="edit danger" onClick={() => editEventRangeDone(true)}>
               Modify
             </button>
           </div>
@@ -104,10 +115,12 @@ export default connect(
   state => ({
     eventDetails: getCurrentEventDetails(state),
     updatedEventDetails: getUpdatedEventsDetails(state),
+    isEditingEventRange: getIsEditingEventRange(state),
   }),
   dispatch => ({
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    editEventRangeDone: eventState => dispatch(isEditingEventRangeAction(eventState)),
   }),
 )(EventDetails);

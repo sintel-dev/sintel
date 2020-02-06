@@ -4,6 +4,7 @@ import {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
   UPDATE_EVENT_DETAILS,
+  IS_CHANGING_EVENT_RANGE,
   SET_CURRENT_EVENT,
   GET_EVENT_COMMENTS_SUCCESS,
   TOGGLE_PREDICTION_MODE,
@@ -63,12 +64,17 @@ export function updateEventDetailsAction(updatedEventDetails) {
   };
 }
 
+export function isEditingEventRangeAction(eventState) {
+  return function(dispatch) {
+    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: eventState });
+  };
+}
+
 export function saveEventDetailsAction() {
   return async function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
-
     if (comments) {
       const commentData = {
         event_id: currentEventDetails.id,

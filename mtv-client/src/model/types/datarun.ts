@@ -3,6 +3,7 @@ import { EventDataType } from './event';
 export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
 export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
+export const IS_CHANGING_EVENT_RANGE = 'IS_CHANGING_EVENT_RANGE';
 export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
 export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
 
@@ -34,6 +35,7 @@ export type DatarunState = {
   eventComments: Array<any>;
   isPredictionEnabled: boolean;
   eventDetails: object;
+  isEditingEventRange: boolean;
 };
 
 /**
