@@ -64,17 +64,24 @@ export function updateEventDetailsAction(updatedEventDetails) {
 }
 
 export function saveEventDetailsAction() {
-  return function(dispatch, getState) {
+  return async function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
 
     if (comments) {
       const commentData = {
-        event: currentEventDetails.id,
+        event_id: currentEventDetails.id,
         text: comments,
-        created_by: null,
+        created_by: null, // no logged in user yet
       };
+      // posting comments
+      await API.comments.create(commentData);
+      dispatch(getEventComments());
+      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...updatedEventDetails, comments: '' } });
+      // dispatch({ type: 'POST_COMMENT_SUCCESS', newComments });
+
+      // posting event details
     }
 
     // @TODO - close the popup on save success

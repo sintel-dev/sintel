@@ -366,10 +366,26 @@ class FocusChart extends Component<Props, State> {
     this.setState({ zoomValue });
   }
 
+  addEventEditor() {
+    const { width, height } = this.state;
+    const brush = d3.brushX().extent([
+      [0, 0],
+      [0, 0],
+    ]);
+    const xRange = d3.scaleTime().range([0, width]);
+    const chartData = d3.select('g.chart-data');
+    const eventEditor = chartData
+      .append('g')
+      .attr('class', 'brushContext')
+      .call(brush)
+      .call(brush.move, xRange.range());
+  }
+
   drawChart() {
     this.drawData();
     this.drawAxis();
     this.drawEvents();
+    this.addEventEditor();
     this.togglePredictions();
   }
 

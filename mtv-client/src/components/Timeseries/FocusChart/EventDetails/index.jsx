@@ -7,12 +7,18 @@ import {
   updateEventDetailsAction,
   saveEventDetailsAction,
 } from '../../../../model/actions/datarun';
-import { getCurrentEventDetails } from '../../../../model/selectors/datarun';
+import { getCurrentEventDetails, getUpdatedEventsDetails } from '../../../../model/selectors/datarun';
 import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
 
-const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, saveEventDetails }) => {
+const EventDetails = ({
+  eventDetails,
+  updatedEventDetails,
+  closeEventDetails,
+  updateEventDetails,
+  saveEventDetails,
+}) => {
   const isActive = eventDetails ? 'active' : '';
   return (
     <div className={`events-wrapper ${isActive}`}>
@@ -62,6 +68,7 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
               <textarea
                 id="comment"
                 placeholder="Enter your comment..."
+                value={updatedEventDetails.comments}
                 onChange={event => updateEventDetails({ comments: event.target.value })}
               />
             </div>
@@ -96,6 +103,7 @@ EventDetails.propTypes = {
 export default connect(
   state => ({
     eventDetails: getCurrentEventDetails(state),
+    updatedEventDetails: getUpdatedEventsDetails(state),
   }),
   dispatch => ({
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
