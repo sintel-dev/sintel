@@ -12,6 +12,7 @@ const initialState: DatarunState = {
   eventComments: [],
   isPredictionEnabled: false,
   eventDetails: {},
+  isEditingEventRange: false,
 };
 
 /**
@@ -45,6 +46,10 @@ function TOGGLE_PREDICTION_MODE(nextState, { isPredictionEnabled }) {
   nextState.isPredictionEnabled = isPredictionEnabled;
 }
 
+function IS_CHANGING_EVENT_RANGE(nextState, { isEditingEventRange }) {
+  nextState.isEditingEventRange = isEditingEventRange;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -52,4 +57,5 @@ export default createReducer<DatarunState>(initialState, {
   UPDATE_EVENT_DETAILS,
   TOGGLE_PREDICTION_MODE,
   GET_EVENT_COMMENTS_SUCCESS,
+  IS_CHANGING_EVENT_RANGE,
 });
