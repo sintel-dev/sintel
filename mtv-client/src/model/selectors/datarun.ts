@@ -47,16 +47,3 @@ export const getCurrentEventDetails = createSelector(
     return eventDetails;
   },
 );
-
-// export const getIsEditingEventRange = createSelector(
-//   [getIsEventRangeUnderEdit, getCurrentEventDetails],
-//   (isEditingEventRange, currentDetails) => {
-//     if (!isEditingEventRange) {
-//       return null;
-//     }
-
-//   },
-// );
-
-// export const getIsEditingEventRange = createSelector(
-//   [getCurrentEventDetails])

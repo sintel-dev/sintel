@@ -47,7 +47,6 @@ function TOGGLE_PREDICTION_MODE(nextState, { isPredictionEnabled }) {
 }
 
 function IS_CHANGING_EVENT_RANGE(nextState, { isEditingEventRange }) {
-  debugger;
   nextState.isEditingEventRange = isEditingEventRange;
 }
 
