@@ -60,6 +60,9 @@ export function togglePredictionsAction(event) {
 export function updateEventDetailsAction(updatedEventDetails) {
   return function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
+    const { start_time, stop_time } = updatedEventDetails;
+    debugger;
+    console.log(updatedEventDetails);
     dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
   };
 }
@@ -91,11 +94,22 @@ export function saveEventDetailsAction() {
     }
 
     const { start_time, stop_time, score, tag, event_id } = updatedEventDetails;
-    const start = Math.floor(new Date(start_time).getTime() / 1000);
-    const stop = Math.floor(new Date(stop_time).getTime() / 1000);
+    const start = new Date(start_time).getTime() / 1000;
+    const stop = new Date(stop_time).getTime() / 1000;
 
+    debugger;
+
+    const payload = {
+      start_time: start,
+      stop_time: stop,
+      score,
+      tag,
+      event_id,
+    };
+
+    debugger;
     // @TODO - yet to be implemented
-    await API.events.update(currentEventDetails.id, { start, stop, score, tag, event_id });
+    // await API.events.update(currentEventDetails.id, payload);
 
     dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { updatedEventDetails } });
     dispatch(setCurrentEventAction(null));

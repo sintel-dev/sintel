@@ -37,6 +37,7 @@ export const getCurrentEventDetails = createSelector(
       (updatedDetails.start_time && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
 
     const stop_time = (updatedDetails.stop_time && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
+    debugger;
 
     const eventDetails = {
       id: currentEvent[3],
@@ -51,6 +52,8 @@ export const getCurrentEventDetails = createSelector(
       eventComments,
       isCommentsLoading,
     };
+
+    debugger;
     return eventDetails;
   },
 );

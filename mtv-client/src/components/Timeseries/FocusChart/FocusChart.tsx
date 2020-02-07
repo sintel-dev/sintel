@@ -198,7 +198,10 @@ class FocusChart extends Component<Props, State> {
     chartData.selectAll('.line-highlight').remove();
 
     const drawHlEvent = (event, eventIndex) => {
-      const lineData = chartData.append('g').attr('class', 'line-highlight').attr('id', `_${eventWindows[eventIndex][3]}`);;
+      const lineData = chartData
+        .append('g')
+        .attr('class', 'line-highlight')
+        .attr('id', `_${eventWindows[eventIndex][3]}`);
       const currentEvent = eventWindows[eventIndex];
       const startIndex = currentEvent[0];
       const stopIndex = currentEvent[1];
@@ -455,7 +458,6 @@ class FocusChart extends Component<Props, State> {
     const { eventWindows, timeSeries } = datarun;
     const selectedEventData = eventWindows.filter(event => event[3] === currentEventDetails.id);
     const lineData = timeSeries.slice(selectedEventData[0][0], selectedEventData[0][1] + 1);
-    debugger;
     d3.select(`g#_${currentEventDetails.id} path.evt-highlight`).attr('d', this.drawLine(lineData));
   }
 
