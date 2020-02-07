@@ -424,8 +424,8 @@ class FocusChart extends Component<Props, State> {
       .on('brush', () => {
         const [selection_start, selection_end] = d3.event.selection;
         updateEventDetails({
-          start_time: new Date(xCoord.invert(selection_start)).getTime(),
-          stop_time: new Date(xCoord.invert(selection_end)).getTime(),
+          start_time: new Date(xCoord.invert(selection_start)).toUTCString(),
+          stop_time: new Date(xCoord.invert(selection_end)).toUTCString(),
         });
       });
 
