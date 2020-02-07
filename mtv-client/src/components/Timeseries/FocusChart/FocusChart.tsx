@@ -249,11 +249,11 @@ class FocusChart extends Component<Props, State> {
 
       chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
-      const { brushInstance, brushContext } = this.addEventEditor();
-      this.setState({
-        brushInstance,
-        brushContext,
-      });
+      // const { brushInstance, brushContext } = this.addEventEditor();
+      // this.setState({
+      //   brushInstance,
+      //   brushContext,
+      // });
     }, DRAW_EVENTS_TIMEOUT);
   }
 
@@ -405,18 +405,25 @@ class FocusChart extends Component<Props, State> {
     return { brushInstance, brushContext };
   }
 
-  changeEventRange() {
-    const { width, height, brushInstance, brushContext } = this.state;
-    const { currentEventDetails, editEventRangeDone, datarun, updateEventDetails, updatedEventDetails } = this.props;
-    const { xCoord } = getScale(width, height, datarun.timeSeries);
+  getBrushCoords() {
+    const { updatedEventDetails, currentEventDetails } = this.props;
     const brushStart = new Date(
       (updatedEventDetails.start_time && updatedEventDetails.start_time) || currentEventDetails.start_time,
     ).getTime();
     const brushEnd = new Date(
-      (updatedEventDetails.start_time && updatedEventDetails.stop_time) || currentEventDetails.stop_time,
+      (updatedEventDetails.stop_time && updatedEventDetails.stop_time) || currentEventDetails.stop_time,
     ).getTime();
+    return { brushStart, brushEnd };
+  }
 
-    brushInstance
+  changeEventRange() {
+    const { width, height } = this.state;
+    const { editEventRangeDone, datarun, updateEventDetails } = this.props;
+    const { xCoord } = getScale(width, height, datarun.timeSeries);
+    const { brushStart, brushEnd } = this.getBrushCoords();
+
+    const brushInstance = d3
+      .brushX()
       .extent([
         [0, 0],
         [width, height - 3.5 * CHART_MARGIN],
@@ -429,8 +436,12 @@ class FocusChart extends Component<Props, State> {
         });
       });
 
-    brushContext.call(brushInstance).call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
-
+    const brushContext = d3.select('g.chart-data');
+    brushContext
+      .append('g')
+      .attr('class', 'focuschart-brush')
+      .call(brushInstance)
+      .call(brushInstance.move, [xCoord(brushStart), xCoord(brushEnd)]);
     const brushOverlay = document.querySelector('.focuschart-brush .selection');
     d3.select('.focuschart-brush .selection').attr('pointer-events', 'all');
     document.querySelector('.focuschart-brush .selection');

@@ -75,20 +75,30 @@ export function saveEventDetailsAction() {
     const currentEventDetails = getCurrentEventDetails(getState());
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
+
     if (comments) {
       const commentData = {
         event_id: currentEventDetails.id,
         text: comments,
         created_by: null, // no logged in user yet
       };
+
       // posting comments
       await API.comments.create(commentData);
       dispatch(getEventComments());
       dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...updatedEventDetails, comments: '' } });
-      // dispatch({ type: 'POST_COMMENT_SUCCESS', newComments });
-
-      // posting event details
+      return;
     }
+
+    const { start_time, stop_time, score, tag, event_id } = updatedEventDetails;
+    const start = Math.floor(new Date(start_time).getTime() / 1000);
+    const stop = Math.floor(new Date(stop_time).getTime() / 1000);
+
+    // @TODO - yet to be implemented
+    await API.events.update(currentEventDetails.id, { start, stop, score, tag, event_id });
+
+    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { updatedEventDetails } });
+    dispatch(setCurrentEventAction(null));
 
     // @TODO - close the popup on save success
   };
