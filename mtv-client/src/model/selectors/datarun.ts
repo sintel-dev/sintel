@@ -33,12 +33,19 @@ export const getCurrentEventDetails = createSelector(
     }
 
     const currentEvent = datarun.eventWindows[eventIndex];
+    const start_time =
+      (updatedDetails.start_time && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
+
+    const stop_time = (updatedDetails.stop_time && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
+
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],
       tag: updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
-      start_time: new Date(datarun.timeSeries[currentEvent[0]][0]).toUTCString(),
-      stop_time: new Date(datarun.timeSeries[currentEvent[1]][0]).toUTCString(),
+      // start_time: new Date(datarun.timeSeries[currentEvent[0]][0]).toUTCString(),
+      start_time: new Date(start_time).toUTCString(),
+      stop_time: new Date(stop_time).toUTCString(),
+      // stop_time: new Date(datarun.timeSeries[currentEvent[1]][0]).toUTCString(),
       datarun: datarun.id,
       signal: datarun.signal,
       eventComments,
