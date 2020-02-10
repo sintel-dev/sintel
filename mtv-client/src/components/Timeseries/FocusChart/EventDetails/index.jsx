@@ -26,7 +26,7 @@ const EventDetails = ({
   updateEventDetails,
   closeEventDetails,
   saveEventDetails,
-  editEventRangeDone,
+  editEventRange,
   isEditingEventRange,
 }) => {
   const isActive = eventDetails && !isEditingEventRange ? 'active' : '';
@@ -53,7 +53,7 @@ const EventDetails = ({
           <div className="row">
             <label>To:</label>
             <span>{new Date(eventDetails.stop_time).toUTCString()}</span>
-            <button type="button" className="edit danger" onClick={() => editEventRangeDone(true)}>
+            <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
               Modify
             </button>
           </div>
@@ -121,6 +121,6 @@ export default connect(
     closeEventDetails: () => dispatch(setCurrentEventAction(null)),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
-    editEventRangeDone: eventState => dispatch(isEditingEventRangeAction(eventState)),
+    editEventRange: eventState => dispatch(isEditingEventRangeAction(eventState)),
   }),
 )(EventDetails);

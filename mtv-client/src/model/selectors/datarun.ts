@@ -12,6 +12,7 @@ export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
 export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
 export const getIsEditingEventRange = state => state.datarun.isEditingEventRange;
+export const getIsEditingEventRangeDone = state => state.datarun.isEditingEventRangeDone;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
@@ -50,6 +51,8 @@ export const getCurrentEventDetails = createSelector(
       signal: datarun.signal,
       eventComments,
       isCommentsLoading,
+      startIndex,
+      stopIndex,
     };
 
     return eventDetails;

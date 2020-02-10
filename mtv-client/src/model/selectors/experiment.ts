@@ -27,6 +27,7 @@ export const getProcessedDataRuns = createSelector([getSelectedExperimentData], 
   if (experimentData.isExperimentDataLoading) {
     return [];
   }
+
   return experimentData.data.dataruns.map(datarun => {
     const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
     const timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');

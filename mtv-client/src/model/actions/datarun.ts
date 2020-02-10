@@ -1,4 +1,5 @@
 import { getCurrentEventDetails, getUpdatedEventsDetails } from '../selectors/datarun';
+import { getProcessedDataRuns } from '../selectors/experiment';
 import API from '../utils/api';
 import {
   SELECT_DATARUN,
@@ -10,6 +11,7 @@ import {
   TOGGLE_PREDICTION_MODE,
   SelectDatarunAction,
   SetTimeseriesPeriodAction,
+  EVENT_RANGE_EDITING_DONE,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -87,7 +89,6 @@ export function saveEventDetailsAction() {
       tag,
       event_id: currentEventDetails.id,
     };
-
     if (comments) {
       const commentData = {
         event_id: currentEventDetails.id,
@@ -102,11 +103,33 @@ export function saveEventDetailsAction() {
     }
 
     await API.events.update(currentEventDetails.id, payload).then(() => {
+      const processedDatarun = getProcessedDataRuns(getState());
+      const datarunIndex = processedDatarun.findIndex(datarun => datarun.id === updatedEventDetails.datarun);
+      const { timeSeries } = processedDatarun[datarunIndex];
+
+      // const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
+      // const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
+
+      // console.log(experimentData.data.dataruns[datarunIndex].events[eventIndex]);
+      // debugger;
+      // experimentData.data.dataruns[datarunIndex].events[eventIndex] = { ...currentEventDetails };
+
+      // console.log(experimentData.data.dataruns[datarunIndex].events[eventIndex]);
+
+      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: updatedEventDetails });
+      dispatch(setCurrentEventAction(null)); // hide popup
       dispatch({
-        type: UPDATE_EVENT_DETAILS,
-        eventDetails: { ...updatedEventDetails, start_time, stop_time },
-      });
-      dispatch(setCurrentEventAction(null));
+        type: EVENT_RANGE_EDITING_DONE,
+        isEditingEventRangeDone: true,
+        ...updatedEventDetails,
+        eventDetails: {
+          start_time: updatedEventDetails.start_time,
+          stop_time: updatedEventDetails.stop_time,
+          score: updatedEventDetails.score,
+          tag: updatedEventDetails.tag,
+        },
+        timeSeries,
+      }); // destroy brush
     });
   };
 }

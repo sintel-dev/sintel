@@ -16,6 +16,7 @@ import {
   getCurrentEventDetails,
   getIsEditingEventRange,
   getUpdatedEventsDetails,
+  getIsEditingEventRangeDone,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -86,6 +87,10 @@ class FocusChart extends Component<Props, State> {
 
     if (prevProps.isEditingEventRange !== this.props.isEditingEventRange) {
       this.changeEventRange();
+    }
+
+    if (prevProps.isEditingEventRangeDone !== this.props.isEditingEventRangeDone) {
+      // this.drawEvents();
     }
   }
 
@@ -160,10 +165,8 @@ class FocusChart extends Component<Props, State> {
         .attr('width', width - TRANSLATE_LEFT - 2 * CHART_MARGIN)
         .attr('height', height);
 
-      const chartLine = focusGroup
-        .append('g')
-        .attr('class', 'chart-data')
-        .attr('clip-path', 'url(#focusClip)');
+      const chartLine = focusGroup.append('g').attr('class', 'chart-data');
+      // .attr('clip-path', 'url(#focusClip)');
 
       const chartGroups = chartLine.append('g').attr('class', 'wawe-data');
       chartGroups
@@ -348,6 +351,7 @@ class FocusChart extends Component<Props, State> {
     const { xCoord, yCoord } = getScale(width, height, timeSeries);
     const xCoordCopy = xCoord.copy();
     const xAxis = d3.axisBottom(xCoord);
+    console.log('updateChartOnBrush===', eventWindows);
     let events = [];
     const line = d3
       .line()
@@ -374,7 +378,7 @@ class FocusChart extends Component<Props, State> {
       const stopIndex = eventWindows[index][1];
       const commentArea = this.children[0];
       const commentText = this.children[1];
-
+      debugger;
       const commentAttr = {
         width: Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])),
         xMove: xCoord(timeSeries[startIndex][0]),
@@ -421,7 +425,7 @@ class FocusChart extends Component<Props, State> {
 
   changeEventRange() {
     const { width, height } = this.state;
-    const { editEventRangeDone, datarun, updateEventDetails } = this.props;
+    const { editEventRangeDone, datarun, updateEventDetails, isEditingEventRange } = this.props;
     const { xCoord } = getScale(width, height, datarun.timeSeries);
     const { brushStart, brushEnd } = this.getBrushCoords();
 
@@ -429,7 +433,7 @@ class FocusChart extends Component<Props, State> {
       .brushX()
       .extent([
         [0, 0],
-        [width, height - 3.5 * CHART_MARGIN],
+        [width - 59, height - 3.5 * CHART_MARGIN], // @TODO investigate what is 58
       ])
       .on('brush', () => {
         const [selection_start, selection_end] = d3.event.selection;
@@ -451,11 +455,14 @@ class FocusChart extends Component<Props, State> {
     document.querySelector('.focuschart-brush .selection');
 
     brushOverlay.addEventListener('dblclick', editEventRangeDone);
+
+    // @TODO - find a more elegant way to handle double creation of '.focuschart-brush' (demo purpose)
+    !isEditingEventRange && document.querySelectorAll('.focuschart-brush').forEach(brush => brush.remove());
   }
 
   updateEvent() {
+    // TODO - investigate more closely a more simple way to handle live range editing
     const { width, height } = this.state;
-
     const { currentEventDetails, datarun } = this.props;
     const { timeSeries } = datarun;
     const { xCoord } = getScale(width, height, timeSeries);
@@ -463,16 +470,73 @@ class FocusChart extends Component<Props, State> {
     const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
     const lineData = timeSeries.slice(startIndex, stopIndex);
+
     const eventArea = d3.select(`g#_${currentEventDetails.id} .evt-area`);
     const commentTag = d3.select(`g#_${currentEventDetails.id} .evt-comment`);
 
-    // .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])))
+    eventArea
+      .attr('x', xCoord(timeSeries[startIndex][0]))
+      .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])));
 
-    eventArea.attr('x', xCoord(timeSeries[startIndex][0]));
-    commentTag.attr('x', xCoord(timeSeries[startIndex][0]));
-    // .attr('width', Math.max(xCoord(timeSeries[stopIndex][0] - xCoord(timeSeries[startIndex][0]))));
-
+    commentTag
+      .attr('x', xCoord(timeSeries[startIndex][0]))
+      .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])));
     d3.select(`g#_${currentEventDetails.id} path.evt-highlight`).attr('d', this.drawLine(lineData));
+
+    this.updateLineChart();
+  }
+
+  getRatio() {
+    const width = document.querySelector('.time-row').clientWidth;
+    // const chartWidth = width - offset.infoWidth - 2 * offset.left;
+    const chartWidth = width + 160;
+    const focusChartWidth =
+      document.querySelector('#focusChartWrapper').clientWidth - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+    const ratio = chartWidth / focusChartWidth;
+    return { width, ratio };
+  }
+
+  updateLineChart() {
+    const { currentEventDetails } = this.props;
+    const width = document.querySelector('.wave-chart').clientWidth - 18;
+    const { datarun } = this.props;
+    const { timeSeries } = datarun;
+
+    const target = d3.select(`#wawe_${currentEventDetails.id}`);
+
+    const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
+    const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
+
+    const getLinechartScale = () => {
+      let minValue = Number.MAX_SAFE_INTEGER;
+      let maxValue = Number.MIN_SAFE_INTEGER;
+      const timeSeriesMin = timeSeries[0][0];
+      const timeSeriesMax = timeSeries[timeSeries.length - 1][0];
+      const xCoord = d3.scaleTime().range([0, width]);
+      const yCoord = d3.scaleLinear().range([36, 0]);
+
+      minValue = Math.min(minValue, timeSeriesMin);
+      maxValue = Math.max(maxValue, timeSeriesMax);
+
+      xCoord.domain([minValue, maxValue]);
+      yCoord.domain([-1, 1]);
+
+      return { xCoord, yCoord };
+    };
+
+    const { xCoord, yCoord } = getLinechartScale();
+
+    const line = d3
+      .line()
+      .x(d => xCoord(d[0]))
+      .y(d => yCoord(d[1]));
+
+    target.attr('d', line(timeSeries.slice(startIndex, stopIndex)));
+  }
+
+  removeBrush() {
+    // debugger;
+    // document.querySelector('.focuschart-brush').remove();
   }
 
   drawChart() {
@@ -500,6 +564,7 @@ const mapState = (state: RootState) => ({
   currentEventDetails: getCurrentEventDetails(state),
   isEditingEventRange: getIsEditingEventRange(state),
   updatedEventDetails: getUpdatedEventsDetails(state),
+  isEditingEventRangeDone: getIsEditingEventRangeDone(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
