@@ -434,9 +434,10 @@ class FocusChart extends Component<Props, State> {
       .on('brush', () => {
         const [selection_start, selection_end] = d3.event.selection;
         updateEventDetails({
-          start_time: new Date(xCoord.invert(selection_start)).toUTCString(),
-          stop_time: new Date(xCoord.invert(selection_end)).toUTCString(),
+          start_time: new Date(xCoord.invert(selection_start)).getTime(),
+          stop_time: new Date(xCoord.invert(selection_end)).getTime(),
         });
+        this.updateEvent();
       });
 
     const brushContext = d3.select('g.chart-data');
@@ -450,14 +451,27 @@ class FocusChart extends Component<Props, State> {
     document.querySelector('.focuschart-brush .selection');
 
     brushOverlay.addEventListener('dblclick', editEventRangeDone);
-    this.updateEvent();
   }
 
   updateEvent() {
+    const { width, height } = this.state;
+
     const { currentEventDetails, datarun } = this.props;
-    const { eventWindows, timeSeries } = datarun;
-    const selectedEventData = eventWindows.filter(event => event[3] === currentEventDetails.id);
-    const lineData = timeSeries.slice(selectedEventData[0][0], selectedEventData[0][1] + 1);
+    const { timeSeries } = datarun;
+    const { xCoord } = getScale(width, height, timeSeries);
+
+    const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
+    const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
+    const lineData = timeSeries.slice(startIndex, stopIndex);
+    const eventArea = d3.select(`g#_${currentEventDetails.id} .evt-area`);
+    const commentTag = d3.select(`g#_${currentEventDetails.id} .evt-comment`);
+
+    // .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])))
+
+    eventArea.attr('x', xCoord(timeSeries[startIndex][0]));
+    commentTag.attr('x', xCoord(timeSeries[startIndex][0]));
+    // .attr('width', Math.max(xCoord(timeSeries[stopIndex][0] - xCoord(timeSeries[startIndex][0]))));
+
     d3.select(`g#_${currentEventDetails.id} path.evt-highlight`).attr('d', this.drawLine(lineData));
   }
 

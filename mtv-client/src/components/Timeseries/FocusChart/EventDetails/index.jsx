@@ -48,11 +48,11 @@ const EventDetails = ({
           </div>
           <div className="row">
             <label>From:</label>
-            <span>{eventDetails.start_time}</span>
+            <span>{new Date(eventDetails.start_time).toUTCString()}</span>
           </div>
           <div className="row">
             <label>To:</label>
-            <span>{eventDetails.stop_time}</span>
+            <span>{new Date(eventDetails.stop_time).toUTCString()}</span>
             <button type="button" className="edit danger" onClick={() => editEventRangeDone(true)}>
               Modify
             </button>

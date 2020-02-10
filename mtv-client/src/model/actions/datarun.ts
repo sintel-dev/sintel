@@ -60,9 +60,6 @@ export function togglePredictionsAction(event) {
 export function updateEventDetailsAction(updatedEventDetails) {
   return function(dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
-    const { start_time, stop_time } = updatedEventDetails;
-    debugger;
-    console.log(updatedEventDetails);
     dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
   };
 }
@@ -78,6 +75,18 @@ export function saveEventDetailsAction() {
     const currentEventDetails = getCurrentEventDetails(getState());
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
+    const { start_time, stop_time, score, tag } = currentEventDetails;
+
+    const start = start_time / 1000;
+    const stop = stop_time / 1000;
+
+    const payload = {
+      start_time: start,
+      stop_time: stop,
+      score,
+      tag,
+      event_id: currentEventDetails.id,
+    };
 
     if (comments) {
       const commentData = {
@@ -90,30 +99,14 @@ export function saveEventDetailsAction() {
       await API.comments.create(commentData);
       dispatch(getEventComments());
       dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...updatedEventDetails, comments: '' } });
-      return;
     }
 
-    const { start_time, stop_time, score, tag, event_id } = updatedEventDetails;
-    const start = new Date(start_time).getTime() / 1000;
-    const stop = new Date(stop_time).getTime() / 1000;
-
-    debugger;
-
-    const payload = {
-      start_time: start,
-      stop_time: stop,
-      score,
-      tag,
-      event_id,
-    };
-
-    debugger;
-    // @TODO - yet to be implemented
-    // await API.events.update(currentEventDetails.id, payload);
-
-    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { updatedEventDetails } });
-    dispatch(setCurrentEventAction(null));
-
-    // @TODO - close the popup on save success
+    await API.events.update(currentEventDetails.id, payload).then(() => {
+      dispatch({
+        type: UPDATE_EVENT_DETAILS,
+        eventDetails: { ...updatedEventDetails, start_time, stop_time },
+      });
+      dispatch(setCurrentEventAction(null));
+    });
   };
 }

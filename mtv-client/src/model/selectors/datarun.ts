@@ -32,28 +32,26 @@ export const getCurrentEventDetails = createSelector(
       return null;
     }
 
+    const { timeSeries } = datarun;
     const currentEvent = datarun.eventWindows[eventIndex];
-    const start_time =
-      (updatedDetails.start_time && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
+    const start_time = (updatedDetails && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
+    const stop_time = (updatedDetails && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
 
-    const stop_time = (updatedDetails.stop_time && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
-    debugger;
+    const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
+    const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
 
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],
       tag: updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
-      // start_time: new Date(datarun.timeSeries[currentEvent[0]][0]).toUTCString(),
-      start_time: new Date(start_time).toUTCString(),
-      stop_time: new Date(stop_time).toUTCString(),
-      // stop_time: new Date(datarun.timeSeries[currentEvent[1]][0]).toUTCString(),
+      start_time: timeSeries[startIndex][0],
+      stop_time: timeSeries[stopIndex][0],
       datarun: datarun.id,
       signal: datarun.signal,
       eventComments,
       isCommentsLoading,
     };
 
-    debugger;
     return eventDetails;
   },
 );
