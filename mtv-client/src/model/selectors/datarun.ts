@@ -12,6 +12,8 @@ export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
 export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
 export const getIsEditingEventRange = state => state.datarun.isEditingEventRange;
+export const getIsEditingEventRangeDone = state => state.datarun.isEditingEventRangeDone;
+export const getIsPopupOpen = state => state.datarun.isPopupOpen;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
@@ -36,10 +38,8 @@ export const getCurrentEventDetails = createSelector(
     const currentEvent = datarun.eventWindows[eventIndex];
     const start_time = (updatedDetails && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
     const stop_time = (updatedDetails && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
-
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
-
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],

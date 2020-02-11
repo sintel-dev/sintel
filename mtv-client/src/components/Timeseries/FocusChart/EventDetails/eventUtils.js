@@ -48,4 +48,4 @@ export const selectedOption = selectedLabel =>
     ? ''
     : grouppedOptions
         .reduce((known, unknown) => [...known.options, ...unknown.options])
-        .find(({ label }) => label.toLowerCase() === selectedLabel);
+        .find(({ label }) => label === selectedLabel);

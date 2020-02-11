@@ -6,6 +6,8 @@ export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
 export const IS_CHANGING_EVENT_RANGE = 'IS_CHANGING_EVENT_RANGE';
 export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
 export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
+export const SAVE_EVENT_DETAILS = 'SAVE_EVENT_DETAILS';
+export const IS_UPDATE_POPUP_OPEN = 'IS_UPDATE_POPUP_OPEN';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -36,6 +38,8 @@ export type DatarunState = {
   isPredictionEnabled: boolean;
   eventDetails: object;
   isEditingEventRange: boolean;
+  isEditingEventRangeDone: boolean;
+  isPopupOpen: boolean;
 };
 
 /**

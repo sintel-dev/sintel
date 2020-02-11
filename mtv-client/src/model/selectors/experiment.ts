@@ -15,8 +15,8 @@ const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
   events.map(
     event =>
       [
-        timestamps.indexOf(Math.trunc(event.start_time) * 1000),
-        timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
+        timestamps.indexOf(event.start_time * 1000),
+        timestamps.indexOf(event.stop_time * 1000),
         event.score,
         event.id,
         event.tag,
@@ -27,6 +27,7 @@ export const getProcessedDataRuns = createSelector([getSelectedExperimentData], 
   if (experimentData.isExperimentDataLoading) {
     return [];
   }
+
   return experimentData.data.dataruns.map(datarun => {
     const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
     const timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');

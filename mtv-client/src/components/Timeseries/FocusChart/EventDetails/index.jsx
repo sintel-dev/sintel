@@ -4,16 +4,17 @@ import Select from 'react-select';
 import PropTypes from 'prop-types';
 
 import {
-  setCurrentEventAction,
   updateEventDetailsAction,
   saveEventDetailsAction,
   isEditingEventRangeAction,
+  closeEventModal,
 } from '../../../../model/actions/datarun';
 
 import {
   getCurrentEventDetails,
   getUpdatedEventsDetails,
   getIsEditingEventRange,
+  getIsPopupOpen,
 } from '../../../../model/selectors/datarun';
 
 import Loader from '../../../Common/Loader';
@@ -26,10 +27,11 @@ const EventDetails = ({
   updateEventDetails,
   closeEventDetails,
   saveEventDetails,
-  editEventRangeDone,
+  editEventRange,
   isEditingEventRange,
+  isPopupOpen,
 }) => {
-  const isActive = eventDetails && !isEditingEventRange ? 'active' : '';
+  const isActive = eventDetails && !isEditingEventRange && isPopupOpen ? 'active' : '';
 
   return (
     <div className={`events-wrapper ${isActive}`}>
@@ -53,7 +55,7 @@ const EventDetails = ({
           <div className="row">
             <label>To:</label>
             <span>{new Date(eventDetails.stop_time).toUTCString()}</span>
-            <button type="button" className="edit danger" onClick={() => editEventRangeDone(true)}>
+            <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
               Modify
             </button>
           </div>
@@ -116,11 +118,12 @@ export default connect(
     eventDetails: getCurrentEventDetails(state),
     updatedEventDetails: getUpdatedEventsDetails(state),
     isEditingEventRange: getIsEditingEventRange(state),
+    isPopupOpen: getIsPopupOpen(state),
   }),
   dispatch => ({
-    closeEventDetails: () => dispatch(setCurrentEventAction(null)),
+    closeEventDetails: () => dispatch(closeEventModal()),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
-    editEventRangeDone: eventState => dispatch(isEditingEventRangeAction(eventState)),
+    editEventRange: eventState => dispatch(isEditingEventRangeAction(eventState)),
   }),
 )(EventDetails);
