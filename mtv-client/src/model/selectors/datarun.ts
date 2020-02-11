@@ -14,6 +14,7 @@ export const getSelectedPeriodRange = (state: RootState) => state.datarun.select
 export const getIsEditingEventRange = state => state.datarun.isEditingEventRange;
 export const getIsEditingEventRangeDone = state => state.datarun.isEditingEventRangeDone;
 export const getIsPopupOpen = state => state.datarun.isPopupOpen;
+export const getIsAddingNewEvents = state => state.datarun.isAddingEvent;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
@@ -41,9 +42,9 @@ export const getCurrentEventDetails = createSelector(
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
     const eventDetails = {
-      id: currentEvent[3],
-      score: currentEvent[2],
-      tag: updatedDetails.tag ? updatedDetails.tag : currentEvent[4],
+      id: currentEvent?.[3],
+      score: currentEvent?.[2],
+      tag: updatedDetails.tag ? updatedDetails.tag : currentEvent?.[4],
       start_time: timeSeries[startIndex][0],
       stop_time: timeSeries[stopIndex][0],
       datarun: datarun.id,

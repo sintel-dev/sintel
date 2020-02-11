@@ -13,6 +13,8 @@ import {
   SetTimeseriesPeriodAction,
   SAVE_EVENT_DETAILS,
   IS_UPDATE_POPUP_OPEN,
+  ADDING_NEW_EVENTS,
+  NEW_EVENT_DETAILS,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -125,5 +127,40 @@ export function saveEventDetailsAction() {
       dispatch({ type: SAVE_EVENT_DETAILS, eventDetails: updatedEventDetails });
       dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     });
+  };
+}
+
+export function addNewEventAction(isAddingEvent) {
+  return function(dispatch, getState) {
+    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent });
+  };
+}
+
+export function updateNewEventDetailsAction(eventDetails) {
+  return function(dispatch, getState) {
+    const datarun = getDatarunDetails(getState());
+    debugger;
+
+    const eventTemplate = {
+      datarun: datarun.id,
+      score: '',
+      signal: '',
+      tag: '',
+      ...eventDetails,
+    };
+    dispatch({ type: NEW_EVENT_DETAILS, eventDetails: eventTemplate });
+    dispatch({ type: SET_CURRENT_EVENT, eventIndex: datarun.events.length });
+  };
+}
+
+export function openNewDetailsPopupAction() {
+  return function(dispatch) {
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
+  };
+}
+
+export function saveNewEventAction() {
+  return function(dispatch, getState) {
+    console.log('save new event here');
   };
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { togglePredictionsAction } from '../../../model/actions/datarun';
+import { togglePredictionsAction, addNewEventAction } from '../../../model/actions/datarun';
 import { isPredictionEnabled } from '../../../model/selectors/datarun';
 import './FocusChartControls.scss';
 
@@ -21,8 +21,8 @@ const FocusChartControls = props => (
         </label>
       </div>
       <div>
-        <label htmlFor="eventMode">
-          <input type="checkbox" id="eventMode" />
+        <label htmlFor="addNewEvent">
+          <input type="checkbox" id="addNewEvent" onChange={event => props.addNewEvent(event.target.checked)} />
           <span className="switch" />
           Add Events
         </label>
@@ -42,5 +42,6 @@ export default connect(
   }),
   dispatch => ({
     togglePredictions: event => dispatch(togglePredictionsAction(event)),
+    addNewEvent: isAddingEvent => dispatch(addNewEventAction(isAddingEvent)),
   }),
 )(FocusChartControls);
