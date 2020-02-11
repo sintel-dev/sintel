@@ -40,7 +40,6 @@ export const getCurrentEventDetails = createSelector(
 
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
-
     const eventDetails = {
       id: currentEvent[3],
       score: currentEvent[2],
@@ -51,8 +50,6 @@ export const getCurrentEventDetails = createSelector(
       signal: datarun.signal,
       eventComments,
       isCommentsLoading,
-      startIndex,
-      stopIndex,
     };
 
     return eventDetails;

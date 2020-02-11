@@ -12,6 +12,7 @@ import {
   SelectDatarunAction,
   SetTimeseriesPeriodAction,
   EVENT_RANGE_EDITING_DONE,
+  SAVE_EVENT_DETAILS,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -103,9 +104,9 @@ export function saveEventDetailsAction() {
     }
 
     await API.events.update(currentEventDetails.id, payload).then(() => {
-      const processedDatarun = getProcessedDataRuns(getState());
-      const datarunIndex = processedDatarun.findIndex(datarun => datarun.id === updatedEventDetails.datarun);
-      const { timeSeries } = processedDatarun[datarunIndex];
+      // const processedDatarun = getProcessedDataRuns(getState());
+      // const datarunIndex = processedDatarun.findIndex(datarun => datarun.id === updatedEventDetails.datarun);
+      // const { timeSeries } = processedDatarun[datarunIndex];
 
       // const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
       // const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
@@ -115,21 +116,24 @@ export function saveEventDetailsAction() {
       // experimentData.data.dataruns[datarunIndex].events[eventIndex] = { ...currentEventDetails };
 
       // console.log(experimentData.data.dataruns[datarunIndex].events[eventIndex]);
-
+      // console.log('updated event details action', updatedEventDetails);
       dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: updatedEventDetails });
-      dispatch(setCurrentEventAction(null)); // hide popup
-      dispatch({
-        type: EVENT_RANGE_EDITING_DONE,
-        isEditingEventRangeDone: true,
-        ...updatedEventDetails,
-        eventDetails: {
-          start_time: updatedEventDetails.start_time,
-          stop_time: updatedEventDetails.stop_time,
-          score: updatedEventDetails.score,
-          tag: updatedEventDetails.tag,
-        },
-        timeSeries,
-      }); // destroy brush
+      dispatch({ type: SAVE_EVENT_DETAILS, eventDetails: updatedEventDetails });
+
+      // dispatch(setCurrentEventAction(null)); // hide popup
+      // dispatch({
+      //   type: EVENT_RANGE_EDITING_DONE,
+      //   isEditingEventRangeDone: true,
+      //   ...updatedEventDetails,
+      //   eventDetails: {
+      //     id: updatedEventDetails.id,
+      //     start_time: updatedEventDetails.start_time,
+      //     stop_time: updatedEventDetails.stop_time,
+      //     score: updatedEventDetails.score,
+      //     tag: updatedEventDetails.tag,
+      //     datarun: updatedEventDetails.datarun,
+      //   },
+      // });
     });
   };
 }

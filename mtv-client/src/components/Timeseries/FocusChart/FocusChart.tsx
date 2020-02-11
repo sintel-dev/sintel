@@ -378,7 +378,6 @@ class FocusChart extends Component<Props, State> {
       const stopIndex = eventWindows[index][1];
       const commentArea = this.children[0];
       const commentText = this.children[1];
-      debugger;
       const commentAttr = {
         width: Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])),
         xMove: xCoord(timeSeries[startIndex][0]),
