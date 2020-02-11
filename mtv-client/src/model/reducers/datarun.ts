@@ -14,6 +14,7 @@ const initialState: DatarunState = {
   eventDetails: {},
   isEditingEventRange: false,
   isEditingEventRangeDone: false,
+  isPopupOpen: false,
 };
 
 /**
@@ -51,8 +52,8 @@ function IS_CHANGING_EVENT_RANGE(nextState, { isEditingEventRange }) {
   nextState.isEditingEventRange = isEditingEventRange;
 }
 
-function EVENT_RANGE_EDITING_DONE(nextState, { isEditingEventRangeDone }) {
-  nextState.isEditingEventRangeDone = isEditingEventRangeDone;
+function IS_UPDATE_POPUP_OPEN(nextState, { isPopupOpen }) {
+  nextState.isPopupOpen = isPopupOpen;
 }
 
 export default createReducer<DatarunState>(initialState, {
@@ -63,5 +64,6 @@ export default createReducer<DatarunState>(initialState, {
   TOGGLE_PREDICTION_MODE,
   GET_EVENT_COMMENTS_SUCCESS,
   IS_CHANGING_EVENT_RANGE,
-  EVENT_RANGE_EDITING_DONE,
+
+  IS_UPDATE_POPUP_OPEN,
 });

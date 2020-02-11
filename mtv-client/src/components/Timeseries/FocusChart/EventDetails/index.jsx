@@ -4,16 +4,17 @@ import Select from 'react-select';
 import PropTypes from 'prop-types';
 
 import {
-  setCurrentEventAction,
   updateEventDetailsAction,
   saveEventDetailsAction,
   isEditingEventRangeAction,
+  closeEventModal,
 } from '../../../../model/actions/datarun';
 
 import {
   getCurrentEventDetails,
   getUpdatedEventsDetails,
   getIsEditingEventRange,
+  getIsPopupOpen,
 } from '../../../../model/selectors/datarun';
 
 import Loader from '../../../Common/Loader';
@@ -28,8 +29,9 @@ const EventDetails = ({
   saveEventDetails,
   editEventRange,
   isEditingEventRange,
+  isPopupOpen,
 }) => {
-  const isActive = eventDetails && !isEditingEventRange ? 'active' : '';
+  const isActive = eventDetails && !isEditingEventRange && isPopupOpen ? 'active' : '';
 
   return (
     <div className={`events-wrapper ${isActive}`}>
@@ -116,9 +118,10 @@ export default connect(
     eventDetails: getCurrentEventDetails(state),
     updatedEventDetails: getUpdatedEventsDetails(state),
     isEditingEventRange: getIsEditingEventRange(state),
+    isPopupOpen: getIsPopupOpen(state),
   }),
   dispatch => ({
-    closeEventDetails: () => dispatch(setCurrentEventAction(null)),
+    closeEventDetails: () => dispatch(closeEventModal()),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     editEventRange: eventState => dispatch(isEditingEventRangeAction(eventState)),

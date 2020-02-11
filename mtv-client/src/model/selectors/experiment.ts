@@ -15,8 +15,8 @@ const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
   events.map(
     event =>
       [
-        timestamps.indexOf(Math.trunc(event.start_time) * 1000),
-        timestamps.indexOf(Math.trunc(event.stop_time) * 1000),
+        timestamps.indexOf(event.start_time * 1000),
+        timestamps.indexOf(event.stop_time * 1000),
         event.score,
         event.id,
         event.tag,
