@@ -32,7 +32,6 @@ const EventDetails = ({
   isPopupOpen,
 }) => {
   const isActive = eventDetails && !isEditingEventRange && isPopupOpen ? 'active' : '';
-
   return (
     <div className={`events-wrapper ${isActive}`}>
       {eventDetails && (

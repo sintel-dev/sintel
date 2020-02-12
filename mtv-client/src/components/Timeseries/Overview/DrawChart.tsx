@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { drawChart, updateBrushPeriod } from './chartUtils';
+import { drawChart, updateBrushPeriod, updateHighlithedEvents } from './chartUtils';
 import { Props as DatarunProps } from './Datarun';
 
 let props: DatarunProps;
@@ -24,6 +24,9 @@ class DrawChart extends Component<Props> {
     // @TODO - investigate how this can be set in immerJS as a compound object
     if (JSON.stringify(prevProps.selectedPeriod) !== JSON.stringify(selectedPeriod)) {
       updateBrushPeriod(selectedPeriod);
+    }
+    if (prevProps.datarun !== this.props.dataRun) {
+      updateHighlithedEvents(this.props.dataRun);
     }
   }
 

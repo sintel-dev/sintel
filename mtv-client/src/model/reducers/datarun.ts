@@ -15,6 +15,8 @@ const initialState: DatarunState = {
   isEditingEventRange: false,
   isEditingEventRangeDone: false,
   isPopupOpen: false,
+  isAddingEvent: false,
+  newEventDetails: {},
 };
 
 /**
@@ -56,6 +58,19 @@ function IS_UPDATE_POPUP_OPEN(nextState, { isPopupOpen }) {
   nextState.isPopupOpen = isPopupOpen;
 }
 
+function ADDING_NEW_EVENTS(nextState, { isAddingEvent }) {
+  nextState.isAddingEvent = isAddingEvent;
+}
+
+function NEW_EVENT_DETAILS(nextState, { eventDetails }) {
+  nextState.isEventCommentsLoading = false;
+  nextState.eventDetails = eventDetails;
+}
+
+function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
+  nextState.addingNewEvent = result;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -64,6 +79,8 @@ export default createReducer<DatarunState>(initialState, {
   TOGGLE_PREDICTION_MODE,
   GET_EVENT_COMMENTS_SUCCESS,
   IS_CHANGING_EVENT_RANGE,
-
   IS_UPDATE_POPUP_OPEN,
+  ADDING_NEW_EVENTS,
+  NEW_EVENT_DETAILS,
+  ADDING_NEW_EVENT_RESULT,
 });

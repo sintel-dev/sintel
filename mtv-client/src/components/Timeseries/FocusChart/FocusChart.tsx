@@ -5,9 +5,11 @@ import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import {
   setTimeseriesPeriod,
-  setCurrentEventAction,
+  setActiveEventAction,
   isEditingEventRangeAction,
   updateEventDetailsAction,
+  updateNewEventDetailsAction,
+  openNewDetailsPopupAction,
 } from '../../../model/actions/datarun';
 import {
   getDatarunDetails,
@@ -17,6 +19,8 @@ import {
   getIsEditingEventRange,
   getUpdatedEventsDetails,
   getIsEditingEventRangeDone,
+  getIsAddingNewEvents,
+  getAddingNewEventStatus,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -94,6 +98,14 @@ class FocusChart extends Component<Props, State> {
     }
     if (prevProps.updatedEventDetails.tag !== this.props.updatedEventDetails.tag) {
       this.updateEventTagOnSave(this.props.updatedEventDetails);
+    }
+
+    if (prevProps.isAddingNewEvents !== this.props.isAddingNewEvents) {
+      this.addNewEvent(this.props.isAddingNewEvents);
+    }
+
+    if (prevProps.datarun.events !== this.props.datarun.events) {
+      this.drawEvents();
     }
   }
 
@@ -260,12 +272,7 @@ class FocusChart extends Component<Props, State> {
 
       chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
-      // const { brushInstance, brushContext } = this.addEventEditor();
-      // this.setState({
-      //   brushInstance,
-      //   brushContext,
-      // });
-    }, DRAW_EVENTS_TIMEOUT);
+    });
   }
 
   togglePredictions() {
@@ -397,22 +404,6 @@ class FocusChart extends Component<Props, State> {
     });
 
     this.setState({ zoomValue });
-  }
-
-  addEventEditor() {
-    const { height } = this.state;
-    const brushInstance = d3.brushX().extent([
-      [0, 0],
-      [0, height - 3.5 * CHART_MARGIN],
-    ]);
-
-    const brushContext = d3.select('g.chart-data');
-    brushContext
-      .append('g')
-      .attr('class', 'focuschart-brush')
-      .call(brushInstance);
-
-    return { brushInstance, brushContext };
   }
 
   getBrushCoords() {
@@ -554,6 +545,48 @@ class FocusChart extends Component<Props, State> {
     this.togglePredictions();
   }
 
+  addNewEvent(isAddingEvent) {
+    document.querySelectorAll('.new-event-brush').forEach(brush => brush.remove());
+    const { width, height } = this.state;
+    const { datarun, updateNewEventDetails, openNewDetailsPopup } = this.props;
+    const { timeSeries } = datarun;
+    const { xCoord } = getScale(width, height, timeSeries);
+
+    const brushInstance = d3
+      .brushX()
+      .extent([
+        [0, 0],
+        [width - 59, height - 3.5 * CHART_MARGIN],
+      ])
+      .on('brush', () => {
+        const [selection_start, selection_end] = d3.event.selection;
+        const startIndex =
+          timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
+        const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
+        updateNewEventDetails({
+          start_time: new Date(timeSeries[startIndex][0]).getTime(),
+          stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
+        });
+      });
+
+    const brushContext = d3.select('g.chart-data');
+    brushContext
+      .append('g')
+      .attr('class', 'new-event-brush')
+      .call(brushInstance)
+      .call(brushInstance.move, [0, 50]);
+
+    const brushOverlay = document.querySelector('.new-event-brush .selection');
+    d3.select('.new-event-brush .selection').attr('pointer-events', 'all');
+    document.querySelector('.new-event-brush .selection');
+
+    brushOverlay.addEventListener('dblclick', openNewDetailsPopup);
+    if (!isAddingEvent) {
+      // @TODO - same problem - double brush
+      document.querySelectorAll('.new-event-brush').forEach(brush => brush.remove());
+    }
+  }
+
   render() {
     return (
       <div className="focus-chart" id="focusChartWrapper">
@@ -573,13 +606,17 @@ const mapState = (state: RootState) => ({
   isEditingEventRange: getIsEditingEventRange(state),
   updatedEventDetails: getUpdatedEventsDetails(state),
   isEditingEventRangeDone: getIsEditingEventRangeDone(state),
+  isAddingNewEvents: getIsAddingNewEvents(state),
+  addingNewEventStatus: getAddingNewEventStatus(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
-  setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
+  setCurrentEvent: eventIndex => dispatch(setActiveEventAction(eventIndex)),
   editEventRangeDone: () => dispatch(isEditingEventRangeAction(false)),
   updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
+  updateNewEventDetails: details => dispatch(updateNewEventDetailsAction(details)),
+  openNewDetailsPopup: () => dispatch(openNewDetailsPopupAction()),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);
