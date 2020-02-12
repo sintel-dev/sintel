@@ -8,6 +8,7 @@ import {
   saveEventDetailsAction,
   isEditingEventRangeAction,
   closeEventModal,
+  deleteEventAction,
 } from '../../../../model/actions/datarun';
 
 import {
@@ -30,6 +31,7 @@ const EventDetails = ({
   editEventRange,
   isEditingEventRange,
   isPopupOpen,
+  deleteEvent,
 }) => {
   const isActive = eventDetails && !isEditingEventRange && isPopupOpen ? 'active' : '';
   return (
@@ -88,7 +90,7 @@ const EventDetails = ({
           <div className="row ">
             <ul>
               <li>
-                <button type="button" className="danger">
+                <button type="button" className="danger" onClick={deleteEvent}>
                   Delete
                 </button>
               </li>
@@ -124,5 +126,6 @@ export default connect(
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     editEventRange: eventState => dispatch(isEditingEventRangeAction(eventState)),
+    deleteEvent: () => dispatch(deleteEventAction()),
   }),
 )(EventDetails);

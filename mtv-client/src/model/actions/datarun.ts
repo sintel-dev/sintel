@@ -203,3 +203,26 @@ export function saveNewEventAction() {
       .catch(err => dispatch({ type: ADDING_NEW_EVENT_RESULT, result: err }));
   };
 }
+
+export function deleteEventAction() {
+  return async function(dispatch, getState) {
+    const currentEventDetails = getCurrentEventDetails(getState());
+    const datarunID = currentEventDetails.datarun;
+    const selectedExperimentData = getSelectedExperimentData(getState());
+    const datarunIndex = selectedExperimentData.data.dataruns.findIndex(dataItem => dataItem.id === datarunID);
+
+    await API.events.delete(currentEventDetails.id).then(async () => {
+      await API.events.all(datarunID).then(datarunEvents => {
+        const newDatarunEvents = datarunEvents.events.filter(event => event.datarun === datarunID);
+        // @TODO - address the case when the deleted comment is the last one
+        // also delete the event from the top linechart
+        dispatch({
+          type: UPDATE_DATARUN_EVENTS,
+          newDatarunEvents,
+          datarunIndex,
+        });
+        dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      });
+    });
+  };
+}
