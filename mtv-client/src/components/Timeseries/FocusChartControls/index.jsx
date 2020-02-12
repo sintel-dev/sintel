@@ -1,14 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { togglePredictionsAction, addNewEventAction } from '../../../model/actions/datarun';
+import Select from 'react-select';
+import { togglePredictionsAction, addNewEventAction, filterEventsByTagAction } from '../../../model/actions/datarun';
 import { isPredictionEnabled, getIsAddingNewEvents } from '../../../model/selectors/datarun';
 import './FocusChartControls.scss';
+
+const filterOptions = [
+  { value: 'Investigate', label: 'Investigate', icon: 'investigate', isFixed: true },
+  { value: 'Do not Investigate', label: 'Do not Investigate', icon: 'not_investigate', isFixed: true },
+  { value: 'Postpone', label: 'Postpone', icon: 'postpone', isFixed: true },
+];
+
+const formatOptionLabel = ({ label, icon }) => (
+  <div className="select-row">
+    <i className={`select ${icon}`} />
+    {label}
+  </div>
+);
 
 const FocusChartControls = props => (
   <div className="chart-controls" id="chartControls">
     <div className="linechart-controls switch-control">
-      <div>
+      <div className="row">
         <label htmlFor="showPredictions">
           <input
             type="checkbox"
@@ -20,7 +34,7 @@ const FocusChartControls = props => (
           Show Predictions
         </label>
       </div>
-      <div>
+      <div className="row">
         <label htmlFor="addNewEvent">
           <input
             type="checkbox"
@@ -32,6 +46,17 @@ const FocusChartControls = props => (
           Add Events
         </label>
       </div>
+    </div>
+    <div className="tag-wrapper">
+      <Select
+        isMulti
+        classNamePrefix="tag-options"
+        className="tag-select"
+        formatOptionLabel={formatOptionLabel}
+        options={filterOptions}
+        placeholder="Filter by tag"
+        onChange={tags => props.filterByTags(tags)}
+      />
     </div>
   </div>
 );
@@ -49,5 +74,6 @@ export default connect(
   dispatch => ({
     togglePredictions: event => dispatch(togglePredictionsAction(event)),
     addNewEvent: isAddingEvent => dispatch(addNewEventAction(isAddingEvent)),
+    filterByTags: tags => dispatch(filterEventsByTagAction(tags)),
   }),
 )(FocusChartControls);

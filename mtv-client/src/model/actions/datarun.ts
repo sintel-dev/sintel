@@ -226,3 +226,9 @@ export function deleteEventAction() {
     });
   };
 }
+
+export function filterEventsByTagAction(tags) {
+  return function(dispatch, getState) {
+    console.log(tags);
+  };
+}

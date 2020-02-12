@@ -5,4 +5,19 @@
     display: inline-block;
     margin-top: 10px;
     margin: 0px 20px 20px 0;
+    width: 100%;
+
+    .tag-select {
+        min-width: 160px;
+    }
+    .tag-wrapper{
+        float: right
+    }
+}
+.switch-control{
+    float: left;
+}
+
+.tag-wrapper{
+    float: right
 }
