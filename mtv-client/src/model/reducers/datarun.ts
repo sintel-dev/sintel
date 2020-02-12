@@ -63,7 +63,12 @@ function ADDING_NEW_EVENTS(nextState, { isAddingEvent }) {
 }
 
 function NEW_EVENT_DETAILS(nextState, { eventDetails }) {
+  nextState.isEventCommentsLoading = false;
   nextState.eventDetails = eventDetails;
+}
+
+function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
+  nextState.addingNewEvent = result;
 }
 
 export default createReducer<DatarunState>(initialState, {
@@ -77,4 +82,5 @@ export default createReducer<DatarunState>(initialState, {
   IS_UPDATE_POPUP_OPEN,
   ADDING_NEW_EVENTS,
   NEW_EVENT_DETAILS,
+  ADDING_NEW_EVENT_RESULT,
 });

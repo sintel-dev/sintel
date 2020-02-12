@@ -5,7 +5,7 @@ import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import {
   setTimeseriesPeriod,
-  setCurrentEventAction,
+  setActiveEventAction,
   isEditingEventRangeAction,
   updateEventDetailsAction,
   updateNewEventDetailsAction,
@@ -20,6 +20,7 @@ import {
   getUpdatedEventsDetails,
   getIsEditingEventRangeDone,
   getIsAddingNewEvents,
+  getAddingNewEventStatus,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -101,6 +102,10 @@ class FocusChart extends Component<Props, State> {
 
     if (prevProps.isAddingNewEvents !== this.props.isAddingNewEvents) {
       this.addNewEvent(this.props.isAddingNewEvents);
+    }
+
+    if (prevProps.datarun.events !== this.props.datarun.events) {
+      this.drawEvents();
     }
   }
 
@@ -267,7 +272,7 @@ class FocusChart extends Component<Props, State> {
 
       chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
-    }, DRAW_EVENTS_TIMEOUT);
+    });
   }
 
   togglePredictions() {
@@ -569,7 +574,7 @@ class FocusChart extends Component<Props, State> {
       .append('g')
       .attr('class', 'new-event-brush')
       .call(brushInstance)
-      .call(brushInstance.move, [0, 150]);
+      .call(brushInstance.move, [0, 50]);
 
     const brushOverlay = document.querySelector('.new-event-brush .selection');
     d3.select('.new-event-brush .selection').attr('pointer-events', 'all');
@@ -602,11 +607,12 @@ const mapState = (state: RootState) => ({
   updatedEventDetails: getUpdatedEventsDetails(state),
   isEditingEventRangeDone: getIsEditingEventRangeDone(state),
   isAddingNewEvents: getIsAddingNewEvents(state),
+  addingNewEventStatus: getAddingNewEventStatus(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
-  setCurrentEvent: eventIndex => dispatch(setCurrentEventAction(eventIndex)),
+  setCurrentEvent: eventIndex => dispatch(setActiveEventAction(eventIndex)),
   editEventRangeDone: () => dispatch(isEditingEventRangeAction(false)),
   updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
   updateNewEventDetails: details => dispatch(updateNewEventDetailsAction(details)),
