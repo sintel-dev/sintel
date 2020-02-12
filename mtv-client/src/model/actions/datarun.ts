@@ -198,7 +198,6 @@ export function saveNewEventAction() {
           dispatch({ type: ADDING_NEW_EVENT_RESULT, result: 'success' });
           dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
           dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
-          dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: null });
         });
       })
       .catch(err => dispatch({ type: ADDING_NEW_EVENT_RESULT, result: err }));
