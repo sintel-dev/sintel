@@ -104,7 +104,10 @@ class FocusChart extends Component<Props, State> {
       this.addNewEvent(this.props.isAddingNewEvents);
     }
 
-    if (prevProps.datarun.events !== this.props.datarun.events) {
+    if (
+      prevProps.datarun.events !== this.props.datarun.events ||
+      this.props.datarun.eventWindows !== prevProps.datarun.eventWindows
+    ) {
       this.drawEvents();
     }
   }

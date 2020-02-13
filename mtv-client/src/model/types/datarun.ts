@@ -12,6 +12,7 @@ export const ADDING_NEW_EVENTS = 'ADDING_NEW_EVENTS';
 export const NEW_EVENT_DETAILS = 'NEW_EVENT_DETAILS';
 export const ADDING_NEW_EVENT_RESULT = 'ADDING_NEW_EVENT_RESULT';
 export const UPDATE_DATARUN_EVENTS = 'UPDATE_DATARUN_EVENTS';
+export const SET_FILTER_TAGS = 'SET_FILTER_TAGS';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -46,6 +47,7 @@ export type DatarunState = {
   isPopupOpen: boolean;
   isAddingEvent: boolean;
   newEventDetails: object;
+  filterTags: any;
 };
 
 /**

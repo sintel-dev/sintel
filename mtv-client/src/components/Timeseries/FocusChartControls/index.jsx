@@ -10,6 +10,10 @@ const filterOptions = [
   { value: 'Investigate', label: 'Investigate', icon: 'investigate', isFixed: true },
   { value: 'Do not Investigate', label: 'Do not Investigate', icon: 'not_investigate', isFixed: true },
   { value: 'Postpone', label: 'Postpone', icon: 'postpone', isFixed: true },
+  { value: 'Problem', label: 'Problem', icon: 'problem', isFixed: true },
+  { value: 'Previously seen', label: 'Previously seen', icon: 'seen', isFixed: true },
+  { value: 'Normal', label: 'Normal', icon: 'normal', isFixed: true },
+  { value: '', label: 'untagged', icon: 'untagged', isFixed: true },
 ];
 
 const formatOptionLabel = ({ label, icon }) => (
@@ -50,6 +54,7 @@ const FocusChartControls = props => (
     <div className="tag-wrapper">
       <Select
         isMulti
+        closeMenuOnSelect={false}
         classNamePrefix="tag-options"
         className="tag-select"
         formatOptionLabel={formatOptionLabel}

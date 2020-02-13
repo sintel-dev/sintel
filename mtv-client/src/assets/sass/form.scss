@@ -97,7 +97,6 @@
     .tag-options__option--is-selected{
         color: #fff;
         background: transparent;
-        
     }
 
     .tag-options__option--is-focused {
@@ -133,7 +132,70 @@
 
     .select-row{
         font-size: 13px;
+        color: #fff;
     }
 
+    .tag-options__multi-value{
+        background-color: transparent;
+        color: #fff;
+        position: relative;
+        padding-left: 13px;
+        background: #23242B;
+        border-radius: 12px;
 
+        .tag-options__multi-value__remove{
+            position: absolute;
+            left: 0;
+            top: 4px;
+            &:hover{
+                background: transparent;
+            }
+        }
+    }
+}
+
+i{
+    &.indicator, &.select {
+        border-radius: 100%;
+        display: inline-block;
+    }
+    &.indicator {
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+        margin-bottom: 5px;
+        vertical-align: middle;
+    }
+
+    &.select{
+        width: 10px;
+        height: 10px;
+        margin-right: 4px;
+    }
+
+    &.investigate{
+        background: #FFCD00;
+    }
+
+    &.not_investigate{
+        background: #7CA8FF;
+    }
+
+    &.postpone {
+        background: #A042FF
+    }
+    &.problem{
+        background: #F64242;
+    }
+    &.seen{
+        background: #F5FF00
+    }
+
+    &.normal {
+        background: #45F642;
+    }
+
+    &.untagged{
+        background: #C7C7C7;
+    }
 }

@@ -17,6 +17,7 @@ const initialState: DatarunState = {
   isPopupOpen: false,
   isAddingEvent: false,
   newEventDetails: {},
+  filterTags: [],
 };
 
 /**
@@ -71,6 +72,10 @@ function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
   nextState.addingNewEvent = result;
 }
 
+function SET_FILTER_TAGS(nextState, { filterTags }) {
+  nextState.filterTags = filterTags;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -83,4 +88,5 @@ export default createReducer<DatarunState>(initialState, {
   ADDING_NEW_EVENTS,
   NEW_EVENT_DETAILS,
   ADDING_NEW_EVENT_RESULT,
+  SET_FILTER_TAGS,
 });

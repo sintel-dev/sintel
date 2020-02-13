@@ -16,6 +16,7 @@ import {
   NEW_EVENT_DETAILS,
   ADDING_NEW_EVENT_RESULT,
   UPDATE_DATARUN_EVENTS,
+  SET_FILTER_TAGS,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -228,7 +229,7 @@ export function deleteEventAction() {
 }
 
 export function filterEventsByTagAction(tags) {
-  return function(dispatch, getState) {
-    console.log(tags);
+  return function(dispatch) {
+    dispatch({ type: SET_FILTER_TAGS, filterTags: tags });
   };
 }
