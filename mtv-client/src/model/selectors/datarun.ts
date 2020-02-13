@@ -16,6 +16,8 @@ export const getIsEditingEventRangeDone = state => state.datarun.isEditingEventR
 export const getIsPopupOpen = state => state.datarun.isPopupOpen;
 export const getIsAddingNewEvents = state => state.datarun.isAddingEvent;
 export const getAddingNewEventStatus = state => state.datarun.addingNewEvent;
+export const getZoomOnClickDirection = state => state.datarun.zoomDirection;
+export const getZoomCounter = state => state.datarun.zoomCounter;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
