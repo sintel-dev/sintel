@@ -10,9 +10,8 @@ export const filteringTags = createSelector(
     if (selectedExpedimentData.isExperimentDataLoading) {
       return [];
     }
-    let tags = [];
-    filterTags && filterTags.forEach(tag => tags.push(tag.value));
-    return tags;
+
+    return filterTags.map(tag => tag.value);
   },
 );
 

@@ -358,9 +358,14 @@ class FocusChart extends Component<Props, State> {
     const { zoomOnClick } = this.addZoom();
     const { periodRange, zoomDirection } = this.props;
     const { zoomValue } = periodRange;
-    let zoomStep = zoomValue.k ? zoomValue.k : 1;
-    const zoomingValues = zoomDirection === 'In' ? (zoomStep *= 1.09) : (zoomStep /= 1.09);
-    zoomOnClick(zoomingValues);
+    let zoomStep = zoomValue.k || 1;
+
+    if (zoomDirection === 'In') {
+      zoomStep *= 1.09;
+    } else {
+      zoomStep /= 1.09;
+    }
+    zoomOnClick(zoomStep);
   }
 
   zoomHandler() {
