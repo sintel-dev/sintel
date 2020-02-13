@@ -1,7 +1,19 @@
 import { createSelector } from 'reselect';
 import { RootState, EventDataType } from '../types';
 
+export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
+
+export const filteringTags = createSelector(
+  [getSelectedExperimentData, getFilterTags],
+  (selectedExpedimentData, filterTags) => {
+    if (selectedExpedimentData.isExperimentDataLoading) {
+      return [];
+    }
+
+    return filterTags.map(tag => tag.value);
+  },
+);
 
 const groupDataBy = (
   prediction: {
@@ -23,25 +35,32 @@ const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
       ] as [number, number, number, string, string],
   );
 
-export const getProcessedDataRuns = createSelector([getSelectedExperimentData], experimentData => {
-  if (experimentData.isExperimentDataLoading) {
-    return [];
-  }
+export const getProcessedDataRuns = createSelector(
+  [getSelectedExperimentData, filteringTags],
+  (experimentData, filterTags) => {
+    if (experimentData.isExperimentDataLoading) {
+      return [];
+    }
 
-  return experimentData.data.dataruns.map(datarun => {
-    const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
-    const timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');
-    const timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
-    const eventWindows = groupByEventWindows(
-      datarun.events,
-      timeSeries.map(series => series[0]),
-    );
-    return {
-      ...datarun,
-      timeSeries,
-      timeseriesPred,
-      timeseriesErr,
-      eventWindows,
-    };
-  });
-});
+    return experimentData.data.dataruns.map(datarun => {
+      const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
+      const timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');
+      const timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
+      const { events } = datarun;
+
+      const filteredEvents = filterTags.length ? events.filter(event => filterTags.includes(event.tag)) : events;
+      const eventWindows = groupByEventWindows(
+        filteredEvents,
+        timeSeries.map(series => series[0]),
+      );
+
+      return {
+        ...datarun,
+        timeSeries,
+        timeseriesPred,
+        timeseriesErr,
+        eventWindows,
+      };
+    });
+  },
+);

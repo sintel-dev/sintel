@@ -17,6 +17,9 @@ const initialState: DatarunState = {
   isPopupOpen: false,
   isAddingEvent: false,
   newEventDetails: {},
+  filterTags: [],
+  zoomDirection: '',
+  zoomCounter: 0,
 };
 
 /**
@@ -71,6 +74,15 @@ function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
   nextState.addingNewEvent = result;
 }
 
+function SET_FILTER_TAGS(nextState, { filterTags }) {
+  nextState.filterTags = filterTags;
+}
+
+function ZOOM_ON_CLICK(nextState, { zoomDirection, zoomCounter }) {
+  nextState.zoomCounter = zoomCounter;
+  nextState.zoomDirection = zoomDirection;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -83,4 +95,6 @@ export default createReducer<DatarunState>(initialState, {
   ADDING_NEW_EVENTS,
   NEW_EVENT_DETAILS,
   ADDING_NEW_EVENT_RESULT,
+  SET_FILTER_TAGS,
+  ZOOM_ON_CLICK,
 });

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import EventDetails from './EventDetails';
 import { FocusChartConstants, colorSchemes } from './Constants';
+import ZoomControls from './ZoomControls';
 import {
   setTimeseriesPeriod,
   setActiveEventAction,
@@ -21,6 +22,8 @@ import {
   getIsEditingEventRangeDone,
   getIsAddingNewEvents,
   getAddingNewEventStatus,
+  getZoomOnClickDirection,
+  getZoomCounter,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -104,8 +107,15 @@ class FocusChart extends Component<Props, State> {
       this.addNewEvent(this.props.isAddingNewEvents);
     }
 
-    if (prevProps.datarun.events !== this.props.datarun.events) {
+    if (
+      prevProps.datarun.events !== this.props.datarun.events ||
+      this.props.datarun.eventWindows !== prevProps.datarun.eventWindows
+    ) {
       this.drawEvents();
+    }
+
+    if (this.props.zoomCounter !== prevProps.zoomCounter) {
+      this.updateZoomOnClick();
     }
   }
 
@@ -299,7 +309,7 @@ class FocusChart extends Component<Props, State> {
 
   addZoom() {
     const { width, height, chart } = this.state;
-    let zoomRect;
+    let zoomInstance;
     const chartData = d3.select('.chart-data');
     const zoom = d3
       .zoom()
@@ -315,29 +325,47 @@ class FocusChart extends Component<Props, State> {
       .on('zoom', this.zoomHandler);
 
     chart.selectAll('.zoom').remove();
-    zoomRect = chartData
+    zoomInstance = chartData
       .append('rect')
       .attr('width', width)
       .attr('height', height)
       .attr('class', 'zoom');
 
-    zoomRect = d3.select('.zoom').call(zoom);
+    zoomInstance = d3.select('.zoom').call(zoom);
 
     const enableZoom = () => {
-      zoomRect.attr('width', width);
-      zoomRect.call(zoom);
+      zoomInstance.attr('width', width);
+      zoomInstance.call(zoom);
     };
 
     const disableZoom = () => {
-      zoomRect.attr('width', 0);
-      zoomRect.on('.zoom', null);
+      zoomInstance.attr('width', 0);
+      zoomInstance.on('.zoom', null);
+    };
+
+    const zoomOnClick = value => {
+      zoom.scaleBy(zoomInstance, value);
     };
 
     let resetZoom = () => {
-      zoomRect.call(zoom.transform, d3.zoomIdentity);
+      zoomInstance.call(zoom.transform, d3.zoomIdentity);
     };
 
-    return { zoom, enableZoom, disableZoom, resetZoom };
+    return { zoom, enableZoom, disableZoom, resetZoom, zoomOnClick, zoomInstance };
+  }
+
+  updateZoomOnClick() {
+    const { zoomOnClick } = this.addZoom();
+    const { periodRange, zoomDirection } = this.props;
+    const { zoomValue } = periodRange;
+    let zoomStep = zoomValue.k || 1;
+
+    if (zoomDirection === 'In') {
+      zoomStep *= 1.09;
+    } else {
+      zoomStep /= 1.09;
+    }
+    zoomOnClick(zoomStep);
   }
 
   zoomHandler() {
@@ -593,6 +621,9 @@ class FocusChart extends Component<Props, State> {
         <ShowErrors isOpen={this.props.isPredictionVisible} />
         <EventDetails />
         <svg id="focusChart" />
+        <div className="zoomControlsHolder">
+          <ZoomControls />
+        </div>
       </div>
     );
   }
@@ -608,6 +639,8 @@ const mapState = (state: RootState) => ({
   isEditingEventRangeDone: getIsEditingEventRangeDone(state),
   isAddingNewEvents: getIsAddingNewEvents(state),
   addingNewEventStatus: getAddingNewEventStatus(state),
+  zoomDirection: getZoomOnClickDirection(state),
+  zoomCounter: getZoomCounter(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

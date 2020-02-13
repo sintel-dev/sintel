@@ -1,4 +1,9 @@
-import { getCurrentEventDetails, getUpdatedEventsDetails, getDatarunDetails } from '../selectors/datarun';
+import {
+  getCurrentEventDetails,
+  getUpdatedEventsDetails,
+  getDatarunDetails,
+  getZoomCounter,
+} from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
 import {
@@ -16,6 +21,8 @@ import {
   NEW_EVENT_DETAILS,
   ADDING_NEW_EVENT_RESULT,
   UPDATE_DATARUN_EVENTS,
+  SET_FILTER_TAGS,
+  ZOOM_ON_CLICK,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -224,5 +231,19 @@ export function deleteEventAction() {
         dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
       });
     });
+  };
+}
+
+export function filterEventsByTagAction(tags) {
+  return function(dispatch) {
+    dispatch({ type: SET_FILTER_TAGS, filterTags: tags });
+  };
+}
+
+export function zoomOnClick(zoomDirection) {
+  return function(dispatch, getState) {
+    let zoomCounter = getZoomCounter(getState());
+    zoomDirection === 'In' ? (zoomCounter += 1) : (zoomCounter -= 1);
+    dispatch({ type: ZOOM_ON_CLICK, zoomDirection, zoomCounter });
   };
 }

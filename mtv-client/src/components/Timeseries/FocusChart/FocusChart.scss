@@ -48,4 +48,57 @@
             fill-opacity: 0.5;
         }
     }
+
+    .zoomControlsHolder{
+        position: absolute;
+        bottom: 36px;
+        right: 15px;
+        li{
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            &:first-child{
+                text-align: right;
+                display: block;
+                font-size: 18px;
+            }
+
+            label{
+
+                line-height: 28px;
+            }
+
+            label, button {
+                border: 1px solid #979797;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+                display: inline-block;
+                text-align: center;
+            }
+        }
+        input{
+            &[type="checkbox"]{
+                position: absolute;
+                opacity: 0;
+            }
+        }
+        button{
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: center;
+            outline: none;
+
+            span{
+                line-height: 14px;
+                display: inline-block;
+                font-size: 25px;
+            }
+        }
+    }
+
+
 }
