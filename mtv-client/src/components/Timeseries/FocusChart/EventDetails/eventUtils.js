@@ -31,7 +31,7 @@ export const formatOptionLabel = ({ label, icon }) => (
 );
 
 export const RenderComments = eventComments =>
-  eventComments.comments.length ? (
+  eventComments.comments && eventComments.comments.length ? (
     eventComments.comments.map(comment => (
       <div key={comment.id} className="comment">
         <p>
@@ -48,4 +48,4 @@ export const selectedOption = selectedLabel =>
     ? ''
     : grouppedOptions
         .reduce((known, unknown) => [...known.options, ...unknown.options])
-        .find(({ label }) => label.toLowerCase() === selectedLabel);
+        .find(({ label }) => label === selectedLabel);

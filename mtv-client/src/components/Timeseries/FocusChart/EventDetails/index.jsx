@@ -2,18 +2,38 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
+
 import {
-  setCurrentEventAction,
   updateEventDetailsAction,
-  // saveEventDetailsAction,
+  saveEventDetailsAction,
+  isEditingEventRangeAction,
+  closeEventModal,
+  deleteEventAction,
 } from '../../../../model/actions/datarun';
-import { getCurrentEventDetails } from '../../../../model/selectors/datarun';
+
+import {
+  getCurrentEventDetails,
+  getUpdatedEventsDetails,
+  getIsEditingEventRange,
+  getIsPopupOpen,
+} from '../../../../model/selectors/datarun';
+
 import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
 
-const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, saveEventDetails }) => {
-  const isActive = eventDetails ? 'active' : '';
+const EventDetails = ({
+  eventDetails,
+  updatedEventDetails,
+  updateEventDetails,
+  closeEventDetails,
+  saveEventDetails,
+  editEventRange,
+  isEditingEventRange,
+  isPopupOpen,
+  deleteEvent,
+}) => {
+  const isActive = eventDetails && !isEditingEventRange && isPopupOpen ? 'active' : '';
   return (
     <div className={`events-wrapper ${isActive}`}>
       {eventDetails && (
@@ -31,12 +51,12 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
           </div>
           <div className="row">
             <label>From:</label>
-            <span>{eventDetails.start_time}</span>
+            <span>{new Date(eventDetails.start_time).toUTCString()}</span>
           </div>
           <div className="row">
             <label>To:</label>
-            <span>{eventDetails.stop_time}</span>
-            <button type="button" className="edit danger">
+            <span>{new Date(eventDetails.stop_time).toUTCString()}</span>
+            <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
               Modify
             </button>
           </div>
@@ -62,19 +82,22 @@ const EventDetails = ({ eventDetails, closeEventDetails, updateEventDetails, sav
               <textarea
                 id="comment"
                 placeholder="Enter your comment..."
-                onChange={event => updateEventDetails({ comment: event.target.value })}
+                value={updatedEventDetails.comments}
+                onChange={event => updateEventDetails({ comments: event.target.value })}
               />
             </div>
           </div>
           <div className="row ">
             <ul>
               <li>
-                <button type="button" className="danger">
+                <button type="button" className="danger" onClick={deleteEvent}>
                   Delete
                 </button>
               </li>
               <li>
-                <button type="button">Save</button>
+                <button type="button" onClick={saveEventDetails}>
+                  Save
+                </button>
               </li>
             </ul>
           </div>
@@ -94,10 +117,15 @@ EventDetails.propTypes = {
 export default connect(
   state => ({
     eventDetails: getCurrentEventDetails(state),
+    updatedEventDetails: getUpdatedEventsDetails(state),
+    isEditingEventRange: getIsEditingEventRange(state),
+    isPopupOpen: getIsPopupOpen(state),
   }),
   dispatch => ({
-    closeEventDetails: () => dispatch(setCurrentEventAction(null)),
+    closeEventDetails: () => dispatch(closeEventModal()),
     updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
-    // saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    editEventRange: eventState => dispatch(isEditingEventRangeAction(eventState)),
+    deleteEvent: () => dispatch(deleteEventAction()),
   }),
 )(EventDetails);

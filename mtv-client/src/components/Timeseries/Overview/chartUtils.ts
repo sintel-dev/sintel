@@ -101,19 +101,40 @@ export function updateBrushPeriod(event) {
   selection.attr('simulate', null);
 }
 
+export function updateEventHihlight(eventDetails, width) {
+  const { dataRun, updatedEventDetails } = eventDetails;
+  const { timeSeries } = dataRun;
+  const { xCoord, yCoord } = getScale(width, 36, dataRun);
+
+  const startIndex = timeSeries.findIndex(element => updatedEventDetails.start_time - element[0] < 0) - 1;
+  const stopIndex = timeSeries.findIndex(element => updatedEventDetails.stop_time - element[0] < 0);
+  const line = d3
+    .line()
+    .x(d => xCoord(d[0]))
+    .y(d => yCoord(d[1]));
+
+  d3.select(`#wawe_${updatedEventDetails.id}`).attr('d', line(timeSeries.slice(startIndex, stopIndex)));
+}
+
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
   setRatio(width);
   const { timeSeries, eventWindows } = dataRun;
+
   const { xCoord, yCoord } = getScale(chartWidth, height, dataRun);
   const line = d3
     .line()
     .x(d => xCoord(d[0]))
     .y(d => yCoord(d[1]));
 
-  const highlightedEvents = eventWindows.map(event => timeSeries.slice(event[0], event[1] + 2));
+  const highlightedEvents = eventWindows.map(event => ({
+    period: timeSeries.slice(event[0], event[1] + 2),
+    eventID: event[3],
+  }));
+
   const svg = d3
     .select(`._${dataRun.id}`)
     .append('svg')
+    .attr('id', `_${dataRun.id}`)
     .attr('width', width)
     .attr('class', 'wave-chart');
 
@@ -123,13 +144,44 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
     .attr('d', line(timeSeries))
     .attr('transform', `translate(${offset.left}, ${offset.top})`);
 
-  highlightedEvents.forEach(event => {
+  highlightedEvents.forEach(event =>
     svg
       .append('path')
       .attr('class', 'wave-event')
+      .attr('id', `wawe_${event.eventID}`)
       .attr('transform', `translate(${offset.left}, ${offset.top})`)
-      .attr('d', line(event));
-  });
+      .attr('d', line(event.period)),
+  );
 
   drawBrush(svg, chartWidth, onPeriodTimeChange);
+}
+
+export function updateHighlithedEvents(datarun) {
+  const { events, eventWindows, timeSeries } = datarun;
+  const currentSvg = d3.selectAll(`#_${datarun.id}`);
+
+  events.forEach(event => {
+    currentSvg.select(`#wawe_${event.id}`).remove();
+  });
+
+  const highlightedEvents = eventWindows.map(event => ({
+    period: timeSeries.slice(event[0], event[1] + 2),
+    eventID: event[3],
+  }));
+
+  const { xCoord, yCoord } = getScale(chartWidth, 36, datarun);
+  const svg = d3.select(`#_${datarun.id}`);
+  const line = d3
+    .line()
+    .x(d => xCoord(d[0]))
+    .y(d => yCoord(d[1]));
+
+  highlightedEvents.forEach(event =>
+    svg
+      .append('path')
+      .attr('class', 'wave-event')
+      .attr('id', `wawe_${event.eventID}`)
+      .attr('transform', `translate(${offset.left}, ${offset.top})`)
+      .attr('d', line(event.period)),
+  );
 }

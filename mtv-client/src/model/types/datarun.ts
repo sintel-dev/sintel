@@ -3,8 +3,15 @@ import { EventDataType } from './event';
 export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
 export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
+export const IS_CHANGING_EVENT_RANGE = 'IS_CHANGING_EVENT_RANGE';
 export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
 export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
+export const SAVE_EVENT_DETAILS = 'SAVE_EVENT_DETAILS';
+export const IS_UPDATE_POPUP_OPEN = 'IS_UPDATE_POPUP_OPEN';
+export const ADDING_NEW_EVENTS = 'ADDING_NEW_EVENTS';
+export const NEW_EVENT_DETAILS = 'NEW_EVENT_DETAILS';
+export const ADDING_NEW_EVENT_RESULT = 'ADDING_NEW_EVENT_RESULT';
+export const UPDATE_DATARUN_EVENTS = 'UPDATE_DATARUN_EVENTS';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -34,6 +41,11 @@ export type DatarunState = {
   eventComments: Array<any>;
   isPredictionEnabled: boolean;
   eventDetails: object;
+  isEditingEventRange: boolean;
+  isEditingEventRangeDone: boolean;
+  isPopupOpen: boolean;
+  isAddingEvent: boolean;
+  newEventDetails: object;
 };
 
 /**
