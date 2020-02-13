@@ -11,7 +11,7 @@ export const filteringTags = createSelector(
       return [];
     }
     let tags = [];
-    filterTags && filterTags.map(tag => tags.push(tag.value));
+    filterTags && filterTags.forEach(tag => tags.push(tag.value));
     return tags;
   },
 );
