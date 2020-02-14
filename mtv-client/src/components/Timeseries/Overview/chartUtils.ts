@@ -138,14 +138,15 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
     .attr('width', width)
     .attr('class', 'wave-chart');
 
-  svg
+  const eventWrapper = svg.append('g').attr('class', 'event-wrapper');
+  eventWrapper
     .append('path')
     .attr('class', 'wave-data')
     .attr('d', line(timeSeries))
     .attr('transform', `translate(${offset.left}, ${offset.top})`);
 
   highlightedEvents.forEach(event =>
-    svg
+    eventWrapper
       .append('path')
       .attr('class', 'wave-event')
       .attr('id', `wawe_${event.eventID}`)
@@ -170,7 +171,7 @@ export function updateHighlithedEvents(datarun) {
   }));
 
   const { xCoord, yCoord } = getScale(chartWidth, 36, datarun);
-  const svg = d3.select(`#_${datarun.id}`);
+  const svg = d3.select(`#_${datarun.id} .event-wrapper`);
   const line = d3
     .line()
     .x(d => xCoord(d[0]))
