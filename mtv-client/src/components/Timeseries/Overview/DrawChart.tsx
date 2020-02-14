@@ -25,7 +25,7 @@ class DrawChart extends Component<Props> {
     if (JSON.stringify(prevProps.selectedPeriod) !== JSON.stringify(selectedPeriod)) {
       updateBrushPeriod(selectedPeriod);
     }
-    if (prevProps.datarun !== this.props.dataRun) {
+    if (prevProps.dataRun.eventWindows !== this.props.dataRun.eventWindows) {
       updateHighlithedEvents(this.props.dataRun);
     }
   }

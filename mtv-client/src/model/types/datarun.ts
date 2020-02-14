@@ -76,6 +76,7 @@ export type DatarunDataType = {
     timestamp: number;
     data: { means: number[]; counts: number[] }[][];
   }[];
+  eventWindows?: any;
 };
 
 /**
