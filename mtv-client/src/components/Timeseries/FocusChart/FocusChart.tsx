@@ -376,7 +376,7 @@ class FocusChart extends Component<Props, State> {
     }
     const { width, height } = this.state;
     const { xCoord } = getScale(width, height, this.props.datarun.timeSeries);
-    let zoomValue = d3.event.transform || this.props.periodRange.zoomValue;
+    let zoomValue = d3.event.transform;
     const eventRange = xCoord.range().map(zoomValue.invertX, zoomValue);
     const periodRange = {
       eventRange,
