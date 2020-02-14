@@ -24,6 +24,7 @@ import {
   getAddingNewEventStatus,
   getZoomOnClickDirection,
   getZoomCounter,
+  getZoomMode,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -116,6 +117,10 @@ class FocusChart extends Component<Props, State> {
 
     if (this.props.zoomCounter !== prevProps.zoomCounter) {
       this.updateZoomOnClick();
+    }
+
+    if (prevProps.zoomMode !== this.props.zoomMode) {
+      this.toggleZoom();
     }
   }
 
@@ -366,6 +371,16 @@ class FocusChart extends Component<Props, State> {
       zoomStep /= 1.09;
     }
     zoomOnClick(zoomStep);
+  }
+
+  toggleZoom() {
+    const { zoomMode } = this.props;
+    const { enableZoom, disableZoom } = this.addZoom();
+    if (zoomMode) {
+      enableZoom();
+    } else {
+      disableZoom();
+    }
   }
 
   zoomHandler() {
@@ -641,6 +656,7 @@ const mapState = (state: RootState) => ({
   addingNewEventStatus: getAddingNewEventStatus(state),
   zoomDirection: getZoomOnClickDirection(state),
   zoomCounter: getZoomCounter(state),
+  zoomMode: getZoomMode(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

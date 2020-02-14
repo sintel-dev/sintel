@@ -23,6 +23,7 @@ import {
   UPDATE_DATARUN_EVENTS,
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
+  TOGGLE_ZOOM,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -245,5 +246,11 @@ export function zoomOnClick(zoomDirection) {
     let zoomCounter = getZoomCounter(getState());
     zoomDirection === 'In' ? (zoomCounter += 1) : (zoomCounter -= 1);
     dispatch({ type: ZOOM_ON_CLICK, zoomDirection, zoomCounter });
+  };
+}
+
+export function zoomToggleAction(zoomMode) {
+  return function(dispatch) {
+    dispatch({ type: TOGGLE_ZOOM, zoomMode });
   };
 }

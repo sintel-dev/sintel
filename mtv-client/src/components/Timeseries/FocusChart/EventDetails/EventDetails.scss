@@ -13,7 +13,7 @@
     transition: all 0.2s ease-in-out;
     background: rgba(35, 36, 43, 0.9);
     overflow-y: auto;
-
+    z-index: 9;
     span{
         display: inline-block;
         color: #B5B5B5;

@@ -18,6 +18,7 @@ export const getIsAddingNewEvents = state => state.datarun.isAddingEvent;
 export const getAddingNewEventStatus = state => state.datarun.addingNewEvent;
 export const getZoomOnClickDirection = state => state.datarun.zoomDirection;
 export const getZoomCounter = state => state.datarun.zoomCounter;
+export const getZoomMode = state => state.datarun.zoomMode;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
