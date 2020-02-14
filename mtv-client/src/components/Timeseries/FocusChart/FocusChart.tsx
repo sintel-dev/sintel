@@ -319,29 +319,30 @@ class FocusChart extends Component<Props, State> {
     const { width, height, chart } = this.state;
     let zoomInstance;
     const chartData = d3.select('.chart-data');
+    const zoomWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
     const zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
       .translateExtent([
         [0, 0],
-        [width, height],
+        [zoomWidth, height],
       ])
       .extent([
         [0, 0],
-        [width, height],
+        [zoomWidth, height],
       ])
       .on('zoom', this.zoomHandler);
 
     chart.selectAll('.zoom').remove();
     zoomInstance = chartData
       .append('rect')
-      .attr('width', width)
+      .attr('width', zoomWidth)
       .attr('height', height)
       .attr('class', 'zoom')
       .call(zoom);
 
     const enableZoom = () => {
-      zoomInstance.attr('width', width);
+      zoomInstance.attr('width', zoomWidth);
       zoomInstance.call(zoom);
     };
 
