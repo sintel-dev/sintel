@@ -20,6 +20,7 @@ const initialState: DatarunState = {
   filterTags: [],
   zoomDirection: '',
   zoomCounter: 0,
+  zoomMode: true,
 };
 
 /**
@@ -83,6 +84,10 @@ function ZOOM_ON_CLICK(nextState, { zoomDirection, zoomCounter }) {
   nextState.zoomDirection = zoomDirection;
 }
 
+function TOGGLE_ZOOM(nextState, { zoomMode }) {
+  nextState.zoomMode = zoomMode;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -97,4 +102,5 @@ export default createReducer<DatarunState>(initialState, {
   ADDING_NEW_EVENT_RESULT,
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
+  TOGGLE_ZOOM,
 });
