@@ -51,6 +51,8 @@ class FocusChart extends Component<Props, State> {
 
   private resetZoom: any;
 
+  private zoomOnClick: any;
+
   // TO be checked
   // previously use ...args here
   constructor(props) {
@@ -116,7 +118,7 @@ class FocusChart extends Component<Props, State> {
     }
 
     if (this.props.zoomCounter !== prevProps.zoomCounter) {
-      this.updateZoomOnClick();
+      this.zoomOnClick(this.props.zoomDirection);
     }
 
     if (prevProps.zoomMode !== this.props.zoomMode) {
@@ -281,9 +283,10 @@ class FocusChart extends Component<Props, State> {
     };
 
     setTimeout(() => {
-      const { zoom, resetZoom } = this.addZoom();
+      const { zoom, resetZoom, zoomOnClick } = this.addZoom();
       this.zoom = zoom;
       this.resetZoom = resetZoom;
+      this.zoomOnClick = zoomOnClick;
 
       chartData.selectAll('.line-highlight').remove(); // to make sure all previous events are removed
       eventWindows.forEach((event, index) => drawHlEvent(timeSeries.slice(event[0], event[1] + 1), index));
@@ -334,9 +337,8 @@ class FocusChart extends Component<Props, State> {
       .append('rect')
       .attr('width', width)
       .attr('height', height)
-      .attr('class', 'zoom');
-
-    zoomInstance = d3.select('.zoom').call(zoom);
+      .attr('class', 'zoom')
+      .call(zoom);
 
     const enableZoom = () => {
       zoomInstance.attr('width', width);
@@ -348,29 +350,14 @@ class FocusChart extends Component<Props, State> {
       zoomInstance.on('.zoom', null);
     };
 
-    const zoomOnClick = value => {
-      zoom.scaleBy(zoomInstance, value);
-    };
+    const zoomOnClick = zoomDirection =>
+      zoomDirection === 'In' ? zoom.scaleBy(zoomInstance, 1.03) : zoom.scaleBy(zoomInstance, 0.95);
 
     let resetZoom = () => {
       zoomInstance.call(zoom.transform, d3.zoomIdentity);
     };
 
     return { zoom, enableZoom, disableZoom, resetZoom, zoomOnClick, zoomInstance };
-  }
-
-  updateZoomOnClick() {
-    const { zoomOnClick } = this.addZoom();
-    const { periodRange, zoomDirection } = this.props;
-    const { zoomValue } = periodRange;
-    let zoomStep = zoomValue.k || 1;
-
-    if (zoomDirection === 'In') {
-      zoomStep *= 1.09;
-    } else {
-      zoomStep /= 1.09;
-    }
-    zoomOnClick(zoomStep);
   }
 
   toggleZoom() {
