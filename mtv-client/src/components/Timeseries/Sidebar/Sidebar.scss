@@ -5,6 +5,32 @@
     min-width: 480px;
     padding: 10px;
     box-sizing: border-box;
+    height: 92vh;
+    .data-wrapper{
+        height: 99%;
+    }
+
+    .feature-cell {
+        .target {
+            circle, line{
+                stroke: rgba(218, 227, 245, 0.3);
+                fill: transparent;
+            }
+            .target-info {
+                fill: #CED8FB;
+            }
+            
+        }
+        .period{
+            fill: transparent;
+            stroke: red;
+            stroke-width: 1;
+        }
+        .radial-text{
+            fill: #8A9097;
+            font-size: 13px;
+        }
+    }
 }
 
 @media screen and (max-width: 1200px) {
