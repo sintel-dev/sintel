@@ -35,6 +35,7 @@ class Landing extends React.Component<Props> {
           </div>
           <div className={`experiments-wrapper ${isExperimentPageActive}`}>
             <Experiment />
+            <div className="clear" />
           </div>
         </div>
       </div>

@@ -1,0 +1,15 @@
+@import '../../../assets/sass/colors.scss';
+.sidebar {
+    background: $main-color;
+    float: right;
+    min-width: 480px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 1200px) {
+    .sidebar {
+        margin-top: 20px;
+        width: 100%;
+    }
+}
