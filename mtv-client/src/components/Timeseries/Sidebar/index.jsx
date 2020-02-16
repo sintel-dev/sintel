@@ -83,38 +83,37 @@ class Sidebar extends Component {
   }
 
   getDataScale(innerRadius, outerRadius) {
-    let angle = d3.scaleLinear().range([0, 2 * Math.PI]);
-    debugger;
-    let radius = d3
+    let scaleAngle = d3.scaleLinear().range([0, 2 * Math.PI]);
+
+    let scaleRadius = d3
       .scaleLinear()
       .range([innerRadius, outerRadius])
       .clamp(true);
 
     let area = d3
       .areaRadial()
-      .angle((d, i) => {
-        console.log('----', d, i);
-        debugger;
-        return angle(i);
-      })
-      .innerRadius(d => radius(0))
+      .angle((d, i) =>
+        // do not touch angle ever again
+        scaleAngle(i),
+      )
+      .innerRadius(d => scaleRadius(0))
       .outerRadius(d => {
-        console.log(']=====', d);
-        return radius(d);
+        // @TODO - WHY d has negative values????
+        // this is the whole chart issue!!!!!
+        console.log(d, scaleRadius(d));
+        // return 50;
+        return scaleRadius(d);
       })
       .curve(d3.curveCardinalClosed);
 
     let area0 = d3
       .areaRadial()
-      .angle((d, i) =>
-        // console.log(i);
-        angle(i),
-      )
-      .innerRadius(d => radius(0))
-      .outerRadius(d => radius(0))
+      .angle((d, i) => scaleAngle(i))
+      .innerRadius(d => scaleRadius(0))
+      .outerRadius(d => scaleRadius(0))
       .curve(d3.curveCardinalClosed);
 
-    return { angle, radius, area, area0 };
+    return { scaleAngle, scaleRadius, area, area0 };
   }
 
   drawGradient() {
@@ -136,7 +135,10 @@ class Sidebar extends Component {
     const { width } = this.state;
     const radius = width / 3 / 2;
     const { chart } = this.state;
-    const { area, area0 } = this.getDataScale(9.047208333333332, 72.37766666666666);
+    const { scaleAngle, scaleRadius, area, area0 } = this.getDataScale(9.0425, radius);
+    scaleAngle.domain([0, range.bins.length - 0.08]);
+    scaleRadius.domain([0, 1]);
+
     const featureCell = chart
       .append('g')
       .attr('class', 'feature-cell')
@@ -144,25 +146,29 @@ class Sidebar extends Component {
 
     this.drawFeatureTarget(featureCell, range);
 
-    featureCell
-      .append('circle')
-      .attr('class', 'wrapper')
-      .attr('r', radius * 0.85)
-      .attr('fill', 'url(#blueGradient)');
-
-    let path = featureCell
+    const path = featureCell
       .append('path')
       .datum(range.bins)
       .attr('class', 'feature-area radial-cursor')
       .attr('id', `path_${range.name}`)
-      .attr('d', area0);
+      .attr('d', area0)
+      .on('click', () => {
+        console.log('call to action');
+      });
 
-    let clipPath = featureCell.append('clipPath');
+    const clipPath = featureCell.append('clipPath');
 
     clipPath
       .attr('id', `clip_${range.name}`)
       .append('use')
       .attr('xlink:href', `#path_${range.name}`);
+
+    featureCell
+      .append('circle')
+      .attr('clip-path', `url(#clip_${range.name})`)
+      .attr('class', 'wrapper')
+      .attr('r', radius * 0.85)
+      .attr('fill', 'url(#blueGradient)');
 
     path.attr('d', area);
 

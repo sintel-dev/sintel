@@ -21,14 +21,21 @@
             }
             
         }
-        .period{
-            fill: transparent;
-            stroke: red;
-            stroke-width: 1;
+        // .period{
+        //     fill: transparent;
+        //     stroke: red;
+        //     stroke-width: 1;
+        // }
+        .feature-area {
+            stroke: #687ba3;
         }
         .radial-text{
             fill: #8A9097;
             font-size: 13px;
+        }
+
+        .radial-cursor{
+            fill: transparent;
         }
     }
 }
