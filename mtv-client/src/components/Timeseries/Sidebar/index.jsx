@@ -84,7 +84,7 @@ class Sidebar extends Component {
 
   getDataScale(innerRadius, outerRadius) {
     let angle = d3.scaleLinear().range([0, 2 * Math.PI]);
-
+    debugger;
     let radius = d3
       .scaleLinear()
       .range([innerRadius, outerRadius])
@@ -92,14 +92,24 @@ class Sidebar extends Component {
 
     let area = d3
       .areaRadial()
-      .angle((d, i) => angle(i))
+      .angle((d, i) => {
+        console.log('----', d, i);
+        debugger;
+        return angle(i);
+      })
       .innerRadius(d => radius(0))
-      .outerRadius(d => radius(d))
+      .outerRadius(d => {
+        console.log(']=====', d);
+        return radius(d);
+      })
       .curve(d3.curveCardinalClosed);
 
     let area0 = d3
       .areaRadial()
-      .angle((d, i) => angle(i))
+      .angle((d, i) =>
+        // console.log(i);
+        angle(i),
+      )
       .innerRadius(d => radius(0))
       .outerRadius(d => radius(0))
       .curve(d3.curveCardinalClosed);
@@ -107,11 +117,26 @@ class Sidebar extends Component {
     return { angle, radius, area, area0 };
   }
 
+  drawGradient() {
+    const { chart } = this.state;
+    const defs = chart.append('defs');
+    const offset = defs.append('radialGradient').attr('id', 'blueGradient');
+    offset
+      .append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', '#B2C1FF');
+
+    offset
+      .append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', 'rgba(216,216,216,0)');
+  }
+
   drawFeatureCell(range, index) {
     const { width } = this.state;
     const radius = width / 3 / 2;
     const { chart } = this.state;
-    const { area, area0 } = this.getDataScale(6, radius);
+    const { area, area0 } = this.getDataScale(9.047208333333332, 72.37766666666666);
     const featureCell = chart
       .append('g')
       .attr('class', 'feature-cell')
@@ -120,11 +145,28 @@ class Sidebar extends Component {
     this.drawFeatureTarget(featureCell, range);
 
     featureCell
+      .append('circle')
+      .attr('class', 'wrapper')
+      .attr('r', radius * 0.85)
+      .attr('fill', 'url(#blueGradient)');
+
+    let path = featureCell
       .append('path')
       .datum(range.bins)
-      .attr('d', area)
-      .attr('class', 'period');
-    // cell.attr('d', area);
+      .attr('class', 'feature-area radial-cursor')
+      .attr('id', `path_${range.name}`)
+      .attr('d', area0);
+
+    let clipPath = featureCell.append('clipPath');
+
+    clipPath
+      .attr('id', `clip_${range.name}`)
+      .append('use')
+      .attr('xlink:href', `#path_${range.name}`);
+
+    path.attr('d', area);
+
+    // .on('click', () => self.trigger('select', o));
   }
 
   drawData() {
@@ -134,6 +176,7 @@ class Sidebar extends Component {
 
     chart.attr('width', width).attr('height', height);
     period.map((range, index) => this.drawFeatureCell(range, index));
+    this.drawGradient();
   }
 
   render() {
