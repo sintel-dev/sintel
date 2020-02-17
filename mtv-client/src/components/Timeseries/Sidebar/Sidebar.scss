@@ -11,6 +11,7 @@
     }
 
     .feature-cell {
+        cursor: pointer;
         .target {
             circle, line{
                 stroke: rgba(218, 227, 245, 0.3);
@@ -21,11 +22,6 @@
             }
             
         }
-        // .period{
-        //     fill: transparent;
-        //     stroke: red;
-        //     stroke-width: 1;
-        // }
         .feature-area {
             stroke: #687ba3;
         }

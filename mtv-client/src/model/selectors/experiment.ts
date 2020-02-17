@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import { createSelector } from 'reselect';
 import { RootState, EventDataType } from '../types';
 
@@ -127,6 +128,31 @@ const groupDataByPeriod = data => {
   return result;
 };
 
+const getPeriodRange = periodData => {
+  let minRange = Number.MAX_SAFE_INTEGER;
+  let maxRange = Number.MIN_SAFE_INTEGER;
+  periodData.forEach(currentPeriod => {
+    const { bins } = currentPeriod;
+    bins.forEach(bin => {
+      minRange = minRange > bin ? bin : minRange;
+      maxRange = maxRange < bin ? bin : maxRange;
+    });
+  });
+  return { minRange, maxRange };
+};
+
+const normalizePeriodData = periodData => {
+  const { minRange, maxRange } = getPeriodRange(periodData);
+  const normalizeScale = d3
+    .scaleLinear()
+    .domain([minRange, maxRange])
+    .range([0, 1]);
+  const period = periodData.forEach(currentPeriod => {
+    currentPeriod.bins = currentPeriod.bins.map(bin => (bin !== 0 ? normalizeScale(bin) : 0));
+  });
+  return period;
+};
+
 export const getProcessedDataRuns = createSelector(
   [getSelectedExperimentData, filteringTags],
   (experimentData, filterTags) => {
@@ -140,6 +166,7 @@ export const getProcessedDataRuns = createSelector(
       const timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
       const period = groupDataByPeriod(datarun.raw);
       const { events } = datarun;
+      normalizePeriodData(period);
 
       const filteredEvents = filterTags.length ? events.filter(event => filterTags.includes(event.tag)) : events;
       const eventWindows = groupByEventWindows(
