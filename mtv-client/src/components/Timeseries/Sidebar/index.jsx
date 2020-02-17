@@ -7,6 +7,7 @@ import Header from './Header';
 import { getDatarunDetails } from '../../../model/selectors/datarun';
 import { getWrapperSize } from './SidebarUtils';
 import './Sidebar.scss';
+import { setPeriodRangeAction } from '../../../model/actions/datarun';
 
 class Sidebar extends Component {
   constructor(...props) {
@@ -81,6 +82,7 @@ class Sidebar extends Component {
   drawData(periodRange, index) {
     const graphSpacing = 10;
     const { width } = this.state;
+    const { setPeriodRange } = this.props;
     const radius = width / 3 / 2 - graphSpacing;
     const { horizontalShift, verticalShift } = this.getFeatureCellCoords(index);
 
@@ -90,6 +92,7 @@ class Sidebar extends Component {
           key={periodRange.name}
           className="feature-cell"
           transform={`translate(${horizontalShift}, ${verticalShift})`}
+          onClick={() => setPeriodRange(periodRange.children[0].level)}
         >
           <path
             id={`path_${periodRange.name}`}
@@ -147,7 +150,12 @@ class Sidebar extends Component {
   }
 }
 
-export default connect(state => ({
-  experimentData: getSelectedExperimentData(state),
-  dataRun: getDatarunDetails(state),
-}))(Sidebar);
+export default connect(
+  state => ({
+    experimentData: getSelectedExperimentData(state),
+    dataRun: getDatarunDetails(state),
+  }),
+  dispatch => ({
+    setPeriodRange: periodRange => dispatch(setPeriodRangeAction(periodRange)),
+  }),
+)(Sidebar);

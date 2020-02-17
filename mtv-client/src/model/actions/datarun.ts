@@ -24,6 +24,7 @@ import {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -252,5 +253,11 @@ export function zoomOnClick(zoomDirection) {
 export function zoomToggleAction(zoomMode) {
   return function(dispatch) {
     dispatch({ type: TOGGLE_ZOOM, zoomMode });
+  };
+}
+
+export function setPeriodRangeAction(level) {
+  return function(dispatch, getState) {
+    dispatch({ type: SET_CURRENT_PERIOD_LEVEL, periodLevel: level });
   };
 }

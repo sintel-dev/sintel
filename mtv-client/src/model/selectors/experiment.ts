@@ -4,6 +4,7 @@ import { RootState, EventDataType } from '../types';
 
 export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
+export const getPeriodLevel = state => state.datarun.periodLevel;
 
 export const filteringTags = createSelector(
   [getSelectedExperimentData, getFilterTags],
@@ -154,8 +155,8 @@ const normalizePeriodData = periodData => {
 };
 
 export const getProcessedDataRuns = createSelector(
-  [getSelectedExperimentData, filteringTags],
-  (experimentData, filterTags) => {
+  [getSelectedExperimentData, filteringTags, getPeriodLevel],
+  (experimentData, filterTags, periodLevel) => {
     if (experimentData.isExperimentDataLoading) {
       return [];
     }

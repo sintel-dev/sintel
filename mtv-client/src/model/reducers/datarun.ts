@@ -88,6 +88,10 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
   nextState.zoomMode = zoomMode;
 }
 
+function SET_CURRENT_PERIOD_LEVEL(nextState, { periodLevel }) {
+  nextState.periodLevel = periodLevel;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -103,4 +107,5 @@ export default createReducer<DatarunState>(initialState, {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
 });
