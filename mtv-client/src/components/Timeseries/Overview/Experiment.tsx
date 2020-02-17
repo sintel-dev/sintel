@@ -8,22 +8,26 @@ import Loader from '../../Common/Loader';
 import Datarun from './Datarun';
 import FocusChartControls from '../FocusChartControls';
 import { RootState } from '../../../model/types';
+import Sidebar from '../Sidebar';
 
 type StateProps = ReturnType<typeof mapState>;
 type Props = StateProps;
 
 const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => (
-  <div>
+  <div className="experiment">
     <Loader isLoading={experimentData.isExperimentDataLoading}>
-      <div className="overview-wrapper scroll-style" id="overview-wrapper">
-        {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
-          processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
-        ) : (
-          <p>No datarun for current experiment</p>
-        )}
+      <div className="left-sidebar">
+        <div className="overview-wrapper scroll-style" id="overview-wrapper">
+          {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
+            processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
+          ) : (
+            <p>No datarun for current experiment</p>
+          )}
+        </div>
+        <FocusChartControls />
+        <FocusChart />
       </div>
-      <FocusChartControls />
-      <FocusChart />
+      <Sidebar />
     </Loader>
   </div>
 );

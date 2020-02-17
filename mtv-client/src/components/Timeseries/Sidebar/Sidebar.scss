@@ -1,0 +1,44 @@
+@import '../../../assets/sass/colors.scss';
+.sidebar {
+    background: $main-color;
+    float: right;
+    min-width: 480px;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 92vh;
+    .data-wrapper{
+        height: 99%;
+    }
+
+    .feature-cell {
+        cursor: pointer;
+        .target {
+            circle, line{
+                stroke: rgba(218, 227, 245, 0.3);
+                fill: transparent;
+            }
+            .target-info {
+                fill: #CED8FB;
+            }
+            
+        }
+        .feature-area {
+            stroke: #687ba3;
+        }
+        .radial-text{
+            fill: #8A9097;
+            font-size: 13px;
+        }
+
+        .radial-cursor{
+            fill: transparent;
+        }
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .sidebar {
+        margin-top: 20px;
+        width: 100%;
+    }
+}
