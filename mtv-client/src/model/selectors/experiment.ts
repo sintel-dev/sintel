@@ -134,8 +134,8 @@ const getPeriodRange = periodData => {
   periodData.forEach(currentPeriod => {
     const { bins } = currentPeriod;
     bins.forEach(bin => {
-      minRange = minRange > bin ? bin : minRange;
-      maxRange = maxRange < bin ? bin : maxRange;
+      minRange = Math.min(minRange, bin);
+      maxRange = Math.max(maxRange, bin);
     });
   });
   return { minRange, maxRange };
@@ -147,10 +147,10 @@ const normalizePeriodData = periodData => {
     .scaleLinear()
     .domain([minRange, maxRange])
     .range([0, 1]);
-  const period = periodData.forEach(currentPeriod => {
+
+  periodData.forEach(currentPeriod => {
     currentPeriod.bins = currentPeriod.bins.map(bin => (bin !== 0 ? normalizeScale(bin) : 0));
   });
-  return period;
 };
 
 export const getProcessedDataRuns = createSelector(
