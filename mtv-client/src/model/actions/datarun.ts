@@ -258,15 +258,19 @@ export function zoomToggleAction(zoomMode) {
 
 export function setPeriodLevelAction(currentPeriod) {
   return function(dispatch) {
-    const { level, name } = currentPeriod;
-    const isPeriodLevelSelected = Object.values(currentPeriod).length !== 0;
-    dispatch({
-      type: SET_CURRENT_PERIOD_LEVEL,
-      isPeriodLevelSelected,
-      periodLevel: {
-        level,
-        name,
-      },
-    });
+    if (currentPeriod !== null) {
+      const { level, name, parent } = currentPeriod;
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        isPeriodLevelSelected: true,
+        periodLevel: {
+          level,
+          name,
+          parent: (parent && parent.name) || null,
+        },
+      });
+    } else {
+      dispatch({ type: SET_CURRENT_PERIOD_LEVEL, isPeriodLevelSelected: false, periodLevel: {} });
+    }
   };
 }

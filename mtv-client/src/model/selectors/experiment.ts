@@ -5,6 +5,7 @@ import { RootState, EventDataType } from '../types';
 export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
 export const getSelectedPeriodLevel = state => state.datarun.periodLevel;
+export const getIsPeriodLevelSelected = state => state.datarun.isPeriodLevelSelected;
 
 export const filteringTags = createSelector(
   [getSelectedExperimentData, getFilterTags],
@@ -154,14 +155,25 @@ const normalizePeriodData = periodData => {
   });
 };
 
+const getDatarunPeriod = (period, periodLevel) => {
+  let periodData = period;
+  if (periodLevel.level === 'year') {
+    periodData = [period.find(currentPeriod => currentPeriod.name === periodLevel.name)];
+  }
+
+  if (periodLevel.level === 'month') {
+    const filteredPeriod = period.find(yearLevel => yearLevel.name === periodLevel.parent);
+    periodData = filteredPeriod.children.filter(month => month.name === periodLevel.name);
+  }
+  return periodData;
+};
+
 export const getProcessedDataRuns = createSelector(
   [getSelectedExperimentData, filteringTags, getSelectedPeriodLevel],
   (experimentData, filterTags, periodLevel) => {
     if (experimentData.isExperimentDataLoading) {
       return [];
     }
-
-    const isPeriodLevelSelected = Object.keys(periodLevel).length !== 0;
 
     return experimentData.data.dataruns.map(datarun => {
       const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
@@ -172,9 +184,6 @@ export const getProcessedDataRuns = createSelector(
       normalizePeriodData(period);
 
       const filteredEvents = filterTags.length ? events.filter(event => filterTags.includes(event.tag)) : events;
-      const periodData = isPeriodLevelSelected
-        ? [period.find(currentPeriod => currentPeriod.name === periodLevel.name)]
-        : period;
       const eventWindows = groupByEventWindows(
         filteredEvents,
         timeSeries.map(series => series[0]),
@@ -186,7 +195,7 @@ export const getProcessedDataRuns = createSelector(
         timeseriesPred,
         timeseriesErr,
         eventWindows,
-        period: periodData,
+        period: getDatarunPeriod(period, periodLevel),
       };
     });
   },
