@@ -4,7 +4,7 @@ import {
   getDatarunDetails,
   getZoomCounter,
 } from '../selectors/datarun';
-import { getSelectedExperimentData } from '../../model/selectors/experiment';
+import { getSelectedExperimentData, getSelectedPeriodLevel } from '../../model/selectors/experiment';
 import API from '../utils/api';
 import {
   SELECT_DATARUN,
@@ -45,6 +45,7 @@ export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: an
       type: SET_TIMESERIES_PERIOD,
       eventRange,
     };
+    dispatch(setPeriodLevelAction(null));
     dispatch(action);
   };
 }
@@ -256,10 +257,30 @@ export function zoomToggleAction(zoomMode) {
   };
 }
 
-export function setPeriodLevelAction(currentPeriod) {
-  return function(dispatch) {
-    if (currentPeriod !== null) {
-      const { level, name, parent } = currentPeriod;
+export function setPeriodLevelAction(newPeriod) {
+  return function(dispatch, getState) {
+    const currentPeriod = getSelectedPeriodLevel(getState());
+    if (newPeriod === null) {
+      dispatch({ type: SET_CURRENT_PERIOD_LEVEL, periodLevel: {} });
+      return;
+    }
+    if (newPeriod.level !== 'day') {
+      const { level, name, parent } = newPeriod;
+
+      // let periodLevel = {
+      //   viewLevel: newPeriod.level,
+      //   year: newPeriod.level === 'year' ? newPeriod.name : currentPeriod.name,
+      //   month: newPeriod.level === 'month' ? newPeriod.name : currentPeriod.name,
+      //   parent: (parent && parent.name) || null,
+      // };
+
+      // if (newPeriod.reviewLevel) {
+      //   periodLevel = {
+      //     ...periodLevel,
+      //     viewLevel: newPeriod.reviewLevel,
+      //   };
+      // }
+
       dispatch({
         type: SET_CURRENT_PERIOD_LEVEL,
         isPeriodLevelSelected: true,
@@ -269,8 +290,22 @@ export function setPeriodLevelAction(currentPeriod) {
           parent: (parent && parent.name) || null,
         },
       });
-    } else {
-      dispatch({ type: SET_CURRENT_PERIOD_LEVEL, isPeriodLevelSelected: false, periodLevel: {} });
     }
+  };
+}
+
+export function reviewPeriodAction(period) {
+  return function(dispatch, getState) {
+    const currentPeriod = getSelectedPeriodLevel(getState());
+
+    const periodLevel = {
+      ...currentPeriod,
+      level: period,
+      year: period === 'year' ? currentPeriod.year : currentPeriod.parent,
+      month: currentPeriod.parent,
+    };
+
+    console.log(periodLevel);
+    debugger;
   };
 }

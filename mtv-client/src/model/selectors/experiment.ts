@@ -169,8 +169,8 @@ const getDatarunPeriod = (period, periodLevel) => {
 };
 
 export const getProcessedDataRuns = createSelector(
-  [getSelectedExperimentData, filteringTags, getSelectedPeriodLevel],
-  (experimentData, filterTags, periodLevel) => {
+  [getSelectedExperimentData, filteringTags, getSelectedPeriodLevel, getIsPeriodLevelSelected],
+  (experimentData, filterTags, periodLevel, isPeriodLevelSelected) => {
     if (experimentData.isExperimentDataLoading) {
       return [];
     }
@@ -195,7 +195,7 @@ export const getProcessedDataRuns = createSelector(
         timeseriesPred,
         timeseriesErr,
         eventWindows,
-        period: getDatarunPeriod(period, periodLevel),
+        period: (isPeriodLevelSelected && getDatarunPeriod(period, periodLevel)) || period,
       };
     });
   },

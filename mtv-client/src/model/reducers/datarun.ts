@@ -91,7 +91,6 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
 }
 
 function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLevel }) {
-  // nextState.isPeriodLevelSelected = ;
   nextState.isPeriodLevelSelected = isPeriodLevelSelected;
   nextState.periodLevel = periodLevel;
 }

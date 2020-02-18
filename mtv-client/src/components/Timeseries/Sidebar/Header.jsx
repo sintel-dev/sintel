@@ -1,23 +1,26 @@
 import React from 'react';
 
-const Header = ({ headerTitle, setPeriodLevel, isPeriodLevelSelected, selectedPeriodLevel }) => {
-  const monthClassName = selectedPeriodLevel.level === 'year' ? 'active' : '';
+const Header = ({ headerTitle, reviewPeriod, isPeriodLevelSelected, currentPeriod }) => {
   const yearClassName = !isPeriodLevelSelected ? 'active' : '';
+  const monthClassName = isPeriodLevelSelected && currentPeriod.level === 'year' ? 'active' : '';
+  const dayClassName = isPeriodLevelSelected && currentPeriod.level === 'month' ? 'active' : '';
+
+  const { name, level } = currentPeriod;
 
   return (
     <div className="period-control">
       <div className="sidebar-heading">{headerTitle}</div>
       <ul>
         <li>
-          <button type="button" onClick={() => setPeriodLevel(null)} className={yearClassName}>
+          <button type="button" onClick={() => reviewPeriod('year')} className={yearClassName}>
             Year
           </button>
         </li>
         <li>
           <button
             type="button"
-            onClick={() => setPeriodLevel('month')}
-            disabled={!isPeriodLevelSelected}
+            onClick={() => reviewPeriod('month')}
+            // disabled={!isPeriodLevelSelected}
             className={monthClassName}
           >
             Month
@@ -26,13 +29,15 @@ const Header = ({ headerTitle, setPeriodLevel, isPeriodLevelSelected, selectedPe
         <li>
           <button
             type="button"
-            onClick={() => setPeriodLevel('day')}
-            disabled={!isPeriodLevelSelected && selectedPeriodLevel.level !== 'day'}
+            onClick={() => reviewPeriod('day')}
+            // disabled={!isPeriodLevelSelected && currentPeriod.level !== 'day'}
+            className={dayClassName}
           >
             Day
           </button>
         </li>
       </ul>
+      <div className="clear" />
     </div>
   );
 };

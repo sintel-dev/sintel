@@ -11,7 +11,7 @@ import Header from './Header';
 import { getDatarunDetails } from '../../../model/selectors/datarun';
 import { getWrapperSize } from './SidebarUtils';
 import './Sidebar.scss';
-import { setPeriodLevelAction } from '../../../model/actions/datarun';
+import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
 
 const graphSpacing = 10;
 
@@ -150,7 +150,7 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun, setPeriodLevel, selectedPeriodLevel, isPeriodLevelSelected } = this.props;
+    const { experimentData, dataRun, selectedPeriodLevel, isPeriodLevelSelected, reviewPeriod } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
@@ -158,10 +158,11 @@ class Sidebar extends Component {
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           <Header
             headerTitle={dataRun.signal}
-            setPeriodLevel={setPeriodLevel}
+            reviewPeriod={reviewPeriod}
             isPeriodLevelSelected={isPeriodLevelSelected}
-            selectedPeriodLevel={selectedPeriodLevel}
+            currentPeriod={selectedPeriodLevel}
           />
+          <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
           <div className="data-wrapper" id="dataWrapper">
             <svg id="multiPeriodChart" width={width} height={height}>
               {this.drawData(period)}
@@ -188,5 +189,6 @@ export default connect(
   }),
   dispatch => ({
     setPeriodLevel: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),
+    reviewPeriod: periodLevel => dispatch(reviewPeriodAction(periodLevel)),
   }),
 )(Sidebar);
