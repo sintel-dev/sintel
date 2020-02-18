@@ -256,8 +256,17 @@ export function zoomToggleAction(zoomMode) {
   };
 }
 
-export function setPeriodRangeAction(level) {
-  return function(dispatch, getState) {
-    dispatch({ type: SET_CURRENT_PERIOD_LEVEL, periodLevel: level });
+export function setPeriodLevelAction(currentPeriod) {
+  return function(dispatch) {
+    const { level, name } = currentPeriod;
+    const isPeriodLevelSelected = Object.values(currentPeriod).length !== 0;
+    dispatch({
+      type: SET_CURRENT_PERIOD_LEVEL,
+      isPeriodLevelSelected,
+      periodLevel: {
+        level,
+        name,
+      },
+    });
   };
 }

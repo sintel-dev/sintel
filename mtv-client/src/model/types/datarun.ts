@@ -54,6 +54,8 @@ export type DatarunState = {
   zoomDirection: '';
   zoomCounter: number;
   zoomMode: boolean;
+  periodLevel: object;
+  isPeriodLevelSelected: boolean;
 };
 
 /**

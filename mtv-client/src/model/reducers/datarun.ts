@@ -21,6 +21,8 @@ const initialState: DatarunState = {
   zoomDirection: '',
   zoomCounter: 0,
   zoomMode: true,
+  periodLevel: {},
+  isPeriodLevelSelected: false,
 };
 
 /**
@@ -88,7 +90,9 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
   nextState.zoomMode = zoomMode;
 }
 
-function SET_CURRENT_PERIOD_LEVEL(nextState, { periodLevel }) {
+function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLevel }) {
+  // nextState.isPeriodLevelSelected = ;
+  nextState.isPeriodLevelSelected = isPeriodLevelSelected;
   nextState.periodLevel = periodLevel;
 }
 

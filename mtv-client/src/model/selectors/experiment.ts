@@ -4,7 +4,7 @@ import { RootState, EventDataType } from '../types';
 
 export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
-export const getPeriodLevel = state => state.datarun.periodLevel;
+export const getSelectedPeriodLevel = state => state.datarun.periodLevel;
 
 export const filteringTags = createSelector(
   [getSelectedExperimentData, getFilterTags],
@@ -129,7 +129,7 @@ const groupDataByPeriod = data => {
   return result;
 };
 
-const getPeriodRange = periodData => {
+const normalizePeriodRange = periodData => {
   let minRange = Number.MAX_SAFE_INTEGER;
   let maxRange = Number.MIN_SAFE_INTEGER;
   periodData.forEach(currentPeriod => {
@@ -143,7 +143,7 @@ const getPeriodRange = periodData => {
 };
 
 const normalizePeriodData = periodData => {
-  const { minRange, maxRange } = getPeriodRange(periodData);
+  const { minRange, maxRange } = normalizePeriodRange(periodData);
   const normalizeScale = d3
     .scaleLinear()
     .domain([minRange, maxRange])
@@ -155,11 +155,13 @@ const normalizePeriodData = periodData => {
 };
 
 export const getProcessedDataRuns = createSelector(
-  [getSelectedExperimentData, filteringTags, getPeriodLevel],
+  [getSelectedExperimentData, filteringTags, getSelectedPeriodLevel],
   (experimentData, filterTags, periodLevel) => {
     if (experimentData.isExperimentDataLoading) {
       return [];
     }
+
+    const isPeriodLevelSelected = Object.keys(periodLevel).length !== 0;
 
     return experimentData.data.dataruns.map(datarun => {
       const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
@@ -170,6 +172,9 @@ export const getProcessedDataRuns = createSelector(
       normalizePeriodData(period);
 
       const filteredEvents = filterTags.length ? events.filter(event => filterTags.includes(event.tag)) : events;
+      const periodData = isPeriodLevelSelected
+        ? [period.find(currentPeriod => currentPeriod.name === periodLevel.name)]
+        : period;
       const eventWindows = groupByEventWindows(
         filteredEvents,
         timeSeries.map(series => series[0]),
@@ -181,7 +186,7 @@ export const getProcessedDataRuns = createSelector(
         timeseriesPred,
         timeseriesErr,
         eventWindows,
-        period,
+        period: periodData,
       };
     });
   },

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import { getSelectedExperimentData } from '../../../model/selectors/experiment';
+import { getSelectedExperimentData, getSelectedPeriodLevel } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
 import { getDatarunDetails } from '../../../model/selectors/datarun';
 import { getWrapperSize } from './SidebarUtils';
 import './Sidebar.scss';
-import { setPeriodRangeAction } from '../../../model/actions/datarun';
+import { setPeriodLevelAction } from '../../../model/actions/datarun';
 
 class Sidebar extends Component {
   constructor(...props) {
@@ -82,7 +82,7 @@ class Sidebar extends Component {
   drawData(periodRange, index) {
     const graphSpacing = 10;
     const { width } = this.state;
-    const { setPeriodRange } = this.props;
+    const { setPeriodLevel } = this.props;
     const radius = width / 3 / 2 - graphSpacing;
     const { horizontalShift, verticalShift } = this.getFeatureCellCoords(index);
 
@@ -92,7 +92,7 @@ class Sidebar extends Component {
           key={periodRange.name}
           className="feature-cell"
           transform={`translate(${horizontalShift}, ${verticalShift})`}
-          onClick={() => setPeriodRange(periodRange.children[0].level)}
+          onClick={() => setPeriodLevel(periodRange)}
         >
           <path
             id={`path_${periodRange.name}`}
@@ -126,7 +126,7 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun } = this.props;
+    const { experimentData, dataRun, selectedPeriodLevel } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
@@ -135,7 +135,8 @@ class Sidebar extends Component {
           <Header headerTitle={dataRun.signal} />
           <div className="data-wrapper" id="dataWrapper">
             <svg id="multiPeriodChart" width={width} height={height}>
-              {period.map((periodRange, index) => this.drawData(periodRange, index))}
+              {selectedPeriodLevel && period.map((periodRange, index) => this.drawData(periodRange, index))}
+              {/* {selectedPeriodLevel && console.log('draw level here')} */}
               <defs>
                 <radialGradient id="blueGradient">
                   <stop offset="0" stopColor="#B2C1FF" />
@@ -154,8 +155,9 @@ export default connect(
   state => ({
     experimentData: getSelectedExperimentData(state),
     dataRun: getDatarunDetails(state),
+    selectedPeriodLevel: getSelectedPeriodLevel(state),
   }),
   dispatch => ({
-    setPeriodRange: periodRange => dispatch(setPeriodRangeAction(periodRange)),
+    setPeriodLevel: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),
   }),
 )(Sidebar);
