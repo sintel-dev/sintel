@@ -19,6 +19,33 @@ export const getAddingNewEventStatus = state => state.datarun.addingNewEvent;
 export const getZoomOnClickDirection = state => state.datarun.zoomDirection;
 export const getZoomCounter = state => state.datarun.zoomCounter;
 export const getZoomMode = state => state.datarun.zoomMode;
+export const getReviewPeriod = state => state.datarun.reviewPeriod;
+export const getSelectedPeriodLevel = state => state.datarun.periodLevel;
+
+const filterDatarunPeriod = (period, periodLevel, reviewPeriod) => {
+  const { month, year } = periodLevel;
+
+  let periodData = period;
+  const filterByYear = () => period.find(currentPeriod => currentPeriod.name === year).children;
+  const filterByMonth = () => periodData.find(monthLevel => monthLevel.name === month).children;
+
+  if (year) {
+    periodData = filterByYear();
+  }
+  if (month) {
+    periodData = filterByMonth();
+  }
+
+  if (reviewPeriod) {
+    if (reviewPeriod === 'year') {
+      periodData = period;
+    }
+    if (reviewPeriod === 'month') {
+      periodData = filterByYear();
+    }
+  }
+  return periodData;
+};
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
@@ -27,9 +54,15 @@ export const getSelectedDatarunID = createSelector(
 );
 
 export const getDatarunDetails = createSelector(
-  [getSelectedDatarunID, getProcessedDataRuns],
-  (selectedDatarundID, processedDataruns) =>
-    processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID),
+  [getSelectedDatarunID, getProcessedDataRuns, getSelectedPeriodLevel, getReviewPeriod],
+  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod) => {
+    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID);
+    let { period } = dataRun;
+
+    const filteredPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
+    const newDataRun = { ...dataRun, period: filteredPeriod };
+    return newDataRun;
+  },
 );
 
 export const getCurrentEventDetails = createSelector(

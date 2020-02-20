@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import {
-  getSelectedExperimentData,
-  getSelectedPeriodLevel,
-  getIsPeriodLevelSelected,
-} from '../../../model/selectors/experiment';
+import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
-import { getDatarunDetails } from '../../../model/selectors/datarun';
+import { getDatarunDetails, getSelectedPeriodLevel, getReviewPeriod } from '../../../model/selectors/datarun';
 import { getWrapperSize } from './SidebarUtils';
 import './Sidebar.scss';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
@@ -86,29 +82,39 @@ class Sidebar extends Component {
   }
 
   getColAmount() {
-    const { selectedPeriodLevel, isPeriodLevelSelected } = this.props;
-    if (isPeriodLevelSelected) {
-      if (selectedPeriodLevel.level === 'year') {
-        return 4;
+    const { selectedPeriodLevel, reviewRange } = this.props;
+
+    let nCols = 3;
+    if (!reviewRange) {
+      if (selectedPeriodLevel.year) {
+        nCols = 4;
       }
-      if (selectedPeriodLevel.level === 'month') {
-        return 7;
+      if (selectedPeriodLevel.month) {
+        nCols = 7;
+      }
+    } else {
+      if (reviewRange === 'year') {
+        nCols = 3;
+      }
+      if (reviewRange === 'month') {
+        nCols = 4;
+      }
+      if (reviewRange === 'day') {
+        nCols = 7;
       }
     }
-    return 3;
+
+    return nCols;
   }
 
   drawData() {
     const { width } = this.state;
-    const { setPeriodLevel, isPeriodLevelSelected, dataRun } = this.props;
+    const { setPeriodLevel, dataRun } = this.props;
     const { period } = dataRun;
-
-    const periodData = isPeriodLevelSelected ? period[0].children : period;
     const radius = width / this.getColAmount() / 2 - graphSpacing;
-
     return (
       width > 0 &&
-      periodData.map((currentPeriod, index) => {
+      period.map((currentPeriod, index) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(index);
         return (
           <g
@@ -150,18 +156,13 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun, selectedPeriodLevel, isPeriodLevelSelected, reviewPeriod } = this.props;
+    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
       <div className="sidebar">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
-          <Header
-            headerTitle={dataRun.signal}
-            reviewPeriod={reviewPeriod}
-            isPeriodLevelSelected={isPeriodLevelSelected}
-            currentPeriod={selectedPeriodLevel}
-          />
+          <Header headerTitle={dataRun.signal} reviewPeriod={reviewPeriod} />
           <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
           <div className="data-wrapper" id="dataWrapper">
             <svg id="multiPeriodChart" width={width} height={height}>
@@ -184,8 +185,8 @@ export default connect(
   state => ({
     experimentData: getSelectedExperimentData(state),
     dataRun: getDatarunDetails(state),
-    isPeriodLevelSelected: getIsPeriodLevelSelected(state),
     selectedPeriodLevel: getSelectedPeriodLevel(state),
+    reviewRange: getReviewPeriod(state),
   }),
   dispatch => ({
     setPeriodLevel: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),

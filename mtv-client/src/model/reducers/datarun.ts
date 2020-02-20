@@ -23,6 +23,7 @@ const initialState: DatarunState = {
   zoomMode: true,
   periodLevel: {},
   isPeriodLevelSelected: false,
+  reviewPeriod: null,
 };
 
 /**
@@ -94,6 +95,9 @@ function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLeve
   nextState.isPeriodLevelSelected = isPeriodLevelSelected;
   nextState.periodLevel = periodLevel;
 }
+function REVIEW_PERIOD_LEVEL(nextState, { reviewPeriod }) {
+  nextState.reviewPeriod = reviewPeriod;
+}
 
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
@@ -111,4 +115,5 @@ export default createReducer<DatarunState>(initialState, {
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
   SET_CURRENT_PERIOD_LEVEL,
+  REVIEW_PERIOD_LEVEL,
 });

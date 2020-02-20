@@ -16,6 +16,7 @@ export const SET_FILTER_TAGS = 'SET_FILTER_TAGS';
 export const ZOOM_ON_CLICK = 'ZOOM_ON_CLICK';
 export const TOGGLE_ZOOM = 'TOGGLE_ZOOM';
 export const SET_CURRENT_PERIOD_LEVEL = 'SET_CURRENT_PERIOD_LEVEL';
+export const REVIEW_PERIOD_LEVEL = 'REVIEW_PERIOD_LEVEL';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -56,6 +57,7 @@ export type DatarunState = {
   zoomMode: boolean;
   periodLevel: object;
   isPeriodLevelSelected: boolean;
+  reviewPeriod: null | string;
 };
 
 /**
