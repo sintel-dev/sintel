@@ -3,6 +3,7 @@ import {
   getUpdatedEventsDetails,
   getDatarunDetails,
   getZoomCounter,
+  getSelectedPeriodLevel,
 } from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
@@ -24,6 +25,8 @@ import {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
+  REVIEW_PERIOD_LEVEL,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -44,6 +47,7 @@ export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: an
       type: SET_TIMESERIES_PERIOD,
       eventRange,
     };
+    dispatch(setPeriodLevelAction(null));
     dispatch(action);
   };
 }
@@ -252,5 +256,39 @@ export function zoomOnClick(zoomDirection) {
 export function zoomToggleAction(zoomMode) {
   return function(dispatch) {
     dispatch({ type: TOGGLE_ZOOM, zoomMode });
+  };
+}
+
+export function setPeriodLevelAction(newPeriod) {
+  return function(dispatch, getState) {
+    const currentPeriod = getSelectedPeriodLevel(getState());
+    dispatch({ type: REVIEW_PERIOD_LEVEL, reviewPeriod: null });
+    if (newPeriod.level === 'year') {
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        isPeriodLevelSelected: true,
+        periodLevel: {
+          year: newPeriod.name,
+          month: '',
+        },
+      });
+    }
+
+    if (newPeriod.level === 'month') {
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        isPeriodLevelSelected: true,
+        periodLevel: {
+          ...currentPeriod,
+          month: newPeriod.name,
+        },
+      });
+    }
+  };
+}
+
+export function reviewPeriodAction(period) {
+  return function(dispatch) {
+    dispatch({ type: REVIEW_PERIOD_LEVEL, isPeriodLevelSelected: true, reviewPeriod: period });
   };
 }

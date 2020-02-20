@@ -128,7 +128,7 @@ const groupDataByPeriod = data => {
   return result;
 };
 
-const getPeriodRange = periodData => {
+const normalizePeriodRange = periodData => {
   let minRange = Number.MAX_SAFE_INTEGER;
   let maxRange = Number.MIN_SAFE_INTEGER;
   periodData.forEach(currentPeriod => {
@@ -142,7 +142,7 @@ const getPeriodRange = periodData => {
 };
 
 const normalizePeriodData = periodData => {
-  const { minRange, maxRange } = getPeriodRange(periodData);
+  const { minRange, maxRange } = normalizePeriodRange(periodData);
   const normalizeScale = d3
     .scaleLinear()
     .domain([minRange, maxRange])

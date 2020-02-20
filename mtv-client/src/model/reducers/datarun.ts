@@ -21,6 +21,9 @@ const initialState: DatarunState = {
   zoomDirection: '',
   zoomCounter: 0,
   zoomMode: true,
+  periodLevel: {},
+  isPeriodLevelSelected: false,
+  reviewPeriod: null,
 };
 
 /**
@@ -88,6 +91,14 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
   nextState.zoomMode = zoomMode;
 }
 
+function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLevel }) {
+  nextState.isPeriodLevelSelected = isPeriodLevelSelected;
+  nextState.periodLevel = periodLevel;
+}
+function REVIEW_PERIOD_LEVEL(nextState, { reviewPeriod }) {
+  nextState.reviewPeriod = reviewPeriod;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -103,4 +114,6 @@ export default createReducer<DatarunState>(initialState, {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
+  REVIEW_PERIOD_LEVEL,
 });

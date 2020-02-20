@@ -3,11 +3,11 @@
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding: 10px;
+    padding: 30px 10px 10px 10px;
     box-sizing: border-box;
     height: 92vh;
     .data-wrapper{
-        height: 99%;
+        height: 94%;
     }
 
     .feature-cell {
@@ -32,6 +32,35 @@
 
         .radial-cursor{
             fill: transparent;
+        }
+    }
+    .period-control{
+        .sidebar-heading{
+            display: inline-block;
+        }
+        ul{
+            float: right;
+        }
+        li{
+            display: inline-block;
+        }
+        button{
+            background-color: rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: none;
+            line-height: 1.42px;
+            padding: 17px 15px;
+            outline: none;
+            &.active {
+                background: $btn-blue;
+                color: #fff;
+            }
+            &:disabled{
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
         }
     }
 }
