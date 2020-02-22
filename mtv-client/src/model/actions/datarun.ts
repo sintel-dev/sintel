@@ -47,7 +47,6 @@ export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: an
       type: SET_TIMESERIES_PERIOD,
       eventRange,
     };
-    dispatch(setPeriodLevelAction(null));
     dispatch(action);
   };
 }

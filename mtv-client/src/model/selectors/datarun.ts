@@ -53,6 +53,87 @@ export const getSelectedDatarunID = createSelector(
     selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
 
+const toTimestamp = function(strDate) {
+  let datum = Date.parse(strDate);
+  return datum / 1000;
+};
+
+const groupEventsByTimestamp = events => {
+  let result = {};
+  events.forEach(event => {
+    const { start_time, stop_time } = event;
+
+    const eventStartYear = new Date(start_time * 1000).getFullYear();
+    const eventStopYear = new Date(stop_time * 1000).getFullYear();
+    let currentYear = eventStartYear;
+    while (currentYear <= eventStopYear) {
+      const yearStartDate = toTimestamp(`01/01/${currentYear} 00:00:00`);
+      const yearStopDate = toTimestamp(`12/31/${currentYear} 23:59:59`);
+
+      const eventProps = {
+        id: event.id,
+        start_time: start_time >= yearStartDate ? start_time : yearStartDate,
+        stop_time: stop_time <= yearStopDate ? stop_time : yearStopDate,
+        tag: event.tag,
+        score: event.score,
+      };
+
+      if (result[currentYear]) {
+        result[currentYear].events[event.id] = eventProps;
+      } else {
+        result[currentYear] = {
+          events: { [event.id]: eventProps },
+          months: {},
+        };
+      }
+      const eventStartMonth = new Date(result[currentYear].events[event.id].start_time * 1000).getMonth() + 1;
+      const eventStopMonth = new Date(result[currentYear].events[event.id].stop_time * 1000).getMonth() + 1;
+      let currentMonth = eventStartMonth;
+
+      while (currentMonth <= eventStopMonth) {
+        const maxDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+        const monthDateStart = toTimestamp(`${currentMonth}/01/${currentYear} 00:00:00`);
+        const monthDateStop = toTimestamp(`${currentMonth}/${maxDaysInMonth}/${currentYear} 23:59:59`);
+
+        let month = {
+          id: event.id,
+          start_time: start_time >= monthDateStart ? start_time : monthDateStart,
+          stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
+          tag: event.tag,
+          score: event.score,
+          days: {},
+        };
+
+        const eventStartDay = new Date(month.start_time * 1000).getDate();
+        const eventStopDay = new Date(month.stop_time * 1000).getDate();
+        let currentDay = eventStartDay;
+
+        result[currentYear].months[currentMonth] = month;
+
+        while (currentDay <= eventStopDay) {
+          const dayDateStart = toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 00:00:00`);
+          const dayDateStop = toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 23:59:59`);
+
+          let day = {
+            id: event.id,
+            start_time: start_time >= dayDateStart ? start_time : dayDateStart,
+            stop_time: stop_time <= dayDateStop ? stop_time : dayDateStop,
+            tag: event.tag,
+            score: event.score,
+          };
+
+          result[currentYear].months[currentMonth].days[currentDay] = day;
+          currentDay += 1;
+        }
+
+        currentMonth += 1;
+      }
+      currentYear += 1;
+    }
+  });
+  return result;
+};
+
 export const getDatarunDetails = createSelector(
   [getSelectedDatarunID, getProcessedDataRuns, getSelectedPeriodLevel, getReviewPeriod],
   (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod) => {
@@ -60,7 +141,8 @@ export const getDatarunDetails = createSelector(
     let { period } = dataRun;
 
     const filteredPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
-    const newDataRun = { ...dataRun, period: filteredPeriod };
+    const grouppedEvents = groupEventsByTimestamp(dataRun.events);
+    const newDataRun = { ...dataRun, period: filteredPeriod, grouppedEvents };
     return newDataRun;
   },
 );
