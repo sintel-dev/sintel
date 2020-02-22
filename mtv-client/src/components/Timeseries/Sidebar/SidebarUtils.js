@@ -84,3 +84,34 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
   }
   return arcData;
 };
+
+export const getDataScale = (innerRadius, outerRadius, periodRange) => {
+  const scaleAngle = d3
+    .scaleLinear()
+    .range([0, 2 * Math.PI])
+    .domain([0, periodRange.length - 0.08]);
+
+  const scaleRadius = d3
+    .scaleLinear()
+    .range([innerRadius, outerRadius])
+    .clamp(true)
+    .domain([0, 1.2]);
+
+  const area = d3
+    .areaRadial()
+    .angle((d, i) => scaleAngle(i))
+    .innerRadius(() => scaleRadius(0))
+    .outerRadius(d => scaleRadius(d))
+    .curve(d3.curveCardinalClosed);
+
+  const area0 = d3
+    .areaRadial()
+    .angle((d, i) => {
+      scaleAngle(i);
+    })
+    .innerRadius(() => scaleRadius(0))
+    .outerRadius(() => scaleRadius(0))
+    .curve(d3.curveCardinalClosed);
+
+  return { scaleAngle, scaleRadius, area, area0 };
+};

@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import { RootState, DatarunDataType } from '../types';
-import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
+
+import { getSelectedExperimentData, getProcessedDataRuns, filteringTags } from './experiment';
 
 // @TODO - set state: RootState
 const getEventIndex = state => state.datarun.eventIndex;
@@ -135,13 +136,18 @@ const groupEventsByTimestamp = events => {
 };
 
 export const getDatarunDetails = createSelector(
-  [getSelectedDatarunID, getProcessedDataRuns, getSelectedPeriodLevel, getReviewPeriod],
-  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod) => {
+  [getSelectedDatarunID, getProcessedDataRuns, getSelectedPeriodLevel, getReviewPeriod, filteringTags],
+  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod, filterTags) => {
     const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID);
-    let { period } = dataRun;
-
+    let { period, events } = dataRun;
     const filteredPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
-    const grouppedEvents = groupEventsByTimestamp(dataRun.events);
+    const filteredEvents =
+      (filterTags.length &&
+        events.filter(function(currentEvent) {
+          return this.indexOf(currentEvent.tag) !== -1;
+        }, filterTags)) ||
+      events;
+    const grouppedEvents = groupEventsByTimestamp(filteredEvents);
     const newDataRun = { ...dataRun, period: filteredPeriod, grouppedEvents };
     return newDataRun;
   },

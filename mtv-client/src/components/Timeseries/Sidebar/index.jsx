@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as d3 from 'd3';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
 import { getDatarunDetails, getSelectedPeriodLevel, getReviewPeriod } from '../../../model/selectors/datarun';
-import { getWrapperSize, drawArc } from './SidebarUtils';
+import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
 
@@ -39,43 +38,12 @@ class Sidebar extends Component {
     return { horizontalShift, verticalShift };
   }
 
-  getDataScale(innerRadius, outerRadius, periodRange) {
-    const scaleAngle = d3
-      .scaleLinear()
-      .range([0, 2 * Math.PI])
-      .domain([0, periodRange.length - 0.08]);
-
-    const scaleRadius = d3
-      .scaleLinear()
-      .range([innerRadius, outerRadius])
-      .clamp(true)
-      .domain([0, 1.2]);
-
-    const area = d3
-      .areaRadial()
-      .angle((d, i) => scaleAngle(i))
-      .innerRadius(() => scaleRadius(0))
-      .outerRadius(d => scaleRadius(d))
-      .curve(d3.curveCardinalClosed);
-
-    const area0 = d3
-      .areaRadial()
-      .angle((d, i) => {
-        scaleAngle(i);
-      })
-      .innerRadius(() => scaleRadius(0))
-      .outerRadius(() => scaleRadius(0))
-      .curve(d3.curveCardinalClosed);
-
-    return { scaleAngle, scaleRadius, area, area0 };
-  }
-
   getPathData(periodRange) {
     const { width } = this.state;
     const nCols = this.getColAmount();
     const radius = width / nCols / 2 - graphSpacing;
 
-    const { area } = this.getDataScale(radius * 0.1, radius, periodRange);
+    const { area } = getDataScale(radius * 0.1, radius, periodRange);
     return area(periodRange);
   }
 
