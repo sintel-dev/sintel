@@ -136,17 +136,35 @@ const groupEventsByTimestamp = events => {
 };
 
 export const getDatarunDetails = createSelector(
-  [getSelectedDatarunID, getProcessedDataRuns, getSelectedPeriodLevel, getReviewPeriod, filteringTags],
-  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod, filterTags) => {
+  [
+    getSelectedDatarunID,
+    getProcessedDataRuns,
+    getSelectedPeriodLevel,
+    getReviewPeriod,
+    filteringTags,
+    getUpdatedEventsDetails,
+  ],
+  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod, filterTags, updatedEventDetails) => {
     const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID);
     let { period, events } = dataRun;
     const filteredPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
+
+    let currentDataRunEvents = [...events];
+    let currentEventIndex = events.findIndex(currentEvent => currentEvent.id === updatedEventDetails.id);
+    if (currentEventIndex !== -1) {
+      let { start_time, stop_time } = updatedEventDetails;
+      start_time /= 1000;
+      stop_time /= 1000;
+
+      currentDataRunEvents[currentEventIndex] = { ...updatedEventDetails, start_time, stop_time };
+    }
     const filteredEvents =
       (filterTags.length &&
-        events.filter(function(currentEvent) {
+        currentDataRunEvents.filter(function(currentEvent) {
           return this.indexOf(currentEvent.tag) !== -1;
         }, filterTags)) ||
-      events;
+      currentDataRunEvents;
+
     const grouppedEvents = groupEventsByTimestamp(filteredEvents);
     const newDataRun = { ...dataRun, period: filteredPeriod, grouppedEvents };
     return newDataRun;
