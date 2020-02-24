@@ -126,15 +126,25 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod } = this.props;
+    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
       <div className="sidebar">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
-          <Header headerTitle={dataRun.signal} reviewPeriod={reviewPeriod} />
+          <Header
+            headerTitle={dataRun.signal}
+            reviewPeriod={reviewPeriod}
+            reviewRange={reviewRange}
+            currentPeriod={selectedPeriodLevel}
+          />
           <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
           <div className="data-wrapper" id="dataWrapper">
+            <div className="period-info">
+              <p>
+                {selectedPeriodLevel.month} {selectedPeriodLevel.year}
+              </p>
+            </div>
             <svg id="multiPeriodChart" width={width} height={height}>
               {this.drawData(period)}
               <defs>
