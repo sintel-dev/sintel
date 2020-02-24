@@ -4,11 +4,12 @@ import { RootState, DatarunDataType } from '../types';
 import { getSelectedExperimentData, getProcessedDataRuns, filteringTags } from './experiment';
 
 // @TODO - set state: RootState
-const getEventIndex = state => state.datarun.eventIndex;
+const getActiveEventID = state => state.datarun.activeEventID;
 const getEventComments = state => state.datarun.eventComments;
 const isEventCommentsLoading = state => state.datarun.isEventCommentsLoading;
 
 export const getUpdatedEventsDetails = state => state.datarun.eventDetails;
+export const getNewEventDetails = state => state.datarun.newEventDetails;
 export const isPredictionEnabled = state => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
 export const getSelectedPeriodRange = (state: RootState) => state.datarun.selectedPeriodRange;
@@ -172,22 +173,33 @@ export const getDatarunDetails = createSelector(
 );
 
 export const getCurrentEventDetails = createSelector(
-  [getDatarunDetails, getEventIndex, isEventCommentsLoading, getEventComments, getUpdatedEventsDetails],
-  (datarun, eventIndex, isCommentsLoading, eventComments, updatedDetails) => {
-    if (eventIndex === null) {
+  [getDatarunDetails, getActiveEventID, isEventCommentsLoading, getEventComments, getUpdatedEventsDetails],
+  (datarun, activeEventID, isCommentsLoading, eventComments, updatedEventDetails) => {
+    if (activeEventID === null) {
       return null;
     }
 
     const { timeSeries } = datarun;
-    const currentEvent = datarun.eventWindows[eventIndex];
-    const start_time = (updatedDetails && updatedDetails.start_time) || datarun.timeSeries[currentEvent[0]][0];
-    const stop_time = (updatedDetails && updatedDetails.stop_time) || datarun.timeSeries[currentEvent[1]][0];
+    let start_time = 0;
+    let stop_time = 0;
+    let eventTag = '';
+
+    if (updatedEventDetails.id !== activeEventID) {
+      const currentEvent = datarun.eventWindows.find(event => event[3] === activeEventID);
+      start_time = datarun.timeSeries[currentEvent[0]][0];
+      stop_time = datarun.timeSeries[currentEvent[1]][0];
+      eventTag = currentEvent[4];
+    } else {
+      start_time = updatedEventDetails.start_time;
+      stop_time = updatedEventDetails.stop_time;
+      eventTag = updatedEventDetails.tag;
+    }
+
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
     const eventDetails = {
-      id: currentEvent?.[3],
-      score: currentEvent?.[2],
-      tag: updatedDetails.tag ? updatedDetails.tag : currentEvent?.[4],
+      id: activeEventID,
+      tag: eventTag,
       start_time: timeSeries[startIndex][0],
       stop_time: timeSeries[stopIndex][0],
       datarun: datarun.id,
@@ -195,7 +207,6 @@ export const getCurrentEventDetails = createSelector(
       eventComments,
       isCommentsLoading,
     };
-
     return eventDetails;
   },
 );

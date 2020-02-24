@@ -4,7 +4,7 @@ export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
 export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
 export const IS_CHANGING_EVENT_RANGE = 'IS_CHANGING_EVENT_RANGE';
-export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
+export const SET_ACTIVE_EVENT_ID = 'SET_ACTIVE_EVENT_ID';
 export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
 export const SAVE_EVENT_DETAILS = 'SAVE_EVENT_DETAILS';
 export const IS_UPDATE_POPUP_OPEN = 'IS_UPDATE_POPUP_OPEN';
@@ -41,7 +41,7 @@ export type DatarunState = {
     eventRange: any;
     zoomValue: any;
   };
-  eventIndex: string | null;
+  activeEventID: string | null;
   isEventCommentsLoading: boolean;
   eventComments: Array<any>;
   isPredictionEnabled: boolean;
