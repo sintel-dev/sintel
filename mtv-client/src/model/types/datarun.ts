@@ -4,7 +4,7 @@ export const SELECT_DATARUN = 'SELECT_DATARUN';
 export const SET_TIMESERIES_PERIOD = 'SET_TIMESERIES_PERIOD';
 export const UPDATE_EVENT_DETAILS = 'UPDATE_EVENT_DETAILS';
 export const IS_CHANGING_EVENT_RANGE = 'IS_CHANGING_EVENT_RANGE';
-export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT';
+export const SET_ACTIVE_EVENT_ID = 'SET_ACTIVE_EVENT_ID';
 export const TOGGLE_PREDICTION_MODE = 'TOGGLE_PREDICTION_MODE';
 export const SAVE_EVENT_DETAILS = 'SAVE_EVENT_DETAILS';
 export const IS_UPDATE_POPUP_OPEN = 'IS_UPDATE_POPUP_OPEN';
@@ -15,6 +15,8 @@ export const UPDATE_DATARUN_EVENTS = 'UPDATE_DATARUN_EVENTS';
 export const SET_FILTER_TAGS = 'SET_FILTER_TAGS';
 export const ZOOM_ON_CLICK = 'ZOOM_ON_CLICK';
 export const TOGGLE_ZOOM = 'TOGGLE_ZOOM';
+export const SET_CURRENT_PERIOD_LEVEL = 'SET_CURRENT_PERIOD_LEVEL';
+export const REVIEW_PERIOD_LEVEL = 'REVIEW_PERIOD_LEVEL';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -39,7 +41,7 @@ export type DatarunState = {
     eventRange: any;
     zoomValue: any;
   };
-  eventIndex: string | null;
+  activeEventID: string | null;
   isEventCommentsLoading: boolean;
   eventComments: Array<any>;
   isPredictionEnabled: boolean;
@@ -53,6 +55,9 @@ export type DatarunState = {
   zoomDirection: '';
   zoomCounter: number;
   zoomMode: boolean;
+  periodLevel: object;
+  isPeriodLevelSelected: boolean;
+  reviewPeriod: null | string;
 };
 
 /**

@@ -3,6 +3,9 @@ import {
   getUpdatedEventsDetails,
   getDatarunDetails,
   getZoomCounter,
+  getSelectedPeriodLevel,
+  getNewEventDetails,
+  getIsAddingNewEvents,
 } from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
@@ -11,7 +14,7 @@ import {
   SET_TIMESERIES_PERIOD,
   UPDATE_EVENT_DETAILS,
   IS_CHANGING_EVENT_RANGE,
-  SET_CURRENT_EVENT,
+  SET_ACTIVE_EVENT_ID,
   GET_EVENT_COMMENTS_SUCCESS,
   TOGGLE_PREDICTION_MODE,
   SelectDatarunAction,
@@ -24,6 +27,8 @@ import {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
+  REVIEW_PERIOD_LEVEL,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -33,6 +38,7 @@ export function selectDatarun(datarunID: string) {
       datarunID,
     };
     dispatch(action);
+    dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
   };
@@ -48,33 +54,17 @@ export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: an
   };
 }
 
-export function setActiveEventAction(eventIndex) {
+export function setActiveEventAction(eventID) {
   return function(dispatch) {
-    dispatch({ type: SET_CURRENT_EVENT, eventIndex });
+    dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: eventID });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
     dispatch(getEventComments());
   };
 }
 
 export function closeEventModal() {
-  return function(dispatch, getState) {
-    const currentEventDetails = getCurrentEventDetails(getState());
-    const datarun = getDatarunDetails(getState());
-    const eventIndex = datarun.events.findIndex(data => data.id === currentEventDetails.id);
-
-    if (currentEventDetails.id) {
-      // @TODO - reset time range as well (not only tag)
-      const { tag } = datarun.events[eventIndex];
-
-      const eventDetails = {
-        ...currentEventDetails,
-        tag,
-      };
-      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails });
-    } else {
-      dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
-    }
-
+  return function(dispatch) {
+    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
   };
 }
@@ -97,7 +87,13 @@ export function togglePredictionsAction(event) {
 
 export function updateEventDetailsAction(updatedEventDetails) {
   return function(dispatch, getState) {
-    const currentEventDetails = getCurrentEventDetails(getState());
+    const isAddingNewEvent = getIsAddingNewEvents(getState());
+    let currentEventDetails = getCurrentEventDetails(getState());
+
+    if (isAddingNewEvent) {
+      currentEventDetails = getNewEventDetails(getState());
+    }
+
     dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
   };
 }
@@ -112,7 +108,7 @@ export function saveEventDetailsAction() {
   return async function(dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
-    const { start_time, stop_time, score, tag } = updatedEventDetails;
+    const { start_time, stop_time, tag } = updatedEventDetails;
 
     const start = start_time / 1000;
     const stop = stop_time / 1000;
@@ -120,10 +116,11 @@ export function saveEventDetailsAction() {
     const payload = {
       start_time: start,
       stop_time: stop,
-      score,
+      score: 0,
       tag,
       event_id: updatedEventDetails.id,
     };
+
     if (comments) {
       const commentData = {
         event_id: updatedEventDetails.id,
@@ -138,9 +135,20 @@ export function saveEventDetailsAction() {
     }
 
     if (updatedEventDetails.id) {
-      await API.events.update(updatedEventDetails.id, payload).then(() => {
-        dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: updatedEventDetails });
-        dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      await API.events.update(updatedEventDetails.id, payload).then(async () => {
+        await API.events.all('events').then(response => {
+          const { events } = response;
+          const datarun = getDatarunDetails(getState());
+          const filteredEvents = events.filter(event => event.datarun === datarun.id);
+
+          const selectedExperimentData = getSelectedExperimentData(getState());
+          const datarunIndex = selectedExperimentData.data.dataruns.findIndex(dataItem => dataItem.id === datarun.id);
+          dispatch({
+            type: UPDATE_DATARUN_EVENTS,
+            newDatarunEvents: filteredEvents,
+            datarunIndex,
+          });
+        });
       });
     } else {
       dispatch(saveNewEventAction());
@@ -150,6 +158,7 @@ export function saveEventDetailsAction() {
 
 export function addNewEventAction(isAddingEvent) {
   return async function(dispatch) {
+    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent });
   };
 }
@@ -157,15 +166,16 @@ export function addNewEventAction(isAddingEvent) {
 export function updateNewEventDetailsAction(eventDetails) {
   return function(dispatch, getState) {
     const datarun = getDatarunDetails(getState());
-
+    const currentEventDetails = getNewEventDetails(getState());
     const eventTemplate = {
+      ...currentEventDetails,
       ...eventDetails,
       datarun_id: datarun.id,
-      score: '0',
-      tag: '',
+      score: 0,
+      tag: (eventDetails.tag && eventDetails.tag) || null,
     };
-    dispatch({ type: NEW_EVENT_DETAILS, eventDetails: eventTemplate });
-    dispatch({ type: SET_CURRENT_EVENT, eventIndex: datarun.events.length });
+
+    dispatch({ type: NEW_EVENT_DETAILS, newEventDetails: eventTemplate });
   };
 }
 
@@ -177,7 +187,7 @@ export function openNewDetailsPopupAction() {
 
 export function saveNewEventAction() {
   return async function(dispatch, getState) {
-    const newEventDetails = getUpdatedEventsDetails(getState());
+    const newEventDetails = getNewEventDetails(getState());
     let { start_time, stop_time } = newEventDetails;
     start_time /= 1000;
     stop_time /= 1000;
@@ -188,7 +198,6 @@ export function saveNewEventAction() {
       tag: newEventDetails.tag || 'untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
     };
-
     await API.events
       .create(eventDetails)
       .then(async () => {
@@ -206,6 +215,8 @@ export function saveNewEventAction() {
           dispatch({ type: ADDING_NEW_EVENT_RESULT, result: 'success' });
           dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
           dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
+          dispatch({ type: NEW_EVENT_DETAILS, newEventDetails: {} });
+          dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
         });
       })
       .catch(err => dispatch({ type: ADDING_NEW_EVENT_RESULT, result: err }));
@@ -222,14 +233,17 @@ export function deleteEventAction() {
     await API.events.delete(currentEventDetails.id).then(async () => {
       await API.events.all(datarunID).then(datarunEvents => {
         const newDatarunEvents = datarunEvents.events.filter(event => event.datarun === datarunID);
+
         // @TODO - address the case when the deleted comment is the last one
         // also delete the event from the top linechart
+        dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+        dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
+        dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
         dispatch({
           type: UPDATE_DATARUN_EVENTS,
           newDatarunEvents,
           datarunIndex,
         });
-        dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
       });
     });
   };
@@ -252,5 +266,42 @@ export function zoomOnClick(zoomDirection) {
 export function zoomToggleAction(zoomMode) {
   return function(dispatch) {
     dispatch({ type: TOGGLE_ZOOM, zoomMode });
+  };
+}
+
+export function setPeriodLevelAction(newPeriod) {
+  return function(dispatch, getState) {
+    const currentPeriod = getSelectedPeriodLevel(getState());
+    if (newPeriod.level !== 'day') {
+      if (newPeriod.level === 'year') {
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          isPeriodLevelSelected: true,
+          periodLevel: {
+            year: newPeriod.name,
+            month: '',
+          },
+        });
+        dispatch(reviewPeriodAction('month'));
+      }
+
+      if (newPeriod.level === 'month') {
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          isPeriodLevelSelected: true,
+          periodLevel: {
+            ...currentPeriod,
+            month: newPeriod.name,
+          },
+        });
+        dispatch(reviewPeriodAction('day'));
+      }
+    }
+  };
+}
+
+export function reviewPeriodAction(period) {
+  return function(dispatch) {
+    dispatch({ type: REVIEW_PERIOD_LEVEL, isPeriodLevelSelected: true, reviewPeriod: period });
   };
 }
