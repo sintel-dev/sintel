@@ -7,7 +7,7 @@ const initialState: DatarunState = {
     zoomValue: 1,
     eventRange: [0, 0],
   },
-  eventIndex: null,
+  activeEventID: null,
   isEventCommentsLoading: true,
   eventComments: [],
   isPredictionEnabled: false,
@@ -21,6 +21,9 @@ const initialState: DatarunState = {
   zoomDirection: '',
   zoomCounter: 0,
   zoomMode: true,
+  periodLevel: {},
+  isPeriodLevelSelected: false,
+  reviewPeriod: null,
 };
 
 /**
@@ -37,8 +40,8 @@ function SET_TIMESERIES_PERIOD(nextState: DatarunState, action: SetTimeseriesPer
   nextState.selectedPeriodRange = action.eventRange;
 }
 
-function SET_CURRENT_EVENT(nextState, { eventIndex }) {
-  nextState.eventIndex = eventIndex;
+function SET_ACTIVE_EVENT_ID(nextState, { activeEventID }) {
+  nextState.activeEventID = activeEventID;
 }
 
 function UPDATE_EVENT_DETAILS(nextState, { eventDetails }) {
@@ -66,9 +69,9 @@ function ADDING_NEW_EVENTS(nextState, { isAddingEvent }) {
   nextState.isAddingEvent = isAddingEvent;
 }
 
-function NEW_EVENT_DETAILS(nextState, { eventDetails }) {
+function NEW_EVENT_DETAILS(nextState, { newEventDetails }) {
   nextState.isEventCommentsLoading = false;
-  nextState.eventDetails = eventDetails;
+  nextState.newEventDetails = newEventDetails;
 }
 
 function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
@@ -88,10 +91,18 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
   nextState.zoomMode = zoomMode;
 }
 
+function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLevel }) {
+  nextState.isPeriodLevelSelected = isPeriodLevelSelected;
+  nextState.periodLevel = periodLevel;
+}
+function REVIEW_PERIOD_LEVEL(nextState, { reviewPeriod }) {
+  nextState.reviewPeriod = reviewPeriod;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
-  SET_CURRENT_EVENT,
+  SET_ACTIVE_EVENT_ID,
   UPDATE_EVENT_DETAILS,
   TOGGLE_PREDICTION_MODE,
   GET_EVENT_COMMENTS_SUCCESS,
@@ -103,4 +114,6 @@ export default createReducer<DatarunState>(initialState, {
   SET_FILTER_TAGS,
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
+  SET_CURRENT_PERIOD_LEVEL,
+  REVIEW_PERIOD_LEVEL,
 });

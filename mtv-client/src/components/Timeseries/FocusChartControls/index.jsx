@@ -27,6 +27,17 @@ const FocusChartControls = props => (
   <div className="chart-controls" id="chartControls">
     <div className="linechart-controls switch-control">
       <div className="row">
+        <button
+          type="button"
+          className="btn btn-add-event"
+          disabled={props.isAddingEvent}
+          onClick={() => props.addNewEvent(!props.isAddingEvent)}
+        >
+          <span>+</span>
+          Add Event
+        </button>
+      </div>
+      <div className="row">
         <label htmlFor="showPredictions">
           <input
             type="checkbox"
@@ -36,18 +47,6 @@ const FocusChartControls = props => (
           />
           <span className="switch" />
           Show Predictions
-        </label>
-      </div>
-      <div className="row">
-        <label htmlFor="addNewEvent">
-          <input
-            type="checkbox"
-            id="addNewEvent"
-            checked={props.isAddingEvent}
-            onChange={event => props.addNewEvent(event.target.checked)}
-          />
-          <span className="switch" />
-          Add Events
         </label>
       </div>
     </div>
