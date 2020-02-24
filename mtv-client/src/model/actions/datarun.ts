@@ -63,24 +63,8 @@ export function setActiveEventAction(eventID) {
 }
 
 export function closeEventModal() {
-  return function(dispatch, getState) {
-    const currentEventDetails = getCurrentEventDetails(getState());
-    const datarun = getDatarunDetails(getState());
-    const eventIndex = datarun.events.findIndex(data => data.id === currentEventDetails.id);
-
-    if (currentEventDetails.id) {
-      // @TODO - reset time range as well (not only tag)
-      const { tag } = datarun.events[eventIndex];
-
-      const eventDetails = {
-        ...currentEventDetails,
-        tag,
-      };
-      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails });
-    } else {
-      dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
-    }
-
+  return function(dispatch) {
+    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
   };
 }
@@ -124,7 +108,7 @@ export function saveEventDetailsAction() {
   return async function(dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
-    const { start_time, stop_time, score, tag } = updatedEventDetails;
+    const { start_time, stop_time, tag } = updatedEventDetails;
 
     const start = start_time / 1000;
     const stop = stop_time / 1000;
