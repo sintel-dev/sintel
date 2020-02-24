@@ -8,7 +8,7 @@ export const getSelectedExperimentData = (state: RootState) => state.selectedExp
 export const filteringTags = createSelector(
   [getSelectedExperimentData, getFilterTags],
   (selectedExpedimentData, filterTags) => {
-    if (selectedExpedimentData.isExperimentDataLoading) {
+    if (selectedExpedimentData.isExperimentDataLoading || !filterTags.length) {
       return [];
     }
 
@@ -168,7 +168,8 @@ export const getProcessedDataRuns = createSelector(
       const { events } = datarun;
       normalizePeriodData(period);
 
-      const filteredEvents = filterTags.length ? events.filter(event => filterTags.includes(event.tag)) : events;
+      const filteredEvents =
+        filterTags && filterTags.length ? events.filter(currentEvent => filterTags.includes(currentEvent.tag)) : events;
       const eventWindows = groupByEventWindows(
         filteredEvents,
         timeSeries.map(series => series[0]),

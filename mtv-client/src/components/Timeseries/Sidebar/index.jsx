@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as d3 from 'd3';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
 import { getDatarunDetails, getSelectedPeriodLevel, getReviewPeriod } from '../../../model/selectors/datarun';
-import { getWrapperSize } from './SidebarUtils';
-import './Sidebar.scss';
+import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
+import './Sidebar.scss';
 
-const graphSpacing = 10;
-
+const graphSpacing = 15;
 class Sidebar extends Component {
   constructor(...props) {
     super(...props);
@@ -22,7 +20,6 @@ class Sidebar extends Component {
 
   componentDidMount() {
     const { width, height } = getWrapperSize();
-
     this.setState({
       width,
       height,
@@ -41,43 +38,12 @@ class Sidebar extends Component {
     return { horizontalShift, verticalShift };
   }
 
-  getDataScale(innerRadius, outerRadius, periodRange) {
-    const scaleAngle = d3
-      .scaleLinear()
-      .range([0, 2 * Math.PI])
-      .domain([0, periodRange.length - 0.08]);
-
-    const scaleRadius = d3
-      .scaleLinear()
-      .range([innerRadius, outerRadius])
-      .clamp(true)
-      .domain([0, 1.2]);
-
-    const area = d3
-      .areaRadial()
-      .angle((d, i) => scaleAngle(i))
-      .innerRadius(() => scaleRadius(0))
-      .outerRadius(d => scaleRadius(d))
-      .curve(d3.curveCardinalClosed);
-
-    const area0 = d3
-      .areaRadial()
-      .angle((d, i) => {
-        scaleAngle(i);
-      })
-      .innerRadius(() => scaleRadius(0))
-      .outerRadius(() => scaleRadius(0))
-      .curve(d3.curveCardinalClosed);
-
-    return { scaleAngle, scaleRadius, area, area0 };
-  }
-
   getPathData(periodRange) {
     const { width } = this.state;
     const nCols = this.getColAmount();
     const radius = width / nCols / 2 - graphSpacing;
 
-    const { area } = this.getDataScale(radius * 0.1, radius, periodRange);
+    const { area } = getDataScale(radius * 0.1, radius, periodRange);
     return area(periodRange);
   }
 
@@ -90,7 +56,7 @@ class Sidebar extends Component {
         nCols = 4;
       }
       if (selectedPeriodLevel.month) {
-        nCols = 7;
+        nCols = 6;
       }
     } else {
       if (reviewRange === 'year') {
@@ -100,7 +66,7 @@ class Sidebar extends Component {
         nCols = 4;
       }
       if (reviewRange === 'day') {
-        nCols = 7;
+        nCols = 6;
       }
     }
 
@@ -110,12 +76,14 @@ class Sidebar extends Component {
   drawData() {
     const { width } = this.state;
     const { setPeriodLevel, dataRun } = this.props;
-    const { period } = dataRun;
+    const { period, grouppedEvents } = dataRun;
     const radius = width / this.getColAmount() / 2 - graphSpacing;
     return (
       width > 0 &&
-      period.map((currentPeriod, index) => {
-        const { horizontalShift, verticalShift } = this.getFeatureCellCoords(index);
+      period.map((currentPeriod, periodIndex) => {
+        const { horizontalShift, verticalShift } = this.getFeatureCellCoords(periodIndex);
+        const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
+
         return (
           <g
             key={currentPeriod.name}
@@ -139,9 +107,11 @@ class Sidebar extends Component {
               <line x1={-radius} x2={radius} />
               <line y1={-radius} y2={radius} />
 
-              <text className="radial-text" y={radius + 15} x={-15}>
+              <text className="radial-text" y={radius + 15} x={0}>
                 {currentPeriod.name}
               </text>
+              {arcData.length &&
+                arcData.map(arc => <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />)}
             </g>
             <circle
               r={radius * 0.85}

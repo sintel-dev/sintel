@@ -7,7 +7,7 @@ const initialState: DatarunState = {
     zoomValue: 1,
     eventRange: [0, 0],
   },
-  eventIndex: null,
+  activeEventID: null,
   isEventCommentsLoading: true,
   eventComments: [],
   isPredictionEnabled: false,
@@ -40,8 +40,8 @@ function SET_TIMESERIES_PERIOD(nextState: DatarunState, action: SetTimeseriesPer
   nextState.selectedPeriodRange = action.eventRange;
 }
 
-function SET_CURRENT_EVENT(nextState, { eventIndex }) {
-  nextState.eventIndex = eventIndex;
+function SET_ACTIVE_EVENT_ID(nextState, { activeEventID }) {
+  nextState.activeEventID = activeEventID;
 }
 
 function UPDATE_EVENT_DETAILS(nextState, { eventDetails }) {
@@ -69,9 +69,9 @@ function ADDING_NEW_EVENTS(nextState, { isAddingEvent }) {
   nextState.isAddingEvent = isAddingEvent;
 }
 
-function NEW_EVENT_DETAILS(nextState, { eventDetails }) {
+function NEW_EVENT_DETAILS(nextState, { newEventDetails }) {
   nextState.isEventCommentsLoading = false;
-  nextState.eventDetails = eventDetails;
+  nextState.newEventDetails = newEventDetails;
 }
 
 function ADDING_NEW_EVENT_RESULT(nextState, { result }) {
@@ -102,7 +102,7 @@ function REVIEW_PERIOD_LEVEL(nextState, { reviewPeriod }) {
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
-  SET_CURRENT_EVENT,
+  SET_ACTIVE_EVENT_ID,
   UPDATE_EVENT_DETAILS,
   TOGGLE_PREDICTION_MODE,
   GET_EVENT_COMMENTS_SUCCESS,

@@ -25,6 +25,7 @@ import {
   getZoomOnClickDirection,
   getZoomCounter,
   getZoomMode,
+  getNewEventDetails,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
@@ -243,6 +244,7 @@ class FocusChart extends Component<Props, State> {
       const startIndex = currentEvent[0];
       const stopIndex = currentEvent[1];
       const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.untagged;
+      const currentEventID = currentEvent[3];
 
       // append event highlight
       lineData
@@ -263,7 +265,7 @@ class FocusChart extends Component<Props, State> {
         .attr('y', 0)
         .attr('x', xCoord(timeSeries[startIndex][0]))
         .on('click', () => {
-          setCurrentEvent(eventIndex);
+          setCurrentEvent(currentEventID);
         });
 
       comment
@@ -438,13 +440,9 @@ class FocusChart extends Component<Props, State> {
   }
 
   getBrushCoords() {
-    const { updatedEventDetails, currentEventDetails } = this.props;
-    const brushStart = new Date(
-      (updatedEventDetails.start_time && updatedEventDetails.start_time) || currentEventDetails.start_time,
-    ).getTime();
-    const brushEnd = new Date(
-      (updatedEventDetails.stop_time && updatedEventDetails.stop_time) || currentEventDetails.stop_time,
-    ).getTime();
+    const { currentEventDetails } = this.props;
+    const brushStart = currentEventDetails.start_time;
+    const brushEnd = currentEventDetails.stop_time;
     return { brushStart, brushEnd };
   }
 
@@ -590,11 +588,13 @@ class FocusChart extends Component<Props, State> {
         [width - 59, height - 3.5 * CHART_MARGIN],
       ])
       .on('brush', () => {
+        const { newEventDetails } = this.props;
         const [selection_start, selection_end] = d3.event.selection;
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
         updateNewEventDetails({
+          ...newEventDetails,
           start_time: new Date(timeSeries[startIndex][0]).getTime(),
           stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
         });
@@ -645,11 +645,12 @@ const mapState = (state: RootState) => ({
   zoomDirection: getZoomOnClickDirection(state),
   zoomCounter: getZoomCounter(state),
   zoomMode: getZoomMode(state),
+  newEventDetails: getNewEventDetails(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   setPeriodRange: period => dispatch(setTimeseriesPeriod(period)),
-  setCurrentEvent: eventIndex => dispatch(setActiveEventAction(eventIndex)),
+  setCurrentEvent: eventID => dispatch(setActiveEventAction(eventID)),
   editEventRangeDone: () => dispatch(isEditingEventRangeAction(false)),
   updateEventDetails: details => dispatch(updateEventDetailsAction(details)),
   updateNewEventDetails: details => dispatch(updateNewEventDetailsAction(details)),
