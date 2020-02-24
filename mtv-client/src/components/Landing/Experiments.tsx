@@ -9,6 +9,7 @@ import {
 } from '../../model/selectors/projects';
 import { selectExperiment } from '../../model/actions/landing';
 import { RootState, ExperimentDataType } from '../../model/types';
+import MatrixSummary from './MatrixSummary';
 
 let props: Props;
 type StateProps = ReturnType<typeof mapState>;
@@ -62,7 +63,10 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
         <ul>
           <li>Signals: {experiment.dataruns.length}</li>
           <li>DC: {experiment.date_creation.substring(0, 10)}</li>
+          <li>Events: todo</li>
+          <li>By: todo</li>
         </ul>
+        <MatrixSummary></MatrixSummary>
       </div>
     </div>
   );

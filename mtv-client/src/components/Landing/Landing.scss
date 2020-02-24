@@ -1,7 +1,7 @@
 @import '../../assets/sass/colors.scss';
 @import '../../assets/sass/animations.scss';
 
-.page-landing{
+.page-landing {
     margin-top: 65px;
     position: relative;
     overflow-x: hidden;
@@ -26,6 +26,15 @@
         &.active {
             animation-name: homepage;
             animation-duration: 1s;
+        }
+
+        .matrix-summary {
+            position: absolute;
+            left: 150px;
+            width: calc(100% - 150px);
+            height: 100%;
+            min-width: 180px;
+            // min-height: 150px;
         }
     }
 
