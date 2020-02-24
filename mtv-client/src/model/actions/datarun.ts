@@ -272,27 +272,30 @@ export function zoomToggleAction(zoomMode) {
 export function setPeriodLevelAction(newPeriod) {
   return function(dispatch, getState) {
     const currentPeriod = getSelectedPeriodLevel(getState());
-    dispatch({ type: REVIEW_PERIOD_LEVEL, reviewPeriod: null });
-    if (newPeriod.level === 'year') {
-      dispatch({
-        type: SET_CURRENT_PERIOD_LEVEL,
-        isPeriodLevelSelected: true,
-        periodLevel: {
-          year: newPeriod.name,
-          month: '',
-        },
-      });
-    }
+    if (newPeriod.level !== 'day') {
+      if (newPeriod.level === 'year') {
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          isPeriodLevelSelected: true,
+          periodLevel: {
+            year: newPeriod.name,
+            month: '',
+          },
+        });
+        dispatch(reviewPeriodAction('month'));
+      }
 
-    if (newPeriod.level === 'month') {
-      dispatch({
-        type: SET_CURRENT_PERIOD_LEVEL,
-        isPeriodLevelSelected: true,
-        periodLevel: {
-          ...currentPeriod,
-          month: newPeriod.name,
-        },
-      });
+      if (newPeriod.level === 'month') {
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          isPeriodLevelSelected: true,
+          periodLevel: {
+            ...currentPeriod,
+            month: newPeriod.name,
+          },
+        });
+        dispatch(reviewPeriodAction('day'));
+      }
     }
   };
 }

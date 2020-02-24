@@ -5,9 +5,17 @@
     min-width: 480px;
     padding: 30px 10px 10px 10px;
     box-sizing: border-box;
-    height: 92vh;
+    height: 90vh;
     .data-wrapper{
-        height: 94%;
+        height: 91%;
+        .period-info{
+            p{
+                margin: 0;
+                padding: 0;
+                color: #8A9097;
+                font-size: 12px;
+            }
+        }
     }
 
     .feature-cell {
@@ -36,8 +44,13 @@
         }
     }
     .period-control{
+        border-bottom: 1px solid #484E53;
+        padding-bottom: 20px;
+        margin-bottom: 10px;
         .sidebar-heading{
             display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
         }
         ul{
             float: right;
