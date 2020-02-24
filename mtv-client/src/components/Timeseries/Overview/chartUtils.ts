@@ -158,16 +158,13 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
 }
 
 export function updateHighlithedEvents(datarun) {
-  const { events, eventWindows, timeSeries } = datarun;
+  const { eventWindows, timeSeries } = datarun;
   const currentSvg = d3.selectAll(`#_${datarun.id}`);
+  currentSvg.selectAll('.wave-event').remove();
 
-  events.forEach(event => {
-    currentSvg.select(`#wawe_${event.id}`).remove();
-  });
-
-  const highlightedEvents = eventWindows.map(event => ({
-    period: timeSeries.slice(event[0], event[1] + 2),
-    eventID: event[3],
+  const highlightedEvents = eventWindows.map(currentEvent => ({
+    period: timeSeries.slice(currentEvent[0], currentEvent[1] + 2),
+    eventID: currentEvent[3],
   }));
 
   const { xCoord, yCoord } = getScale(chartWidth, 36, datarun);
@@ -177,12 +174,12 @@ export function updateHighlithedEvents(datarun) {
     .x(d => xCoord(d[0]))
     .y(d => yCoord(d[1]));
 
-  highlightedEvents.forEach(event =>
+  highlightedEvents.forEach(currentEvent =>
     svg
       .append('path')
       .attr('class', 'wave-event')
-      .attr('id', `wawe_${event.eventID}`)
+      .attr('id', `wawe_${currentEvent.eventID}`)
       .attr('transform', `translate(${offset.left}, ${offset.top})`)
-      .attr('d', line(event.period)),
+      .attr('d', line(currentEvent.period)),
   );
 }
