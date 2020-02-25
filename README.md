@@ -83,7 +83,6 @@ Once you've downloaded the MTV repository and installed all the prerequisites, y
 
 ```bash
 $ make install
-$ make install-theme
 ```
 
 This command will install all the dependencies needed for the application (server-end and client-end) to run. For development, use the following command instead, which will install some additional
@@ -91,7 +90,6 @@ dependencies for code linting and testing
 
 ```bash
 $ make install-develop
-$ make install-theme
 ```
 
 
