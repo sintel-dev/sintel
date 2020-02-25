@@ -1,8 +1,6 @@
 import * as d3 from 'd3';
 import { colorSchemes } from '../FocusChart/Constants';
-
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const fromMonthToIndex = month => months.indexOf(month) + 1;
+import { fromMonthToIndex } from '../../../model/utils/Utils';
 
 export const getWrapperSize = () => {
   const siderbarHeaderHeight = document.querySelector('.sidebar-heading').clientHeight;

@@ -26,10 +26,14 @@ import {
   getZoomCounter,
   getZoomMode,
   getNewEventDetails,
+  getSelectedPeriodLevel,
+  getReviewPeriod,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
+import { fromMonthToIndex, maxDaysInMonth } from '../../../model/utils/Utils';
+
 import { RootState } from '../../../model/types';
 
 const { TRANSLATE_LEFT, DRAW_EVENTS_TIMEOUT, CHART_MARGIN } = FocusChartConstants;
@@ -124,6 +128,13 @@ class FocusChart extends Component<Props, State> {
 
     if (prevProps.zoomMode !== this.props.zoomMode) {
       this.toggleZoom();
+    }
+
+    if (
+      prevProps.selectedPeriodLevel !== this.props.selectedPeriodLevel ||
+      prevProps.reviewRange !== this.props.reviewRange
+    ) {
+      this.updateChartOnPeriodChange();
     }
   }
 
@@ -388,6 +399,71 @@ class FocusChart extends Component<Props, State> {
     this.props.setPeriodRange(periodRange);
   }
 
+  updateChartOnPeriodChange() {
+    const { width, height } = this.state;
+    const { selectedPeriodLevel, reviewRange, datarun } = this.props;
+    const { maxTimeSeries } = datarun;
+    const { xCoord } = getScale(width, height, this.props.datarun.maxTimeSeries);
+    const toTimestamp = strDate => Date.parse(strDate);
+    let eventRange = [];
+    let startDate = 0;
+    let stopDate = 0;
+
+    const focusChartWidth =
+      document.querySelector('#focusChartWrapper').clientWidth - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+
+    const setYearLevelView = year => {
+      startDate = toTimestamp(`01/01/${year} 00:00:00`);
+      stopDate = toTimestamp(`12/31/${year} 23:59:59`);
+    };
+
+    const setMonthLevelView = (year, month) => {
+      const currentMonth = fromMonthToIndex(month);
+      const maxMonthDays = maxDaysInMonth(year, currentMonth);
+      startDate = toTimestamp(`${currentMonth}/01/${selectedPeriodLevel.year} 00:00:00`);
+      stopDate = toTimestamp(`${currentMonth}/${maxMonthDays}/${selectedPeriodLevel.year} 23:59:59`);
+    };
+
+    if (selectedPeriodLevel.year) {
+      setYearLevelView(selectedPeriodLevel.year);
+    }
+
+    if (selectedPeriodLevel.month) {
+      const { year, month } = selectedPeriodLevel;
+      setMonthLevelView(year, month);
+    }
+
+    if (reviewRange === 'month') {
+      setYearLevelView(selectedPeriodLevel.year);
+    }
+
+    if (reviewRange === 'day') {
+      const { year, month } = selectedPeriodLevel;
+      setMonthLevelView(year, month);
+    }
+
+    if (reviewRange !== 'year') {
+      const startRange = xCoord(startDate);
+      const stopRange = xCoord(stopDate);
+      eventRange = [startRange, stopRange];
+
+      const zoomValue = d3.zoomIdentity
+        .scale(focusChartWidth / (eventRange[1] - eventRange[0]))
+        .translate(-eventRange[0], 0);
+      this.props.setPeriodRange({ eventRange, zoomValue });
+    }
+
+    if (reviewRange === 'year') {
+      const startRange = xCoord(maxTimeSeries[0][0]);
+      const stopRange = xCoord(maxTimeSeries[maxTimeSeries.length - 1][0]);
+      eventRange = [startRange, stopRange];
+      const zoomValue = d3.zoomIdentity
+        .scale(focusChartWidth / (eventRange[1] - eventRange[0]))
+        .translate(-eventRange[0], 0);
+      this.props.setPeriodRange({ eventRange, zoomValue });
+    }
+  }
+
   updateChartOnBrush() {
     const { chart, width, height } = this.state;
     const { periodRange, datarun } = this.props;
@@ -646,6 +722,8 @@ const mapState = (state: RootState) => ({
   zoomCounter: getZoomCounter(state),
   zoomMode: getZoomMode(state),
   newEventDetails: getNewEventDetails(state),
+  selectedPeriodLevel: getSelectedPeriodLevel(state),
+  reviewRange: getReviewPeriod(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
