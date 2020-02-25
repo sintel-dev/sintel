@@ -1,7 +1,7 @@
 @import '../../assets/sass/colors.scss';
 @import '../../assets/sass/animations.scss';
 
-.page-landing{
+.page-landing {
     margin-top: 65px;
     position: relative;
     overflow-x: hidden;
@@ -112,6 +112,33 @@
                     text-align: right;
                     align-content: flex-end;
                 }
+
+                li {
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+
+    &[data-name='experiments'] {
+        .item-wrapper {
+            height: 240px;
+        }
+
+        .item-data {
+            flex-direction: row;
+            height: calc(100% - 30px);
+            flex-wrap: nowrap;
+            align-items: center;
+            ul {
+                flex: 0 1 30px;
+            }
+            .matrix {
+                flex: 1 1 50px;
+                // width: 180px;
+                // height: 50px;
+                min-width: 180px;
+                min-height: 180px;
             }
         }
     }

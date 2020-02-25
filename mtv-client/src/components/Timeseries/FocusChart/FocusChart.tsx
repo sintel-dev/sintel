@@ -83,7 +83,7 @@ class FocusChart extends Component<Props, State> {
     );
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.datarun && prevProps.datarun.id !== this.props.datarun.id) {
       this.drawChart();
     }

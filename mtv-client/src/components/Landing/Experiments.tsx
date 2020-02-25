@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import * as _ from 'lodash';
 import Loader from '../Common/Loader';
 import {
   getFilteredExperiments,
@@ -9,6 +10,8 @@ import {
 } from '../../model/selectors/projects';
 import { selectExperiment } from '../../model/actions/landing';
 import { RootState, ExperimentDataType } from '../../model/types';
+import drawMatrix, { TagStats, Scale as MatrixScale } from './Matrix';
+import { fromTagToID } from './utils';
 
 let props: Props;
 type StateProps = ReturnType<typeof mapState>;
@@ -16,6 +19,8 @@ type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
 type renderExperimentProps = {
   experiment: ExperimentDataType;
+  tagStats: TagStats;
+  matrixScale: MatrixScale;
   index: number;
   selectedPipeline: typeof props.selectedExperiment;
   selectedExperiment: typeof props.selectedExperiment;
@@ -28,22 +33,67 @@ const Experiments: React.FC<Props> = ({
   onSelectExperiment,
   selectedPipeline,
   selectedExperiment,
-}) => (
-  <div className="item-row scroll-style" id="experiments">
-    <h2>Experiments</h2>
-    <div className="item-wrapper">
-      <Loader isLoading={isExperimentsLoading}>
-        {filteredExperiments.length ? (
-          filteredExperiments.map((experiment, index) =>
-            renderExperiment({ experiment, index, onSelectExperiment, selectedPipeline, selectedExperiment }),
-          )
-        ) : (
-          <h2>No experiments found</h2>
-        )}
-      </Loader>
+}) => {
+  // Compute maxTagNum, maxEventNum, and maxScore
+  // which would be used for plotting Matrix
+  let experiments = filteredExperiments;
+  let maxTagNum = Number.MIN_SAFE_INTEGER;
+  let maxEventNum = Number.MIN_SAFE_INTEGER;
+  let maxScore = Number.MIN_SAFE_INTEGER;
+  let tagStatsList: TagStats[] = [];
+
+  _.each(experiments, experiment => {
+    let tagStats: { [index: string]: number } = {};
+    for (let i = 0; i < 7; i += 1) {
+      tagStats[String(i)] = 0;
+    }
+    _.each(experiment.dataruns, datarun => {
+      for (let i = 0; i < datarun.events.length; i += 1) {
+        let tid = fromTagToID(datarun.events[i].tag);
+        tid = tid === 'untagged' ? '0' : tid;
+        if (!_.has(tagStats, tid)) {
+          tagStats[tid] = 0;
+        }
+        tagStats[tid] += 1;
+        maxTagNum = maxTagNum < tagStats[tid] ? tagStats[tid] : maxTagNum;
+
+        maxScore = maxScore > datarun.events[i].score ? maxScore : datarun.events[i].score;
+        maxEventNum = maxEventNum < datarun.events.length ? datarun.events.length : maxEventNum;
+      }
+    });
+    tagStatsList.push(tagStats);
+  });
+  const matrixScale: MatrixScale = {
+    maxTagNum,
+    maxEventNum,
+    maxScore,
+  };
+
+  return (
+    <div className="item-row scroll-style" id="experiments" data-name="experiments">
+      <h2>Experiments</h2>
+      <div className="item-wrapper">
+        <Loader isLoading={isExperimentsLoading}>
+          {filteredExperiments.length ? (
+            filteredExperiments.map((experiment, index) =>
+              renderExperiment({
+                experiment,
+                tagStats: tagStatsList[index],
+                matrixScale,
+                index,
+                onSelectExperiment,
+                selectedPipeline,
+                selectedExperiment,
+              }),
+            )
+          ) : (
+            <h2>No experiments found</h2>
+          )}
+        </Loader>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const countDatarunEvents = experiment => {
   const { dataruns } = experiment;
@@ -52,6 +102,8 @@ const countDatarunEvents = experiment => {
 
 const renderExperiment: React.FC<renderExperimentProps> = ({
   experiment,
+  tagStats,
+  matrixScale,
   index,
   onSelectExperiment,
   selectedPipeline,
@@ -69,7 +121,9 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
           <li>Signals: {experiment.dataruns.length}</li>
           <li>Events: {eventCounts}</li>
           <li>DC: {experiment.date_creation.substring(0, 10)}</li>
+          <li>By: {`${experiment.created_by}`}</li>
         </ul>
+        {drawMatrix(experiment, tagStats, matrixScale)}
       </div>
     </div>
   );
