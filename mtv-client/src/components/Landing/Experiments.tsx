@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import * as _ from 'lodash';
 import Loader from '../Common/Loader';
 import {
   getFilteredExperiments,
@@ -10,7 +11,6 @@ import {
 import { selectExperiment } from '../../model/actions/landing';
 import { RootState, ExperimentDataType } from '../../model/types';
 import drawMatrix, { TagStats, Scale as MatrixScale } from './Matrix';
-import * as _ from 'lodash';
 import { fromTagToID } from './utils';
 
 let props: Props;
@@ -95,6 +95,11 @@ const Experiments: React.FC<Props> = ({
   );
 };
 
+const countDatarunEvents = experiment => {
+  const { dataruns } = experiment;
+  return dataruns.map(datarun => datarun.events.length).reduce((item, accumulator) => item + accumulator, 0);
+};
+
 const renderExperiment: React.FC<renderExperimentProps> = ({
   experiment,
   tagStats,
@@ -105,7 +110,7 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
   selectedExperiment,
 }) => {
   const activeClass = selectedPipeline || selectedExperiment === experiment.id ? 'active' : '';
-
+  const eventCounts = countDatarunEvents(experiment);
   return (
     <div className={`cell ${activeClass}`} key={index} onClick={() => onSelectExperiment(experiment.id)}>
       <h3>
@@ -114,9 +119,9 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
       <div className="item-data">
         <ul>
           <li>Signals: {experiment.dataruns.length}</li>
+          <li>Events: {eventCounts}</li>
           <li>DC: {experiment.date_creation.substring(0, 10)}</li>
-          <li>Events: {18}</li>
-          <li>By: {experiment.created_by}</li>
+          <li>By: {`${experiment.created_by}`}</li>
         </ul>
         {drawMatrix(experiment, tagStats, matrixScale)}
       </div>

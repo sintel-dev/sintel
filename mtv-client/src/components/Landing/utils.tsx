@@ -8,15 +8,15 @@ export const colorSchemes = {
     '#45F642', // normal
     '#C7C7C7', // untagged
   ],
-  getColorName: function(name) {
+  getColorName(name) {
     return '#426776';
   },
-  getColorCode: function(name) {
+  getColorCode(name) {
     return '#426776';
   },
 };
 
-export let fromIDtoTag = (id: string): string => {
+export const fromIDtoTag = (id: string): string => {
   switch (id) {
     case '1':
       return 'investigate';
@@ -35,7 +35,7 @@ export let fromIDtoTag = (id: string): string => {
   }
 };
 
-export let fromTagToID = (tag: string): string => {
+export const fromTagToID = (tag: string): string => {
   switch (tag) {
     case 'investigate':
       return '1';
