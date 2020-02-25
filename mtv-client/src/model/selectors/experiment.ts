@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { createSelector } from 'reselect';
 import { RootState, EventDataType } from '../types';
+import { months } from '../utils/Utils';
 
 export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
@@ -37,11 +38,9 @@ const groupByEventWindows = (events: EventDataType[], timestamps: number[]) =>
   );
 
 const groupDataByPeriod = data => {
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   let result = [];
 
-  // eslint-disable-next-line no-plusplus
-  for (let yearIterator = 0; yearIterator < data.length; yearIterator++) {
+  for (let yearIterator = 0; yearIterator < data.length; yearIterator += 1) {
     const year = {
       level: 'year',
       name: data[yearIterator].year,
@@ -51,11 +50,10 @@ const groupDataByPeriod = data => {
     };
     result.push(year);
 
-    // eslint-disable-next-line no-plusplus
-    for (let monthIterator = 0; monthIterator < 12; monthIterator++) {
+    for (let monthIterator = 0; monthIterator < 12; monthIterator += 1) {
       const month = {
         level: 'month',
-        name: monthNames[monthIterator],
+        name: months[monthIterator],
         bins: [],
         counts: [],
         children: [],
@@ -63,8 +61,7 @@ const groupDataByPeriod = data => {
       };
       year.children.push(month);
 
-      // eslint-disable-next-line no-plusplus
-      for (let dayIterator = 0; dayIterator < data[yearIterator].data[monthIterator].length; dayIterator++) {
+      for (let dayIterator = 0; dayIterator < data[yearIterator].data[monthIterator].length; dayIterator += 1) {
         let day = {
           level: 'day',
           name: dayIterator + 1,
