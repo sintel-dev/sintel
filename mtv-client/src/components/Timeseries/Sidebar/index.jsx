@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import * as d3 from 'd3';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
@@ -20,10 +21,40 @@ class Sidebar extends Component {
 
   componentDidMount() {
     const { width, height } = getWrapperSize();
-    this.setState({
-      width,
-      height,
-    });
+    this.setState(
+      {
+        width,
+        height,
+        zoomValue: null,
+      },
+      () => {
+        this.initZoom();
+      },
+    );
+  }
+
+  initZoom() {
+    const { width, height } = this.state;
+    let zoom = null;
+
+    zoom = d3
+      .zoom()
+      .scaleExtent([1, Infinity])
+      .translateExtent([
+        [0, 0],
+        [width, height],
+      ])
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .on('zoom', () =>
+        this.setState({
+          zoomValue: d3.event.transform,
+        }),
+      );
+
+    d3.select('#multiPeriodChart .zoom').call(zoom);
   }
 
   getFeatureCellCoords(index) {
@@ -74,7 +105,7 @@ class Sidebar extends Component {
   }
 
   drawData() {
-    const { width } = this.state;
+    const { width, zoomValue } = this.state;
     const { setPeriodLevel, dataRun } = this.props;
     const { period, grouppedEvents } = dataRun;
     const radius = width / this.getColAmount() / 2 - graphSpacing;
@@ -85,40 +116,43 @@ class Sidebar extends Component {
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
 
         return (
-          <g
-            key={currentPeriod.name}
-            className="feature-cell"
-            transform={`translate(${horizontalShift}, ${verticalShift})`}
-            onClick={() => setPeriodLevel(currentPeriod)}
-          >
-            <path
-              id={`path_${currentPeriod.name}`}
-              d={this.getPathData(currentPeriod.bins)}
-              className="feature-area radial-cursor"
-            />
-            <clipPath id={`clip_${currentPeriod.name}`}>
-              <use href={`#path_${currentPeriod.name}`} />
-            </clipPath>
-            <g className="target">
-              <circle r={radius} />
-              <circle r={radius * 0.7} />
-              <circle r={radius * 0.4} />
-              <circle r={radius * 0.1} className="target-info" />
-              <line x1={-radius} x2={radius} />
-              <line y1={-radius} y2={radius} />
+          <g transform={zoomValue} key={currentPeriod.name}>
+            <g
+              className="feature-cell"
+              transform={`translate(${horizontalShift}, ${verticalShift})`}
+              onClick={() => setPeriodLevel(currentPeriod)}
+            >
+              <path
+                id={`path_${currentPeriod.name}`}
+                d={this.getPathData(currentPeriod.bins)}
+                className="feature-area radial-cursor"
+              />
+              <clipPath id={`clip_${currentPeriod.name}`}>
+                <use href={`#path_${currentPeriod.name}`} />
+              </clipPath>
+              <g className="target">
+                <circle r={radius} />
+                <circle r={radius * 0.7} />
+                <circle r={radius * 0.4} />
+                <circle r={radius * 0.1} className="target-info" />
+                <line x1={-radius} x2={radius} />
+                <line y1={-radius} y2={radius} />
 
-              <text className="radial-text" y={radius + 15} x={0}>
-                {currentPeriod.name}
-              </text>
-              {arcData.length &&
-                arcData.map(arc => <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />)}
+                <text className="radial-text" y={radius + 15} x={0}>
+                  {currentPeriod.name}
+                </text>
+                {arcData.length &&
+                  arcData.map(arc => (
+                    <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
+                  ))}
+              </g>
+              <circle
+                r={radius * 0.85}
+                className="wrapper"
+                fill="url(#blueGradient)"
+                clipPath={`url(#clip_${currentPeriod.name})`}
+              />
             </g>
-            <circle
-              r={radius * 0.85}
-              className="wrapper"
-              fill="url(#blueGradient)"
-              clipPath={`url(#clip_${currentPeriod.name})`}
-            />
           </g>
         );
       })
@@ -146,6 +180,7 @@ class Sidebar extends Component {
               </p>
             </div>
             <svg id="multiPeriodChart" width={width} height={height}>
+              <rect className="zoom" width={width} height={height} />
               {this.drawData(period)}
               <defs>
                 <radialGradient id="blueGradient">
