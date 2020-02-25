@@ -77,6 +77,10 @@
             }
         }
     }
+    .zoom{
+        fill: transparent;
+        cursor: move;
+    }
 }
 
 @media screen and (max-width: 1200px) {
