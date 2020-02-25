@@ -1,34 +1,30 @@
-import * as _ from 'lodash';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { RootState, ExperimentDataType } from '../../../model/types';
 import * as d3 from 'd3';
-import * as pip from '../../services/pip';
-import { colorSchemes, fromIDtoTag, fromTagToID } from '../../services/helpers';
-import * as dataPC from '../../services/dataProcessor';
-import * as DT from '../../services/server.itf';
-import { Experiment } from '../pageLanding';
+import * as _ from 'lodash';
+import { fromIDtoTag, colorSchemes } from '../utils';
+import { TagStats, Scale } from './types';
+import './Matrix.scss';
 
-export interface Option {
-  svgHeight?: number;
-  height?: number;
-  width?: number;
-  margin?: { top: number; right: number; bottom: number; left: number };
+type ownProps = {
+  experiment: ExperimentDataType;
+  tagStats: TagStats;
+  scale: Scale;
+};
+type StateProps = ReturnType<typeof mapState>;
+type DispatchProps = ReturnType<typeof mapDispatch>;
+type Props = ownProps & StateProps & DispatchProps;
 
-  maxTagNum?: number;
-  maxEventNum?: number;
-  maxScore?: number;
-  matrixHeight?: number;
-  matrixWidth?: number;
-  matrixMargin?: { top: number; right: number; bottom: number; left: number };
-}
-
-export class Matrix extends pip.Events {
-  private minHeight = 160;
-  private minWidth = 180;
-
-  private option: Option = {
+// class Matrix extends Component<Props, Stats> {
+class Matrix extends Component<Props> {
+  private svgContainer: d3.Selection<HTMLElement, any, any, any>;
+  private svg: d3.Selection<SVGElement, any, any, any>;
+  private option = {
     height: 160, // min height
     width: 180, // min width
     margin: {
-      top: 2,
+      top: 10,
       right: 5,
       bottom: 5,
       left: 2,
@@ -37,28 +33,39 @@ export class Matrix extends pip.Events {
     matrixWidth: 120,
   };
 
-  private svgContainer: d3.Selection<HTMLElement, any, any, any>;
-  private svg: d3.Selection<SVGElement, any, any, any>;
-  private canvas: d3.Selection<any, any, any, any>;
+  // constructor(props) {
+  //   super(props);
+  //   // this.state = {
+  //   //   width: 0,
+  //   //   height: 0,
+  //   // };
+  // }
 
-  constructor(ele: HTMLElement, private data: Experiment, option?: Option) {
-    super();
+  componentDidMount() {
     let self = this;
-    _.extend(self.option, option);
-
-    console.log('exp-matrix: ', data);
-
-    self.svgContainer = d3.select<HTMLElement, any>(ele);
-    self.option.width = _.isUndefined(self.option.width) ? self.minWidth : self.option.width;
-    self.option.height = _.isUndefined(self.option.height) ? self.minHeight : self.option.height;
-
+    self.svgContainer = d3.select<HTMLElement, any>(`.matrix[data-eid='${this.props.experiment.id}']`);
+    let { width, height } = self.svgContainer.node().getBoundingClientRect();
+    self.option.width = width > 0 ? width : self.option.width;
+    self.option.height = height > 0 ? height : self.option.height;
     self.svg = self.svgContainer
       .append<SVGElement>('svg')
-      .attr('class', 'matrix')
+      .attr('class', 'matrix-svg')
       .attr('width', self.option.width)
       .attr('height', self.option.height);
 
+    self.props.scale.maxScore = Math.ceil(self.props.scale.maxScore);
+
     self.plot();
+    // this.setState(
+    //   {
+    //     width,
+    //     height,
+    //     chart,
+    //   },
+    //   () => {
+    //     this.drawChart();
+    //   },
+    // );
   }
 
   private plot() {
@@ -123,7 +130,7 @@ export class Matrix extends pip.Events {
     let interval = -1;
     // find max score
     let tScore = false;
-    _.each(self.data.dataruns, datarun => {
+    _.each(self.props.experiment.dataruns, datarun => {
       for (let i = 0; i < datarun.events.length; i += 1) {
         if (datarun.events[i].score > 0) {
           tScore = true;
@@ -133,14 +140,14 @@ export class Matrix extends pip.Events {
     if (!tScore) {
       return;
     }
-    self.option.maxScore = self.option.maxScore > 6 ? 6 : self.option.maxScore;
-    interval = self.option.maxScore / binNum;
+    self.props.scale.maxScore = Math.min(6, self.props.scale.maxScore);
+    interval = self.props.scale.maxScore / binNum;
     let maxCount = 0;
     let outerMaxNum = 0;
     // get bins
-    _.each(self.data.dataruns, datarun => {
+    _.each(self.props.experiment.dataruns, datarun => {
       for (let i = 0; i < datarun.events.length; i += 1) {
-        if (datarun.events[i].score > self.option.maxScore) {
+        if (datarun.events[i].score > self.props.scale.maxScore) {
           outerMaxNum += 1;
         } else {
           let idx = Math.trunc(datarun.events[i].score / interval);
@@ -188,7 +195,7 @@ export class Matrix extends pip.Events {
       .append('text')
       .attr('class', 'axis-text')
       .attr('text-anchor', 'end')
-      .text(self.option.maxScore);
+      .text(self.props.scale.maxScore);
   }
 
   private addMatrixHeatmap(g: d3.Selection<SVGGElement, any, any, any>) {
@@ -196,7 +203,7 @@ export class Matrix extends pip.Events {
     let w = self.option.matrixWidth;
     let h = self.option.matrixHeight;
 
-    let cells: [string, number][] = _.chain(self.data.dataruns)
+    let cells: [string, number][] = _.chain(self.props.experiment.dataruns)
       .map(d => [d.signal, d.events.length])
       .sortBy(d => d[0])
       .value() as [string, number][];
@@ -204,15 +211,15 @@ export class Matrix extends pip.Events {
     let color = d3
       .scaleLinear<any>()
       .range(['#A3A4A5', '#43434E'])
-      .domain([0, self.option.maxEventNum]);
+      .domain([0, self.props.scale.maxEventNum]);
     // .domain(d3.extent(cells, d => d[1]));
-    let cx = d3
-      .scaleLinear<any>()
-      .range([0, 0.85])
-      .domain([0, self.option.maxEventNum]);
-    let color2 = function(t) {
-      return d3.interpolateGreys(cx(t));
-    };
+    // let cx = d3
+    //   .scaleLinear<any>()
+    //   .range([0, 0.85])
+    //   .domain([0, self.props.scale.maxEventNum]);
+    // let color2 = function(t) {
+    //   return d3.interpolateGreys(cx(t));
+    // };
     let rowNum = 6;
     let fx = d3
       .scaleBand()
@@ -235,12 +242,12 @@ export class Matrix extends pip.Events {
       .attr('fill', d => color(d[1]))
       // .attr('fill', d => color2(d[1]))
       .append('title')
-      .text(d => `signal: ${d[0]}\n` + `events: ${d[1]}`);
+      .text(d => `signal: ${d[0]}\nevents: ${d[1]}`);
   }
 
   private addTagBars(g: d3.Selection<SVGGElement, any, any, any>) {
     let self = this;
-    let tagStats = _.sortBy(_.toPairs(self.data.tagStats), d => +d[0]);
+    let tagStats = _.sortBy(_.toPairs(self.props.tagStats), d => +d[0]);
 
     tagStats.push(tagStats[0]);
     tagStats.shift();
@@ -260,7 +267,7 @@ export class Matrix extends pip.Events {
     let fy = d3
       .scaleLinear()
       .range([0, w - rh - rm])
-      .domain([0, self.option.maxTagNum]);
+      .domain([0, self.props.scale.maxTagNum]);
 
     let getTagColor = (tag: string): string => {
       let tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal'];
@@ -332,4 +339,14 @@ export class Matrix extends pip.Events {
       .attr('x2', 0)
       .attr('y2', h);
   }
+
+  render() {
+    return <div className="matrix" data-eid={this.props.experiment.id}></div>;
+  }
 }
+
+const mapState = (state: RootState) => ({});
+
+const mapDispatch = (dispatch: Function) => ({});
+
+export default connect<StateProps, DispatchProps, ownProps, RootState>(mapState, mapDispatch)(Matrix);
