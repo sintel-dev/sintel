@@ -1,0 +1,28 @@
+.matrix-svg {
+    .sep-line {
+        stroke: #616365;
+        stroke-width: 1;
+    }
+
+    .area {
+        fill: #616365;
+    }
+
+    .axis-text {
+        font-size: 12px;
+        fill: #616365;
+        // font-family: sans-serif;
+    }
+
+    .bar,
+    .bar-hat {
+        opacity: 1;
+        stroke-width: 0;
+        cursor: pointer;
+    }
+
+    .cell {
+        stroke-width: 0;
+        cursor: pointer;
+    }
+}

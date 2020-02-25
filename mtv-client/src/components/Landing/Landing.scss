@@ -27,15 +27,6 @@
             animation-name: homepage;
             animation-duration: 1s;
         }
-
-        .matrix-summary {
-            position: absolute;
-            left: 150px;
-            width: calc(100% - 150px);
-            height: 100%;
-            min-width: 180px;
-            // min-height: 150px;
-        }
     }
 
     .projects-wrapper,
@@ -121,6 +112,33 @@
                     text-align: right;
                     align-content: flex-end;
                 }
+
+                li {
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+
+    &[data-name='experiments'] {
+        .item-wrapper {
+            height: 240px;
+        }
+
+        .item-data {
+            flex-direction: row;
+            height: calc(100% - 30px);
+            flex-wrap: nowrap;
+            align-items: center;
+            ul {
+                flex: 0 1 30px;
+            }
+            .matrix {
+                flex: 1 1 50px;
+                // width: 180px;
+                // height: 50px;
+                min-width: 180px;
+                min-height: 180px;
             }
         }
     }
