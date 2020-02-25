@@ -160,8 +160,16 @@ export const getProcessedDataRuns = createSelector(
       return [];
     }
 
+    const timeSeriesDataLength = experimentData.data.dataruns.map(datarun => datarun.prediction.data.length);
+
+    const maxTimeSeriesLength = Math.max(...timeSeriesDataLength);
+    const maxTimeSeriesData = experimentData.data.dataruns.filter(
+      data => data.prediction.data.length === maxTimeSeriesLength,
+    )[0];
+
     return experimentData.data.dataruns.map(datarun => {
       const timeSeries = groupDataBy(datarun.prediction, 'y_raw');
+      const maxTimeSeries = groupDataBy(maxTimeSeriesData.prediction, 'y_raw');
       const timeseriesPred = groupDataBy(datarun.prediction, 'y_raw_hat');
       const timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
       const period = groupDataByPeriod(datarun.raw);
@@ -182,6 +190,7 @@ export const getProcessedDataRuns = createSelector(
         timeseriesErr,
         eventWindows,
         period,
+        maxTimeSeries,
       };
     });
   },

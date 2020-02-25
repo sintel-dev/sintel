@@ -19,9 +19,9 @@ let ratio = 0;
 const getScale = (width, height, dataRun) => {
   let minValue = Number.MAX_SAFE_INTEGER;
   let maxValue = Number.MIN_SAFE_INTEGER;
-  const { timeSeries } = dataRun;
-  const timeSeriesMin = timeSeries[0][0];
-  const timeSeriesMax = timeSeries[timeSeries.length - 1][0];
+  const { maxTimeSeries } = dataRun;
+  const timeSeriesMin = maxTimeSeries[0][0];
+  const timeSeriesMax = maxTimeSeries[maxTimeSeries.length - 1][0];
   const xCoord = d3.scaleTime().range([0, width]);
   const yCoord = d3.scaleLinear().range([height, 0]);
 
