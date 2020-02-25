@@ -251,7 +251,7 @@ export function deleteEventAction() {
 
 export function filterEventsByTagAction(tags) {
   return function(dispatch) {
-    dispatch({ type: SET_FILTER_TAGS, filterTags: tags });
+    dispatch({ type: SET_FILTER_TAGS, filterTags: tags !== null ? tags : [] });
   };
 }
 
