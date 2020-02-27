@@ -1,7 +1,10 @@
 import * as d3 from 'd3';
 import { createSelector } from 'reselect';
+import * as _ from 'lodash';
 import { RootState, EventDataType } from '../types';
 import { months } from '../utils/Utils';
+import { getFilteredExperiments } from './projects';
+import { fromTagToID } from '../../components/Landing/utils';
 
 export const getFilterTags = state => state.datarun.filterTags;
 export const getSelectedExperimentData = (state: RootState) => state.selectedExperimentData;
@@ -192,3 +195,43 @@ export const getProcessedDataRuns = createSelector(
     });
   },
 );
+
+// @TODO - move logic from Experiment.tsx ove here
+export const getProcessedMatrixData = createSelector([getFilteredExperiments], filteredExperiments => {
+  let maxTagNum = Number.MIN_SAFE_INTEGER;
+  let maxEventNum = Number.MIN_SAFE_INTEGER;
+  let maxScore = Number.MIN_SAFE_INTEGER;
+  let tagStatsList = [];
+
+  filteredExperiments.forEach((currentExperiment, experimentIndex) => {
+    const { dataruns } = currentExperiment;
+    let tagStats: { [index: string]: number } = {};
+    for (let i = 0; i < 7; i += 1) {
+      tagStats[String(i)] = 0;
+    }
+    dataruns.forEach(currentDatarun => {
+      const { events } = currentDatarun;
+      events.forEach(currentEvent => {
+        let tid = fromTagToID(currentEvent.tag);
+        tid = tid === 'untagged' ? '0' : tid;
+        if (!_.has(tagStats, tid)) {
+          tagStats[tid] = 0;
+        }
+        tagStats[tid] += 1;
+        maxTagNum = maxTagNum < tagStats[tid] ? tagStats[tid] : maxTagNum;
+
+        maxScore = maxScore > currentEvent.score ? maxScore : currentEvent.score;
+        maxEventNum = maxEventNum < currentDatarun.events.length ? currentDatarun.events.length : maxEventNum;
+      });
+    });
+    tagStatsList.push(tagStats);
+  });
+
+  const scale = {
+    maxTagNum,
+    maxEventNum,
+    maxScore,
+  };
+
+  return { scale, tagStats: tagStatsList[0] };
+});
