@@ -144,11 +144,11 @@ def verify_auth_token(token):
     s = Serializer(g['config']['AUTH_KEY'])
     try:
         data = s.loads(token)
+        return data['id']
     except SignatureExpired:
         return None  # valid token, but expired
     except BadSignature:
         return None  # invalid token
-    return True
 
 
 def setup_logging(verbosity=1, logfile=None, logger_name=None):

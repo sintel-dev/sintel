@@ -38,7 +38,8 @@ class Reset(Resource):
         @apiParam {String} email email address.
         """
 
-        if not verify_auth_token(request.headers.get('Authorization')):
+        verify_res = verify_auth_token(request.headers.get('Authorization').encode())
+        if verify_res is None:
             return {'message': 'please login first'}, 401
 
         body = request.json
@@ -51,9 +52,10 @@ class Reset(Resource):
                 user['password'] = password_encrypted
                 user.save()
                 send_mail('MTV: your new password', password, user['email'])
+            return {}, 204
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': ''}, 204
+            return {}, 204
 
 
 class Signout(Resource):
@@ -67,10 +69,16 @@ class Signout(Resource):
         @apiParam {String} id user id.
         """
 
-        if not verify_auth_token(request.headers.get('Authorization')):
-            return {'message': 'please login first'}, 401
+        # print(request.headers.get('Authorization'))
+        uid = request.args.get('id', None)
 
-        return '', 204
+        verify_res = verify_auth_token(request.headers.get('Authorization').encode())
+        if verify_res is None:
+            return {'message': 'please login first'}, 401
+        elif uid == verify_res:
+            return {}, 204
+
+        return {'message': 'unknown error'}, 400
 
 
 class Signup(Resource):
@@ -128,7 +136,7 @@ class Signin(Resource):
             password = body['password']
             user = model.User.find_one(email=email)
             if user and check_password_hash(user.password, password):
-                token = generate_auth_token(str(user.id))
+                token = generate_auth_token(str(user.id)).decode()
                 return {
                     'data': {
                         'id': str(user.id),
@@ -136,9 +144,9 @@ class Signin(Resource):
                         'email': user.email,
                         'token': token
                     }
-                }
+                }, 200
             else:
                 return {'message': 'Email and/or Passkey are wrong!'}, 401
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e)}, 401
