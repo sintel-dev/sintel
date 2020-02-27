@@ -17,6 +17,7 @@ requirements = [
     # General
     'termcolor==1.1.0',
     'PyYAML==5.1',
+    'passlib==1.7.2',
 
     # Math
     'numpy>=1.15.4,<1.17',

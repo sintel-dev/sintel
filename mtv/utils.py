@@ -5,6 +5,11 @@ import os
 
 from bson import ObjectId
 from yaml import load
+from mtv import g
+import smtplib
+import ssl
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 try:
     from yaml import CLoader as Loader
@@ -113,6 +118,37 @@ def remove_dots(document):
 
 def restore_dots(document):
     return walk(document, lambda key, value: (key.replace('-', '.'), value))
+
+
+def send_mail(subject, body, receiver):
+    cf = g['app'].config
+    port = cf['MAIL_PORT']
+    smtp_server = cf['MAIL_SERVER']
+    sender = cf['MAIL_USERNAME']
+    password = cf['MAIL_PASSWORD']
+    # password = os.environ['MAIL_PASSWORD']
+    message = 'Subject: {}\n\n{}'.format(subject, body)
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender, password)
+        server.sendmail(sender, receiver, message)
+
+
+def generate_auth_token(id, expiration=600):
+    s = Serializer(g['config']['AUTH_KEY'], expires_in=expiration)
+    return s.dumps({'id': id})
+
+
+def verify_auth_token(token):
+    s = Serializer(g['config']['AUTH_KEY'])
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        return None  # valid token, but expired
+    except BadSignature:
+        return None  # invalid token
+    return True
 
 
 def setup_logging(verbosity=1, logfile=None, logger_name=None):

@@ -1,8 +1,10 @@
 import logging
 
+from flask import request
 from flask_restful import Resource
 
 from mtv import model
+from mtv.utils import verify_auth_token
 
 LOGGER = logging.getLogger(__name__)
 

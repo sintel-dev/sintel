@@ -1,6 +1,7 @@
 import logging
 
 from flask_restful import Resource
+from flask import request
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,7 +14,9 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
-        return {'message': 'get'}, 200, {'username': 'dyu'}
+        print(request.headers.get('Authorization'))
+
+        return {'message': request.headers.get('Authorization'), }, 200, {'username': 'dyu'}
 
     def post(self):
         """

@@ -49,6 +49,7 @@ export class RestClient {
     this.requestConfig = { ...this.requestConfig, ...config };
     this.server = axios.create(this.requestConfig);
 
+    this.server.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';
     // add resources
     this.test = new Resource(this.server, 'test/');
     this.datasets = new Resource(this.server, 'datasets/');

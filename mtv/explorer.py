@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+import smtplib
+import ssl
 
 from flask import Flask
 from flask_cors import CORS
@@ -10,6 +12,7 @@ from mongoengine import connect
 from pymongo import MongoClient
 from termcolor import colored
 
+from mtv import g
 from mtv.db import db
 from mtv.routes import add_routes
 from mtv.utils import import_object
@@ -49,9 +52,10 @@ class MTVExplorer:
             app.config.from_mapping(DEBUG=False, TESTING=True)
 
         CORS(app)
-
         add_routes(app)
 
+        g['config'] = self._cf
+        g['app'] = app
         return app
 
     def update_db(self):
