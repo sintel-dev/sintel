@@ -195,7 +195,7 @@ export function saveNewEventAction() {
       start_time,
       stop_time,
       score: '0.00',
-      tag: newEventDetails.tag || 'untagged',
+      tag: newEventDetails.tag || 'Untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
     };
     await API.events
