@@ -213,7 +213,7 @@ export const getProcessedMatrixData = createSelector([getFilteredExperiments], f
       const { events } = currentDatarun;
       events.forEach(currentEvent => {
         let tid = fromTagToID(currentEvent.tag);
-        tid = tid === 'untagged' ? '0' : tid;
+        tid = tid === 'Untagged' ? '0' : tid;
         if (!_.has(tagStats, tid)) {
           tagStats[tid] = 0;
         }

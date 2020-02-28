@@ -254,7 +254,7 @@ class FocusChart extends Component<Props, State> {
       const currentEvent = eventWindows[eventIndex];
       const startIndex = currentEvent[0];
       const stopIndex = currentEvent[1];
-      const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.untagged;
+      const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.Untagged;
       const currentEventID = currentEvent[3];
 
       // append event highlight
@@ -639,7 +639,7 @@ class FocusChart extends Component<Props, State> {
 
   updateEventTagOnSave(event) {
     const eventTag = d3.select(`#_${event.id} rect.evt-comment`);
-    const tagColor = colorSchemes[event.tag] || colorSchemes.untagged;
+    const tagColor = colorSchemes[event.tag] || colorSchemes.Untagged;
     eventTag.attr('fill', tagColor);
   }
 

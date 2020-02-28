@@ -13,7 +13,7 @@ const filterOptions = [
   { value: 'Problem', label: 'Problem', icon: 'problem', isFixed: true },
   { value: 'Previously seen', label: 'Previously seen', icon: 'seen', isFixed: true },
   { value: 'Normal', label: 'Normal', icon: 'normal', isFixed: true },
-  { value: '', label: 'untagged', icon: 'untagged', isFixed: true },
+  { value: 'Untagged', label: 'Untagged', icon: 'untagged', isFixed: true },
 ];
 
 const formatOptionLabel = ({ label, icon }) => (
