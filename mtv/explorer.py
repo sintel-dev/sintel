@@ -11,6 +11,7 @@ from gridfs import GridFS
 from mongoengine import connect
 from pymongo import MongoClient
 from termcolor import colored
+from oauthlib.oauth2 import WebApplicationClient
 
 from mtv import g
 from mtv.db import db
@@ -56,6 +57,7 @@ class MTVExplorer:
 
         g['config'] = self._cf
         g['app'] = app
+        g['client'] = WebApplicationClient(self._cf['GOOGLE_CLIENT_ID'])
         return app
 
     def update_db(self):
@@ -98,9 +100,11 @@ class MTVExplorer:
 
         if env == 'development':
             app.run(debug=True, port=port)
+            # app.run(debug=True, port=port, ssl_context="adhoc")
 
         elif env == 'production':
             server = WSGIServer(('0.0.0.0', port), app, log=None)
+            # server = WSGIServer(('0.0.0.0', port), app, ssl_context="adhoc", log=None)
             server.serve_forever()
 
     def run_module(self, module, args):

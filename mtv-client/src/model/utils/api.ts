@@ -60,6 +60,10 @@ export class RestClient {
     this.comments = new Resource(this.server, 'comments/');
     this.data = new Resource(this.server, 'data/');
   }
+
+  public authorize(authToken: string) {
+    this.server.defaults.headers.common['Authorization'] = authToken;
+  }
 }
 
 export default new RestClient({

@@ -107,7 +107,8 @@ class PipelineField(fields.DictField):
 class User(Document, MongoUtils):
     name = fields.StringField(required=True)
     email = fields.StringField(required=True)
-    password = fields.StringField(required=True)
+    password = fields.StringField()
+    gid = fields.StringField()
 
 
 class Dataset(Document, MongoUtils):

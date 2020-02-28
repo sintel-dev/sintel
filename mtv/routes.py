@@ -7,6 +7,41 @@ import mtv.resources as ctrl
 current_api_version = '/api/v1/'
 
 
+# def decorator(*args, **kwargs):
+#     print("Inside decorator")
+
+#     def inner(func):
+#         print("Inside inner function")
+#         print("I like", kwargs['like'])
+#         return func
+#     return inner
+
+
+# @decorator(like="geeksforgeeks")
+# def func(a, b):
+#     print(a + b)
+
+
+# func(1, 2)
+
+
+# def decorator(arg1, arg2):
+#     def real_decorator(function):
+#         def wrapper(*args, **kwargs):
+#             print (arg1, arg2)
+#             function(*args, **kwargs)
+#         return wrapper
+
+#     return real_decorator
+
+
+# @decorator("arg1", "arg2")
+# def print_args(*args):
+#     for arg in args:
+#         print (arg)
+
+# print_args(1,2,3)
+
 def add_routes(app):
 
     # add index.html
@@ -27,6 +62,11 @@ def add_routes(app):
     api.add_resource(ctrl.user.Signup, current_api_version + 'auth/signup/')
     api.add_resource(ctrl.user.Signin, current_api_version + 'auth/signin/')
     api.add_resource(ctrl.user.Signout, current_api_version + 'auth/signout/')
+
+    # google login
+    api.add_resource(ctrl.user.GoogleLogin, current_api_version + 'auth/google_login/')
+    api.add_resource(ctrl.user.GoogleLoginCallback,
+                     current_api_version + 'auth/google_login/callback/')
 
     # data
     api.add_resource(ctrl.data.Data, current_api_version + current_api_version + 'data/')
