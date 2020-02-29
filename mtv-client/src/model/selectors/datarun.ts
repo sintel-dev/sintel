@@ -197,16 +197,19 @@ export const getCurrentEventDetails = createSelector(
 
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
-    const eventDetails = {
-      id: activeEventID,
-      tag: eventTag,
-      start_time: timeSeries[startIndex][0],
-      stop_time: timeSeries[stopIndex][0],
-      datarun: datarun.id,
-      signal: datarun.signal,
-      eventComments,
-      isCommentsLoading,
-    };
-    return eventDetails;
+    if (startIndex !== -1 && stopIndex !== -1) {
+      const eventDetails = {
+        id: activeEventID,
+        tag: eventTag,
+        start_time: timeSeries[startIndex][0],
+        stop_time: timeSeries[stopIndex][0],
+        datarun: datarun.id,
+        signal: datarun.signal,
+        eventComments,
+        isCommentsLoading,
+      };
+
+      return eventDetails;
+    }
   },
 );
