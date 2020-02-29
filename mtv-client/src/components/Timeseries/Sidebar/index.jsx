@@ -4,7 +4,12 @@ import * as d3 from 'd3';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
-import { getDatarunDetails, getSelectedPeriodLevel, getReviewPeriod } from '../../../model/selectors/datarun';
+import {
+  getDatarunDetails,
+  getSelectedPeriodLevel,
+  getReviewPeriod,
+  getIsEditingEventRange,
+} from '../../../model/selectors/datarun';
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
@@ -106,7 +111,7 @@ class Sidebar extends Component {
 
   drawData() {
     const { width, zoomValue } = this.state;
-    const { setPeriodLevel, dataRun } = this.props;
+    const { setPeriodLevel, dataRun, isEditingEventRange } = this.props;
     const { period, grouppedEvents } = dataRun;
     const radius = width / this.getColAmount() / 2 - graphSpacing;
     return (
@@ -120,7 +125,7 @@ class Sidebar extends Component {
             <g
               className="feature-cell"
               transform={`translate(${horizontalShift}, ${verticalShift})`}
-              onClick={() => setPeriodLevel(currentPeriod)}
+              onClick={() => !isEditingEventRange && setPeriodLevel(currentPeriod)}
             >
               <path
                 id={`path_${currentPeriod.name}`}
@@ -160,7 +165,7 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange } = this.props;
+    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange, isEditingEventRange } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
@@ -171,6 +176,7 @@ class Sidebar extends Component {
             reviewPeriod={reviewPeriod}
             reviewRange={reviewRange}
             currentPeriod={selectedPeriodLevel}
+            isEditingEventRange={isEditingEventRange}
           />
           <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
           <div className="data-wrapper" id="dataWrapper">
@@ -202,6 +208,7 @@ export default connect(
     dataRun: getDatarunDetails(state),
     selectedPeriodLevel: getSelectedPeriodLevel(state),
     reviewRange: getReviewPeriod(state),
+    isEditingEventRange: getIsEditingEventRange(state),
   }),
   dispatch => ({
     setPeriodLevel: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),

@@ -1,13 +1,13 @@
 import React from 'react';
 
-const Header = ({ headerTitle, reviewPeriod, reviewRange, currentPeriod }) => (
+const Header = ({ headerTitle, reviewPeriod, reviewRange, currentPeriod, isEditingEventRange }) => (
   <div className="period-control">
     <div className="sidebar-heading">{headerTitle}</div>
     <ul>
       <li>
         <button
           type="button"
-          onClick={() => reviewPeriod('year')}
+          onClick={() => !isEditingEventRange && reviewPeriod('year')}
           className={reviewRange === 'year' || reviewRange === null ? 'active' : ''}
         >
           Year
@@ -16,7 +16,7 @@ const Header = ({ headerTitle, reviewPeriod, reviewRange, currentPeriod }) => (
       <li>
         <button
           type="button"
-          onClick={() => reviewPeriod('month')}
+          onClick={() => !isEditingEventRange && reviewPeriod('month')}
           className={reviewRange === 'month' ? 'active' : ''}
           disabled={reviewRange === null}
         >
@@ -26,7 +26,7 @@ const Header = ({ headerTitle, reviewPeriod, reviewRange, currentPeriod }) => (
       <li>
         <button
           type="button"
-          onClick={() => reviewPeriod('day')}
+          onClick={() => !isEditingEventRange && reviewPeriod('day')}
           className={reviewRange === 'day' ? 'active' : ''}
           disabled={reviewRange === null || currentPeriod.month === ''}
         >
