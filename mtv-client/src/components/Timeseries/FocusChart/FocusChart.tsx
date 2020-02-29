@@ -700,11 +700,13 @@ class FocusChart extends Component<Props, State> {
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
-        updateNewEventDetails({
-          ...newEventDetails,
-          start_time: new Date(timeSeries[startIndex][0]).getTime(),
-          stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
-        });
+        if (startIndex !== -1 && stopIndex !== -1) {
+          updateNewEventDetails({
+            ...newEventDetails,
+            start_time: new Date(timeSeries[startIndex][0]).getTime(),
+            stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
+          });
+        }
       });
 
     const brushContext = d3.select('g.chart-data');
