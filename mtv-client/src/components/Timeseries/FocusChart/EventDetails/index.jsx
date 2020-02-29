@@ -117,11 +117,13 @@ const EventDetails = ({
           </div>
           <div className="row ">
             <ul>
-            {!isAddingNewEvent && <li>
-                <button type="button" className="danger" onClick={deleteEvent}>
-                  Delete
-                </button>
-              </li>}
+              {!isAddingNewEvent && (
+                <li>
+                  <button type="button" className="danger" onClick={deleteEvent}>
+                    Delete
+                  </button>
+                </li>
+              )}
               <li>
                 <button type="button" onClick={saveEventDetails}>
                   Save

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { RootState, DatarunDataType } from '../../../model/types';
 import { selectDatarun, setTimeseriesPeriod } from '../../../model/actions/datarun';
-import { getSelectedDatarunID, getSelectedPeriodRange } from '../../../model/selectors/datarun';
+import { getSelectedDatarunID, getSelectedPeriodRange, getIsEditingEventRange } from '../../../model/selectors/datarun';
 import DrawChart from './DrawChart';
 
 type OwnProps = {
@@ -20,10 +20,11 @@ const Datarun: React.FC<Props> = ({
   selectedDatarunID,
   onChangePeriod,
   selectedPeriodRange,
+  isEditingEventRange,
 }) => {
   const activeClass = datarun.id === selectedDatarunID ? 'active' : '';
   return (
-    <div className={`time-row ${activeClass}`} onClick={() => onSelectDatarun(datarun.id)}>
+    <div className={`time-row ${activeClass}`} onClick={() => !isEditingEventRange && onSelectDatarun(datarun.id)}>
       <ul>
         <li>{datarun.signal}</li>
         <li>
@@ -42,6 +43,7 @@ const Datarun: React.FC<Props> = ({
 const mapState = (state: RootState, ownProps: OwnProps) => ({
   selectedDatarunID: getSelectedDatarunID(state),
   selectedPeriodRange: getSelectedPeriodRange(state),
+  isEditingEventRange: getIsEditingEventRange(state),
 });
 
 const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
