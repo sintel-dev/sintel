@@ -634,18 +634,18 @@ class FocusChart extends Component<Props, State> {
     const { currentEventDetails } = this.props;
     const width = document.querySelector('.wave-chart').clientWidth - 18;
     const { datarun } = this.props;
-    const { timeSeries } = datarun;
+    const { timeSeries, maxTimeSeries } = datarun;
 
     const target = d3.select(`#wawe_${currentEventDetails.id}`);
 
-    const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
-    const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
+    const startIndex = maxTimeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
+    const stopIndex = maxTimeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
 
     const getLinechartScale = () => {
       let minValue = Number.MAX_SAFE_INTEGER;
       let maxValue = Number.MIN_SAFE_INTEGER;
-      const timeSeriesMin = timeSeries[0][0];
-      const timeSeriesMax = timeSeries[timeSeries.length - 1][0];
+      const timeSeriesMin = maxTimeSeries[0][0];
+      const timeSeriesMax = maxTimeSeries[maxTimeSeries.length - 1][0];
       const xCoord = d3.scaleTime().range([0, width]);
       const yCoord = d3.scaleLinear().range([36, 0]);
 
