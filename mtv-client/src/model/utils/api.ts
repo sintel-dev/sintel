@@ -15,6 +15,8 @@ import {
 import { PipelineDataType } from '../types/pipeline';
 import { EventDataType } from '../types/event';
 import { CommentDataType } from '../types/comment';
+import g from './g';
+import * as _ from 'lodash';
 
 export class RestClient {
   private server: AxiosInstance;
@@ -26,21 +28,15 @@ export class RestClient {
   };
 
   public test: Resource<any, any>;
-
   public datasets: Resource<DatasetDataType, DatasetsResponse>;
-
   public dataruns: Resource<DatarunDataType, DatarunsResponse>;
-
   public experiments: Resource<ExperimentDataType, ExperimentsResponse>;
-
   public pipelines: Resource<PipelineDataType, PipelinesResponse>;
-
   public events: Resource<EventDataType, EventsResponse>;
-
   public comments: Resource<CommentDataType, CommentsResponse>;
-
   public data: Resource<any, DataResponse>;
 
+  private resourceList = ['test', 'datasets', 'dataruns', 'experiments', 'pipelines', 'events', 'comments', 'data'];
   /**
    *
    * @param config AxiosRequestConfig
@@ -51,18 +47,14 @@ export class RestClient {
 
     this.server.defaults.headers.common['Authorization'] = 'AUTH_TOKEN';
     // add resources
-    this.test = new Resource(this.server, 'test/');
-    this.datasets = new Resource(this.server, 'datasets/');
-    this.dataruns = new Resource(this.server, 'dataruns/');
-    this.experiments = new Resource(this.server, 'experiments/');
-    this.pipelines = new Resource(this.server, 'pipelines/');
-    this.events = new Resource(this.server, 'events/');
-    this.comments = new Resource(this.server, 'comments/');
-    this.data = new Resource(this.server, 'data/');
+    _.each(this.resourceList, rname => {
+      this[rname] = new Resource(this.server, `${rname}/`);
+    });
   }
 
-  public authorize(authToken: string) {
-    this.server.defaults.headers.common['Authorization'] = authToken;
+  public authorize(uid: string, token: string) {
+    this.server.defaults.headers.common['Authorization'] = token;
+    g.auth = { uid, token };
   }
 }
 

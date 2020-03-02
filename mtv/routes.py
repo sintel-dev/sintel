@@ -7,41 +7,6 @@ import mtv.resources as ctrl
 current_api_version = '/api/v1/'
 
 
-# def decorator(*args, **kwargs):
-#     print("Inside decorator")
-
-#     def inner(func):
-#         print("Inside inner function")
-#         print("I like", kwargs['like'])
-#         return func
-#     return inner
-
-
-# @decorator(like="geeksforgeeks")
-# def func(a, b):
-#     print(a + b)
-
-
-# func(1, 2)
-
-
-# def decorator(arg1, arg2):
-#     def real_decorator(function):
-#         def wrapper(*args, **kwargs):
-#             print (arg1, arg2)
-#             function(*args, **kwargs)
-#         return wrapper
-
-#     return real_decorator
-
-
-# @decorator("arg1", "arg2")
-# def print_args(*args):
-#     for arg in args:
-#         print (arg)
-
-# print_args(1,2,3)
-
 def add_routes(app):
 
     # add index.html
@@ -54,14 +19,10 @@ def add_routes(app):
     api = Api(app)
 
     # user management
-    # api.add_resource(ctrl.user.Users, current_api_version + 'users/')
-    # api.add_resource(ctrl.user.Users, current_api_version + 'users/me/')
-    # api.add_resource(ctrl.user.Users, current_api_version + 'users/accounts/')
-    # api.add_resource(ctrl.user.Users, current_api_version + 'users/password/')
-    # api.add_resource(ctrl.user.Users, current_api_version + 'users/picture/')
-    api.add_resource(ctrl.user.Signup, current_api_version + 'auth/signup/')
-    api.add_resource(ctrl.user.Signin, current_api_version + 'auth/signin/')
-    api.add_resource(ctrl.user.Signout, current_api_version + 'auth/signout/')
+    api.add_resource(ctrl.user.Signup, current_api_version + 'users/signup/')
+    api.add_resource(ctrl.user.Signin, current_api_version + 'users/signin/')
+    api.add_resource(ctrl.user.Signout, current_api_version + 'users/signout/')
+    api.add_resource(ctrl.user.Reset, current_api_version + 'users/reset/')
 
     # google login
     api.add_resource(ctrl.user.GoogleLogin, current_api_version + 'auth/google_login/')

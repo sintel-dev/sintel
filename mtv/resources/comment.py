@@ -3,8 +3,10 @@ import logging
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
-
 from mtv import model
+from mtv.resources.auth_utils import verify_auth
+from mtv.resources.auth_utils import verify_auth
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +26,10 @@ class Comment(Resource):
         @apiSuccess {String} text Comment content.
         @apiSuccess {String} created_by User ID.
         """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
 
         try:
             cid = ObjectId(comment_id)
@@ -62,6 +68,10 @@ class Comment(Resource):
         @apiSuccess {String} text Comment content.
         @apiSuccess {String} created_by User ID.
         """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
 
         # get values from body or form
         text = None
@@ -126,6 +136,9 @@ class Comments(Resource):
         @apiSuccess {String} comments.created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # get values from request args
         event_id = request.args.get('event_id', None)
 
@@ -164,6 +177,10 @@ class Comments(Resource):
         @apiParam {String} text Content of comment.
         @apiParam {String} [created_by='default'] User ID.
         """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
 
         event_id = None
         text = None
