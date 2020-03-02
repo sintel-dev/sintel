@@ -16,5 +16,5 @@ export const colorSchemes = {
   Problem: '#F64242',
   'Previously seen': '#F5FF00',
   Normal: '#45F642',
-  untagged: '#C7C7C7',
+  Untagged: '#C7C7C7',
 };

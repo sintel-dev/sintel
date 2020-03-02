@@ -38,7 +38,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
         arcStart = ((start_time - base) / secondsInMonth) * circleMonths;
         arcStop = ((stop_time - base) / secondsInMonth) * circleMonths;
         arc.startAngle(arcStart).endAngle(arcStop);
-        const tagColor = colorSchemes[tag] || colorSchemes.untagged;
+        const tagColor = colorSchemes[tag] || colorSchemes.Untagged;
         arcData.push({ tag, tagColor, pathData: arc(), eventID: id });
       });
     }
@@ -56,7 +56,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
       arcStop = ((stop_time - base) / secondsInDay) * circleDays;
 
       arc.startAngle(arcStart).endAngle(arcStop);
-      const tagColor = colorSchemes[tag] || colorSchemes.untagged;
+      const tagColor = colorSchemes[tag] || colorSchemes.Untagged;
       arcData.push({ tag, tagColor, pathData: arc(), eventID: id });
     }
   }
@@ -75,7 +75,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
         arcStart = ((start_time - base) / 3600) * circleHours;
         arcStop = ((stop_time - base) / 3600) * circleHours;
         arc.startAngle(arcStart).endAngle(arcStop);
-        const tagColor = colorSchemes[tag] || colorSchemes.untagged;
+        const tagColor = colorSchemes[tag] || colorSchemes.Untagged;
         arcData.push({ tag, tagColor, pathData: arc(), eventID: id });
       }
     }

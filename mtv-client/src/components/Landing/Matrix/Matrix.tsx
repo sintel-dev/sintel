@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { RootState, ExperimentDataType } from '../../../model/types';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
-import { fromIDtoTag, colorSchemes } from '../utils';
+import { RootState, ExperimentDataType } from '../../../model/types';
+import { fromIDtoTag, getTagColor } from '../utils';
 import { TagStats, Scale } from './types';
 import './Matrix.scss';
+import { getMatrixSize } from './MatrixUtils';
+
+// @TODO - gather `tagStats` from selectors/experiment
+// import { getProcessedMatrixData } from '../../../model/selectors/experiment'; - later use
 
 type ownProps = {
   experiment: ExperimentDataType;
@@ -15,11 +19,29 @@ type ownProps = {
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = ownProps & StateProps & DispatchProps;
+interface LocalState {
+  width: number;
+  height: number;
+}
 
-// class Matrix extends Component<Props, Stats> {
-class Matrix extends Component<Props> {
-  private svgContainer: d3.Selection<HTMLElement, any, any, any>;
-  private svg: d3.Selection<SVGElement, any, any, any>;
+class Matrix extends Component<Props, LocalState> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      width: 0,
+      height: 0,
+    };
+  }
+
+  componentDidMount() {
+    const { width, height } = getMatrixSize();
+
+    this.setState({
+      width: Math.max(width, this.option.width),
+      height: Math.max(height, this.option.height),
+    });
+  }
+
   private option = {
     height: 160, // min height
     width: 180, // min width
@@ -33,91 +55,21 @@ class Matrix extends Component<Props> {
     matrixWidth: 120,
   };
 
-  // constructor(props) {
-  //   super(props);
-  //   // this.state = {
-  //   //   width: 0,
-  //   //   height: 0,
-  //   // };
-  // }
+  private drawScore(scale, dataruns) {
+    const self = this;
+    const currentMaxScore = Math.min(6, scale.maxScore);
+    let width = self.option.matrixWidth;
+    let height = self.option.height - self.option.matrixHeight;
+    let bins = new Array(10).fill(0);
+    let binNum = bins.length;
+    let interval = -1;
+    interval = currentMaxScore / binNum;
+    let maxCount = 0;
+    let outerMaxNum = 0;
 
-  componentDidMount() {
-    let self = this;
-    self.svgContainer = d3.select<HTMLElement, any>(`.matrix[data-eid='${this.props.experiment.id}']`);
-    let { width, height } = self.svgContainer.node().getBoundingClientRect();
-    self.option.width = width > 0 ? width : self.option.width;
-    self.option.height = height > 0 ? height : self.option.height;
-    self.svg = self.svgContainer
-      .append<SVGElement>('svg')
-      .attr('class', 'matrix-svg')
-      .attr('width', self.option.width)
-      .attr('height', self.option.height);
+    let fx = d3.scaleLinear().range([0, width]);
+    let fy = d3.scaleLinear().range([0, height - 16]);
 
-    self.props.scale.maxScore = Math.ceil(self.props.scale.maxScore);
-
-    self.plot();
-    // this.setState(
-    //   {
-    //     width,
-    //     height,
-    //     chart,
-    //   },
-    //   () => {
-    //     this.drawChart();
-    //   },
-    // );
-  }
-
-  private plot() {
-    let self = this;
-
-    let g = self.svg
-      .append<SVGGElement>('g')
-      .attr('transform', `translate(${self.option.margin.left}, ${self.option.margin.top})`);
-
-    self.option.width -= self.option.margin.left + self.option.margin.right;
-    self.option.height -= self.option.margin.top + self.option.margin.bottom;
-
-    self.addTagBars(g);
-    self.addMatrixHeatmap(g);
-    self.addAreaChart(g);
-  }
-
-  private addAreaChart(g: d3.Selection<SVGGElement, any, any, any>) {
-    let self = this;
-    let w = self.option.matrixWidth;
-    let h = self.option.height - self.option.matrixHeight;
-
-    let cg = g.append('g').attr('transform', `translate(${self.option.width - w}, ${h})`);
-
-    cg.append('line')
-      .attr('class', 'sep-line')
-      .attr('x1', 0)
-      .attr('y1', -14)
-      .attr('x2', w)
-      .attr('y2', -14);
-
-    let symbol = d3.symbol().size(36);
-
-    cg.append('g')
-      .attr('transform', `translate(4, -8)`)
-      .append('path')
-      .attr('d', symbol.type(d3.symbolTriangle))
-      .style('fill', '#616365');
-
-    cg.append('g')
-      .attr('transform', `translate(${w - 4}, -8)`)
-      .append('path')
-      .attr('d', symbol.type(d3.symbolTriangle))
-      .style('fill', '#616365');
-
-    // set the ranges
-    let areaG = g.append('g').attr('transform', `translate(${self.option.width - w}, ${h - 16})`);
-
-    let fx = d3.scaleLinear().range([0, w]);
-    let fy = d3.scaleLinear().range([0, h - 16]);
-
-    // define the area
     let area = d3
       .area()
       .x(d => d[0])
@@ -125,223 +77,206 @@ class Matrix extends Component<Props> {
       .y1(d => d[1])
       .curve(d3.curveCardinal);
 
-    let bins = new Array(10).fill(0);
-    let binNum = bins.length;
-    let interval = -1;
-    // find max score
-    let tScore = false;
-    _.each(self.props.experiment.dataruns, datarun => {
-      for (let i = 0; i < datarun.events.length; i += 1) {
-        if (datarun.events[i].score > 0) {
-          tScore = true;
-        }
-      }
-    });
-    if (!tScore) {
-      return;
-    }
-    self.props.scale.maxScore = Math.min(6, self.props.scale.maxScore);
-    interval = self.props.scale.maxScore / binNum;
-    let maxCount = 0;
-    let outerMaxNum = 0;
-    // get bins
-    _.each(self.props.experiment.dataruns, datarun => {
-      for (let i = 0; i < datarun.events.length; i += 1) {
-        if (datarun.events[i].score > self.props.scale.maxScore) {
+    dataruns.forEach(currentDatarun => {
+      const { events } = currentDatarun;
+      events.forEach(currentEvent => {
+        if (currentEvent.score > currentMaxScore) {
           outerMaxNum += 1;
         } else {
-          let idx = Math.trunc(datarun.events[i].score / interval);
-          if (idx === datarun.events[i].score / interval) {
+          let idx = Math.trunc(currentEvent.score / interval);
+          if (idx === currentEvent.score / interval) {
             idx -= 1;
           }
           bins[idx] += 1;
           maxCount = maxCount < bins[idx] ? bins[idx] : maxCount;
         }
-      }
+      });
     });
 
     fx.domain([0, binNum]);
     fy.domain([0, maxCount]);
 
-    // let curve = d3.line()
-    //   .x(d => d[0])
-    //   .y(d => d[1])
-    //   .curve(d3.curveCardinal);
-
-    let points = _.map(_.range(binNum), i => {
-      return [fx(i + 0.5), -fy(bins[i])];
-    }) as [number, number][];
-
+    let points = _.map(_.range(binNum), i => [fx(i + 0.5), -fy(bins[i])]) as [number, number][];
     points.unshift([0, 0]);
     points.push([fx(binNum), -fy(outerMaxNum)]);
 
-    areaG
-      .append('path')
-      .attr('class', 'area')
-      // .style('fill', 'none')
-      // .style('stroke-width', '1px')
-      // .style('stroke', 'white')
-      .attr('d', area(points));
-
-    cg.append('g')
-      .attr('transform', `translate(-2, -4)`)
-      .append('text')
-      .attr('class', 'axis-text')
-      .attr('text-anchor', 'end')
-      .text(0);
-
-    cg.append('g')
-      .attr('transform', `translate(${w - 10}, -4)`)
-      .append('text')
-      .attr('class', 'axis-text')
-      .attr('text-anchor', 'end')
-      .text(self.props.scale.maxScore);
+    return (
+      <g>
+        <g transform={`translate(${self.option.width - width}, ${height - 16})`}>
+          <path className="area" d={area(points)} />
+          <text transform="translate(-10, 12)" className="axis-text" textAnchor="text-anchor">
+            0
+          </text>
+          <text transform={`translate(${width - 20}, 12)`} className="axis-text" textAnchor="text-anchor">
+            {currentMaxScore}
+          </text>
+        </g>
+      </g>
+    );
   }
 
-  private addMatrixHeatmap(g: d3.Selection<SVGGElement, any, any, any>) {
-    let self = this;
-    let w = self.option.matrixWidth;
-    let h = self.option.matrixHeight;
+  private drawAreaChart(scale) {
+    const self = this;
+    let width = self.option.matrixWidth;
+    let symbol = d3.symbol().size(36);
+    let cellWidth = self.option.width - self.option.matrixWidth;
+    let cellHeight = self.option.matrixHeight;
 
-    let cells: [string, number][] = _.chain(self.props.experiment.dataruns)
-      .map(d => [d.signal, d.events.length])
-      .sortBy(d => d[0])
-      .value() as [string, number][];
+    let tScore = false;
+    const { experiment } = this.props;
+    const { dataruns } = experiment;
 
-    let color = d3
+    dataruns.forEach(currentDatarun => {
+      const { events } = currentDatarun;
+      events.forEach(currentEvent => {
+        if (currentEvent.score > 0) {
+          tScore = true;
+        }
+      });
+    });
+
+    return (
+      <g>
+        <g transform={`translate(${cellWidth}, ${self.option.height - cellHeight})`}>
+          <line className="sep-line" x1="0" y1="-14" x2={width} y2="-14" />
+          <g transform="translate(4, -8)">
+            <path d={symbol.type(d3.symbolTriangle)()} fill="#616365" />
+          </g>
+          <g transform={`translate(${width - 6}, -8)`}>
+            <path d={symbol.type(d3.symbolTriangle)()} fill="#616365" />
+          </g>
+        </g>
+        {tScore && this.drawScore(scale, dataruns)}
+      </g>
+    );
+  }
+
+  private drawCell(cellData, index, scale) {
+    const self = this;
+    const width = self.option.matrixWidth;
+    const rowNum = 6;
+    const color = d3
       .scaleLinear<any>()
       .range(['#A3A4A5', '#43434E'])
-      .domain([0, self.props.scale.maxEventNum]);
-    // .domain(d3.extent(cells, d => d[1]));
-    // let cx = d3
-    //   .scaleLinear<any>()
-    //   .range([0, 0.85])
-    //   .domain([0, self.props.scale.maxEventNum]);
-    // let color2 = function(t) {
-    //   return d3.interpolateGreys(cx(t));
-    // };
-    let rowNum = 6;
-    let fx = d3
+      .domain([0, scale.maxEventNum]);
+
+    const fx = d3
       .scaleBand()
-      .range([0, w])
+      .range([0, width])
       .domain(_.map(d3.range(rowNum), d => String(d)))
       .padding(0.1);
 
-    let cg = g.append('g').attr('transform', `translate(${self.option.width - w}, ${self.option.height - h})`);
+    const size = fx.bandwidth();
 
-    let size = fx.bandwidth();
-    cg.selectAll('.cell')
-      .data(cells)
-      .enter()
-      .append('rect')
-      .attr('class', 'cell')
-      .attr('x', (d, i) => fx(String(i % rowNum)))
-      .attr('y', (d, i) => (size + fx.paddingInner() * 1.2) * Math.trunc(i / rowNum))
-      .attr('width', size)
-      .attr('height', size)
-      .attr('fill', d => color(d[1]))
-      // .attr('fill', d => color2(d[1]))
-      .append('title')
-      .text(d => `signal: ${d[0]}\nevents: ${d[1]}`);
+    return (
+      <rect
+        className="cell"
+        width={size}
+        height={size}
+        fill={color(cellData[1])}
+        x={fx(String(index % rowNum))}
+        y={(size + fx.paddingInner() * 1.2) * Math.trunc(index / rowNum)}
+        key={Math.random()}
+      >
+        <title>{`Signal: ${cellData[0]}\nEvents: ${cellData[1]}`}</title>
+      </rect>
+    );
   }
 
-  private addTagBars(g: d3.Selection<SVGGElement, any, any, any>) {
-    let self = this;
-    let tagStats = _.sortBy(_.toPairs(self.props.tagStats), d => +d[0]);
+  private drawMatrix(tagStats, scale) {
+    const self = this;
+    scale.maxScore = Math.ceil(scale.maxScore);
+    let sortedTagStats = _.sortBy(_.toPairs(tagStats), tag => +tag[0]);
+    let cellWidth = self.option.width - self.option.matrixWidth;
+    let cellHeight = self.option.matrixHeight;
 
-    tagStats.push(tagStats[0]);
-    tagStats.shift();
+    const rh = 7;
+    const rm = 3;
 
-    let rh = 7; // rounded height
-    let rm = 3;
+    sortedTagStats.push(sortedTagStats[0]);
+    sortedTagStats.shift();
 
-    let w = self.option.width - self.option.matrixWidth;
-    let h = self.option.matrixHeight;
-
-    let fx = d3
+    const fx = d3
       .scaleBand()
-      .domain(_.map(tagStats, d => d[0]))
-      .rangeRound([0, h])
+      .domain(_.map(sortedTagStats, d => d[0]))
+      .rangeRound([0, cellHeight])
       .paddingInner(0.1);
 
-    let fy = d3
+    const fy = d3
       .scaleLinear()
-      .range([0, w - rh - rm])
-      .domain([0, self.props.scale.maxTagNum]);
+      .range([0, cellWidth - rh - rm])
+      .domain([0, scale.maxTagNum]);
 
-    let getTagColor = (tag: string): string => {
-      let tagSeq = ['investigate', 'do not investigate', 'postpone', 'problem', 'previously seen', 'normal'];
-
-      let colorIdx: number;
-      for (let i = 0; i < tagSeq.length; i += 1) {
-        if (tagSeq[i] === tag) {
-          colorIdx = i;
-        }
-      }
-      if (_.isUndefined(colorIdx)) {
-        colorIdx = 6;
-      }
-      return colorSchemes.tag[colorIdx];
-    };
-
-    let cg = g.append('g').attr('transform', `translate(${w}, ${self.option.height - h})`);
-
-    cg.selectAll('.bar')
-      .data(tagStats)
-      .enter()
-      .append('rect')
-      .attr('class', 'bar')
-      .attr('x', d => -fy(d[1]) - rm)
-      .attr('width', d => fy(d[1]))
-      .attr('y', d => fx(d[0]))
-      .attr('height', fx.bandwidth())
-      .attr('fill', d => getTagColor(fromIDtoTag(d[0])))
-      .append('title')
-      .text(d => fromIDtoTag(d[0]) + `: ${d[1]}`);
-
-    let curve = d3
+    const curve = d3
       .line()
       .x(d => d[0])
       .y(d => d[1])
       .curve(d3.curveBasis);
 
-    cg.selectAll('.bar-hat')
-      .data(tagStats)
-      .enter()
-      .append('path')
-      .attr('class', 'bar-hat')
-      .each(function(d) {
-        // add rounded header
-        let barHat = d3.select(this);
-        if (d[1] === 0) {
-          return;
-        }
-        let [x0, y0, x1, y1] = [-fy(d[1]) + 1 - rm, fx(d[0]), -fy(d[1]) + 1 - rm, fx(d[0]) + fx.bandwidth()];
-        let [xm0, ym0, xm1, ym1] = [x0 - rh, y0, x1 - rh, y1];
-        barHat.attr(
-          'd',
-          curve([
-            [x0, y0],
-            [xm0, ym0],
-            [xm1, ym1],
-            [x1, y1],
-          ]),
-        );
-      })
-      .attr('fill', d => getTagColor(fromIDtoTag(d[0])))
-      .append('title')
-      .text(d => fromIDtoTag(d[0]) + `: ${d[1]}`);
+    const drawBarPath = tag => {
+      if (tag[1] === 0) {
+        return null;
+      }
 
-    cg.append('line')
-      .attr('class', 'sep-line')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', 0)
-      .attr('y2', h);
+      const [x0, y0, x1, y1] = [-fy(tag[1]) + 1 - rm, fx(tag[0]), -fy(tag[1]) + 1 - rm, fx(tag[0]) + fx.bandwidth()];
+      const [xm0, ym0, xm1, ym1] = [x0 - rh, y0, x1 - rh, y1];
+      const path = curve([
+        [x0, y0],
+        [xm0, ym0],
+        [xm1, ym1],
+        [x1, y1],
+      ]);
+      return path;
+    };
+
+    const cells: [string, number][] = _.chain(self.props.experiment.dataruns)
+      .map(d => [d.signal, d.events.length])
+      .sortBy(d => d[0])
+      .value() as [string, number][];
+
+    return (
+      <g transform={`translate(${self.option.margin.left}, ${self.option.margin.top})`}>
+        <g transform={`translate(${cellWidth}, ${self.option.height - cellHeight})`}>
+          {sortedTagStats.map(currentTag => (
+            <g key={Math.random()}>
+              <rect
+                className="bar"
+                x={-fy(currentTag[1]) - rm}
+                y={fx(currentTag[0])}
+                width={fy(currentTag[1])}
+                height={fx.bandwidth()}
+                fill={getTagColor(fromIDtoTag(currentTag[0]))}
+              >
+                <title>
+                  {fromIDtoTag(currentTag[0])}: {currentTag[1]}
+                </title>
+              </rect>
+              {drawBarPath(currentTag) && (
+                <path className="bar-hat" d={drawBarPath(currentTag)} fill={getTagColor(fromIDtoTag(currentTag[0]))} />
+              )}
+            </g>
+          ))}
+          <line className="sep-line" x1={0} y1={0} x2={0} y2={cellHeight} />
+        </g>
+        <g transform={`translate(${cellWidth}, ${self.option.height - cellHeight})`}>
+          {cells && cells.map((cell, index) => this.drawCell(cell, index, scale))}
+        </g>
+        {this.drawAreaChart(scale)}
+      </g>
+    );
   }
 
   render() {
-    return <div className="matrix" data-eid={this.props.experiment.id}></div>;
+    const { width, height } = this.state;
+    const { tagStats, scale } = this.props;
+
+    return (
+      <div data-eid={this.props.experiment.id} className="matrix">
+        <svg width={width} height={height} className="matrix-svg">
+          {this.drawMatrix(tagStats, scale)}
+        </svg>
+      </div>
+    );
   }
 }
 

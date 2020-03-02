@@ -101,21 +101,6 @@ export function updateBrushPeriod(event) {
   selection.attr('simulate', null);
 }
 
-export function updateEventHihlight(eventDetails, width) {
-  const { dataRun, updatedEventDetails } = eventDetails;
-  const { timeSeries } = dataRun;
-  const { xCoord, yCoord } = getScale(width, 36, dataRun);
-
-  const startIndex = timeSeries.findIndex(element => updatedEventDetails.start_time - element[0] < 0) - 1;
-  const stopIndex = timeSeries.findIndex(element => updatedEventDetails.stop_time - element[0] < 0);
-  const line = d3
-    .line()
-    .x(d => xCoord(d[0]))
-    .y(d => yCoord(d[1]));
-
-  d3.select(`#wawe_${updatedEventDetails.id}`).attr('d', line(timeSeries.slice(startIndex, stopIndex)));
-}
-
 export function drawChart(width, height, dataRun, onPeriodTimeChange) {
   setRatio(width);
   const { timeSeries, eventWindows } = dataRun;

@@ -10,8 +10,9 @@ import {
 } from '../../model/selectors/projects';
 import { selectExperiment } from '../../model/actions/landing';
 import { RootState, ExperimentDataType } from '../../model/types';
-import drawMatrix, { TagStats, Scale as MatrixScale } from './Matrix';
+import { TagStats, Scale as MatrixScale } from './Matrix/types';
 import { fromTagToID } from './utils';
+import Matrix from './Matrix/Matrix';
 
 let props: Props;
 type StateProps = ReturnType<typeof mapState>;
@@ -36,13 +37,14 @@ const Experiments: React.FC<Props> = ({
 }) => {
   // Compute maxTagNum, maxEventNum, and maxScore
   // which would be used for plotting Matrix
-  let experiments = filteredExperiments;
+
   let maxTagNum = Number.MIN_SAFE_INTEGER;
   let maxEventNum = Number.MIN_SAFE_INTEGER;
   let maxScore = Number.MIN_SAFE_INTEGER;
   let tagStatsList: TagStats[] = [];
 
-  _.each(experiments, experiment => {
+  // @TODO - move this logic to selectors/experiment
+  _.each(filteredExperiments, experiment => {
     let tagStats: { [index: string]: number } = {};
     for (let i = 0; i < 7; i += 1) {
       tagStats[String(i)] = 0;
@@ -63,6 +65,7 @@ const Experiments: React.FC<Props> = ({
     });
     tagStatsList.push(tagStats);
   });
+
   const matrixScale: MatrixScale = {
     maxTagNum,
     maxEventNum,
@@ -123,7 +126,7 @@ const renderExperiment: React.FC<renderExperimentProps> = ({
           <li>DC: {experiment.date_creation.substring(0, 10)}</li>
           <li>By: {`${experiment.created_by}`}</li>
         </ul>
-        {drawMatrix(experiment, tagStats, matrixScale)}
+        <Matrix experiment={experiment} tagStats={tagStats} scale={matrixScale} />
       </div>
     </div>
   );

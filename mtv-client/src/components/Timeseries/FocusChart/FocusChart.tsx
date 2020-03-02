@@ -52,12 +52,6 @@ type State = {
 };
 
 class FocusChart extends Component<Props, State> {
-  private zoom: any;
-
-  private resetZoom: any;
-
-  private zoomOnClick: any;
-
   // TO be checked
   // previously use ...args here
   constructor(props) {
@@ -138,10 +132,22 @@ class FocusChart extends Component<Props, State> {
     }
   }
 
+  private zoom: any;
+
+  private resetZoom: any;
+
+  private zoomOnClick: any;
+
   drawLine(data) {
     const { width, height } = this.state;
+    const { periodRange } = this.props;
     const { maxTimeSeries } = this.props.datarun;
     const { xCoord, yCoord } = getScale(width, height, maxTimeSeries);
+    const xCoordCopy = xCoord.copy();
+
+    if (periodRange.zoomValue !== 1) {
+      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+    }
 
     const line = d3
       .line()
@@ -227,8 +233,8 @@ class FocusChart extends Component<Props, State> {
       d3.select('.chart-waves')
         .transition()
         .duration(DRAW_EVENTS_TIMEOUT)
-        .attr('d', () => this.drawLine(datarun.timeSeries));
-      this.resetZoom();
+        .attr('d', () => this.drawLine(datarun.timeSeries))
+        .on('end', () => this.updateChartOnBrush());
     };
 
     if (isChartDataReady === null) {
@@ -240,11 +246,16 @@ class FocusChart extends Component<Props, State> {
 
   drawEvents() {
     const { width, height } = this.state;
-    const { datarun, setCurrentEvent } = this.props;
+    const { datarun, setCurrentEvent, periodRange } = this.props;
     const { timeSeries, eventWindows, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
     const chartData = d3.select('g.chart-data');
     chartData.selectAll('.line-highlight').remove();
+
+    if (periodRange.zoomValue !== 1) {
+      const xCoordCopy = xCoord.copy();
+      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+    }
 
     const drawHlEvent = (event, eventIndex) => {
       const lineData = chartData
@@ -254,7 +265,7 @@ class FocusChart extends Component<Props, State> {
       const currentEvent = eventWindows[eventIndex];
       const startIndex = currentEvent[0];
       const stopIndex = currentEvent[1];
-      const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.untagged;
+      const tagColor = colorSchemes[currentEvent[4]] || colorSchemes.Untagged;
       const currentEventID = currentEvent[3];
 
       // append event highlight
@@ -391,6 +402,10 @@ class FocusChart extends Component<Props, State> {
     const { width, height } = this.state;
     const { xCoord } = getScale(width, height, this.props.datarun.maxTimeSeries);
     let zoomValue = d3.event.transform;
+    if (zoomValue === 1) {
+      return;
+    }
+
     const eventRange = xCoord.range().map(zoomValue.invertX, zoomValue);
     const periodRange = {
       eventRange,
@@ -468,18 +483,22 @@ class FocusChart extends Component<Props, State> {
     const { chart, width, height } = this.state;
     const { periodRange, datarun } = this.props;
     const { zoomValue } = periodRange;
+    if (zoomValue === 1) {
+      return;
+    }
     const { timeSeries, eventWindows, timeseriesPred, maxTimeSeries } = datarun;
     const { xCoord, yCoord } = getScale(width, height, maxTimeSeries);
     const xCoordCopy = xCoord.copy();
     const xAxis = d3.axisBottom(xCoord);
     let events = [];
+
+    d3.select('.zoom').call(this.zoom.transform, zoomValue);
+    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+
     const line = d3
       .line()
       .x(d => xCoord(d[0]))
       .y(d => yCoord(d[1]));
-
-    d3.select('.zoom').call(this.zoom.transform, zoomValue);
-    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
 
     d3.select('.axis.axis--x').call(xAxis);
 
@@ -524,27 +543,34 @@ class FocusChart extends Component<Props, State> {
 
   changeEventRange() {
     const { width, height } = this.state;
-    const { editEventRangeDone, datarun, updateEventDetails, isEditingEventRange } = this.props;
+    const { editEventRangeDone, datarun, updateEventDetails, isEditingEventRange, periodRange } = this.props;
     const { timeSeries, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
     const { brushStart, brushEnd } = this.getBrushCoords();
+
+    if (periodRange.zoomValue !== 1) {
+      const xCoordCopy = xCoord.copy();
+      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+    }
 
     const brushInstance = d3
       .brushX()
       .extent([
         [0, 0],
-        [width - 59, height - 3.5 * CHART_MARGIN], // @TODO investigate what is 58
+        [width - 59, height - 3.5 * CHART_MARGIN], // @TODO investigate what is 59
       ])
       .on('brush', () => {
         const [selection_start, selection_end] = d3.event.selection;
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
-        updateEventDetails({
-          start_time: new Date(timeSeries[startIndex][0]).getTime(),
-          stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
-        });
-        this.liveUpdateEvent();
+        if (startIndex !== -1 && stopIndex !== -1) {
+          updateEventDetails({
+            start_time: new Date(timeSeries[startIndex][0]).getTime(),
+            stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
+          });
+          this.liveUpdateEvent();
+        }
       });
 
     const brushContext = d3.select('g.chart-data');
@@ -566,7 +592,7 @@ class FocusChart extends Component<Props, State> {
   liveUpdateEvent() {
     // TODO - investigate more closely a more simple way to handle live range editing
     const { width, height } = this.state;
-    const { currentEventDetails, datarun } = this.props;
+    const { currentEventDetails, datarun, periodRange } = this.props;
     const { timeSeries, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
 
@@ -577,6 +603,11 @@ class FocusChart extends Component<Props, State> {
 
     const eventArea = d3.select(`g#_${currentEventDetails.id} .evt-area`);
     const commentTag = d3.select(`g#_${currentEventDetails.id} .evt-comment`);
+
+    if (periodRange.zoomValue !== 1) {
+      const xCoordCopy = xCoord.copy();
+      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+    }
 
     eventArea
       .attr('x', xCoord(currentEventDetails.start_time))
@@ -603,18 +634,18 @@ class FocusChart extends Component<Props, State> {
     const { currentEventDetails } = this.props;
     const width = document.querySelector('.wave-chart').clientWidth - 18;
     const { datarun } = this.props;
-    const { timeSeries } = datarun;
+    const { timeSeries, maxTimeSeries } = datarun;
 
     const target = d3.select(`#wawe_${currentEventDetails.id}`);
 
-    const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
-    const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
+    const startIndex = maxTimeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
+    const stopIndex = maxTimeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
 
     const getLinechartScale = () => {
       let minValue = Number.MAX_SAFE_INTEGER;
       let maxValue = Number.MIN_SAFE_INTEGER;
-      const timeSeriesMin = timeSeries[0][0];
-      const timeSeriesMax = timeSeries[timeSeries.length - 1][0];
+      const timeSeriesMin = maxTimeSeries[0][0];
+      const timeSeriesMax = maxTimeSeries[maxTimeSeries.length - 1][0];
       const xCoord = d3.scaleTime().range([0, width]);
       const yCoord = d3.scaleLinear().range([36, 0]);
 
@@ -639,7 +670,7 @@ class FocusChart extends Component<Props, State> {
 
   updateEventTagOnSave(event) {
     const eventTag = d3.select(`#_${event.id} rect.evt-comment`);
-    const tagColor = colorSchemes[event.tag] || colorSchemes.untagged;
+    const tagColor = colorSchemes[event.tag] || colorSchemes.Untagged;
     eventTag.attr('fill', tagColor);
   }
 
@@ -669,11 +700,13 @@ class FocusChart extends Component<Props, State> {
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
-        updateNewEventDetails({
-          ...newEventDetails,
-          start_time: new Date(timeSeries[startIndex][0]).getTime(),
-          stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
-        });
+        if (startIndex !== -1 && stopIndex !== -1) {
+          updateNewEventDetails({
+            ...newEventDetails,
+            start_time: new Date(timeSeries[startIndex][0]).getTime(),
+            stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
+          });
+        }
       });
 
     const brushContext = d3.select('g.chart-data');
