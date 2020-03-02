@@ -9,7 +9,7 @@ const Loader: React.FC<Props> = ({ isLoading, children }) => {
   const loadingOverlay = () => (
     <div className="loading">
       <div className="loader-overlay">
-        <i className="fa fa-refresh fa-spin" />
+        <i className="fa fa-sync fa-spin" />
       </div>
     </div>
   );
