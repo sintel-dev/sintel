@@ -8,14 +8,15 @@ type Props = {
   onPeriodTimeChange: typeof props.onChangePeriod;
   selectedPeriod: typeof props.selectedPeriodRange;
   selectedDatarunID: typeof props.selectedDatarunID;
+  onSelectDatarun: typeof props.onSelectDatarun;
 };
 
 class DrawChart extends Component<Props> {
   componentDidMount() {
-    const { dataRun, onPeriodTimeChange } = this.props;
+    const { dataRun, onPeriodTimeChange, onSelectDatarun } = this.props;
     const width = document.querySelector('.time-row').clientWidth;
     const height = 36;
-    drawChart(width, height, dataRun, onPeriodTimeChange);
+    drawChart(width, height, dataRun, onPeriodTimeChange, onSelectDatarun);
   }
 
   componentDidUpdate(prevProps) {
