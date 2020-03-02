@@ -47,9 +47,8 @@ const setRatio = width => {
   ratio = chartWidth / focusChartWidth;
 };
 
-export function drawBrush(element, width, onPeriodTimeChange) {
+export function drawBrush(element, width, onPeriodTimeChange, onSelectDatarun, dataRun) {
   const brushHeight = 43;
-  const xRange = d3.scaleTime().range([0, width]);
 
   brush = d3.brushX().extent([
     [0, 0],
@@ -60,8 +59,10 @@ export function drawBrush(element, width, onPeriodTimeChange) {
     .append('g')
     .attr('class', 'brush')
     .attr('transform', `translate(${offset.left}, ${offset.top / 2})`)
-    .call(brush)
-    .call(brush.move, xRange.range());
+    .on('mousedown', () => {
+      onSelectDatarun(dataRun.id);
+    })
+    .call(brush);
 
   brush.on('brush', () => {
     const eventRangeSelection = d3.event.selection && d3.event.selection;
@@ -101,7 +102,7 @@ export function updateBrushPeriod(event) {
   selection.attr('simulate', null);
 }
 
-export function drawChart(width, height, dataRun, onPeriodTimeChange) {
+export function drawChart(width, height, dataRun, onPeriodTimeChange, onSelectDatarun) {
   setRatio(width);
   const { timeSeries, eventWindows } = dataRun;
 
@@ -138,8 +139,7 @@ export function drawChart(width, height, dataRun, onPeriodTimeChange) {
       .attr('transform', `translate(${offset.left}, ${offset.top})`)
       .attr('d', line(event.period)),
   );
-
-  drawBrush(svg, chartWidth, onPeriodTimeChange);
+  drawBrush(svg, chartWidth, onPeriodTimeChange, onSelectDatarun, dataRun);
 }
 
 export function updateHighlithedEvents(datarun) {

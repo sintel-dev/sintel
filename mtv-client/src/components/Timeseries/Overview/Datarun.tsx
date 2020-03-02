@@ -33,6 +33,7 @@ const Datarun: React.FC<Props> = ({
             onPeriodTimeChange={onChangePeriod}
             selectedPeriod={selectedPeriodRange}
             selectedDatarunID={selectedDatarunID}
+            onSelectDatarun={onSelectDatarun}
           />
         </li>
       </ul>
