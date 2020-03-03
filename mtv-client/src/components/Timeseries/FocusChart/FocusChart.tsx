@@ -32,7 +32,7 @@ import {
 import { getWrapperSize, getScale } from './FocusChartUtils';
 import ShowErrors from './ShowErrors';
 import './FocusChart.scss';
-import { fromMonthToIndex, maxDaysInMonth } from '../../../model/utils/Utils';
+import { fromMonthToIndex, maxDaysInMonth, formatDate } from '../../../model/utils/Utils';
 
 import { RootState } from '../../../model/types';
 
@@ -49,6 +49,8 @@ type State = {
   zoomValue?: any;
   brushInstance?: any;
   brushContext?: any;
+  isTooltipVisible?: boolean;
+  tooltipData?: any;
 };
 
 class FocusChart extends Component<Props, State> {
@@ -60,6 +62,8 @@ class FocusChart extends Component<Props, State> {
     this.state = {
       width: 0,
       height: 0,
+      isTooltipVisible: false,
+      tooltipData: {},
     };
 
     this.zoomHandler = this.zoomHandler.bind(this);
@@ -286,6 +290,25 @@ class FocusChart extends Component<Props, State> {
         .attr('width', Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0])))
         .attr('y', 0)
         .attr('x', xCoord(timeSeries[startIndex][0]))
+        .on('mouseover, mousemove', () => {
+          const startDate = new Date(timeSeries[currentEvent[0]][0]);
+          const stopDate = new Date(timeSeries[currentEvent[1]][0]);
+          const tooltipOffset = 20;
+          this.setState({
+            isTooltipVisible: true,
+            tooltipData: {
+              xCoord: d3.event.x + tooltipOffset,
+              yCoord: d3.event.y,
+              eventStartTime: startDate,
+              eventEndTime: stopDate,
+            },
+          });
+        })
+        .on('mouseout', () => {
+          this.setState({
+            isTooltipVisible: false,
+          });
+        })
         .on('click', () => {
           setCurrentEvent(currentEventID);
         });
@@ -617,7 +640,6 @@ class FocusChart extends Component<Props, State> {
       .attr('x', xCoord(currentEventDetails.start_time))
       .attr('width', Math.max(xCoord(stop_time) - xCoord(start_time)));
     d3.select(`g#_${currentEventDetails.id} path.evt-highlight`).attr('d', this.drawLine(lineData));
-
     this.updateLineChart();
   }
 
@@ -727,11 +749,40 @@ class FocusChart extends Component<Props, State> {
     }
   }
 
+  showEventTooltip() {
+    const { tooltipData } = this.state;
+    const startDate = formatDate(tooltipData.eventStartTime);
+    const endDate = formatDate(tooltipData.eventEndTime);
+
+    return (
+      <div className="tooltip-data" style={{ left: `${tooltipData.xCoord}px`, top: `${tooltipData.yCoord}px` }}>
+        <ul>
+          <li>
+            starts:
+            <span>
+              {startDate.day}/{startDate.month}/{startDate.year}
+            </span>
+            <span>{startDate.time}</span>
+          </li>
+          <li>
+            ends:
+            <span>
+              {endDate.day}/{endDate.month}/{endDate.year}
+            </span>
+            <span>{endDate.time}</span>
+          </li>
+        </ul>
+      </div>
+    );
+  }
+
   render() {
+    const { isTooltipVisible } = this.state;
     return (
       <div className="focus-chart" id="focusChartWrapper">
         <ShowErrors isOpen={this.props.isPredictionVisible} />
         <EventDetails />
+        {isTooltipVisible && this.showEventTooltip()}
         <svg id="focusChart" />
         <div className="zoomControlsHolder">
           <ZoomControls />

@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { FocusChartConstants } from '../FocusChart/Constants';
+import { formatDate } from '../../../model/utils/Utils';
 
 const { TRANSLATE_LEFT, CHART_MARGIN } = FocusChartConstants;
 
@@ -45,6 +46,60 @@ const setRatio = width => {
   chartWidth = width - offset.infoWidth - 2 * offset.left;
   focusChartWidth = document.querySelector('#focusChartWrapper').clientWidth - TRANSLATE_LEFT - 2 * CHART_MARGIN;
   ratio = chartWidth / focusChartWidth;
+};
+
+const toggleBrushTooltip = (selectedRange = null, dataRun) => {
+  const tootltipContext = d3.select('body');
+  const { eventRange } = selectedRange;
+
+  if (selectedRange === null) {
+    return;
+  }
+
+  const { clientX, clientY } = d3.event;
+  const { xCoord } = getScale(chartWidth, 36, dataRun);
+
+  const startDate = formatDate(new Date(xCoord.invert(eventRange[0]).getTime()));
+  const endDate = formatDate(new Date(xCoord.invert(eventRange[1]).getTime()));
+  const tooltipHTML = `<ul>
+      <li><span>starts:</span> <span>${startDate.day}/${startDate.month}/${startDate.year}</span> <span>${startDate.time}</span> </li>
+      <li><span>ends:</span> <span>${endDate.day}/${endDate.month}/${endDate.year}</span> <span>${endDate.time}</span></li>
+    </ul>`;
+
+  const tooltipDiv = tootltipContext
+    .append('div')
+    .attr('class', 'brush-tooltip')
+    .attr('style', `left: ${clientX + 10}px; top: ${clientY + 10}px`);
+
+  tooltipDiv.html(tooltipHTML);
+};
+
+const removeTooltip = () => {
+  d3.selectAll('.brush-tooltip').remove();
+};
+
+const updateTooltipCoords = () => {
+  const { clientX, clientY } = d3.event;
+  const tooltipDiv = d3.select('.brush-tooltip');
+  tooltipDiv.attr('style', `left: ${clientX + 10}px; top: ${clientY + 10}px`);
+};
+
+export const brushTooltip = (selectedRange, dataRun) => {
+  const brushes = d3.selectAll('.brush .selection');
+
+  // eslint-disable-next-line no-underscore-dangle
+  brushes._groups[0].forEach(currentBrush => {
+    d3.select(currentBrush)
+      .on('mouseover', function() {
+        toggleBrushTooltip(selectedRange, dataRun);
+      })
+      .on('mousemove', function() {
+        updateTooltipCoords();
+      })
+      .on('mouseout', function() {
+        removeTooltip();
+      });
+  });
 };
 
 export function drawBrush(element, width, onPeriodTimeChange, onSelectDatarun, dataRun) {

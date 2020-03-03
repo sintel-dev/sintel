@@ -91,3 +91,20 @@
         display: none;
     }
 }
+
+.brush-tooltip{
+    position: fixed;
+    width: 170px;
+    font-size: 12px;
+    background: rgba(103, 106, 130, 0.7);
+    padding: 10px;
+    border-radius: 4px;
+    z-index: 999;
+    li{
+        display: flex;
+        justify-content: space-between;
+        span{
+            flex-flow: column;
+        }
+    }
+}
