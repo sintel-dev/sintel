@@ -100,5 +100,31 @@
         }
     }
 
+    .tooltip-data {
+        width: 170px;
+        font-size: 12px;
+        background: rgba(103, 106, 130, 0.7);
+        padding: 10px;
+        border-radius: 4px;
+        position: fixed;
+        z-index: 999;
+
+        text{
+            color: #fff;
+        }
+
+        &.active{
+            display: block;
+        }
+
+        li{
+            display: flex;
+            justify-content: space-between;
+            span{
+                flex-flow: column;
+            }
+        }
+    }
+
 
 }
