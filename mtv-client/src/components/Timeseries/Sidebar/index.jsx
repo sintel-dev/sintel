@@ -177,14 +177,11 @@ class Sidebar extends Component {
             reviewRange={reviewRange}
             currentPeriod={selectedPeriodLevel}
             isEditingEventRange={isEditingEventRange}
+            dataRun={dataRun}
+            selectedPeriodLevel={selectedPeriodLevel}
           />
-          <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
-          <div className="data-wrapper" id="dataWrapper">
-            <div className="period-info">
-              <p>
-                {selectedPeriodLevel.month} {selectedPeriodLevel.year}
-              </p>
-            </div>
+          <div className="data-wrapper scroll-style" id="dataWrapper">
+            {/* <div style={{ height: '700px' }}>asd</div> */}
             <svg id="multiPeriodChart" width={width} height={height}>
               <rect className="zoom" width={width} height={height} />
               {this.drawData(period)}

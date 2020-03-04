@@ -17,7 +17,35 @@ export const colorSchemes = {
 };
 
 // @TODO - later investigation for refactoring (fromIDToTag/fromTagToId)
-const tagSeq = ['Investigate', 'Do not Investigate', 'Postpone', 'Problem', 'Previously seen', 'Normal'];
+export const tagSeq = [
+  'Investigate',
+  'Do not Investigate',
+  'Postpone',
+  'Problem',
+  'Previously seen',
+  'Normal',
+  'Untagged',
+];
+const tagClassNames = ['investigate', 'not_investigate', 'postpone', 'problem', 'seen', 'normal', 'untagged'];
+
+export const fromTagToClassName = (tag: string): string => {
+  switch (tag) {
+    case tagSeq[0]:
+      return tagClassNames[0];
+    case tagSeq[1]:
+      return tagClassNames[1];
+    case tagSeq[2]:
+      return tagClassNames[2];
+    case tagSeq[3]:
+      return tagClassNames[3];
+    case tagSeq[4]:
+      return tagClassNames[4];
+    case tagSeq[5]:
+      return tagClassNames[5];
+    default:
+      return 'untagged';
+  }
+};
 
 export const fromIDtoTag = (id: string): string => {
   switch (id) {

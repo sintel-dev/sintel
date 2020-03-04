@@ -1,4 +1,6 @@
 @import '../../../assets/sass/colors.scss';
+@import '../../../assets/sass/main.scss';
+
 .sidebar {
     background: $main-color;
     float: right;
@@ -6,16 +8,23 @@
     padding: 30px 10px 10px 10px;
     box-sizing: border-box;
     height: 90vh;
+    // height: 99vh;
+    // padding-top: 65px;
+    .period-info{
+        display: inline-block;
+        p{
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            font-size: 18px;
+            // color: #8A9097;
+        }
+    }
+
     .data-wrapper{
         height: 91%;
-        .period-info{
-            p{
-                margin: 0;
-                padding: 0;
-                color: #8A9097;
-                font-size: 12px;
-            }
-        }
+        // height: 270px;
+        // overflow: auto;
     }
 
     .feature-cell {
@@ -43,8 +52,9 @@
             fill: transparent;
         }
     }
+
     .period-control{
-        border-bottom: 1px solid #484E53;
+        // border-bottom: 1px solid #484E53;
         padding-bottom: 20px;
         margin-bottom: 10px;
         .sidebar-heading{
@@ -58,28 +68,34 @@
         li{
             display: inline-block;
         }
-        button{
-            background-color: rgba(0, 0, 0, 0.4);
-            color: rgba(255, 255, 255, 0.5);
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            border: none;
-            line-height: 1.42px;
-            padding: 17px 15px;
-            outline: none;
-            &.active {
-                background: $btn-blue;
-                color: #fff;
-            }
-            &:disabled{
-                opacity: 0.4;
-                cursor: not-allowed;
+        .period-filter{
+            button{
+                background-color: rgba(0, 0, 0, 0.4);
+                color: rgba(255, 255, 255, 0.5);
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
+                border: none;
+                line-height: 1.42px;
+                padding: 17px 15px;
+                outline: none;
+                &.active {
+                    background: $btn-blue;
+                    color: #fff;
+                }
+                &:disabled{
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                }
             }
         }
     }
     .zoom{
         fill: transparent;
         cursor: move;
+    }
+
+    .event-summary{
+        margin: 30px 0 25px 0;
     }
 }
 

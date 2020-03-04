@@ -1,0 +1,76 @@
+@import '../../../../assets/sass/form.scss';
+.event-summary{
+    text-transform: uppercase;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #60666C;
+    padding: 16px 0 0 0;
+    // padding: 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #26282E;
+
+
+    .event-header {
+        padding: 0 16px;
+    }
+    table{
+        border-collapse: collapse;
+        width: 100%;
+        th {
+            text-align: left;
+            font-weight: normal;
+            padding: 0 5px 0 16px;
+        }
+        td{
+            text-align: center;
+            height: 38px;
+
+        }
+        .row-light{
+            background: #2C3034
+        }
+
+        tr:last-child{
+            th{
+                border-bottom-left-radius: 4px;
+
+            }
+            td{
+                &:last-child{
+                    border-bottom-right-radius: 4px;
+
+                }
+            }
+        }
+    }
+
+    .event-header {
+        height: 40px;
+        line-height: 27px;
+        .left-wrapper{
+            float: left;
+        }
+        .right-wrapper{
+            float: right
+        }
+        button{
+            background: transparent;
+            border: none;
+            color: #fff;
+            i{
+                margin-left: 3px;
+                font-size: 10px;
+            }
+        }
+    }
+
+    .summary-details {
+        .indicator{
+            width: 7px;
+            height: 7px;
+            margin: 0 10px;
+        }
+    }
+
+}
