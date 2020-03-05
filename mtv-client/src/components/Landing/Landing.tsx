@@ -1,15 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fetchProjects } from '../../model/actions/landing';
-import Experiment from '../Timeseries/Overview/Experiment';
-
 import Projects from './Projects';
 import Pipelines from './Pipelines';
 import Experiments from './Experiments';
 
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { RootState } from '../../model/types';
-
 import './Landing.scss';
 
 type StateProps = ReturnType<typeof mapState>;
@@ -18,26 +15,17 @@ type Props = StateProps & DispatchProps;
 
 class Landing extends React.Component<Props> {
   componentDidMount() {
-    this.props.fetchProjectsList();
+    if (this.props.isExperimentSelected === null) {
+      this.props.fetchProjectsList();
+    }
   }
 
   render() {
-    const isMainPageActive = !this.props.isExperimentSelected ? 'active' : '';
-    const isExperimentPageActive = this.props.isExperimentSelected ? 'active' : '';
-
     return (
       <div className="page-landing">
-        <div className="page-wrapper">
-          <div className={`projects-wrapper ${isMainPageActive}`}>
-            <Projects />
-            <Pipelines />
-            <Experiments />
-          </div>
-          <div className={`experiments-wrapper ${isExperimentPageActive}`}>
-            <Experiment />
-            <div className="clear" />
-          </div>
-        </div>
+        <Projects />
+        <Pipelines />
+        <Experiments />
       </div>
     );
   }

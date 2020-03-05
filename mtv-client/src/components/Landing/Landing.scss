@@ -2,49 +2,11 @@
 @import '../../assets/sass/animations.scss';
 
 .page-landing {
-    margin-top: 65px;
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    .page-wrapper {
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: calc(100vh - 70px);
-    }
-
     .projects-wrapper {
         background: $second-color;
         z-index: 10;
-        transition: transform 1s cubic-bezier(0.694, 0, 0.335, 1), -webkit-transform 1s cubic-bezier(0.694, 0, 0.335, 1);
-
-        &:not(.active) {
-            transform: translate3d(-100%, 0, 0);
-        }
-
-        &.active {
-            animation-name: homepage;
-            animation-duration: 1s;
-        }
     }
 
-    .projects-wrapper,
-    .experiments-wrapper {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    .experiments-wrapper {
-        opacity: 0;
-        padding: 0 0 0 25px;
-        &.active {
-            opacity: 1;
-        }
-    }
 }
 
 @keyframes homepage {
@@ -57,12 +19,12 @@
 }
 
 .item-row {
-    margin: 0 50px;
+    margin: 0;
     padding: 0 10px;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
-    width: calc(100% - 100px);
+    width: 100%;
 
     .item-wrapper {
         display: flex;
@@ -135,11 +97,95 @@
             }
             .matrix {
                 flex: 1 1 50px;
-                // width: 180px;
-                // height: 50px;
                 min-width: 180px;
                 min-height: 180px;
             }
         }
+    }
+}
+
+.page-slider {
+    margin-top: 51px;
+    width: 100%;
+    height: 94vh;
+    position: relative;
+    animation-name: enterRight;
+    animation-duration: 1s;
+    .animate-left, .animate-right {
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+
+    .mask{
+        overflow: hidden;
+    }
+
+    .page-slider-enter{
+        background:#23242b;
+        z-index: 9;
+    }
+    .page-slider-exit{
+        background: #23242b;
+        z-index: 1;
+    }
+
+    .animate-left {
+        &.page-slider-enter {
+            animation-name: enterLeft;
+            animation-duration: 1s;
+        }
+        &.page-slider-exit {
+            animation-name: leaveLeft;
+            animation-duration: 1s;
+        }
+    }
+
+    .animate-right {
+        &.page-slider-enter{
+            animation-name: enterRight;
+            animation-duration: 1s;
+        }
+
+        &.page-slider-exit{
+            animation-name: leaveRight;
+            animation-duration: 1s;
+        }
+    }
+}
+
+@keyframes enterLeft {
+    0% {
+        transform: translate3d(-100%, 0, 0);
+    }
+    100% {
+        transform: translate3d(0%, 0, 0);
+    }
+}
+
+@keyframes leaveLeft {
+    0% {
+        transform: translate3d(0%, 0, 0);
+    }
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+@keyframes enterRight {
+    0% {
+        transform: translate3d(100%, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes leaveRight{
+    0% {
+        transform: translate3d(0%, 0, 0);
+    }
+    100% {
+        transform: translate3d(100%, 0, 0);
     }
 }

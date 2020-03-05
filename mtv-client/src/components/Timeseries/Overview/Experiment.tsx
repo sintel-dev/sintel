@@ -9,11 +9,14 @@ import Datarun from './Datarun';
 import FocusChartControls from '../FocusChartControls';
 import { RootState } from '../../../model/types';
 import Sidebar from '../Sidebar';
+import { selectExperiment } from '../../../model/actions/landing';
+import { getSelectedExperiment } from '../../../model/selectors/projects';
 
 type StateProps = ReturnType<typeof mapState>;
+type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps;
 
-const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => (
+const RenderExperimentData = ({ experimentData, processedDataruns }) => (
   <div className="experiment">
     <Loader isLoading={experimentData.isExperimentDataLoading}>
       <div className="left-sidebar">
@@ -29,11 +32,21 @@ const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => (
       </div>
       <Sidebar />
     </Loader>
+    <div className="clear" />
   </div>
+);
+
+const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => (
+  <RenderExperimentData experimentData={experimentData} processedDataruns={processedDataruns} />
 );
 const mapState = (state: RootState) => ({
   experimentData: getSelectedExperimentData(state),
   processedDataruns: getProcessedDataRuns(state),
+  currenteExperimentID: getSelectedExperiment(state),
 });
 
-export default connect<StateProps, {}, {}, RootState>(mapState)(Experiment);
+const mapDispatch = (dispatch: Function) => ({
+  onSelectExperiment: (history, experiment: string) => dispatch(selectExperiment(history, experiment)),
+});
+
+export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiment);
