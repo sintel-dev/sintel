@@ -1,16 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fetchProjects } from '../../model/actions/landing';
-import Experiment from '../Timeseries/Overview/Experiment';
-
 import Projects from './Projects';
 import Pipelines from './Pipelines';
 import Experiments from './Experiments';
 
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { RootState } from '../../model/types';
-
 import './Landing.scss';
+import { getProcessedDataRuns } from '../../model/selectors/experiment';
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -22,22 +20,11 @@ class Landing extends React.Component<Props> {
   }
 
   render() {
-    const isMainPageActive = !this.props.isExperimentSelected ? 'active' : '';
-    const isExperimentPageActive = this.props.isExperimentSelected ? 'active' : '';
-
     return (
       <div className="page-landing">
-        <div className="page-wrapper">
-          <div className={`projects-wrapper ${isMainPageActive}`}>
-            <Projects />
-            <Pipelines />
-            <Experiments />
-          </div>
-          <div className={`experiments-wrapper ${isExperimentPageActive}`}>
-            <Experiment />
-            <div className="clear" />
-          </div>
-        </div>
+        <Projects />
+        <Pipelines />
+        <Experiments />
       </div>
     );
   }
@@ -45,6 +32,7 @@ class Landing extends React.Component<Props> {
 
 const mapState = (state: RootState) => ({
   isExperimentSelected: getSelectedExperiment(state),
+  processedDataruns: getProcessedDataRuns(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

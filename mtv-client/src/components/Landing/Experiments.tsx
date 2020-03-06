@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as _ from 'lodash';
+import { withRouter, useHistory } from 'react-router-dom';
 import Loader from '../Common/Loader';
 import {
   getFilteredExperiments,
@@ -78,8 +79,8 @@ const Experiments: React.FC<Props> = ({
       <div className="item-wrapper">
         <Loader isLoading={isExperimentsLoading}>
           {filteredExperiments.length ? (
-            filteredExperiments.map((experiment, index) =>
-              renderExperiment({
+            filteredExperiments.map((experiment, index) => {
+              const experimentProps = {
                 experiment,
                 tagStats: tagStatsList[index],
                 matrixScale,
@@ -87,8 +88,9 @@ const Experiments: React.FC<Props> = ({
                 onSelectExperiment,
                 selectedPipeline,
                 selectedExperiment,
-              }),
-            )
+              };
+              return <Experiment key={experiment.id} {...experimentProps} />;
+            })
           ) : (
             <h2>No experiments found</h2>
           )}
@@ -103,19 +105,19 @@ const countDatarunEvents = experiment => {
   return dataruns.map(datarun => datarun.events.length).reduce((item, accumulator) => item + accumulator, 0);
 };
 
-const renderExperiment: React.FC<renderExperimentProps> = ({
+const Experiment: React.FC<renderExperimentProps> = ({
   experiment,
   tagStats,
   matrixScale,
   index,
-  onSelectExperiment,
   selectedPipeline,
   selectedExperiment,
 }) => {
+  let history = useHistory();
   const activeClass = selectedPipeline || selectedExperiment === experiment.id ? 'active' : '';
   const eventCounts = countDatarunEvents(experiment);
   return (
-    <div className={`cell ${activeClass}`} key={index} onClick={() => onSelectExperiment(experiment.id)}>
+    <div className={`cell ${activeClass}`} key={index} onClick={() => history.push(`/experiment/${experiment.id}`)}>
       <h3>
         #{index + 1} {experiment.dataset}_{experiment.pipeline}
       </h3>
@@ -140,7 +142,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = (dispatch: Function) => ({
-  onSelectExperiment: (experiment: string) => dispatch(selectExperiment(experiment)),
+  onSelectExperiment: (history, experiment: string) => dispatch(selectExperiment(history, experiment)),
 });
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiments);
+export default withRouter(connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiments));

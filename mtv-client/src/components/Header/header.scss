@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     top: 0;
-    z-index: 2;
+    z-index: 20;
 
     a {
         transition: all 0.2s ease-in-out;
@@ -26,6 +26,7 @@
             overflow: hidden;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             transition: width 0.3s ease-in-out;
+            text-decoration: none;
         }
 
         &:hover,
