@@ -1,4 +1,5 @@
-import { AxiosRequestConfig, AxiosInstance } from 'axios';
+import { AxiosRequestConfig, AxiosInstance, AxiosPromise } from 'axios';
+import g from './g';
 
 export default class Resource<T, R> {
   /**
@@ -14,6 +15,9 @@ export default class Resource<T, R> {
    * @param params URL parameters
    */
   public all(data = {}, params = {}): Promise<R> {
+    if (g.auth) {
+      params['uid'] = g.auth.uid;
+    }
     const promise = this.server.get<R>(this.url, { data, params });
     return promise
       .then(res => {
@@ -35,6 +39,9 @@ export default class Resource<T, R> {
    * @param params URL parameters
    */
   public find(id, data = {}, params = {}): Promise<T> {
+    if (g.auth) {
+      params['uid'] = g.auth.uid;
+    }
     const newUrl = `${this.url}${id}`;
     const promise = this.server.get<T>(newUrl, { data, params });
     return promise
@@ -56,6 +63,9 @@ export default class Resource<T, R> {
    * @param params URL parameters
    */
   public create(data = {}, params = {}): Promise<T> {
+    if (g.auth) {
+      params['uid'] = g.auth.uid;
+    }
     const promise = this.server.post<T>(this.url, data, { params });
     return promise
       .then(res => {
@@ -76,8 +86,12 @@ export default class Resource<T, R> {
    * @returns Promise of the response's status
    */
   public delete(id): Promise<number> {
+    let params = {};
+    if (g.auth) {
+      params['uid'] = g.auth.uid;
+    }
     const newUrl = `${this.url}${id}/`;
-    const promise = this.server.delete<number>(newUrl);
+    const promise = this.server.delete<number>(newUrl, { params });
     return promise
       .then(res => res.status)
       .catch(err => {
@@ -93,6 +107,9 @@ export default class Resource<T, R> {
    * @param params URL parameters
    */
   public update(id, data = {}, params = {}): Promise<T> {
+    if (g.auth) {
+      params['uid'] = g.auth.uid;
+    }
     const newUrl = `${this.url}${id}/`;
     const promise = this.server.put<T>(newUrl, data, { params });
     return promise
@@ -111,14 +128,9 @@ export default class Resource<T, R> {
   /**
    * Allow customize your request.
    * @param config request config
-   * @param id item id
    */
-  public request<Z>(config: AxiosRequestConfig = {}, id?: string): Promise<Z> {
-    let newUrl = this.url;
-    if (id !== undefined) {
-      newUrl += `${id}/`;
-    }
-    const promise = this.server.get<Z>(newUrl, config);
+  public request<Z>(config: AxiosRequestConfig = {}): Promise<Z> {
+    const promise: AxiosPromise<Z> = this.server(config);
     return promise
       .then(res => {
         if (res.status !== 204) {

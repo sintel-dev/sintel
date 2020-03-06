@@ -37,5 +37,9 @@
         "source.fixAll.eslint": true,
         "source.fixAll.stylelint": true
     },
-    "cSpell.enabled": false
+    "cSpell.enabled": false,
+    "python.pythonPath": "/Users/dyu/anaconda3/envs/mtv/bin/python",
+    "code-runner.executorMap": {
+        "python": "$pythonPath -u $fullFileName"
+    }
 }

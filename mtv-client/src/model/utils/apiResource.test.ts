@@ -1,14 +1,6 @@
 import API from './api';
 
 describe('Should fetch data from server', () => {
-  it('Datasets', async () => {
-    const oneDataset = await API.datasets.find('SMAP_set3');
-    expect(oneDataset).toHaveProperty('insert_time');
-
-    const datasets = await API.datasets.all();
-    expect(datasets.datasets).toHaveLength(8);
-  });
-
   it('Events', async () => {
     // create
     const creatingEvent = {
