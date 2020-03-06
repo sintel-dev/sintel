@@ -20,11 +20,16 @@
 
 .item-row {
     margin: 0;
-    padding: 0 10px;
+    padding: 10px 10px 0 10px;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
     width: 100%;
+
+    h2{
+        margin-top: 0px;
+        margin-bottom: 10px;
+    }
 
     .item-wrapper {
         display: flex;
@@ -105,29 +110,37 @@
 }
 
 .page-slider {
-    margin-top: 51px;
     width: 100%;
-    height: 94vh;
-    position: relative;
+    height: 90vh;
     animation-name: enterRight;
     animation-duration: 1s;
+    overflow: hidden;
+
     .animate-left, .animate-right {
         position: absolute;
         top: 0;
         width: 100%;
     }
 
-    .mask{
-        overflow: hidden;
-    }
+
 
     .page-slider-enter{
         background:#23242b;
         z-index: 9;
+
+        &.page-slider-enter-active{
+            overflow: hidden;
+            height: 89vh;
+        }
     }
     .page-slider-exit{
         background: #23242b;
         z-index: 1;
+
+        &.page-slider-exit-active{
+            height: 89vh;
+            overflow: hidden;
+        }
     }
 
     .animate-left {

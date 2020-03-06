@@ -106,7 +106,5 @@ export function selectExperiment(history: any, experimentID: string) {
 
     dispatch(action);
     dispatch(fetchDatarunsByExperimentID());
-
-    history.push(`/experiment/${experimentID}`);
   };
 }
