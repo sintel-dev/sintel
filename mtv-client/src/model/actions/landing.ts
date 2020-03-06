@@ -97,14 +97,13 @@ export function selectPipeline(selectedPipelineName: string) {
   };
 }
 
-export function selectExperiment(experimentID: string) {
-  return function(dispatch, getState) {
-    const selectedExperiment: string = getSelectedExperiment(getState());
-    if (experimentID === selectedExperiment) return;
+export function selectExperiment(history: any, experimentID: string) {
+  return function(dispatch) {
     const action: SelectExperimentAction = {
       type: SELECT_EXPERIMENT,
       selectedExperimentID: experimentID,
     };
+
     dispatch(action);
     dispatch(fetchDatarunsByExperimentID());
   };
