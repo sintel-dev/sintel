@@ -8,6 +8,7 @@ import Experiments from './Experiments';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { RootState } from '../../model/types';
 import './Landing.scss';
+import { getProcessedDataRuns } from '../../model/selectors/experiment';
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -15,9 +16,7 @@ type Props = StateProps & DispatchProps;
 
 class Landing extends React.Component<Props> {
   componentDidMount() {
-    if (this.props.isExperimentSelected === null) {
-      this.props.fetchProjectsList();
-    }
+    this.props.fetchProjectsList();
   }
 
   render() {
@@ -33,6 +32,7 @@ class Landing extends React.Component<Props> {
 
 const mapState = (state: RootState) => ({
   isExperimentSelected: getSelectedExperiment(state),
+  processedDataruns: getProcessedDataRuns(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

@@ -79,8 +79,8 @@ const Experiments: React.FC<Props> = ({
       <div className="item-wrapper">
         <Loader isLoading={isExperimentsLoading}>
           {filteredExperiments.length ? (
-            filteredExperiments.map((experiment, index) =>
-              Experiment({
+            filteredExperiments.map((experiment, index) => {
+              const experimentProps = {
                 experiment,
                 tagStats: tagStatsList[index],
                 matrixScale,
@@ -88,8 +88,9 @@ const Experiments: React.FC<Props> = ({
                 onSelectExperiment,
                 selectedPipeline,
                 selectedExperiment,
-              }),
-            )
+              };
+              return <Experiment key={experiment.id} {...experimentProps} />;
+            })
           ) : (
             <h2>No experiments found</h2>
           )}
@@ -109,7 +110,6 @@ const Experiment: React.FC<renderExperimentProps> = ({
   tagStats,
   matrixScale,
   index,
-  onSelectExperiment,
   selectedPipeline,
   selectedExperiment,
 }) => {
@@ -117,7 +117,7 @@ const Experiment: React.FC<renderExperimentProps> = ({
   const activeClass = selectedPipeline || selectedExperiment === experiment.id ? 'active' : '';
   const eventCounts = countDatarunEvents(experiment);
   return (
-    <div className={`cell ${activeClass}`} key={index} onClick={() => onSelectExperiment(history, experiment.id)}>
+    <div className={`cell ${activeClass}`} key={index} onClick={() => history.push(`/experiment/${experiment.id}`)}>
       <h3>
         #{index + 1} {experiment.dataset}_{experiment.pipeline}
       </h3>

@@ -20,7 +20,7 @@ const App: React.FC = () => {
           classNames="page-slider"
           mountOnEnter
           unmountOnExit={false}
-          transitionName="page-slider"
+          transitionname="page-slider"
         >
           <div className={animateDirection}>
             <Switch location={location}>

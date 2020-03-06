@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Overview.scss';
 import FocusChart from '../FocusChart';
@@ -12,9 +12,12 @@ import Sidebar from '../Sidebar';
 import { selectExperiment } from '../../../model/actions/landing';
 import { getSelectedExperiment } from '../../../model/selectors/projects';
 
+type ownProps = {
+  location: any;
+};
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
-type Props = StateProps;
+type Props = StateProps & DispatchProps & ownProps;
 
 const RenderExperimentData = ({ experimentData, processedDataruns }) => (
   <div className="experiment">
@@ -36,9 +39,22 @@ const RenderExperimentData = ({ experimentData, processedDataruns }) => (
   </div>
 );
 
-const Experiment: React.FC<Props> = ({ experimentData, processedDataruns }) => (
-  <RenderExperimentData experimentData={experimentData} processedDataruns={processedDataruns} />
-);
+class Experiment extends Component<Props> {
+  componentDidMount() {
+    const { currenteExperimentID } = this.props;
+    const experimentID = this.props.location.pathname.split('/')[2];
+
+    if (currenteExperimentID !== experimentID) {
+      this.props.onSelectExperiment(this.props.location, experimentID);
+    }
+  }
+
+  render() {
+    const { experimentData, processedDataruns } = this.props;
+    return <RenderExperimentData experimentData={experimentData} processedDataruns={processedDataruns} />;
+  }
+}
+
 const mapState = (state: RootState) => ({
   experimentData: getSelectedExperimentData(state),
   processedDataruns: getProcessedDataRuns(state),
