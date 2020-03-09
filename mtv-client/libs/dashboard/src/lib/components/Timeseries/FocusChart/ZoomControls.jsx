@@ -1,5 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
 import { getZoomMode, getIsEditingEventRange } from '../../../model/selectors/datarun';
 import { zoomOnClick, zoomToggleAction } from '../../../model/actions/datarun';
 
@@ -8,7 +10,7 @@ const ZoomControls = props => (
     <ul>
       <li>
         <label htmlFor="zoomMode">
-          <i className="fas fa-arrows-alt" />
+          <FontAwesomeIcon icon={faArrowsAlt} />
           <input
             type="checkbox"
             name="zoomMode"
