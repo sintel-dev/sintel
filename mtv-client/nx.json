@@ -1,0 +1,31 @@
+{
+  "npmScope": "nx-react",
+  "implicitDependencies": {
+    "workspace.json": "*",
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  },
+  "projects": {
+    "nx-react": {
+      "tags": []
+    },
+    "nx-react-e2e": {
+      "tags": [],
+      "implicitDependencies": ["nx-react"]
+    },
+    "session": {
+      "tags": []
+    },
+    "dashboard": {
+      "tags": []
+    },
+    "common": {
+      "tags": []
+    }
+  }
+}

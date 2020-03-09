@@ -32,14 +32,14 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
 
 
 def generate_auth_token(id, expiration=600):
-    s = Serializer(os.environ['AUTH_KEY'], expires_in=expiration)
-    # s = Serializer(g['config']['AUTH_KEY'], expires_in=expiration)
+    # s = Serializer(os.environ['AUTH_KEY'], expires_in=expiration)
+    s = Serializer(g['config']['AUTH_KEY'], expires_in=expiration)
     return s.dumps({'id': id})
 
 
 def decode_auth_token(token):
-    s = Serializer(os.environ['AUTH_KEY'])
-    # s = Serializer(g['config']['AUTH_KEY'])
+    # s = Serializer(os.environ['AUTH_KEY'])
+    s = Serializer(g['config']['AUTH_KEY'])
     try:
         data = s.loads(token)
         return data['id']
@@ -50,17 +50,17 @@ def decode_auth_token(token):
 
 
 def verify_auth():
-    uid = request.args.get('uid', None)
+    # uid = request.args.get('uid', None)
     token = request.headers.get('Authorization')
 
-    if (token is None or uid is None):
+    if (token is None):
         return {'message': 'please login first'}, 401
 
     verify_res = decode_auth_token(token.encode())
     if verify_res is None:
         return {'message': 'please login first'}, 401
-    elif uid != verify_res:
-        return {'message': 'please login first'}, 401
+    # elif uid != verify_res:
+    #     return {'message': 'please login first'}, 401
 
     return {'message:' 'login successfully'}, 204
 
@@ -70,8 +70,8 @@ def send_mail(subject, body, receiver):
     port = cf['MAIL_PORT']
     smtp_server = cf['MAIL_SERVER']
     sender = cf['MAIL_USERNAME']
-    # password = cf['MAIL_PASSWORD']
-    password = os.environ['MAIL_PASSWORD']
+    password = cf['MAIL_PASSWORD']
+    # password = os.environ['MAIL_PASSWORD']
     message = 'Subject: {}\n\n{}'.format(subject, body)
 
     context = ssl.create_default_context()

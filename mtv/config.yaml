@@ -35,6 +35,11 @@ MAIL_SERVER: 'smtp.gmail.com'
 MAIL_PORT: 465
 MAIL_USERNAME: 'ucenter.mtv@gmail.com'
 
+
+AUTH_KEY: 'JI#NV*03nlAJIG)JAN<VPQ'
+MAIL_PASSWORD: 'Sdfjiv923n+'
+GOOGLE_CLIENT_SECRET: 'K0TaIPc7nRefI-YvkRAE7OQB'
+
 # Google AUTH
 #===================================
 GOOGLE_CLIENT_ID: '772078202631-vln87t531hbn366s8kjk84nn2vab2p32.apps.googleusercontent.com'
