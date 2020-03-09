@@ -27,6 +27,11 @@ const Header: React.FC<Props> = props => {
       <Link to={linkTo} className={`page-switch-btn ${isSwitchVisible}`}>
         <FontAwesomeIcon icon={currentView === '/' ? faChevronRight : faChevronLeft} />
       </Link>
+      <ul className="user-opts">
+        <li>
+          <Link to="/logout">Logout</Link>
+        </li>
+      </ul>
     </header>
   );
 };

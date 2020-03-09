@@ -16,7 +16,7 @@ import {
   REGISTER_FEATURE_KEY,
   registerReducer,
   RESET_PASSKEY_FEATURE_KEY,
-  resetPasskeyReducer
+  resetPasskeyReducer,
 } from '@nx-react/session';
 import { dashboardReducers, api } from '@nx-react/dashboard';
 
@@ -29,11 +29,11 @@ const store = configureStore({
       [REGISTER_FEATURE_KEY]: registerReducer,
       [RESET_PASSKEY_FEATURE_KEY]: resetPasskeyReducer,
       [CURRENT_USER_FEATURE_KEY]: currentUserReducer,
-      [LOGOUT_FEATURE_KEY]: logoutReducer
+      [LOGOUT_FEATURE_KEY]: logoutReducer,
     }),
     ...dashboardReducers,
   },
-  middleware: [thunkMiddleware, api, createLogger({ collapsed: true })]
+  middleware: [thunkMiddleware, api, createLogger({ collapsed: true })],
 });
 
 ReactDOM.render(
@@ -42,5 +42,5 @@ ReactDOM.render(
       <App />
     </BrowserRouter>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );

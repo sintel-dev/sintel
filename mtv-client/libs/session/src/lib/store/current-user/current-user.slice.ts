@@ -67,6 +67,12 @@ export const selectCurrentUserError = createSelector(
   s => s.error,
 );
 
+export const isUserLoggedIn = () => {
+  const authHeader = Cookies.get(SESSION_TOKEN);
+
+  return !!authHeader;
+};
+
 export const fetchCurrentUser = () => async dispatch => {
   try {
     dispatch(getCurrentUserStart());

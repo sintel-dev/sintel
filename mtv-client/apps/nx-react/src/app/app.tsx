@@ -1,20 +1,29 @@
-import React from 'react';
-import { Route, Switch } from 'react-router';
-import { Session } from '@nx-react/session';
+import React, { PureComponent } from 'react';
+import { Route, Switch, withRouter, RouteComponentProps } from 'react-router';
+import { Session, isUserLoggedIn } from '@nx-react/session';
 import { Dashboard } from '@nx-react/dashboard';
 
 import './app.scss';
 
-export const App = () => {
-  // @todo: implement the logic to check the authorization token
+const sessionUrls = ['/login', '/register', '/reset-key'];
 
-  return (
-    <Switch>
-      <Route component={Dashboard} path="/" exact/>
-      <Route component={Dashboard} path="/experiment"/>
-      <Route component={Session} path="/" />
-    </Switch>
-  );
-};
+type AppProps = RouteComponentProps;
+class App extends PureComponent<AppProps> {
+  componentDidMount() {
+    if (!isUserLoggedIn() && !sessionUrls.includes(this.props.location.pathname)) {
+      this.props.history.push('/login');
+    }
+  }
 
-export default App;
+  render() {
+    return (
+      <Switch>
+        <Route component={Dashboard} path="/" exact />
+        <Route component={Dashboard} path="/experiment" />
+        <Route component={Session} path="/" />
+      </Switch>
+    );
+  }
+}
+
+export default withRouter(App);

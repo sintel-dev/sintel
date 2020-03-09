@@ -8,7 +8,6 @@ import Experiment from './components/Timeseries/Overview/Experiment';
 const transtitionTimeOut = { enter: 1000, exit: 1000 };
 
 export const App: React.FC = () => {
-
   const location = useLocation();
   const animateDirection = location.pathname === '/' ? 'animate-left' : 'animate-right';
   return (
