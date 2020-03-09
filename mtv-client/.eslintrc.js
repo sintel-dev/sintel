@@ -71,6 +71,7 @@ module.exports = {
       },
     ],
     'prefer-const': 'off',
+    'import/extensions':'off',
     'no-unused-expressions': 'off',
     'object-curly-newline': 'off',
     'no-use-before-define': 'off',

@@ -9,14 +9,17 @@ import { fetchLogout, selectLogoutLoaded } from '../../store/logout/logout.slice
 
 export interface LogoutProps {
   loaded: boolean;
-  logout: () => ThunkAction<void, void, null, Action>
+  logout: () => ThunkAction<void, void, null, Action>;
 }
 
-@(connect(state => ({
-  loaded: selectLogoutLoaded(state)
-}), dispatch => ({
-  logout: () => dispatch(fetchLogout())
-})) as any)
+@(connect(
+  state => ({
+    loaded: selectLogoutLoaded(state),
+  }),
+  dispatch => ({
+    logout: () => dispatch(fetchLogout()),
+  }),
+) as any)
 export class Logout extends Component<LogoutProps> {
   componentDidMount(): void {
     this.props.logout();
@@ -30,10 +33,7 @@ export class Logout extends Component<LogoutProps> {
 
   render() {
     return (
-      <Wrapper
-        title="Logout"
-        description="You will be redirected after logout."
-      >
+      <Wrapper title="Logout" description="You will be redirected after logout.">
         <LinearProgress />
       </Wrapper>
     );

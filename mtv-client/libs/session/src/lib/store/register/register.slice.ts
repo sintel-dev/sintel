@@ -20,46 +20,41 @@ export interface RegisterState {
 
 export const initialRegisterState: RegisterState = {
   status: '',
-  error: null
+  error: null,
 };
 
 export const registerSlice = createSlice({
   name: REGISTER_FEATURE_KEY,
   initialState: initialRegisterState as RegisterState,
   reducers: {
-    postRegisterStart: (state) => {
+    postRegisterStart: state => {
       state.status = 'loading';
       state.error = null;
     },
-    postRegisterSuccess: (state) => {
+    postRegisterSuccess: state => {
       state.status = 'success';
     },
     postRegisterFailure: (state, action: PayloadAction<RegisterError>) => {
       state.status = 'fail';
       state.error = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const registerReducer = registerSlice.reducer;
 
-export const {
-  postRegisterStart,
-  postRegisterSuccess,
-  postRegisterFailure
-} = registerSlice.actions;
+export const { postRegisterStart, postRegisterSuccess, postRegisterFailure } = registerSlice.actions;
 
-export const getRegisterState = (rootState: any): RegisterState =>
-  rootState.session[REGISTER_FEATURE_KEY];
+export const getRegisterState = (rootState: any): RegisterState => rootState.session[REGISTER_FEATURE_KEY];
 
 export const selectRegisterStatus = createSelector(
   getRegisterState,
-  s => s.status
+  s => s.status,
 );
 
 export const selectRegisterError = createSelector(
   getRegisterState,
-  s => s.error
+  s => s.error,
 );
 
 export const postRegister = (data: RegisterPayload) => async dispatch => {

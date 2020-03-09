@@ -9,15 +9,10 @@ export interface SuccessWrapperProps {
 
 export class SuccessWrapper extends Component<SuccessWrapperProps> {
   static defaultProps: Partial<SuccessWrapperProps> = {
-    className: 'success-wrapper'
+    className: 'success-wrapper',
   };
 
   render() {
-    return (
-      <div className={this.props.className}>
-        {this.props.children}
-      </div>
-    );
+    return <div className={this.props.className}>{this.props.children}</div>;
   }
 }
-

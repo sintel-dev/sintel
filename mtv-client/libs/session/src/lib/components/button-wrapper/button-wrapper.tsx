@@ -9,14 +9,10 @@ export interface ButtonProps {
 
 export class ButtonWrapper extends Component<ButtonProps> {
   static defaultProps: Partial<ButtonProps> = {
-    className: 'button-wrapper'
+    className: 'button-wrapper',
   };
-  
+
   render() {
-    return (
-      <div className={this.props.className}>
-        {this.props.children}
-      </div>
-    );
+    return <div className={this.props.className}>{this.props.children}</div>;
   }
 }

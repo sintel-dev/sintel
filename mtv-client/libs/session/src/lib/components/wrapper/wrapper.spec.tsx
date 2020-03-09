@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import Wrapper from './wrapper';
+import { Wrapper } from './wrapper';
 
 describe(' Wrapper', () => {
   it('should render successfully', () => {

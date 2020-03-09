@@ -13,7 +13,7 @@ export interface WrapperProps {
   className?: string;
 }
 
-class Wrapper extends Component<WrapperProps> {
+export class Wrapper extends Component<WrapperProps> {
   static defaultProps = {
     title: '',
     description: '',
@@ -50,5 +50,3 @@ class Wrapper extends Component<WrapperProps> {
     );
   }
 }
-
-export default Wrapper;

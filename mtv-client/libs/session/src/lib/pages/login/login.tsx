@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 
 import { ThunkAction } from 'redux-thunk';
 import { Action } from '@reduxjs/toolkit';
-import Wrapper from '../../components/wrapper/wrapper';
+import { Wrapper } from '../../components/wrapper/wrapper';
 import { FieldWrapper } from '../../components/field-wrapper/field-wrapper';
 import { FooterWrapper } from '../../components/footer-wrapper/footer-wrapper';
 import { GoogleButton } from '../../components/google-button/google-button';

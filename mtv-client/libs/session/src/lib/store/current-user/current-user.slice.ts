@@ -25,54 +25,46 @@ export interface CurrentUserState {
 export const initialCurrentUserState: CurrentUserState = {
   entity: null,
   loaded: false,
-  error: null
+  error: null,
 };
 
 export const currentUserSlice = createSlice({
   name: CURRENT_USER_FEATURE_KEY,
   initialState: initialCurrentUserState as CurrentUserState,
   reducers: {
-    getCurrentUserStart: (state) => {
+    getCurrentUserStart: state => {
       state.error = null;
       state.loaded = false;
     },
-    getCurrentUserSuccess: (
-      state,
-      action: PayloadAction<CurrentUserEntity>
-    ) => {
+    getCurrentUserSuccess: (state, action: PayloadAction<CurrentUserEntity>) => {
       state.loaded = true;
       state.entity = action.payload;
     },
     getCurrentUserFailure: (state, action: PayloadAction<CurrentUserError>) => {
       state.error = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const currentUserReducer = currentUserSlice.reducer;
 
-export const {
-  getCurrentUserStart,
-  getCurrentUserSuccess,
-  getCurrentUserFailure
-} = currentUserSlice.actions;
+export const { getCurrentUserStart, getCurrentUserSuccess, getCurrentUserFailure } = currentUserSlice.actions;
 
-export const getCurrentUserState = (rootState: any): CurrentUserState =>
-  rootState[CURRENT_USER_FEATURE_KEY];
+export const getCurrentUserState = (rootState: any): CurrentUserState => rootState[CURRENT_USER_FEATURE_KEY];
 
 export const selectCurrentUserEntity = createSelector(
   getCurrentUserState,
-  s => s.entity
+  s => s.entity,
 );
 
 export const selectCurrentUserLoaded = createSelector(
   getCurrentUserState,
-  s => s.loaded
+  s => s.loaded,
 );
 
 export const selectCurrentUserError = createSelector(
   getCurrentUserState,
-  s => s.error
+  s => s.error,
 );
 
 export const fetchCurrentUser = () => async dispatch => {
@@ -81,17 +73,19 @@ export const fetchCurrentUser = () => async dispatch => {
     const authHeader = Cookies.get(SESSION_TOKEN);
 
     if (!authHeader) {
-      dispatch(getCurrentUserFailure({
-        message: '' // @todo: add message here
-      }));
+      dispatch(
+        getCurrentUserFailure({
+          message: '', // @todo: add message here
+        }),
+      );
 
       return;
     }
 
     const response = await axios.get(`${API_URL}users/me`, {
       headers: {
-        [SESSION_TOKEN]: authHeader
-      }
+        [SESSION_TOKEN]: authHeader,
+      },
     });
     dispatch(getCurrentUserSuccess(response.data));
   } catch (err) {

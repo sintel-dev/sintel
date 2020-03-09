@@ -9,14 +9,10 @@ export interface FooterWrapperProps {
 
 export class FooterWrapper extends Component<FooterWrapperProps> {
   static defaultProps: Partial<FooterWrapperProps> = {
-    className: 'footer-wrapper'
+    className: 'footer-wrapper',
   };
 
   render() {
-    return (
-      <div className={`${this.props.className}`}>
-        {this.props.children}
-      </div>
-    );
+    return <div className={`${this.props.className}`}>{this.props.children}</div>;
   }
 }

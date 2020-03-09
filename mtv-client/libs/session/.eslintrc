@@ -179,6 +179,7 @@
     "getter-return": "warn",
     "import/first": "error",
     "import/no-amd": "error",
+    "import/extensions":"off",
     "import/no-webpack-loader-syntax": "error",
     "react/forbid-foreign-prop-types": ["warn", { "allowInPropTypes": true }],
     "react/jsx-no-comment-textnodes": "warn",

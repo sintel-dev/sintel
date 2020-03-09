@@ -1,13 +1,13 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { SESSION_TOKEN } from '../current-user/current-user.slice';
 import axios from 'axios';
 import { API_URL } from '@nx-react/common';
+import { SESSION_TOKEN } from '../current-user/current-user.slice';
 
 export const LOGOUT_FEATURE_KEY = 'logout';
 
 export type LogoutError = {
-  message: string
+  message: string;
 };
 
 export interface LogoutState {
@@ -17,45 +17,40 @@ export interface LogoutState {
 
 export const initialLogoutState: LogoutState = {
   loaded: false,
-  error: null
+  error: null,
 };
 
 export const logoutSlice = createSlice({
   name: LOGOUT_FEATURE_KEY,
   initialState: initialLogoutState as LogoutState,
   reducers: {
-    getLogoutStart: (state) => {
+    getLogoutStart: state => {
       state.loaded = false;
     },
-    getLogoutSuccess: (state) => {
+    getLogoutSuccess: state => {
       state.loaded = true;
     },
     getLogoutFailure: (state, action: PayloadAction<LogoutError>) => {
       state.loaded = true;
       state.error = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const logoutReducer = logoutSlice.reducer;
 
-export const {
-  getLogoutStart,
-  getLogoutSuccess,
-  getLogoutFailure
-} = logoutSlice.actions;
+export const { getLogoutStart, getLogoutSuccess, getLogoutFailure } = logoutSlice.actions;
 
-export const getLogoutState = (rootState: any): LogoutState =>
-  rootState.session[LOGOUT_FEATURE_KEY];
+export const getLogoutState = (rootState: any): LogoutState => rootState.session[LOGOUT_FEATURE_KEY];
 
 export const selectLogoutLoaded = createSelector(
   getLogoutState,
-  s => s.loaded
+  s => s.loaded,
 );
 
 export const selectLogoutError = createSelector(
   getLogoutState,
-  s => s.error
+  s => s.error,
 );
 
 export const fetchLogout = () => async dispatch => {
@@ -70,8 +65,8 @@ export const fetchLogout = () => async dispatch => {
     }
     await axios.get(`${API_URL}users/signout/`, {
       headers: {
-        [SESSION_TOKEN]: authHeader
-      }
+        [SESSION_TOKEN]: authHeader,
+      },
     });
     Cookies.remove(SESSION_TOKEN);
 

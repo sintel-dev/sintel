@@ -6,15 +6,21 @@ import { ThunkAction } from 'redux-thunk';
 import { connect } from 'react-redux';
 import { Action } from '@reduxjs/toolkit';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { Wrapper } from '../../components/wrapper/wrapper';
 import { FieldWrapper } from '../../components/field-wrapper/field-wrapper';
 import { FooterWrapper } from '../../components/footer-wrapper/footer-wrapper';
 import { GoogleButton } from '../../components/google-button/google-button';
 import { SuccessWrapper } from '../../components/success-wrapper/success-wrapper';
 import { isEmail, isName } from '../../utils/validators';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { ButtonWrapper } from '../../components/button-wrapper/button-wrapper';
-import { postRegister, RegisterError, RegisterPayload, selectRegisterError, selectRegisterStatus } from '../../store/register/register.slice';
+import {
+  postRegister,
+  RegisterError,
+  RegisterPayload,
+  selectRegisterError,
+  selectRegisterStatus,
+} from '../../store/register/register.slice';
 
 // @todo: handle error from API
 export interface RegisterProps {
@@ -31,13 +37,16 @@ export interface RegisterState {
   emailError: boolean;
 }
 
-@(connect(state => ({
-  status: selectRegisterStatus(state),
-  googleUrl: '',
-  error: selectRegisterError(state)
-}), dispatch => ({
-  register: data => dispatch(postRegister(data))
-})) as any)
+@(connect(
+  state => ({
+    status: selectRegisterStatus(state),
+    googleUrl: '',
+    error: selectRegisterError(state),
+  }),
+  dispatch => ({
+    register: data => dispatch(postRegister(data)),
+  }),
+) as any)
 export class Register extends Component<RegisterProps, RegisterState> {
   constructor(props) {
     super(props);
@@ -46,7 +55,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
       name: '',
       email: '',
       nameError: false,
-      emailError: false
+      emailError: false,
     };
 
     this.onNameChangeHandler = this.onNameChangeHandler.bind(this);
@@ -59,7 +68,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
   onNameChangeHandler({ target }): void {
     this.setState({
       name: target.value,
-      nameError: target.value.toString().length < 3 || !isName(target.value)
+      nameError: target.value.toString().length < 3 || !isName(target.value),
     });
   }
 
@@ -67,7 +76,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
     const { name, nameError } = this.state;
     if ((name.toString().length < 3 || !isName(name)) && !nameError) {
       this.setState({
-        nameError: true
+        nameError: true,
       });
     }
   }
@@ -75,7 +84,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
   onEmailChangeHandler({ target }): void {
     this.setState({
       email: target.value,
-      emailError: !isEmail(target.value)
+      emailError: !isEmail(target.value),
     });
   }
 
@@ -83,7 +92,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
     const { emailError, email } = this.state;
     if (!isEmail(email) && !emailError) {
       this.setState({
-        emailError: true
+        emailError: true,
       });
     }
   }
@@ -92,7 +101,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
     event.preventDefault();
     this.props.register({
       email: this.state.email,
-      name: this.state.name
+      name: this.state.name,
     });
   }
 
@@ -101,8 +110,12 @@ export class Register extends Component<RegisterProps, RegisterState> {
       return (
         <Wrapper success>
           <SuccessWrapper>
-            <p>You will receive an e-mail shortly at <strong>{this.state.email}</strong> with your passkey.</p>
-            <p>Please follow the instructions and then <Link to="/login">log in</Link>.</p>
+            <p>
+              You will receive an e-mail shortly at <strong>{this.state.email}</strong> with your passkey.
+            </p>
+            <p>
+              Please follow the instructions and then <Link to="/login">log in</Link>.
+            </p>
           </SuccessWrapper>
         </Wrapper>
       );
@@ -112,11 +125,7 @@ export class Register extends Component<RegisterProps, RegisterState> {
 
     return (
       <Wrapper title="Register">
-        <form
-          onSubmit={this.onFormSubmitHandler}
-          noValidate
-          autoComplete="off"
-        >
+        <form onSubmit={this.onFormSubmitHandler} noValidate autoComplete="off">
           <FieldWrapper>
             <TextField
               autoFocus
@@ -152,35 +161,25 @@ export class Register extends Component<RegisterProps, RegisterState> {
             />
           </FieldWrapper>
           <ButtonWrapper>
-            <Button
-              className="button"
-              fullWidth
-              variant="contained"
-              disabled={isLoading}
-              color="primary"
-              type="submit"
-            >
-              {isLoading && (
-                <CircularProgress
-                  color="secondary"
-                  size={28}
-                />
-              )}
+            <Button className="button" fullWidth variant="contained" disabled={isLoading} color="primary" type="submit">
+              {isLoading && <CircularProgress color="secondary" size={28} />}
               <span>Register</span>
             </Button>
           </ButtonWrapper>
           <FooterWrapper>
-            <p>Already have an account? <Link to="/login">Log in</Link>.</p>
+            <p>
+              Already have an account? <Link to="/login">Log in</Link>.
+            </p>
           </FooterWrapper>
           {!!this.props.googleUrl && (
-            <Fragment>
+            <>
               <FooterWrapper>
                 <p>- or -</p>
               </FooterWrapper>
               <FooterWrapper>
                 <GoogleButton url={this.props.googleUrl} />
               </FooterWrapper>
-            </Fragment>
+            </>
           )}
         </form>
       </Wrapper>

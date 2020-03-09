@@ -76,9 +76,9 @@ export class RestClient {
       ...config,
       headers: {
         ...config.headers,
-        Authorization: authHeader
-      }
-    }
+        Authorization: authHeader,
+      },
+    };
   }
 }
 

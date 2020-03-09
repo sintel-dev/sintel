@@ -12,16 +12,16 @@ const darkTheme = createMuiTheme({
     type: 'dark',
     primary: {
       main: '#4285F4',
-      contrastText: '#fff'
+      contrastText: '#fff',
     },
     secondary: {
       light: '#0066ff',
       main: '#0044ff',
-      contrastText: '#ffcc00'
+      contrastText: '#ffcc00',
     },
     contrastThreshold: 3,
-    tonalOffset: 0.2
-  }
+    tonalOffset: 0.2,
+  },
 });
 
 export const Session = () => (

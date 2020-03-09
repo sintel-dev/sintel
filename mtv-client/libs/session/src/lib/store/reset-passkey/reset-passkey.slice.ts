@@ -19,46 +19,41 @@ export interface ResetPasskeyState {
 
 export const initialResetPasskeyState: ResetPasskeyState = {
   status: '',
-  error: null
+  error: null,
 };
 
 export const resetPasskeySlice = createSlice({
   name: RESET_PASSKEY_FEATURE_KEY,
   initialState: initialResetPasskeyState as ResetPasskeyState,
   reducers: {
-    postResetPasskeyStart: (state) => {
+    postResetPasskeyStart: state => {
       state.status = 'loading';
       state.error = null;
     },
-    postResetPasskeySuccess: (state) => {
+    postResetPasskeySuccess: state => {
       state.status = 'success';
     },
     postResetPasskeyFailure: (state, action: PayloadAction<ResetPasskeyError>) => {
       state.status = 'fail';
       state.error = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const resetPasskeyReducer = resetPasskeySlice.reducer;
 
-export const {
-  postResetPasskeyStart,
-  postResetPasskeySuccess,
-  postResetPasskeyFailure
-} = resetPasskeySlice.actions;
+export const { postResetPasskeyStart, postResetPasskeySuccess, postResetPasskeyFailure } = resetPasskeySlice.actions;
 
-export const getResetPasskeyState = (rootState: any): ResetPasskeyState =>
-  rootState.session[RESET_PASSKEY_FEATURE_KEY];
+export const getResetPasskeyState = (rootState: any): ResetPasskeyState => rootState.session[RESET_PASSKEY_FEATURE_KEY];
 
 export const selectResetPasskeyStatus = createSelector(
   getResetPasskeyState,
-  s => s.status
+  s => s.status,
 );
 
 export const selectResetPasskeyError = createSelector(
   getResetPasskeyState,
-  s => s.error
+  s => s.error,
 );
 
 export const postResetPasskey = (data: ResetPasskeyPayload) => async dispatch => {

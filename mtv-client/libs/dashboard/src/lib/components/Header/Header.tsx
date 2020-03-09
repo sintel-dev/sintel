@@ -2,9 +2,9 @@ import React from 'react';
 import './header.scss';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
-import { getSelectedExperiment } from '../../model/selectors/projects';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { getSelectedExperiment } from '../../model/selectors/projects';
 import { RootState } from '../../model/types';
 
 const mapState = (state: RootState) => ({
