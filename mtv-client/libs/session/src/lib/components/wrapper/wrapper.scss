@@ -1,0 +1,60 @@
+.session-wrapper {
+  background-color: #23242b;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+
+  &__body {
+    display: flex;
+    flex: 0 0 50%;
+    flex-direction: column;
+    padding: 70px 150px;
+  }
+
+  &__splash {
+    background: no-repeat center center/cover;
+    flex: 0 0 50%;
+  }
+
+  &__logo {
+    height: 110px;
+    margin-bottom: 85px;
+    width: 110px;
+
+    ~ .session-wrapper__logo {
+      margin-bottom: 0;
+    }
+  }
+
+  &__form {
+    max-width: 100%;
+    width: 350px;
+
+    &--success {
+      width: 410px;
+    }
+
+    .button {
+      height: 60px;
+      margin-top: 20px;
+    }
+  }
+
+  &__header {
+    margin-bottom: 75px;
+  }
+
+  &__title {
+    color: #dbdbdb;
+    font-size: 40px;
+    line-height: 47px;
+    text-transform: uppercase;
+  }
+
+  &__description {
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 15px;
+    margin-top: 25px;
+  }
+}

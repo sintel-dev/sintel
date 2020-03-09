@@ -78,6 +78,8 @@ module.exports = {
     'arrow-parens': 'off',
     'space-before-function-paren': 'off',
     'func-names': 'off',
+    'react/prefer-stateless-function':'off',
+    'react/static-property-placement':'off',
     indent: 'off',
     'implicit-arrow-linebreak': 'off',
     'function-paren-newline': 'off',
