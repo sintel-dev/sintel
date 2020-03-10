@@ -18,14 +18,16 @@ export interface CurrentUserEntity {
 
 export interface CurrentUserState {
   entity: CurrentUserEntity;
-  loaded: boolean;
+  loading: boolean;
   error: CurrentUserError;
+  loggedIn: 'success' | 'fail' | '';
 }
 
 export const initialCurrentUserState: CurrentUserState = {
   entity: null,
-  loaded: false,
+  loading: false,
   error: null,
+  loggedIn: '',
 };
 
 export const currentUserSlice = createSlice({
@@ -34,14 +36,17 @@ export const currentUserSlice = createSlice({
   reducers: {
     getCurrentUserStart: state => {
       state.error = null;
-      state.loaded = false;
+      state.loggedIn = '';
+      state.loading = true;
     },
-    getCurrentUserSuccess: (state, action: PayloadAction<CurrentUserEntity>) => {
-      state.loaded = true;
-      state.entity = action.payload;
+    getCurrentUserSuccess: state => {
+      state.loading = false;
+      state.loggedIn = 'success';
     },
     getCurrentUserFailure: (state, action: PayloadAction<CurrentUserError>) => {
       state.error = action.payload;
+      state.loading = false;
+      state.loggedIn = 'fail';
     },
   },
 });
@@ -50,16 +55,21 @@ export const currentUserReducer = currentUserSlice.reducer;
 
 export const { getCurrentUserStart, getCurrentUserSuccess, getCurrentUserFailure } = currentUserSlice.actions;
 
-export const getCurrentUserState = (rootState: any): CurrentUserState => rootState[CURRENT_USER_FEATURE_KEY];
+export const getCurrentUserState = (rootState: any): CurrentUserState => rootState.session[CURRENT_USER_FEATURE_KEY];
 
 export const selectCurrentUserEntity = createSelector(
   getCurrentUserState,
   s => s.entity,
 );
 
-export const selectCurrentUserLoaded = createSelector(
+export const selectCurrentUserLoading = createSelector(
   getCurrentUserState,
-  s => s.loaded,
+  s => s.loading,
+);
+
+export const selectCurrentUserLoggedIn = createSelector(
+  getCurrentUserState,
+  s => s.loggedIn,
 );
 
 export const selectCurrentUserError = createSelector(
@@ -73,7 +83,7 @@ export const isUserLoggedIn = () => {
   return !!authHeader;
 };
 
-export const fetchCurrentUser = () => async dispatch => {
+export const fetchCurrentUser = () => dispatch => {
   try {
     dispatch(getCurrentUserStart());
     const authHeader = Cookies.get(SESSION_TOKEN);
@@ -88,12 +98,12 @@ export const fetchCurrentUser = () => async dispatch => {
       return;
     }
 
-    const response = await axios.get(`${API_URL}users/me`, {
-      headers: {
-        [SESSION_TOKEN]: authHeader,
-      },
-    });
-    dispatch(getCurrentUserSuccess(response.data));
+    // const response = await axios.get(`${API_URL}users/me`, {
+    //   headers: {
+    //     [SESSION_TOKEN]: authHeader,
+    //   },
+    // });
+    dispatch(getCurrentUserSuccess());
   } catch (err) {
     dispatch(getCurrentUserFailure(err));
   }

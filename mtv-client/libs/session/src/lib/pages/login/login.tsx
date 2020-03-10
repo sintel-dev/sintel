@@ -22,6 +22,7 @@ import {
   selectLoginError,
   selectLoginStatus,
 } from '../../store/login/login.slice';
+import { fetchCurrentUser } from '../../store/current-user/current-user.slice';
 
 // @todo: handle error from API
 export interface LoginProps {
@@ -32,6 +33,7 @@ export interface LoginProps {
   history: {
     push: (url: string) => void;
   };
+  fetchCurrentUser: () => void;
 }
 
 export interface LoginState {
@@ -49,6 +51,7 @@ export interface LoginState {
   }),
   dispatch => ({
     login: data => dispatch(postLogin(data)),
+    fetchCurrentUser: () => dispatch(fetchCurrentUser()),
   }),
 ) as any)
 export class Login extends Component<LoginProps, LoginState> {
@@ -74,6 +77,7 @@ export class Login extends Component<LoginProps, LoginState> {
   componentDidUpdate(prevProps) {
     if (this.props.status === 'success' && prevProps.status !== this.props.status) {
       this.props.history.push('/');
+      this.props.fetchCurrentUser();
     }
   }
 
