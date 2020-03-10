@@ -63,6 +63,7 @@ export class RestClient {
     this.comments = new Resource(this.server, 'comments/');
     this.data = new Resource(this.server, 'data/');
     this.server.interceptors.request.use(this.requestInterceptor);
+    this.server.interceptors.response.use(this.responseSuccessInterceptor, this.responseFailInterceptor);
   }
 
   public requestInterceptor(config) {
@@ -79,6 +80,18 @@ export class RestClient {
         Authorization: authHeader,
       },
     };
+  }
+
+  public responseSuccessInterceptor(response) {
+    return response;
+  }
+
+  public responseFailInterceptor(error) {
+    if (error.response.status === 401) {
+      window.location.href = '/logout';
+    }
+
+    return Promise.reject(error);
   }
 }
 

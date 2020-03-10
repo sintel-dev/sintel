@@ -68,10 +68,11 @@ export const fetchLogout = () => async dispatch => {
         [SESSION_TOKEN]: authHeader,
       },
     });
-    Cookies.remove(SESSION_TOKEN);
 
     dispatch(getLogoutSuccess());
   } catch (err) {
     dispatch(getLogoutFailure(err));
   }
+
+  Cookies.remove(SESSION_TOKEN);
 };
