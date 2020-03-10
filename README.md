@@ -13,7 +13,7 @@
 
 **MTV** is a visual analytics system built for anomaly analysis of multiple time-series data.
 
-The Restful APIs documentation: http://45.77.5.58/apidoc/
+The Restful APIs documentation: http://54.208.61.79/apidoc/
 
 
 
