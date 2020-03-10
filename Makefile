@@ -42,14 +42,6 @@ install-develop: clean-build clean-pyc clean-client ## install the package in ed
 	pip install -e .[dev]
 	cd client && npm install
 
-.PHONY: install-theme
-install-theme:
-	rm -f -r ./client/public/themes/
-	mkdir -p ./client/public/themes/
-	curl -o theme.tar.bz2 "http://dongyu.name/themes/AdminLTE-2.4.2.tar.bz2"
-	tar -xf theme.tar.bz2 -C ./client/public/themes/
-	rm -f theme.tar.bz2
-
 .PHONY: init-db
 init-db: clean-db
 	mkdir -p db-instance
@@ -60,14 +52,14 @@ init-db: clean-db
 .PHONY: load-db-mtv
 load-db-mtv: init-db
 	rm -f -r db-instance/data/mtv/
-	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	mongorestore --db mtv ./db-instance/data/mtv/
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
 docker-db-up: init-db	## download and 
-	curl -o mtv.tar.bz2 "http://45.77.5.58/data/mtv.tar.bz2"
+	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	docker-compose -f docker-compose-db.yml up
 
