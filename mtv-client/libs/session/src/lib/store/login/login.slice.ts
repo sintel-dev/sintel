@@ -60,11 +60,16 @@ export const selectLoginError = createSelector(
   s => s.error,
 );
 
+export const googleLoginAction = userData => async dispatch => {
+  const response = await axios.post(`${API_URL}auth/google_login/`, userData);
+  Cookies.set(SESSION_TOKEN, response.data);
+  dispatch(postLoginSuccess());
+};
+
 export const postLogin = (data: LoginPayload) => async dispatch => {
   try {
     dispatch(postLoginStart());
     const response = await axios.post(`${API_URL}users/signin/`, data);
-
     Cookies.set(SESSION_TOKEN, response.data.data.token, {
       expires: Date.now() + (data.rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 24),
     });

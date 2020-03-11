@@ -20,7 +20,11 @@ import {
   RegisterPayload,
   selectRegisterError,
   selectRegisterStatus,
+  googleRegisterAction,
+  googleRegisterStatus,
 } from '../../store/register/register.slice';
+
+import { fetchCurrentUser } from '../../store/current-user/current-user.slice';
 
 // @todo: handle error from API
 export interface RegisterProps {
@@ -28,6 +32,12 @@ export interface RegisterProps {
   googleUrl: string;
   register: (data: RegisterPayload) => ThunkAction<void, RegisterPayload, null, Action>;
   error: RegisterError;
+  googleRegister: (userdata) => void;
+  fetchCurrentUser: () => void;
+  googleRegisterStatus: string;
+  history: {
+    push: (url: string) => void;
+  };
 }
 
 export interface RegisterState {
@@ -42,9 +52,12 @@ export interface RegisterState {
     status: selectRegisterStatus(state),
     googleUrl: '',
     error: selectRegisterError(state),
+    googleRegisterStatus: googleRegisterStatus(state),
   }),
   dispatch => ({
     register: data => dispatch(postRegister(data)),
+    fetchCurrentUser: () => dispatch(fetchCurrentUser()),
+    googleRegister: userData => dispatch(googleRegisterAction(userData)),
   }),
 ) as any)
 export class Register extends Component<RegisterProps, RegisterState> {
@@ -63,6 +76,16 @@ export class Register extends Component<RegisterProps, RegisterState> {
     this.onEmailChangeHandler = this.onEmailChangeHandler.bind(this);
     this.onEmailBlurHandler = this.onEmailBlurHandler.bind(this);
     this.onFormSubmitHandler = this.onFormSubmitHandler.bind(this);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.googleRegisterStatus !== prevProps.googleRegisterStatus &&
+      this.props.googleRegisterStatus === 'success'
+    ) {
+      this.props.history.push('/');
+      this.props.fetchCurrentUser();
+    }
   }
 
   onNameChangeHandler({ target }): void {
@@ -171,16 +194,12 @@ export class Register extends Component<RegisterProps, RegisterState> {
               Already have an account? <Link to="/login">Log in</Link>.
             </p>
           </FooterWrapper>
-          {!!this.props.googleUrl && (
-            <>
-              <FooterWrapper>
-                <p>- or -</p>
-              </FooterWrapper>
-              <FooterWrapper>
-                <GoogleButton url={this.props.googleUrl} />
-              </FooterWrapper>
-            </>
-          )}
+          <FooterWrapper>
+            <p>- or -</p>
+          </FooterWrapper>
+          <FooterWrapper>
+            <GoogleButton onUserSelect={this.props.googleRegister} text="Sign Up with Google" />
+          </FooterWrapper>
         </form>
       </Wrapper>
     );

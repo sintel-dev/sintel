@@ -57,7 +57,7 @@ class Signin(Resource):
         @apiParam {String} password password.
         @apiParam {String} rememberMe  boolean value.
 
-        @apiSuccess {Object} data 
+        @apiSuccess {Object} data
         @apiSuccess {String} data.name user name.
         @apiSuccess {String} data.email user email.
         @apiSuccess {String} data.token token for authentication.
@@ -88,7 +88,7 @@ class Signin(Resource):
 class Reset(Resource):
     def post(self):
         """
-        @api {post} /auth/reset/ Reset password 
+        @api {post} /auth/reset/ Reset password
         @apiName ResetPassword
         @apiGroup User
         @apiVersion 1.0.0
@@ -136,7 +136,7 @@ class Signout(Resource):
 
 class GoogleLogin(Resource):
     """
-        @api {post} /auth/google_login/ google login 
+        @api {post} /auth/google_login/ google login
         @apiName GoogleLogin
         @apiGroup User
         @apiVersion 1.0.0
@@ -157,9 +157,19 @@ class GoogleLogin(Resource):
         return redirect(request_uri)
 
 
+class GoogleAuthentication(Resource):
+    def post(self):
+        body = request.json
+
+        # import pudb;
+        # pudb.set_trace();
+        # Temporarily addressed google auth
+        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
+        return token
+
 class GoogleLoginCallback(Resource):
     """
-        @api {post} /auth/google_login/callback google login 
+        @api {post} /auth/google_login/callback google login
         @apiName GoogleLogin
         @apiGroup User
         @apiVersion 1.0.0

@@ -98,11 +98,6 @@ export const fetchCurrentUser = () => dispatch => {
       return;
     }
 
-    // const response = await axios.get(`${API_URL}users/me`, {
-    //   headers: {
-    //     [SESSION_TOKEN]: authHeader,
-    //   },
-    // });
     dispatch(getCurrentUserSuccess());
   } catch (err) {
     dispatch(getCurrentUserFailure(err));

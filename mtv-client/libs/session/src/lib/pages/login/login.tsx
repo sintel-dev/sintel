@@ -21,19 +21,20 @@ import {
   postLogin,
   selectLoginError,
   selectLoginStatus,
+  googleLoginAction,
 } from '../../store/login/login.slice';
 import { fetchCurrentUser } from '../../store/current-user/current-user.slice';
 
 // @todo: handle error from API
 export interface LoginProps {
   status: 'loading' | 'success' | 'fail' | '';
-  googleUrl: string;
   login: (data: LoginPayload) => ThunkAction<void, LoginPayload, null, Action>;
   error: LoginError;
   history: {
     push: (url: string) => void;
   };
   fetchCurrentUser: () => void;
+  googleLogin: (userdata) => void;
 }
 
 export interface LoginState {
@@ -46,12 +47,12 @@ export interface LoginState {
 @(connect(
   state => ({
     status: selectLoginStatus(state),
-    googleUrl: '',
     error: selectLoginError(state),
   }),
   dispatch => ({
     login: data => dispatch(postLogin(data)),
     fetchCurrentUser: () => dispatch(fetchCurrentUser()),
+    googleLogin: userData => dispatch(googleLoginAction(userData)),
   }),
 ) as any)
 export class Login extends Component<LoginProps, LoginState> {
@@ -198,16 +199,14 @@ export class Login extends Component<LoginProps, LoginState> {
               Don’t have an account? <Link to="/register">Register</Link>.
             </p>
           </FooterWrapper>
-          {!!this.props.googleUrl && (
-            <>
-              <FooterWrapper>
-                <p>- or -</p>
-              </FooterWrapper>
-              <FooterWrapper>
-                <GoogleButton url={this.props.googleUrl} />
-              </FooterWrapper>
-            </>
-          )}
+          <>
+            <FooterWrapper>
+              <p>- or -</p>
+            </FooterWrapper>
+            <FooterWrapper>
+              <GoogleButton onUserSelect={this.props.googleLogin} text="Sign In with Google" />
+            </FooterWrapper>
+          </>
         </form>
       </Wrapper>
     );
