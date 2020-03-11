@@ -104,6 +104,14 @@ class PipelineField(fields.DictField):
         super(fields.DictField, self).validate(value)
 
 
+class User(Document, MongoUtils):
+    name = fields.StringField(required=True)
+    email = fields.StringField(required=True)
+    password = fields.StringField()
+    gid = fields.StringField()
+    picture = fields.StringField()
+
+
 class Dataset(Document, MongoUtils):
     name = fields.StringField(required=True)
     entity_id = fields.StringField()

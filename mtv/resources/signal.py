@@ -1,6 +1,8 @@
 import logging
 
+from flask import request
 from flask_restful import Resource
+from mtv.resources.auth_utils import verify_auth
 
 from mtv import model
 
@@ -38,6 +40,9 @@ class Signal(Resource):
         @apiSuccess {String} created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         document = model.Signal.find_one(name=signal_name)
 
         if document is None:
@@ -74,6 +79,10 @@ class Signals(Resource):
         @apiSuccess {Int} signals.stop_time Signal stop time.
         @apiSuccess {String} signals.created_by User ID.
         """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
 
         documents = model.Signal.find()
 

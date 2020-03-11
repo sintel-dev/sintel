@@ -5,6 +5,8 @@ from flask import request
 from flask_restful import Resource
 
 from mtv import model
+from mtv.resources.auth_utils import verify_auth
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -15,6 +17,11 @@ class Data(Resource):
 
         GET /api/v1/data/?eid=xxx
         '''
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
+
         eid = request.args.get('eid', None)
 
         if (eid is None):

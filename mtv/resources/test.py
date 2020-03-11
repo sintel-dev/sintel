@@ -1,6 +1,8 @@
 import logging
 
 from flask_restful import Resource
+from flask import Flask, request, redirect, url_for
+from mtv.resources.auth_utils import verify_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,7 +15,10 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
-        return {'message': 'get'}, 200, {'username': 'dyu'}
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
+        return {'message': 'auth pass'}, 200
 
     def post(self):
         """
@@ -22,6 +27,9 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         return {'message': 'post'}, 200, {'username': 'dyu'}
 
     def delete(self):
@@ -31,6 +39,9 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         return {'message': 'delete'}, 200, {'username': 'dyu'}
 
     def put(self):
@@ -40,4 +51,7 @@ class Test(Resource):
         @apiVersion 1.0.0
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         return {'message': 'put'}, 200, {'username': 'dyu'}
