@@ -37,6 +37,7 @@ wheels/
 node_modules/
 !/client/public/dist/
 /client/public/dist/*
+# The following two files are only used in prod mode
 !/client/public/dist/*.min.css
 !/client/public/dist/*.min.js
 /client/public/themes/
