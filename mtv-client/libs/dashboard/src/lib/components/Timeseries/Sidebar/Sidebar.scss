@@ -1,18 +1,14 @@
 @import '../../../assets/sass/colors.scss';
 @import '../../../assets/sass/main.scss';
 
-.sidebar {
+.right-sidebar {
     background: $main-color;
     float: right;
     min-width: 480px;
     padding: 30px 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
-    .data-wrapper{
-        height: 91%;
-        // height: 270px;
-        // overflow: auto;
-    }
+
 
     .feature-cell {
         cursor: pointer;
@@ -84,10 +80,19 @@
     .event-summary{
         margin: 30px 0 25px 0;
     }
+    .period-info{
+        display: inline-block;
+
+        p{
+            margin: 0;
+            padding: 0;
+            line-height: 34px;
+        }
+    }
 }
 
 @media screen and (max-width: 1200px) {
-    .sidebar {
+    .right-sidebar {
         margin-top: 20px;
         width: 100%;
     }

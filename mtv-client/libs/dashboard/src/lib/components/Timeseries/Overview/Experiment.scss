@@ -1,14 +1,14 @@
 
 .experiment {
-    margin: 0px 10px 10px 10px;
+    margin: 0px auto 10px auto;
     position: relative;
+    width: 96%;
     height: 88vh;
 }
 
 .left-sidebar{
     float: left;
     margin-right: 20px;
-    // margin-top: 65px;
 }
 
 @media screen and (max-width: 1200px) {

@@ -21,17 +21,19 @@ const Header: React.FC<Props> = props => {
   const linkTo = currentView === '/' ? `/experiment/${props.selectedExperimentID}` : '/';
   return (
     <header id="header" className="main-header">
-      <Link to="/" className="logo">
-        <b>MTV</b>
-      </Link>
-      <Link to={linkTo} className={`page-switch-btn ${isSwitchVisible}`}>
-        <FontAwesomeIcon icon={currentView === '/' ? faChevronRight : faChevronLeft} />
-      </Link>
-      <ul className="user-opts">
-        <li>
-          <Link to="/logout">Logout</Link>
-        </li>
-      </ul>
+      <div className="header-container">
+        <Link to="/" className="logo">
+          <b>MTV</b>
+        </Link>
+        <Link to={linkTo} className={`page-switch-btn ${isSwitchVisible}`}>
+          <FontAwesomeIcon icon={currentView === '/' ? faChevronRight : faChevronLeft} />
+        </Link>
+        <ul className="user-opts">
+          <li>
+            <Link to="/logout">Logout</Link>
+          </li>
+        </ul>
+      </div>
     </header>
   );
 };

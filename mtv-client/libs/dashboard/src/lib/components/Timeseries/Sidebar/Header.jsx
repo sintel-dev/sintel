@@ -26,10 +26,10 @@ const Header = ({
   dataRun,
   selectedPeriodLevel,
 }) => (
-  <div>
-    <div className="period-control">
-      <div className="sidebar-heading">{headerTitle}</div>
-      <EventSummary dataRun={dataRun} selectedPeriodLevel={selectedPeriodLevel} />
+  <div className="period-control">
+    <div className="sidebar-heading">{headerTitle}</div>
+    <EventSummary dataRun={dataRun} selectedPeriodLevel={selectedPeriodLevel} />
+    <div>
       {showPeriod(selectedPeriodLevel)}
       <ul className="period-filter">
         <li>
@@ -62,8 +62,8 @@ const Header = ({
           </button>
         </li>
       </ul>
-      <div className="clear" />
     </div>
+    <div className="clear" />
   </div>
 );
 
