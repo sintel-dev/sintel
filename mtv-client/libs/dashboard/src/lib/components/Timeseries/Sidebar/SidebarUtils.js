@@ -3,11 +3,13 @@ import { colorSchemes } from '../FocusChart/Constants';
 import { fromMonthToIndex } from '../../../model/utils/Utils';
 
 export const getWrapperSize = () => {
-  const siderbarHeaderHeight = document.querySelector('.sidebar-heading').clientHeight;
+  const sidebarHeight = document.querySelector('.right-sidebar').clientHeight - 40; // padding-top and bottom
+  const sidebarHeaderHeight = document.querySelector('.period-control').clientHeight + 10; // margin-bottom;
   const wrapper = document.querySelector('#dataWrapper');
 
+  const height = sidebarHeight - sidebarHeaderHeight;
+
   const width = wrapper.clientWidth;
-  const height = wrapper.clientHeight - siderbarHeaderHeight;
   return { width, height };
 };
 
@@ -48,16 +50,18 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
     const year = currentPeriod.parent.name;
     const monthEvents = periodEvents[year] && periodEvents[year].months[periodIndex + 1];
     if (monthEvents !== undefined) {
-      const { start_time, stop_time, tag, id } = monthEvents;
-      const daysInMonth = new Date(Number(year), periodIndex + 1, 0).getDate();
-      const circleDays = (2 * Math.PI) / daysInMonth;
-      base = new Date(year, periodIndex + 1).getTime() / 1000;
-      arcStart = ((start_time - base) / secondsInDay) * circleDays;
-      arcStop = ((stop_time - base) / secondsInDay) * circleDays;
+      Object.values(monthEvents.events).forEach(event => {
+        const { start_time, stop_time, tag, id } = event;
+        const daysInMonth = new Date(Number(year), periodIndex + 1, 0).getDate();
+        const circleDays = (2 * Math.PI) / daysInMonth;
+        base = new Date(year, periodIndex + 1).getTime() / 1000;
+        arcStart = ((start_time - base) / secondsInDay) * circleDays;
+        arcStop = ((stop_time - base) / secondsInDay) * circleDays;
 
-      arc.startAngle(arcStart).endAngle(arcStop);
-      const tagColor = colorSchemes[tag] || colorSchemes.Untagged;
-      arcData.push({ tag, tagColor, pathData: arc(), eventID: id });
+        arc.startAngle(arcStart).endAngle(arcStop);
+        const tagColor = colorSchemes[tag] || colorSchemes.Untagged;
+        arcData.push({ tag, tagColor, pathData: arc(), eventID: id });
+      });
     }
   }
 

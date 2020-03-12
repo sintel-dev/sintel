@@ -1,22 +1,14 @@
 @import '../../../assets/sass/colors.scss';
-.sidebar {
+@import '../../../assets/sass/main.scss';
+
+.right-sidebar {
     background: $main-color;
     float: right;
     min-width: 480px;
     padding: 30px 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
-    .data-wrapper{
-        height: 91%;
-        .period-info{
-            p{
-                margin: 0;
-                padding: 0;
-                color: #8A9097;
-                font-size: 12px;
-            }
-        }
-    }
+
 
     .feature-cell {
         cursor: pointer;
@@ -43,8 +35,9 @@
             fill: transparent;
         }
     }
+
     .period-control{
-        border-bottom: 1px solid #484E53;
+        // border-bottom: 1px solid #484E53;
         padding-bottom: 20px;
         margin-bottom: 10px;
         .sidebar-heading{
@@ -58,22 +51,24 @@
         li{
             display: inline-block;
         }
-        button{
-            background-color: rgba(0, 0, 0, 0.4);
-            color: rgba(255, 255, 255, 0.5);
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            border: none;
-            line-height: 1.42px;
-            padding: 17px 15px;
-            outline: none;
-            &.active {
-                background: $btn-blue;
-                color: #fff;
-            }
-            &:disabled{
-                opacity: 0.4;
-                cursor: not-allowed;
+        .period-filter{
+            button{
+                background-color: rgba(0, 0, 0, 0.4);
+                color: rgba(255, 255, 255, 0.5);
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
+                border: none;
+                line-height: 1.42px;
+                padding: 17px 15px;
+                outline: none;
+                &.active {
+                    background: $btn-blue;
+                    color: #fff;
+                }
+                &:disabled{
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                }
             }
         }
     }
@@ -81,10 +76,23 @@
         fill: transparent;
         cursor: move;
     }
+
+    .event-summary{
+        margin: 30px 0 25px 0;
+    }
+    .period-info{
+        display: inline-block;
+
+        p{
+            margin: 0;
+            padding: 0;
+            line-height: 34px;
+        }
+    }
 }
 
 @media screen and (max-width: 1200px) {
-    .sidebar {
+    .right-sidebar {
         margin-top: 20px;
         width: 100%;
     }

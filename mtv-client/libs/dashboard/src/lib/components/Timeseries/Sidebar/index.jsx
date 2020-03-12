@@ -45,14 +45,8 @@ class Sidebar extends Component {
     zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
-      .translateExtent([
-        [0, 0],
-        [width, height],
-      ])
-      .extent([
-        [0, 0],
-        [width, height],
-      ])
+      .translateExtent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height]])
       .on('zoom', () =>
         this.setState({
           zoomValue: d3.event.transform,
@@ -169,7 +163,7 @@ class Sidebar extends Component {
     const { period } = dataRun;
     const { width, height } = this.state;
     return (
-      <div className="sidebar">
+      <div className="right-sidebar">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           <Header
             headerTitle={dataRun.signal}
@@ -177,14 +171,11 @@ class Sidebar extends Component {
             reviewRange={reviewRange}
             currentPeriod={selectedPeriodLevel}
             isEditingEventRange={isEditingEventRange}
+            dataRun={dataRun}
+            selectedPeriodLevel={selectedPeriodLevel}
           />
-          <div>{selectedPeriodLevel && selectedPeriodLevel.name}</div>
-          <div className="data-wrapper" id="dataWrapper">
-            <div className="period-info">
-              <p>
-                {selectedPeriodLevel.month} {selectedPeriodLevel.year}
-              </p>
-            </div>
+
+          <div id="dataWrapper" className="data-wrapper scroll-style">
             <svg id="multiPeriodChart" width={width} height={height}>
               <rect className="zoom" width={width} height={height} />
               {this.drawData(period)}

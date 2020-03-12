@@ -97,7 +97,7 @@ const groupEventsByTimestamp = events => {
         const monthDateStart = toTimestamp(`${currentMonth}/01/${currentYear} 00:00:00`);
         const monthDateStop = toTimestamp(`${currentMonth}/${maxDaysInMonth}/${currentYear} 23:59:59`);
 
-        let month = {
+        let eventPerMonth = {
           id: event.id,
           start_time: start_time >= monthDateStart ? start_time : monthDateStart,
           stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
@@ -106,11 +106,18 @@ const groupEventsByTimestamp = events => {
           days: {},
         };
 
-        const eventStartDay = new Date(month.start_time * 1000).getDate();
-        const eventStopDay = new Date(month.stop_time * 1000).getDate();
+        const eventStartDay = new Date(eventPerMonth.start_time * 1000).getDate();
+        const eventStopDay = new Date(eventPerMonth.stop_time * 1000).getDate();
         let currentDay = eventStartDay;
 
-        result[currentYear].months[currentMonth] = month;
+        if (result[currentYear].months[currentMonth]) {
+          result[currentYear].months[currentMonth].events[event.id] = eventPerMonth;
+        } else {
+          result[currentYear].months[currentMonth] = {
+            events: { [event.id]: eventPerMonth },
+            days: {},
+          };
+        }
 
         while (currentDay <= eventStopDay) {
           const dayDateStart = toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 00:00:00`);
