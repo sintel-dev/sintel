@@ -126,5 +126,20 @@
         }
     }
 
+    .focuschart-brush, .new-event-brush{
+        .selection {
+            stroke: none;
+        }
 
+        .handle{
+            fill: #b3bbd3;
+            display: block;
+        }
+    }
+
+    .focuschart-brush{
+        .selection{
+            fill: none;
+        }
+    }
 }
