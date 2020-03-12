@@ -558,6 +558,20 @@ class FocusChart extends Component<Props, State> {
     return { brushStart, brushEnd };
   }
 
+  // @TODO - room for improvement
+  normalizeHanlers(chart) {
+    const brushHandlers = d3.selectAll(`.${chart} rect.handle`);
+    const overlayHeight = d3.select(`.${chart} .overlay`).attr('height');
+    brushHandlers
+      .attr('y', function() {
+        return overlayHeight / 2 - overlayHeight / 8;
+      })
+      .attr('height', function() {
+        return overlayHeight / 6;
+      })
+      .attr('ry', 3);
+  }
+
   changeEventRange() {
     const { width, height } = this.state;
     const { editEventRangeDone, datarun, updateEventDetails, isEditingEventRange, periodRange } = this.props;
@@ -576,11 +590,16 @@ class FocusChart extends Component<Props, State> {
         [0, 0],
         [width - 59, height - 3.5 * CHART_MARGIN], // @TODO investigate what is 59
       ])
+      .on('brush start', () => {
+        this.normalizeHanlers('focuschart-brush');
+      })
       .on('brush', () => {
+        this.normalizeHanlers('focuschart-brush');
         const [selection_start, selection_end] = d3.event.selection;
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
+
         if (startIndex !== -1 && stopIndex !== -1) {
           updateEventDetails({
             start_time: new Date(timeSeries[startIndex][0]).getTime(),
@@ -588,6 +607,9 @@ class FocusChart extends Component<Props, State> {
           });
           this.liveUpdateEvent();
         }
+      })
+      .on('end', () => {
+        this.normalizeHanlers('focuschart-brush');
       });
 
     const brushContext = d3.select('g.chart-data');
@@ -707,12 +729,16 @@ class FocusChart extends Component<Props, State> {
     const brushInstance = d3
       .brushX()
       .extent([[0, 0], [width - 59, height - 3.5 * CHART_MARGIN]])
+      .on('brush start', () => {
+        this.normalizeHanlers('new-event-brush');
+      })
       .on('brush', () => {
         const { newEventDetails } = this.props;
         const [selection_start, selection_end] = d3.event.selection;
         const startIndex =
           timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
+        this.normalizeHanlers('new-event-brush');
         if (startIndex !== -1 && stopIndex !== -1) {
           updateNewEventDetails({
             ...newEventDetails,
@@ -720,6 +746,9 @@ class FocusChart extends Component<Props, State> {
             stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
           });
         }
+      })
+      .on('end', () => {
+        this.normalizeHanlers('new-event-brush');
       });
 
     const brushContext = d3.select('g.chart-data');
