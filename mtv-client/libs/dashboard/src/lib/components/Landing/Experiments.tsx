@@ -145,4 +145,9 @@ const mapDispatch = (dispatch: Function) => ({
   onSelectExperiment: (history, experiment: string) => dispatch(selectExperiment(history, experiment)),
 });
 
-export default withRouter(connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiments));
+export default withRouter(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapState,
+    mapDispatch,
+  )(Experiments),
+);

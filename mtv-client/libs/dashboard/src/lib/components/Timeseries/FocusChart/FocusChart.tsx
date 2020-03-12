@@ -370,14 +370,8 @@ class FocusChart extends Component<Props, State> {
     const zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
-      .translateExtent([
-        [0, 0],
-        [zoomWidth, height],
-      ])
-      .extent([
-        [0, 0],
-        [zoomWidth, height],
-      ])
+      .translateExtent([[0, 0], [zoomWidth, height]])
+      .extent([[0, 0], [zoomWidth, height]])
       .on('zoom', this.zoomHandler);
 
     chart.selectAll('.zoom').remove();
@@ -712,10 +706,7 @@ class FocusChart extends Component<Props, State> {
 
     const brushInstance = d3
       .brushX()
-      .extent([
-        [0, 0],
-        [width - 59, height - 3.5 * CHART_MARGIN],
-      ])
+      .extent([[0, 0], [width - 59, height - 3.5 * CHART_MARGIN]])
       .on('brush', () => {
         const { newEventDetails } = this.props;
         const [selection_start, selection_end] = d3.event.selection;
@@ -819,4 +810,7 @@ const mapDispatch = (dispatch: Function) => ({
   openNewDetailsPopup: () => dispatch(openNewDetailsPopupAction()),
 });
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapState,
+  mapDispatch,
+)(FocusChart);

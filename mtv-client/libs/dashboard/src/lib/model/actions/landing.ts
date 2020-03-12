@@ -17,6 +17,7 @@ import {
   SelectExperimentAction,
   FETCH_DATARUNS_BY_EXPERIMENT_ID,
   FecthDatarunsByExperimentIDAction,
+  SELECT_DATARUN,
 } from '../types';
 
 export function fetchExperiments() {
@@ -106,5 +107,9 @@ export function selectExperiment(history: any, experimentID: string) {
 
     dispatch(action);
     dispatch(fetchDatarunsByExperimentID());
+    dispatch({
+      type: SELECT_DATARUN,
+      datarunID: '',
+    });
   };
 }
