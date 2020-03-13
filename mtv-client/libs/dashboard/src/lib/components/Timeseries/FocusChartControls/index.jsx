@@ -52,6 +52,7 @@ const FocusChartControls = props => (
     </div>
     <div className="tag-wrapper">
       <Select
+        isSearchable={false}
         isMulti
         closeMenuOnSelect={false}
         classNamePrefix="tag-options"
