@@ -63,14 +63,17 @@
     }
 
     .tag-options__control {
-        min-height: 20px;
+        min-height: 33px;
         font-size: 16px;
         color: #fff;
         background-color: #26282D !important;
-        border-radius: 0;
+        border-radius: 3px;
+        border-color: rgba(151, 151, 151, 0.7);
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+        min-width: 185px;
+        cursor: pointer;
         &:hover{
-            border-color: #fff;
-            box-shadow: none;
+            border-color: rgba(151, 151, 151, 0.7);
         }
     }
     .tag-options__indicator-separator {
@@ -79,7 +82,7 @@
 
     .tag-options__control--is-focused{
         outline: none;
-        border-color: #fff;
+        border-color: rgba(151, 151, 151, 0.7);
         box-shadow: none
     }
 
@@ -90,7 +93,7 @@
     .tag-options__menu{
         background-color: #26282D;
         padding: 0 5px 0 5px;
-        border: 1px solid #fff;
+        border: 1px solid rgba(151, 151, 151, 0.7);
         border-radius: 0;
     }
 
@@ -107,7 +110,7 @@
     }
 
     .tag-options__option {
-        padding: 0 0 0 10px;
+        padding: 0 0 3px 10px;
         &, &:hover {
             background: transparent;
         }
