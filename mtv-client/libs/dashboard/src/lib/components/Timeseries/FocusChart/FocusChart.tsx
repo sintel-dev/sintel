@@ -721,10 +721,12 @@ class FocusChart extends Component<Props, State> {
 
   addNewEvent(isAddingEvent) {
     document.querySelectorAll('.new-event-brush').forEach(brush => brush.remove());
-    const { width, height } = this.state;
+    const { width, height, zoomValue } = this.state;
     const { datarun, updateNewEventDetails, openNewDetailsPopup } = this.props;
     const { timeSeries, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
+    const xCoordCopy = xCoord.copy();
+    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
 
     const brushInstance = d3
       .brushX()
