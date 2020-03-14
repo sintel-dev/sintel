@@ -66,7 +66,7 @@
         min-height: 33px;
         font-size: 16px;
         color: #fff;
-        background-color: #26282D !important;
+        background-color: #2C3034 !important;
         border-radius: 3px;
         border-color: rgba(151, 151, 151, 0.7);
         box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
@@ -76,6 +76,12 @@
             border-color: rgba(151, 151, 151, 0.7);
         }
     }
+
+    .tag-options__placeholder{
+        color: #fff !important;
+        font-size: 13px;
+    }
+
     .tag-options__indicator-separator {
         display: none;
     }
@@ -95,6 +101,7 @@
         padding: 0 5px 0 5px;
         border: 1px solid rgba(151, 151, 151, 0.7);
         border-radius: 0;
+        min-width: 185px;
     }
 
     .tag-options__option--is-selected{
@@ -145,6 +152,7 @@
         padding-left: 13px;
         background: #23242B;
         border-radius: 12px;
+        padding-right: 3px;
 
         .tag-options__multi-value__remove{
             position: absolute;

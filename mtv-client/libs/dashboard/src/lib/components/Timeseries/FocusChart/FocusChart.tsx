@@ -725,8 +725,11 @@ class FocusChart extends Component<Props, State> {
     const { datarun, updateNewEventDetails, openNewDetailsPopup } = this.props;
     const { timeSeries, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
-    const xCoordCopy = xCoord.copy();
-    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+
+    if (zoomValue !== undefined) {
+      const xCoordCopy = xCoord.copy();
+      xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+    }
 
     const brushInstance = d3
       .brushX()
