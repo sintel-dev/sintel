@@ -59,7 +59,7 @@ const FocusChartControls = props => (
         className="tag-select"
         formatOptionLabel={formatOptionLabel}
         options={filterOptions}
-        placeholder="Filter by tag"
+        placeholder="All tags"
         onChange={props.filterByTags}
       />
     </div>
