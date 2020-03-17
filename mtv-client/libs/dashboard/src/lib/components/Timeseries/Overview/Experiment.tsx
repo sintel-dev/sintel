@@ -29,6 +29,7 @@ const RenderExperimentData = ({ experimentData, processedDataruns }) => (
           ) : (
             <p>No datarun for current experiment</p>
           )}
+          <div id="brushTooltip" className="brush-tooltip" />
         </div>
         <FocusChartControls />
         <FocusChart />
