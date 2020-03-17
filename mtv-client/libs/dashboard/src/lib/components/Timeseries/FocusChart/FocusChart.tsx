@@ -102,9 +102,6 @@ class FocusChart extends Component<Props, State> {
       this.changeEventRange();
     }
 
-    if (prevProps.isEditingEventRangeDone !== this.props.isEditingEventRangeDone) {
-      // this.drawEvents();
-    }
     if (prevProps.updatedEventDetails.tag !== this.props.updatedEventDetails.tag) {
       this.updateEventTagOnSave(this.props.updatedEventDetails);
     }
@@ -133,6 +130,10 @@ class FocusChart extends Component<Props, State> {
       prevProps.reviewRange !== this.props.reviewRange
     ) {
       this.updateChartOnPeriodChange();
+    }
+
+    if (prevProps.currentEventDetails !== this.props.currentEventDetails) {
+      this.liveUpdateEvent();
     }
   }
 
