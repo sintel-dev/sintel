@@ -56,15 +56,26 @@ class Sidebar extends Component {
     d3.select('#multiPeriodChart .zoom').call(zoom);
   }
 
-  getFeatureCellCoords(index) {
+  getFeatureCellCoords(currentPeriod, index) {
     const { width } = this.state;
     const nCols = this.getColAmount();
     const diameter = width / nCols;
 
     const colIteration = index % nCols > 0 ? index % nCols : 0;
     const rowIteration = Math.floor(index / nCols);
-    const horizontalShift = diameter * colIteration + diameter / 2;
-    const verticalShift = rowIteration * diameter + diameter / 2;
+
+    let horizontalShift = diameter * colIteration + diameter / 2;
+    let verticalShift = rowIteration * diameter + diameter / 2;
+    const radius = width / nCols / 2 - graphSpacing;
+
+    if (currentPeriod.level === 'day') {
+      let dayOffset = new Date(`${currentPeriod.parent.name} 1, ${currentPeriod.parent.parent.name} 00:00:00`).getDay();
+      const hShiftAddition = (index + dayOffset) % nCols;
+      const vShiftAddition = Math.floor((index + dayOffset) / nCols);
+
+      horizontalShift = hShiftAddition * diameter + radius + 2;
+      verticalShift = vShiftAddition * diameter + radius + 2;
+    }
     return { horizontalShift, verticalShift };
   }
 
@@ -108,10 +119,11 @@ class Sidebar extends Component {
     const { setPeriodLevel, dataRun, isEditingEventRange } = this.props;
     const { period, grouppedEvents } = dataRun;
     const radius = width / this.getColAmount() / 2 - graphSpacing;
+
     return (
       width > 0 &&
       period.map((currentPeriod, periodIndex) => {
-        const { horizontalShift, verticalShift } = this.getFeatureCellCoords(periodIndex);
+        const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
 
         return (
@@ -162,6 +174,7 @@ class Sidebar extends Component {
     const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange, isEditingEventRange } = this.props;
     const { period } = dataRun;
     const { width, height } = this.state;
+
     return (
       <div className="right-sidebar">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
