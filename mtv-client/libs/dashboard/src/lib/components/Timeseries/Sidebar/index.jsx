@@ -14,13 +14,15 @@ import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
 
-const graphSpacing = 15;
 class Sidebar extends Component {
   constructor(...props) {
     super(...props);
     this.state = {
       width: 0,
       height: 0,
+      radius: 0,
+      colSpacing: 0,
+      rowSpacing: 30,
     };
   }
 
@@ -31,11 +33,50 @@ class Sidebar extends Component {
         width,
         height,
         zoomValue: null,
+        initialHeight: height,
       },
       () => {
+        this.setGlyphRadius();
         this.initZoom();
       },
     );
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.dataRun.period !== prevProps.dataRun.period) {
+      this.setGlyphRadius();
+    }
+  }
+
+  getColSpacing() {
+    const { width, height } = this.state;
+    const { nCols } = this.getColAmount();
+    const diff = (width > height ? width - height : height - width) / nCols;
+    const colSpacing = diff / nCols;
+
+    return { colSpacing };
+  }
+
+  setGlyphRadius() {
+    const { width, rowSpacing } = this.state;
+    const { colSpacing } = this.getColSpacing();
+    const { nCols } = this.getColAmount();
+    const { dataRun } = this.props;
+    const { period } = dataRun;
+    const glyphCellDiameter = width / nCols - 3; // offset for the arc
+    const radius = glyphCellDiameter / 2 - colSpacing; // / 2;
+    const nRows = Math.round(dataRun.period.length / nCols);
+    let height = nRows * (radius * 2 + rowSpacing);
+
+    if (period[0].level === 'day') {
+      height += radius * 3 + rowSpacing;
+    }
+
+    this.setState({
+      radius,
+      colSpacing,
+      height,
+    });
   }
 
   initZoom() {
@@ -57,33 +98,27 @@ class Sidebar extends Component {
   }
 
   getFeatureCellCoords(currentPeriod, index) {
-    const { width } = this.state;
-    const nCols = this.getColAmount();
-    const diameter = width / nCols;
-
+    const { width, colSpacing, rowSpacing, radius } = this.state;
+    const { nCols } = this.getColAmount();
+    const glyphCell = width / nCols;
     const colIteration = index % nCols > 0 ? index % nCols : 0;
     const rowIteration = Math.floor(index / nCols);
-
-    let horizontalShift = diameter * colIteration + diameter / 2;
-    let verticalShift = rowIteration * diameter + diameter / 2;
-    const radius = width / nCols / 2 - graphSpacing;
+    let horizontalShift = (glyphCell + colSpacing / nCols) * colIteration + radius + 3;
+    let verticalShift = (radius * 2 + rowSpacing) * rowIteration + radius + 3;
 
     if (currentPeriod.level === 'day') {
       let dayOffset = new Date(`${currentPeriod.parent.name} 1, ${currentPeriod.parent.parent.name} 00:00:00`).getDay();
       const hShiftAddition = (index + dayOffset) % nCols;
       const vShiftAddition = Math.floor((index + dayOffset) / nCols);
 
-      horizontalShift = hShiftAddition * diameter + radius + 2;
-      verticalShift = vShiftAddition * diameter + radius + 2;
+      horizontalShift = hShiftAddition * glyphCell + radius + 2;
+      verticalShift = vShiftAddition * (glyphCell + rowSpacing / 2) + radius + 2;
     }
     return { horizontalShift, verticalShift };
   }
 
   getPathData(periodRange) {
-    const { width } = this.state;
-    const nCols = this.getColAmount();
-    const radius = width / nCols / 2 - graphSpacing;
-
+    const { radius } = this.state;
     const { area } = getDataScale(radius * 0.1, radius, periodRange);
     return area(periodRange);
   }
@@ -97,7 +132,7 @@ class Sidebar extends Component {
         nCols = 4;
       }
       if (selectedPeriodLevel.month) {
-        nCols = 6;
+        nCols = 7;
       }
     } else {
       if (reviewRange === 'year') {
@@ -107,21 +142,21 @@ class Sidebar extends Component {
         nCols = 4;
       }
       if (reviewRange === 'day') {
-        nCols = 6;
+        nCols = 7;
       }
     }
 
-    return nCols;
+    return { nCols };
   }
 
   drawData() {
-    const { width, zoomValue } = this.state;
+    const { width, zoomValue, radius } = this.state;
     const { setPeriodLevel, dataRun, isEditingEventRange } = this.props;
     const { period, grouppedEvents } = dataRun;
-    const radius = width / this.getColAmount() / 2 - graphSpacing;
 
     return (
       width > 0 &&
+      radius > 0 &&
       period.map((currentPeriod, periodIndex) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
@@ -170,10 +205,40 @@ class Sidebar extends Component {
     );
   }
 
+  renderWeekDays() {
+    const { dataRun } = this.props;
+    const { period } = dataRun;
+    const { width } = this.state;
+    const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const { nCols } = this.getColAmount();
+    const cellWidth = width / nCols;
+
+    return (
+      period[0].level === 'day' && (
+        <ul className="week-days">
+          {weekDays.map(currentDay => (
+            <li style={{ width: `${cellWidth}px` }} key={currentDay}>
+              {currentDay}
+            </li>
+          ))}
+        </ul>
+      )
+    );
+  }
+
   render() {
     const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange, isEditingEventRange } = this.props;
     const { period } = dataRun;
-    const { width, height } = this.state;
+    const { width, height, initialHeight } = this.state;
+
+    const getWrapperHeight = () => {
+      let wrapperHeight = initialHeight;
+
+      if (period[0].level === 'day') {
+        wrapperHeight -= 20; // wrapper heading height (day names)
+      }
+      return wrapperHeight;
+    };
 
     return (
       <div className="right-sidebar">
@@ -188,17 +253,20 @@ class Sidebar extends Component {
             selectedPeriodLevel={selectedPeriodLevel}
           />
 
-          <div id="dataWrapper" className="data-wrapper scroll-style">
-            <svg id="multiPeriodChart" width={width} height={height}>
-              <rect className="zoom" width={width} height={height} />
-              {this.drawData(period)}
-              <defs>
-                <radialGradient id="blueGradient">
-                  <stop offset="0" stopColor="#B2C1FF" />
-                  <stop offset="100" stopColor="rgba(216,216,216,0)" />
-                </radialGradient>
-              </defs>
-            </svg>
+          <div id="dataWrapper" className="data-wrapper">
+            {this.renderWeekDays()}
+            <div className="wrapper-container scroll-style" style={{ height: `${getWrapperHeight()}px` }}>
+              <svg id="multiPeriodChart" width={width} height={height}>
+                <rect className="zoom" width={width} height={height} />
+                {this.drawData(period)}
+                <defs>
+                  <radialGradient id="blueGradient">
+                    <stop offset="0" stopColor="#B2C1FF" />
+                    <stop offset="100" stopColor="rgba(216,216,216,0)" />
+                  </radialGradient>
+                </defs>
+              </svg>
+            </div>
           </div>
         </Loader>
       </div>

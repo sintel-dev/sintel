@@ -9,7 +9,6 @@
     box-sizing: border-box;
     height: 89vh;
 
-
     .feature-cell {
         cursor: pointer;
         .target {
@@ -89,11 +88,35 @@
             line-height: 34px;
         }
     }
+
+    .data-wrapper{
+        .wrapper-container{
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .week-days{
+            padding-bottom: 5px;
+            li{
+                display: inline-block;
+                text-align: center;
+                font-size: 13px;
+                color: #8A9097;
+            }
+        }
+    }
 }
 
 @media screen and (max-width: 1200px) {
     .right-sidebar {
         margin-top: 20px;
         width: 100%;
+    }
+}
+
+@media screen and (min-width: 1201px) {
+    .right-sidebar {
+        float: right;
+        max-width: 480px;
     }
 }
