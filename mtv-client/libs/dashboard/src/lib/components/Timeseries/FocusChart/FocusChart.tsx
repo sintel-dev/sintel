@@ -426,7 +426,7 @@ class FocusChart extends Component<Props, State> {
 
     const eventRange = xCoord.range().map(zoomValue.invertX, zoomValue);
     const periodRange = {
-      eventRange,
+      eventRange: [eventRange[0] < 0 ? 0 : eventRange[0], eventRange[1]],
       zoomValue,
     };
     this.props.setPeriodRange(periodRange);
@@ -633,9 +633,13 @@ class FocusChart extends Component<Props, State> {
     // TODO - investigate more closely a more simple way to handle live range editing
     const { width, height } = this.state;
     const { currentEventDetails, datarun, periodRange } = this.props;
+
+    if (currentEventDetails === null) {
+      return;
+    }
+
     const { timeSeries, maxTimeSeries } = datarun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
-
     const startIndex = timeSeries.findIndex(element => currentEventDetails.start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => currentEventDetails.stop_time - element[0] < 0);
     const lineData = timeSeries.slice(startIndex, stopIndex);

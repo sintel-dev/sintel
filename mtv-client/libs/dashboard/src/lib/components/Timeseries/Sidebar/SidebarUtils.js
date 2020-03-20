@@ -8,8 +8,8 @@ export const getWrapperSize = () => {
   const wrapper = document.querySelector('#dataWrapper');
 
   const height = sidebarHeight - sidebarHeaderHeight;
+  const width = wrapper.clientWidth - 7; // scrollbar offset
 
-  const width = wrapper.clientWidth;
   return { width, height };
 };
 
