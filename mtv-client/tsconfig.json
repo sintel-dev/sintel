@@ -1,25 +1,25 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "alwaysStrict": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "strictNullChecks": false,
-    "experimentalDecorators": true,
-    "removeComments": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitThis": false,
-    "module": "esnext",
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
     "moduleResolution": "node",
-    "noImplicitAny": false,
-    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react"
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nx-react/session": ["libs/session/src/index.ts"],
+      "@nx-react/dashboard": ["libs/dashboard/src/index.ts"],
+      "@nx-react/common": ["libs/common/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "exclude": ["node_modules", "tmp"]
 }

@@ -6,6 +6,8 @@ from flask_restful import Resource
 
 from mtv import model
 from mtv.resources.experiment import validate_experiment_id
+from mtv.resources.auth_utils import verify_auth
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -103,6 +105,9 @@ class Datarun(Resource):
         @apiSuccess {Object[][]} raw.data The aggregated signal data.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # validate datarun_id
         validate_result = validate_datarun_id(datarun_id)
         if validate_result[1] == 400:
@@ -152,6 +157,9 @@ class Dataruns(Resource):
         @apiSuccess {Object[][]} dataruns.raw.data The aggregated signal data.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         experiment_id = request.args.get('experiment_id', None)
 
         # validate experiment_id

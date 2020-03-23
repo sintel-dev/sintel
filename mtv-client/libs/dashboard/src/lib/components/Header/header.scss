@@ -1,0 +1,64 @@
+@import '../../assets/sass/colors.scss';
+@import '../../assets/sass/main.scss';
+.main-header {
+    box-shadow: 0 0 14px #000;
+    background: $main-color;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 20;
+
+    .header-container {
+        width: 96%;
+        margin: 0 auto;
+    }
+
+    a {
+        transition: all 0.2s ease-in-out;
+        color: #fff;
+        &.logo {
+            background: $main-color;
+            text-align: left;
+            font-size: 28px;
+            line-height: 50px;
+            padding: 0;
+            height: 50px;
+            float: left;
+            width: 73px;
+            font-weight: 300;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            transition: width 0.3s ease-in-out;
+            text-decoration: none;
+        }
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+
+    .page-switch-btn {
+        float: left;
+        background-color: transparent;
+        background-image: none;
+        padding: 15px;
+        display: none;
+
+        &.active {
+            display: inline-block;
+        }
+    }
+
+    .user-opts{
+        float: right;
+        line-height: 40px;
+        a{
+            text-decoration: none;
+            &:hover{
+                text-decoration: underline;
+            }
+        }
+    }
+}

@@ -6,6 +6,8 @@ from flask_restful import Resource
 
 from mtv import model
 from mtv.resources.datarun import validate_datarun_id
+from mtv.resources.auth_utils import verify_auth
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -79,6 +81,9 @@ class Event(Resource):
         @apiSuccess {String} comments.created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # validate event_id
         validate_result = validate_event_id(event_id)
         if validate_result[1] == 400:
@@ -122,6 +127,9 @@ class Event(Resource):
         @apiSuccess {String} comments.created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # validate event_id
         validate_result = validate_event_id(event_id)
         if validate_result[1] == 400:
@@ -176,6 +184,10 @@ class Event(Resource):
         @apiParam {String} event_id Event ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
+
         # validate event_id
         validate_result = validate_event_id(event_id)
         if validate_result[1] == 400:
@@ -217,6 +229,9 @@ class Events(Resource):
         @apiSuccess {String} events.comments.created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         datarun_id = request.args.get('datarun_id', None)
         query = dict()
 
@@ -268,6 +283,9 @@ class Events(Resource):
         @apiSuccess {String} comments.created_by User ID.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # modifiable attributes
         attrs = ['start_time', 'stop_time', 'score', 'tag', 'datarun_id']
         attrs_type = [float, float, float, str, str]

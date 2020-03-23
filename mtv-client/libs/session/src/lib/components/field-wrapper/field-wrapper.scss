@@ -1,0 +1,28 @@
+.field-wrapper {
+  height: 65px;
+  margin-bottom: 15px;
+  max-width: 100%;
+  position: relative;
+  width: 350px;
+
+  &--checkbox {
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .checkbox-label {
+    color: #dbdbdb;
+    font-size: 15px;
+    line-height: 18px;
+  }
+
+  .field-url {
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    line-height: 1.66;
+    position: absolute;
+    right: 0;
+    top: 50px;
+  }
+}
