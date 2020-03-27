@@ -151,7 +151,7 @@ class Sidebar extends Component {
 
   drawData() {
     const { width, zoomValue, radius } = this.state;
-    const { setPeriodLevel, dataRun, isEditingEventRange } = this.props;
+    const { setPeriodRange, dataRun, isEditingEventRange } = this.props;
     const { period, grouppedEvents } = dataRun;
 
     return (
@@ -166,7 +166,7 @@ class Sidebar extends Component {
             <g
               className="feature-cell"
               transform={`translate(${horizontalShift}, ${verticalShift})`}
-              onClick={() => !isEditingEventRange && setPeriodLevel(currentPeriod)}
+              onClick={() => !isEditingEventRange && setPeriodRange(currentPeriod)}
             >
               <path
                 id={`path_${currentPeriod.name}`}
@@ -283,7 +283,7 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
   }),
   dispatch => ({
-    setPeriodLevel: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),
+    setPeriodRange: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),
     reviewPeriod: periodLevel => dispatch(reviewPeriodAction(periodLevel)),
   }),
 )(Sidebar);
