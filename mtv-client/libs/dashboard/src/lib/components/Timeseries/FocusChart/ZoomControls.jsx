@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
+import { faArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { getZoomMode, getIsEditingEventRange } from '../../../model/selectors/datarun';
 import { zoomOnClick, zoomToggleAction } from '../../../model/actions/datarun';
 

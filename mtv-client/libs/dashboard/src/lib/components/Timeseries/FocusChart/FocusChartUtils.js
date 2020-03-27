@@ -33,3 +33,45 @@ export const getScale = (width, height, datarun) => {
 
   return { xCoord, yCoord };
 };
+
+export const drawLine = (data, periodRange, maxTimeSeries) => {
+  const { width, height } = getWrapperSize();
+  const { zoomValue } = periodRange;
+  const { xCoord, yCoord } = getScale(width, height - 3, maxTimeSeries);
+  const xCoordCopy = xCoord.copy();
+
+  if (zoomValue !== 1) {
+    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+  }
+
+  const line = d3
+    .line()
+    .x(d => xCoord(d[0]))
+    .y(d => yCoord(d[1]));
+  return line(data);
+};
+
+export const normalizeHanlers = chart => {
+  const brushHandlers = d3.selectAll(`.${chart} rect.handle`);
+  const overlay = d3.select(`.${chart} .selection`);
+
+  if (overlay === undefined) {
+    return;
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  const overlayWidth = overlay._groups[0][0] !== null && overlay.attr('width');
+  if (overlayWidth === '0' || overlayWidth === null) {
+    return;
+  }
+
+  const { height } = getWrapperSize();
+  brushHandlers
+    .attr('y', function() {
+      return height / 2 - height / 6;
+    })
+    .attr('height', function() {
+      return height / 4;
+    })
+    .attr('ry', 3);
+};

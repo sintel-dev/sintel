@@ -64,15 +64,20 @@ export function setActiveEventAction(eventID) {
 
 export function closeEventModal() {
   return function(dispatch, getState) {
-    const dataRun = getDatarunDetails(getState());
-    const currentEventDetails = getCurrentEventDetails(getState());
-    const initialEventDetails = dataRun.events.filter(currentEvent => currentEvent.id === currentEventDetails.id)[0];
-    const { start_time, stop_time, tag } = initialEventDetails;
+    const isAddingNewEvent = getIsAddingNewEvents(getState());
 
-    dispatch({
-      type: UPDATE_EVENT_DETAILS,
-      eventDetails: { ...currentEventDetails, start_time: start_time * 1000, stop_time: stop_time * 1000, tag },
-    });
+    if (!isAddingNewEvent) {
+      const dataRun = getDatarunDetails(getState());
+      const currentEventDetails = getCurrentEventDetails(getState());
+      const initialEventDetails = dataRun.events.filter(currentEvent => currentEvent.id === currentEventDetails.id)[0];
+      const { start_time, stop_time, tag } = initialEventDetails;
+
+      dispatch({
+        type: UPDATE_EVENT_DETAILS,
+        eventDetails: { ...currentEventDetails, start_time: start_time * 1000, stop_time: stop_time * 1000, tag },
+      });
+    }
+
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
@@ -191,6 +196,13 @@ export function updateNewEventDetailsAction(eventDetails) {
 
 export function openNewDetailsPopupAction() {
   return function(dispatch) {
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
+  };
+}
+
+export function openEventDetailsPopupAction() {
+  return function(dispatch) {
+    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
   };
 }

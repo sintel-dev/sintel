@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Overview.scss';
-import FocusChart from '../FocusChart';
+import FocusChart from '../FocusChart/FocusChart';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';

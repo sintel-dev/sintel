@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import { RootState, DatarunDataType } from '../types';
 
 import { getSelectedExperimentData, getProcessedDataRuns, filteringTags } from './experiment';
+import { groupEventsByTimestamp } from '../utils/Utils';
 
 // @TODO - set state: RootState
 const getActiveEventID = state => state.datarun.activeEventID;
@@ -55,168 +56,83 @@ export const getSelectedDatarunID = createSelector(
     selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
 
-const toTimestamp = function(strDate) {
-  let datum = Date.parse(strDate);
-  return datum / 1000;
-};
-
-const groupEventsByTimestamp = events => {
-  let result = {};
-  events.forEach(event => {
-    const { start_time, stop_time } = event;
-
-    const eventStartYear = new Date(start_time * 1000).getFullYear();
-    const eventStopYear = new Date(stop_time * 1000).getFullYear();
-    let currentYear = eventStartYear;
-    while (currentYear <= eventStopYear) {
-      const yearStartDate = toTimestamp(`01/01/${currentYear} 00:00:00`);
-      const yearStopDate = toTimestamp(`12/31/${currentYear} 23:59:59`);
-
-      const eventProps = {
-        id: event.id,
-        start_time: start_time >= yearStartDate ? start_time : yearStartDate,
-        stop_time: stop_time <= yearStopDate ? stop_time : yearStopDate,
-        tag: event.tag,
-        score: event.score,
-      };
-
-      if (result[currentYear]) {
-        result[currentYear].events[event.id] = eventProps;
-      } else {
-        result[currentYear] = {
-          events: { [event.id]: eventProps },
-          months: {},
-        };
-      }
-      const eventStartMonth = new Date(result[currentYear].events[event.id].start_time * 1000).getMonth() + 1;
-      const eventStopMonth = new Date(result[currentYear].events[event.id].stop_time * 1000).getMonth() + 1;
-      let currentMonth = eventStartMonth;
-
-      while (currentMonth <= eventStopMonth) {
-        const maxDaysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-        const monthDateStart = toTimestamp(`${currentMonth}/01/${currentYear} 00:00:00`);
-        const monthDateStop = toTimestamp(`${currentMonth}/${maxDaysInMonth}/${currentYear} 23:59:59`);
-
-        let eventPerMonth = {
-          id: event.id,
-          start_time: start_time >= monthDateStart ? start_time : monthDateStart,
-          stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
-          tag: event.tag,
-          score: event.score,
-          days: {},
-        };
-
-        const eventStartDay = new Date(eventPerMonth.start_time * 1000).getDate();
-        const eventStopDay = new Date(eventPerMonth.stop_time * 1000).getDate();
-        let currentDay = eventStartDay;
-
-        if (result[currentYear].months[currentMonth]) {
-          result[currentYear].months[currentMonth].events[event.id] = eventPerMonth;
-        } else {
-          result[currentYear].months[currentMonth] = {
-            events: { [event.id]: eventPerMonth },
-            days: {},
-          };
-        }
-
-        while (currentDay <= eventStopDay) {
-          const dayDateStart = toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 00:00:00`);
-          const dayDateStop = toTimestamp(`${currentMonth}/${currentDay}/${currentYear} 23:59:59`);
-
-          let day = {
-            id: event.id,
-            start_time: start_time >= dayDateStart ? start_time : dayDateStart,
-            stop_time: stop_time <= dayDateStop ? stop_time : dayDateStop,
-            tag: event.tag,
-            score: event.score,
-          };
-
-          result[currentYear].months[currentMonth].days[currentDay] = day;
-          currentDay += 1;
-        }
-
-        currentMonth += 1;
-      }
-      currentYear += 1;
-    }
-  });
-  return result;
-};
+const getSelectedDatarun = createSelector(
+  [getProcessedDataRuns, getSelectedDatarunID],
+  (processedDataruns, selectedDatarunID) => {
+    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarunID);
+    return dataRun;
+  },
+);
 
 export const getDatarunDetails = createSelector(
-  [
-    getSelectedDatarunID,
-    getProcessedDataRuns,
-    getSelectedPeriodLevel,
-    getReviewPeriod,
-    filteringTags,
-    getUpdatedEventsDetails,
-  ],
-  (selectedDatarundID, processedDataruns, periodLevel, reviewPeriod, filterTags, updatedEventDetails) => {
-    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarundID);
-    let { period, events } = dataRun;
-    const filteredPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
+  [getSelectedDatarun, getSelectedPeriodLevel, getReviewPeriod, getUpdatedEventsDetails],
+  (dataRun, periodLevel, reviewPeriod, updatedEventDetails) => {
+    let { period, events, eventWindows, timeSeries } = dataRun;
+    const selectedPeriod = filterDatarunPeriod(period, periodLevel, reviewPeriod);
 
     let currentDataRunEvents = [...events];
     let currentEventIndex = events.findIndex(currentEvent => currentEvent.id === updatedEventDetails.id);
+
     if (currentEventIndex !== -1) {
-      let { start_time, stop_time } = updatedEventDetails;
-      start_time /= 1000;
-      stop_time /= 1000;
-
-      currentDataRunEvents[currentEventIndex] = { ...updatedEventDetails, start_time, stop_time };
+      updateDatarunEventWindow(updatedEventDetails, timeSeries, currentDataRunEvents, currentEventIndex, eventWindows);
     }
-    const filteredEvents =
-      (filterTags.length &&
-        currentDataRunEvents.filter(function(currentEvent) {
-          return this.indexOf(currentEvent.tag) !== -1;
-        }, filterTags)) ||
-      currentDataRunEvents;
 
-    const grouppedEvents = groupEventsByTimestamp(filteredEvents);
-    const newDataRun = { ...dataRun, period: filteredPeriod, grouppedEvents };
-    return newDataRun;
+    const grouppedEvents = groupEventsByTimestamp(currentDataRunEvents);
+    const completeDataRun = { ...dataRun, period: selectedPeriod, grouppedEvents };
+    return completeDataRun;
   },
 );
 
 export const getCurrentEventDetails = createSelector(
-  [getDatarunDetails, getActiveEventID, isEventCommentsLoading, getEventComments, getUpdatedEventsDetails],
-  (datarun, activeEventID, isCommentsLoading, eventComments, updatedEventDetails) => {
+  [getDatarunDetails, getActiveEventID, isEventCommentsLoading, getEventComments],
+  (datarun, activeEventID, isCommentsLoading, eventComments) => {
     if (activeEventID === null) {
       return null;
     }
-
     const { timeSeries } = datarun;
-    let start_time = 0;
-    let stop_time = 0;
-    let eventTag = '';
+    const currentEvent = datarun.eventWindows.find(windowEvent => windowEvent[3] === activeEventID);
 
-    if (updatedEventDetails.id !== activeEventID) {
-      const currentEvent = datarun.eventWindows.find(event => event[3] === activeEventID);
-      start_time = datarun.timeSeries[currentEvent[0]][0];
-      stop_time = datarun.timeSeries[currentEvent[1]][0];
-      eventTag = currentEvent[4];
-    } else {
-      start_time = updatedEventDetails.start_time;
-      stop_time = updatedEventDetails.stop_time;
-      eventTag = updatedEventDetails.tag;
-    }
-
+    const start_time = datarun.timeSeries[currentEvent[0]][0];
+    const stop_time = datarun.timeSeries[currentEvent[1]][0];
+    const eventTag = currentEvent[4];
     const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0);
-    if (startIndex !== -1 && stopIndex !== -1) {
-      const eventDetails = {
-        id: activeEventID,
-        tag: eventTag,
-        start_time: timeSeries[startIndex][0],
-        stop_time: timeSeries[stopIndex][0],
-        datarun: datarun.id,
-        signal: datarun.signal,
-        eventComments,
-        isCommentsLoading,
-      };
 
-      return eventDetails;
+    if (startIndex === -1 || stopIndex === -1) {
+      return null;
     }
+
+    const eventDetails = {
+      id: activeEventID,
+      tag: eventTag,
+      start_time: timeSeries[startIndex][0],
+      stop_time: timeSeries[stopIndex][0],
+      datarun: datarun.id,
+      signal: datarun.signal,
+      eventComments,
+      isCommentsLoading,
+    };
+    return eventDetails;
   },
 );
+
+const updateDatarunEventWindow = (
+  updatedEventDetails: any,
+  timeSeries: any,
+  currentDataRunEvents: any[],
+  currentEventIndex: any,
+  eventWindows: any,
+) => {
+  let { start_time, stop_time } = updatedEventDetails;
+  const startIndex = timeSeries.findIndex(element => updatedEventDetails.start_time - element[0] < 0) - 1;
+  const stopIndex = timeSeries.findIndex(element => updatedEventDetails.stop_time - element[0] < 0);
+  const currentEventWindow = eventWindows.findIndex(currentWindow => currentWindow[3] === updatedEventDetails.id);
+
+  start_time = timeSeries[startIndex][0] / 1000;
+  stop_time = timeSeries[stopIndex][0] / 1000;
+
+  currentDataRunEvents[currentEventIndex] = { ...updatedEventDetails, start_time, stop_time };
+  eventWindows[currentEventWindow][0] = startIndex;
+  eventWindows[currentEventWindow][1] = stopIndex;
+  eventWindows[currentEventWindow][4] = updatedEventDetails.tag;
+};

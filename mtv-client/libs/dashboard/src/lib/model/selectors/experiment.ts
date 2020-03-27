@@ -180,12 +180,17 @@ export const getProcessedDataRuns = createSelector(
         filterTags && filterTags.length ? events.filter(currentEvent => filterTags.includes(currentEvent.tag)) : events;
       const eventWindows = groupByEventWindows(filteredEvents, timeSeries.map(series => series[0]));
 
+      const filteredEventWindows = filterTags.length
+        ? eventWindows.filter(currentWindow => filterTags.includes(currentWindow[4]))
+        : eventWindows;
+
       return {
         ...datarun,
         timeSeries,
         timeseriesPred,
         timeseriesErr,
-        eventWindows,
+        eventWindows: filteredEventWindows,
+        events: filteredEvents,
         period,
         maxTimeSeries,
       };

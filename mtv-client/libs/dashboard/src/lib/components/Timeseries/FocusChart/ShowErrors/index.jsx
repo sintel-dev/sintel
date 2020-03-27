@@ -98,14 +98,8 @@ class ShowErrors extends Component {
     const zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
-      .translateExtent([
-        [0, 0],
-        [width, height],
-      ])
-      .extent([
-        [0, 0],
-        [width, height],
-      ]);
+      .translateExtent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height]]);
 
     if (isZoomReady) {
       return { zoom };
