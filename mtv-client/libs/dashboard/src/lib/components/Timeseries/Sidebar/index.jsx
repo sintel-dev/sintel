@@ -9,6 +9,7 @@ import {
   getSelectedPeriodLevel,
   getReviewPeriod,
   getIsEditingEventRange,
+  getGrouppedDatarunEvents,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
@@ -151,16 +152,14 @@ class Sidebar extends Component {
 
   drawData() {
     const { width, zoomValue, radius } = this.state;
-    const { setPeriodRange, dataRun, isEditingEventRange } = this.props;
-    const { period, grouppedEvents } = dataRun;
+    const { setPeriodRange, dataRun, isEditingEventRange, grouppedEvents } = this.props;
 
     return (
       width > 0 &&
       radius > 0 &&
-      period.map((currentPeriod, periodIndex) => {
+      dataRun.period.map((currentPeriod, periodIndex) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
-
         return (
           <g transform={zoomValue} key={currentPeriod.name}>
             <g
@@ -227,7 +226,7 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, dataRun, selectedPeriodLevel, reviewPeriod, reviewRange, isEditingEventRange } = this.props;
+    const { experimentData, dataRun } = this.props;
     const { period } = dataRun;
     const { width, height, initialHeight } = this.state;
 
@@ -243,22 +242,13 @@ class Sidebar extends Component {
     return (
       <div className="right-sidebar">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
-          <Header
-            headerTitle={dataRun.signal}
-            reviewPeriod={reviewPeriod}
-            reviewRange={reviewRange}
-            currentPeriod={selectedPeriodLevel}
-            isEditingEventRange={isEditingEventRange}
-            dataRun={dataRun}
-            selectedPeriodLevel={selectedPeriodLevel}
-          />
-
+          <Header />
           <div id="dataWrapper" className="data-wrapper">
             {this.renderWeekDays()}
             <div className="wrapper-container scroll-style" style={{ height: `${getWrapperHeight()}px` }}>
               <svg id="multiPeriodChart" width={width} height={height}>
                 <rect className="zoom" width={width} height={height} />
-                {this.drawData(period)}
+                {this.drawData()}
                 <defs>
                   <radialGradient id="blueGradient">
                     <stop offset="0" stopColor="#B2C1FF" />
@@ -281,6 +271,7 @@ export default connect(
     selectedPeriodLevel: getSelectedPeriodLevel(state),
     reviewRange: getReviewPeriod(state),
     isEditingEventRange: getIsEditingEventRange(state),
+    grouppedEvents: getGrouppedDatarunEvents(state),
   }),
   dispatch => ({
     setPeriodRange: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),

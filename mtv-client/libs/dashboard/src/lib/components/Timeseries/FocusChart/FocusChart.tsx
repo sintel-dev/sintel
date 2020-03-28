@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
 import { RootState } from '../../../model/types';
-import { getWrapperSize, getScale, drawLine } from './FocusChartUtils';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import EventDetails from './EventDetails';
 import AddEvent from './FocusChartEvents/AddEvent';
 import ShowErrors from './ShowErrors';
 import { setTimeseriesPeriod, setActiveEventAction } from '../../../model/actions/datarun';
-import { fromMonthToIndex, maxDaysInMonth, formatDate, toTimestamp } from '../../../model/utils/Utils';
+import { formatDate } from '../../../model/utils/Utils';
+import { getWrapperSize, getScale, drawLine, getSelectedRange } from './FocusChartUtils';
 import ZoomControls from './ZoomControls';
 import {
   getDatarunDetails,
@@ -43,6 +43,8 @@ type State = {
 };
 
 class FocusChart extends Component<Props, State> {
+  private zoom: d3.zoom;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -84,8 +86,6 @@ class FocusChart extends Component<Props, State> {
       this.toggleZoom();
     }
   }
-
-  private zoom: d3.zoom;
 
   renderEventTooltip() {
     const { eventData } = this.state;
@@ -250,7 +250,7 @@ class FocusChart extends Component<Props, State> {
     const { selectedPeriod, setPeriodRange, dataRun, reviewRange } = this.props;
     const { maxTimeSeries } = dataRun;
     const { xCoord } = getScale(width, height, maxTimeSeries);
-    const { dateRangeStart, dateRangeStop } = this.getSelectedRange(selectedPeriod, reviewRange, maxTimeSeries);
+    const { dateRangeStart, dateRangeStop } = getSelectedRange(selectedPeriod, reviewRange, maxTimeSeries);
 
     const startRange = xCoord(dateRangeStart * 1000);
     const stopRange = xCoord(dateRangeStop * 1000);
@@ -273,39 +273,6 @@ class FocusChart extends Component<Props, State> {
     } else {
       zoom.scaleBy(zoomInstance, 0.95);
     }
-  }
-
-  getSelectedRange(selectedPeriod, reviewRange, maxTimeSeries) {
-    let dateRangeStart = 0;
-    let dateRangeStop = 0;
-
-    if (selectedPeriod.year) {
-      const { year } = selectedPeriod;
-      dateRangeStart = toTimestamp(`01/01/${year} 00:00:00`);
-      dateRangeStop = toTimestamp(`12/31/${year} 23:59:59`);
-    }
-
-    if (selectedPeriod.month !== '') {
-      const { year, month } = selectedPeriod;
-      const monthIndex = fromMonthToIndex(month);
-      const maxMonthDays = maxDaysInMonth(year, monthIndex);
-
-      dateRangeStart = toTimestamp(`${monthIndex}/01/${year} 00:00:00`);
-      dateRangeStop = toTimestamp(`${monthIndex}/${maxMonthDays}/${year} 23:59:59`);
-    }
-
-    if (reviewRange === 'year') {
-      dateRangeStart = maxTimeSeries[0][0] / 1000;
-      dateRangeStop = maxTimeSeries[maxTimeSeries.length - 1][0] / 1000;
-    }
-
-    if (reviewRange === 'month') {
-      const { year } = selectedPeriod;
-      dateRangeStart = toTimestamp(`01/01/${year} 00:00:00`);
-      dateRangeStop = toTimestamp(`12/31/${year} 23:59:59`);
-    }
-
-    return { dateRangeStart, dateRangeStop };
   }
 
   drawChartData() {

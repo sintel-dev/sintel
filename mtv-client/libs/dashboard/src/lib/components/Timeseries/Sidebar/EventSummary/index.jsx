@@ -76,8 +76,7 @@ class EventSummary extends Component {
   }
 
   render() {
-    const { dataRun, selectedPeriodLevel } = this.props;
-    const { grouppedEvents } = dataRun;
+    const { selectedPeriodLevel, grouppedEvents } = this.props;
     const isPeriodLevelSelected = Object.keys(selectedPeriodLevel).length !== 0;
     const activeSummary = this.state.isSummaryVisible ? 'active' : '';
     const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
