@@ -52,4 +52,7 @@ const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
   onChangePeriod: (period: { eventRange: any; zoomValue: any }) => dispatch(setTimeseriesPeriod(period)),
 });
 
-export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapState, mapDispatch)(Datarun);
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapState,
+  mapDispatch,
+)(Datarun);

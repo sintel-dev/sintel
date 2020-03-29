@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as d3 from 'd3';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
@@ -33,12 +32,10 @@ class Sidebar extends Component {
       {
         width,
         height,
-        zoomValue: null,
         initialHeight: height,
       },
       () => {
         this.setGlyphRadius();
-        this.initZoom();
       },
     );
   }
@@ -49,21 +46,23 @@ class Sidebar extends Component {
     }
   }
 
-  getColSpacing() {
-    const { width, height } = this.state;
-    const { nCols } = this.getColAmount();
-    const diff = (width > height ? width - height : height - width) / nCols;
-    const colSpacing = diff / nCols;
+  getColSpacing(period) {
+    const periodLevel = period[0];
+    let colSpacing = 3;
+
+    if (periodLevel === 'day') {
+      colSpacing = 2;
+    }
 
     return { colSpacing };
   }
 
   setGlyphRadius() {
     const { width, rowSpacing } = this.state;
-    const { colSpacing } = this.getColSpacing();
     const { nCols } = this.getColAmount();
     const { dataRun } = this.props;
     const { period } = dataRun;
+    const { colSpacing } = this.getColSpacing(period);
     const glyphCellDiameter = width / nCols - 3; // offset for the arc
     const radius = glyphCellDiameter / 2 - colSpacing; // / 2;
     const nRows = Math.round(dataRun.period.length / nCols);
@@ -78,24 +77,6 @@ class Sidebar extends Component {
       colSpacing,
       height,
     });
-  }
-
-  initZoom() {
-    const { width, height } = this.state;
-    let zoom = null;
-
-    zoom = d3
-      .zoom()
-      .scaleExtent([1, Infinity])
-      .translateExtent([[0, 0], [width, height]])
-      .extent([[0, 0], [width, height]])
-      .on('zoom', () =>
-        this.setState({
-          zoomValue: d3.event.transform,
-        }),
-      );
-
-    d3.select('#multiPeriodChart .zoom').call(zoom);
   }
 
   getFeatureCellCoords(currentPeriod, index) {
@@ -151,7 +132,7 @@ class Sidebar extends Component {
   }
 
   drawData() {
-    const { width, zoomValue, radius } = this.state;
+    const { width, radius } = this.state;
     const { setPeriodRange, dataRun, isEditingEventRange, grouppedEvents } = this.props;
 
     return (
@@ -161,7 +142,7 @@ class Sidebar extends Component {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
         return (
-          <g transform={zoomValue} key={currentPeriod.name}>
+          <g key={currentPeriod.name}>
             <g
               className="feature-cell"
               transform={`translate(${horizontalShift}, ${verticalShift})`}
@@ -225,19 +206,20 @@ class Sidebar extends Component {
     );
   }
 
+  getWrapperHeight = () => {
+    const { dataRun } = this.props;
+    const { initialHeight } = this.state;
+    let wrapperHeight = initialHeight;
+
+    if (dataRun.period[0].level === 'day') {
+      wrapperHeight -= 20; // wrapper heading height (day names)
+    }
+    return wrapperHeight;
+  };
+
   render() {
-    const { experimentData, dataRun } = this.props;
-    const { period } = dataRun;
-    const { width, height, initialHeight } = this.state;
-
-    const getWrapperHeight = () => {
-      let wrapperHeight = initialHeight;
-
-      if (period[0].level === 'day') {
-        wrapperHeight -= 20; // wrapper heading height (day names)
-      }
-      return wrapperHeight;
-    };
+    const { experimentData } = this.props;
+    const { width, height } = this.state;
 
     return (
       <div className="right-sidebar">
@@ -245,9 +227,8 @@ class Sidebar extends Component {
           <Header />
           <div id="dataWrapper" className="data-wrapper">
             {this.renderWeekDays()}
-            <div className="wrapper-container scroll-style" style={{ height: `${getWrapperHeight()}px` }}>
+            <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}>
               <svg id="multiPeriodChart" width={width} height={height}>
-                <rect className="zoom" width={width} height={height} />
                 {this.drawData()}
                 <defs>
                   <radialGradient id="blueGradient">
