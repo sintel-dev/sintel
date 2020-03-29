@@ -63,24 +63,25 @@ export function setActiveEventAction(eventID) {
 }
 
 export function closeEventModal() {
-  return function(dispatch, getState) {
-    const isAddingNewEvent = getIsAddingNewEvents(getState());
-
-    if (!isAddingNewEvent) {
-      const dataRun = getDatarunDetails(getState());
-      const currentEventDetails = getCurrentEventDetails(getState());
-      const initialEventDetails = dataRun.events.filter(currentEvent => currentEvent.id === currentEventDetails.id)[0];
-      const { start_time, stop_time, tag } = initialEventDetails;
+  return async function(dispatch, getState) {
+    const dataRun = getDatarunDetails(getState());
+    const currentEventDetails = getCurrentEventDetails(getState());
+    await API.events.all('events').then(response => {
+      const { events } = response;
+      const filteredEvents = events.filter(currentEvent => currentEvent.datarun === dataRun.id);
+      const eventData = filteredEvents.find(currentEvent => currentEvent.id === currentEventDetails.id);
+      let { start_time, stop_time } = eventData;
 
       dispatch({
         type: UPDATE_EVENT_DETAILS,
-        eventDetails: { ...currentEventDetails, start_time: start_time * 1000, stop_time: stop_time * 1000, tag },
+        eventDetails: { ...eventData, start_time: start_time * 1000, stop_time: stop_time * 1000 },
       });
-    }
-
-    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
-    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
-    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
+      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
+    });
   };
 }
 
