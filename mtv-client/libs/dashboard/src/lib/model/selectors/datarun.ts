@@ -54,7 +54,7 @@ const updateEventDetails = (updatedEventDetails, timeSeries, eventIndex, eventWi
   let { start_time, stop_time, tag } = updatedEventDetails;
 
   const startIndex = timeSeries.findIndex(element => start_time - element[0] < 0) - 1;
-  const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0) - 2;
+  const stopIndex = timeSeries.findIndex(element => stop_time - element[0] < 0) - 1;
 
   eventWindows[eventIndex][0] = startIndex;
   eventWindows[eventIndex][1] = stopIndex;
