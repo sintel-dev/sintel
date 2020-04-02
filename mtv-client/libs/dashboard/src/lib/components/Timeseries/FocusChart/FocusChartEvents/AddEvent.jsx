@@ -15,9 +15,9 @@ import {
 } from '../../../../model/selectors/datarun';
 
 import { FocusChartConstants } from '../Constants';
-import { getScale, getWrapperSize, normalizeHanlers } from '../FocusChartUtils';
+import { getWrapperSize, normalizeHanlers } from '../FocusChartUtils';
 
-const { CHART_MARGIN } = FocusChartConstants;
+const { CHART_MARGIN, TRANSLATE_LEFT, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
 class AddEvents extends Component {
   componentDidMount() {
@@ -38,11 +38,50 @@ class AddEvents extends Component {
     }
   }
 
-  getBrushCoords() {
-    const { width, height } = this.state;
-    const { currentEventDetails, isEditingEventRange, dataRun, periodRange } = this.props;
+  getScale(width = this.state.width, height = this.state.height) {
+    const { dataRun } = this.props;
+    const { maxTimeSeries } = dataRun;
+    const [minTX, maxTX] = d3.extent(maxTimeSeries, time => time[0]);
+    const [minTY, maxTY] = d3.extent(maxTimeSeries, time => time[1]);
+    const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
+    const drawableHeight = height - 3.5 * CHART_MARGIN;
+
+    const xCoord = d3.scaleTime().range([0, drawableWidth]);
+    const yCoord = d3.scaleLinear().range([drawableHeight, 0]);
+
+    const minX = Math.min(MIN_VALUE, minTX);
+    const maxX = Math.max(MAX_VALUE, maxTX);
+
+    const minY = Math.min(MIN_VALUE, minTY);
+    const maxY = Math.max(MAX_VALUE, maxTY);
+
+    xCoord.domain([minX, maxX]);
+    yCoord.domain([minY, maxY]);
+
+    return { xCoord, yCoord };
+  }
+
+  drawLine(data) {
+    const { periodRange } = this.props;
     const { zoomValue } = periodRange;
-    const { xCoord } = getScale(width, height, dataRun.maxTimeSeries);
+    const { xCoord, yCoord } = this.getScale();
+    const xCoordCopy = xCoord.copy();
+
+    if (zoomValue !== 1) {
+      xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+    }
+
+    const line = d3
+      .line()
+      .x(d => xCoord(d[0]))
+      .y(d => yCoord(d[1]));
+    return line(data);
+  }
+
+  getBrushCoords() {
+    const { currentEventDetails, isEditingEventRange, periodRange } = this.props;
+    const { zoomValue } = periodRange;
+    const { xCoord } = this.getScale();
 
     let brushStart = 0;
     let brushEnd = 50;
@@ -71,8 +110,8 @@ class AddEvents extends Component {
       isAddingNewEvent,
     } = this.props;
     const { zoomValue } = periodRange;
-    const { timeSeries, maxTimeSeries } = dataRun;
-    const { xCoord } = getScale(width, height, maxTimeSeries);
+    const { timeSeries } = dataRun;
+    const { xCoord } = this.getScale();
 
     const { brushStart, brushEnd } = this.getBrushCoords();
 

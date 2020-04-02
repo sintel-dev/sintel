@@ -6,6 +6,8 @@ import {
   getSelectedPeriodLevel,
   getNewEventDetails,
   getIsAddingNewEvents,
+  getSelectedPeriodRange,
+  isDatarunIDSelected,
 } from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
@@ -32,7 +34,11 @@ import {
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
-  return function(dispatch) {
+  return function(dispatch, getState) {
+    const currentDatarunID = isDatarunIDSelected(getState());
+    if (currentDatarunID === datarunID) {
+      return;
+    }
     const action: SelectDatarunAction = {
       type: SELECT_DATARUN,
       datarunID,
@@ -45,7 +51,12 @@ export function selectDatarun(datarunID: string) {
 }
 
 export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: any }) {
-  return function(dispatch) {
+  return function(dispatch, getState) {
+    const currentRange = getSelectedPeriodRange(getState());
+    if (JSON.stringify(eventRange.eventRange) === JSON.stringify(currentRange.eventRange)) {
+      return;
+    }
+
     const action: SetTimeseriesPeriodAction = {
       type: SET_TIMESERIES_PERIOD,
       eventRange,

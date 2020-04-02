@@ -35,6 +35,7 @@ export const getScale = (width, height, datarun) => {
   return { xCoord, yCoord };
 };
 
+// Still being used in showErrors/index
 export const drawLine = (data, periodRange, maxTimeSeries) => {
   const { width, height } = getWrapperSize();
   const { zoomValue } = periodRange;

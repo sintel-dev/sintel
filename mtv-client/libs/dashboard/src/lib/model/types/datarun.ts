@@ -26,8 +26,8 @@ export type SelectDatarunAction = {
 export type SetTimeseriesPeriodAction = {
   type: typeof SET_TIMESERIES_PERIOD;
   eventRange: {
-    eventRange: any;
-    zoomValue: any;
+    eventRange: Array<number>;
+    zoomValue: object;
   };
 };
 
@@ -36,10 +36,9 @@ export type SetTimeseriesPeriodAction = {
  */
 export type DatarunState = {
   selectedDatarunID: string;
-  // selectedPeriodRange: [number, number];
   selectedPeriodRange: {
-    eventRange: any;
-    zoomValue: any;
+    eventRange: Array<number>;
+    zoomValue: object;
   };
   activeEventID: string | null;
   isEventCommentsLoading: boolean;
@@ -82,6 +81,8 @@ export type DatarunDataType = {
     data: { means: number[]; counts: number[] }[][];
   }[];
   eventWindows?: any;
+  timeSeries?: Array<number>;
+  maxTimeSeries?: Array<number>;
 };
 
 /**
