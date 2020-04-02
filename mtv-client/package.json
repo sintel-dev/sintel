@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "nx": "nx",
     "start": "nx serve",
     "build": "nx build",
@@ -93,9 +92,7 @@
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~3.7.4",
-    "@types/react-redux": "^7.1.5"
-  },
-  "resolutions": {
-    "@babel/preset-env": "^7.8.7"
+    "@types/react-redux": "^7.1.5",
+    "@babel/compat-data": "~7.8.0"
   }
 }
