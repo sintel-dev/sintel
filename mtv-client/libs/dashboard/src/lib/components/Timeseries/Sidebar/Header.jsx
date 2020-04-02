@@ -1,5 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import EventSummary from './EventSummary';
+import {
+  getDatarunDetails,
+  getReviewPeriod,
+  getSelectedPeriodLevel,
+  getIsEditingEventRange,
+  getGrouppedDatarunEvents,
+} from '../../../model/selectors/datarun';
+import { reviewPeriodAction } from '../../../model/actions/datarun';
 
 const showPeriod = selectedPeriodLevel => {
   let periodString = 'YY/MM';
@@ -17,25 +26,17 @@ const showPeriod = selectedPeriodLevel => {
   );
 };
 
-const Header = ({
-  headerTitle,
-  reviewPeriod,
-  reviewRange,
-  currentPeriod,
-  isEditingEventRange,
-  dataRun,
-  selectedPeriodLevel,
-}) => (
+const Header = ({ dataRun, setReviewRange, reviewRange, selectedPeriodLevel, isEditingEventRange, grouppedEvents }) => (
   <div className="period-control">
-    <div className="sidebar-heading">{headerTitle}</div>
-    <EventSummary dataRun={dataRun} selectedPeriodLevel={selectedPeriodLevel} />
+    <div className="sidebar-heading">{dataRun.signal}</div>
+    <EventSummary selectedPeriodLevel={selectedPeriodLevel} grouppedEvents={grouppedEvents} />
     <div>
       {showPeriod(selectedPeriodLevel)}
       <ul className="period-filter">
         <li>
           <button
             type="button"
-            onClick={() => !isEditingEventRange && reviewPeriod('year')}
+            onClick={() => !isEditingEventRange && setReviewRange('year')}
             className={reviewRange === 'year' || reviewRange === null ? 'active' : ''}
           >
             Year
@@ -44,7 +45,7 @@ const Header = ({
         <li>
           <button
             type="button"
-            onClick={() => !isEditingEventRange && reviewPeriod('month')}
+            onClick={() => !isEditingEventRange && setReviewRange('month')}
             className={reviewRange === 'month' ? 'active' : ''}
             disabled={reviewRange === null}
           >
@@ -54,9 +55,9 @@ const Header = ({
         <li>
           <button
             type="button"
-            onClick={() => !isEditingEventRange && reviewPeriod('day')}
+            onClick={() => !isEditingEventRange && setReviewRange('day')}
             className={reviewRange === 'day' ? 'active' : ''}
-            disabled={reviewRange === null || currentPeriod.month === ''}
+            disabled={reviewRange === null || selectedPeriodLevel.month === ''}
           >
             Day
           </button>
@@ -67,4 +68,15 @@ const Header = ({
   </div>
 );
 
-export default Header;
+export default connect(
+  state => ({
+    dataRun: getDatarunDetails(state),
+    reviewRange: getReviewPeriod(state),
+    selectedPeriodLevel: getSelectedPeriodLevel(state),
+    isEditingEventRange: getIsEditingEventRange(state),
+    grouppedEvents: getGrouppedDatarunEvents(state),
+  }),
+  dispatch => ({
+    setReviewRange: periodLevel => dispatch(reviewPeriodAction(periodLevel)),
+  }),
+)(Header);

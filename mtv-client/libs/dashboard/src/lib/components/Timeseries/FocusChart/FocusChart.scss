@@ -4,6 +4,7 @@
     border-radius: 10px;
     overflow: hidden;
     position: relative;
+    margin-bottom: 30px;
 
     .chart-data path,
     .line-highlight,
@@ -97,6 +98,11 @@
                 display: inline-block;
                 font-size: 25px;
             }
+
+            &:disabled{
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
         }
     }
 
@@ -126,7 +132,7 @@
         }
     }
 
-    .focuschart-brush, .new-event-brush{
+    .brush-instance{
         .selection {
             stroke: none;
         }

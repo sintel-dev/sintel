@@ -50,15 +50,6 @@ const EventDetails = ({
     }
   };
 
-  // @TODO - later implementation of saving new event comments
-  const updateEventComments = comments => {
-    if (isAddingNewEvent) {
-      updateNewEventDetails({ comments });
-    } else {
-      updateEventDetails({ comments });
-    }
-  };
-
   return (
     <div className={`events-wrapper ${isActive}`}>
       {currentEventDetails && (
@@ -110,7 +101,7 @@ const EventDetails = ({
                 id="comment"
                 placeholder="Enter your comment..."
                 value={updatedEventDetails.comments}
-                onChange={event => updateEventComments(event.target.value)}
+                onChange={event => updateEventDetails({ comments: event.target.value })}
                 readOnly={isAddingNewEvent}
               />
             </div>

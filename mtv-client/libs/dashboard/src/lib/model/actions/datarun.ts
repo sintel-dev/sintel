@@ -6,6 +6,8 @@ import {
   getSelectedPeriodLevel,
   getNewEventDetails,
   getIsAddingNewEvents,
+  getSelectedPeriodRange,
+  isDatarunIDSelected,
 } from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
@@ -32,7 +34,11 @@ import {
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
-  return function(dispatch) {
+  return function(dispatch, getState) {
+    const currentDatarunID = isDatarunIDSelected(getState());
+    if (currentDatarunID === datarunID) {
+      return;
+    }
     const action: SelectDatarunAction = {
       type: SELECT_DATARUN,
       datarunID,
@@ -45,7 +51,12 @@ export function selectDatarun(datarunID: string) {
 }
 
 export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: any }) {
-  return function(dispatch) {
+  return function(dispatch, getState) {
+    const currentRange = getSelectedPeriodRange(getState());
+    if (JSON.stringify(eventRange.eventRange) === JSON.stringify(currentRange.eventRange)) {
+      return;
+    }
+
     const action: SetTimeseriesPeriodAction = {
       type: SET_TIMESERIES_PERIOD,
       eventRange,
@@ -63,19 +74,25 @@ export function setActiveEventAction(eventID) {
 }
 
 export function closeEventModal() {
-  return function(dispatch, getState) {
+  return async function(dispatch, getState) {
     const dataRun = getDatarunDetails(getState());
     const currentEventDetails = getCurrentEventDetails(getState());
-    const initialEventDetails = dataRun.events.filter(currentEvent => currentEvent.id === currentEventDetails.id)[0];
-    const { start_time, stop_time, tag } = initialEventDetails;
+    await API.events.all('events').then(response => {
+      const { events } = response;
+      const filteredEvents = events.filter(currentEvent => currentEvent.datarun === dataRun.id);
+      const eventData = filteredEvents.find(currentEvent => currentEvent.id === currentEventDetails.id);
+      let { start_time, stop_time } = eventData;
 
-    dispatch({
-      type: UPDATE_EVENT_DETAILS,
-      eventDetails: { ...currentEventDetails, start_time: start_time * 1000, stop_time: stop_time * 1000, tag },
+      dispatch({
+        type: UPDATE_EVENT_DETAILS,
+        eventDetails: { ...eventData, start_time: start_time * 1000, stop_time: stop_time * 1000 },
+      });
+      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
+      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+      dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
     });
-    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
-    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
-    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
   };
 }
 
@@ -191,6 +208,13 @@ export function updateNewEventDetailsAction(eventDetails) {
 
 export function openNewDetailsPopupAction() {
   return function(dispatch) {
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
+  };
+}
+
+export function openEventDetailsPopupAction() {
+  return function(dispatch) {
+    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
   };
 }

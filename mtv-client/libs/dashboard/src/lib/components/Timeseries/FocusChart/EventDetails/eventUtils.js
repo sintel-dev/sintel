@@ -44,8 +44,8 @@ export const RenderComments = eventComments =>
   );
 
 export const selectedOption = selectedLabel =>
-  selectedLabel === null
-    ? ''
+  selectedLabel === null || selectedLabel === 'Untagged'
+    ? 'Select a tag'
     : grouppedOptions
         .reduce((known, unknown) => [...known.options, ...unknown.options])
         .find(({ label }) => label === selectedLabel);

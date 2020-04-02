@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './Overview.scss';
-import FocusChart from '../FocusChart';
-
+import FocusChart from '../FocusChart/FocusChart';
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Datarun from './Datarun';
@@ -11,6 +9,7 @@ import { RootState } from '../../../model/types';
 import Sidebar from '../Sidebar';
 import { selectExperiment } from '../../../model/actions/landing';
 import { getSelectedExperiment } from '../../../model/selectors/projects';
+import './Overview.scss';
 
 type ownProps = {
   location: any;
@@ -18,27 +17,6 @@ type ownProps = {
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps & ownProps;
-
-const RenderExperimentData = ({ experimentData, processedDataruns }) => (
-  <div className="experiment">
-    <Loader isLoading={experimentData.isExperimentDataLoading}>
-      <div className="left-sidebar">
-        <div className="overview-wrapper scroll-style" id="overview-wrapper">
-          {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
-            processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
-          ) : (
-            <p>No datarun for current experiment</p>
-          )}
-          <div id="brushTooltip" className="brush-tooltip" />
-        </div>
-        <FocusChartControls />
-        <FocusChart />
-      </div>
-      <Sidebar />
-    </Loader>
-    <div className="clear" />
-  </div>
-);
 
 class Experiment extends Component<Props> {
   componentDidMount() {
@@ -52,7 +30,26 @@ class Experiment extends Component<Props> {
 
   render() {
     const { experimentData, processedDataruns } = this.props;
-    return <RenderExperimentData experimentData={experimentData} processedDataruns={processedDataruns} />;
+    return (
+      <div className="experiment">
+        <Loader isLoading={experimentData.isExperimentDataLoading}>
+          <div className="left-sidebar">
+            <div className="overview-wrapper scroll-style" id="overview-wrapper">
+              {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
+                processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
+              ) : (
+                <p>No datarun for current experiment</p>
+              )}
+              <div id="brushTooltip" className="brush-tooltip" />
+            </div>
+            <FocusChartControls />
+            <FocusChart />
+          </div>
+          <Sidebar />
+        </Loader>
+        <div className="clear" />
+      </div>
+    );
   }
 }
 
