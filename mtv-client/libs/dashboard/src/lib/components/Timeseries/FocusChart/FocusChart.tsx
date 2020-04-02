@@ -8,7 +8,7 @@ import AddEvent from './FocusChartEvents/AddEvent';
 import ShowErrors from './ShowErrors';
 import { setTimeseriesPeriod, setActiveEventAction } from '../../../model/actions/datarun';
 import { formatDate } from '../../../model/utils/Utils';
-import { getWrapperSize, getScale, drawLine, getSelectedRange } from './FocusChartUtils';
+import { getWrapperSize, getSelectedRange } from './FocusChartUtils';
 import ZoomControls from './ZoomControls';
 import {
   getDatarunDetails,
@@ -23,7 +23,7 @@ import {
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
-const { TRANSLATE_LEFT, CHART_MARGIN } = FocusChartConstants;
+const { TRANSLATE_LEFT, CHART_MARGIN, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -87,6 +87,47 @@ class FocusChart extends Component<Props, State> {
     }
   }
 
+  getScale() {
+    const { width, height } = this.state;
+    const { dataRun } = this.props;
+    const { maxTimeSeries } = dataRun;
+    const [minTX, maxTX] = d3.extent(maxTimeSeries, time => time[0]);
+    const [minTY, maxTY] = d3.extent(maxTimeSeries, time => time[1]);
+    const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
+    const drawableHeight = height - 3.5 * CHART_MARGIN;
+
+    const xCoord = d3.scaleTime().range([0, drawableWidth]);
+    const yCoord = d3.scaleLinear().range([drawableHeight, 0]);
+
+    const minX = Math.min(MIN_VALUE, minTX);
+    const maxX = Math.max(MAX_VALUE, maxTX);
+
+    const minY = Math.min(MIN_VALUE, minTY);
+    const maxY = Math.max(MAX_VALUE, maxTY);
+
+    xCoord.domain([minX, maxX]);
+    yCoord.domain([minY, maxY]);
+
+    return { xCoord, yCoord };
+  }
+
+  drawLine(data) {
+    const { periodRange } = this.props;
+    const { zoomValue } = periodRange;
+    const { xCoord, yCoord } = this.getScale();
+    const xCoordCopy = xCoord.copy();
+
+    if (zoomValue !== 1) {
+      xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+    }
+
+    const line = d3
+      .line()
+      .x(d => xCoord(d[0]))
+      .y(d => yCoord(d[1]));
+    return line(data);
+  }
+
   renderEventTooltip() {
     const { eventData } = this.state;
     const startDate = formatDate(eventData.startDate);
@@ -120,10 +161,10 @@ class FocusChart extends Component<Props, State> {
 
   renderEvents(currentEvent) {
     const { dataRun, periodRange, setActiveEvent } = this.props;
-    const { timeSeries, maxTimeSeries } = dataRun;
-    const { width, height } = this.state;
+    const { timeSeries } = dataRun;
+    const { height } = this.state;
 
-    const { xCoord } = getScale(width, height, maxTimeSeries);
+    const { xCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
     const commentHeight = height - 3.5 * CHART_MARGIN;
 
@@ -163,7 +204,7 @@ class FocusChart extends Component<Props, State> {
         }}
         onMouseLeave={() => this.setState({ isTooltipVisible: false })}
       >
-        <path className="evt-highlight" d={drawLine(event, periodRange, maxTimeSeries)} />
+        <path className="evt-highlight" d={this.drawLine(event)} />
         <g className="event-comment">
           <rect className="evt-area" width={commentWidth} height={commentHeight} y={0} x={translateComment} />
           <rect className="evt-comment" height="10" width={commentWidth} y="0" x={translateComment} fill={tagColor} />
@@ -173,10 +214,8 @@ class FocusChart extends Component<Props, State> {
   }
 
   renderChartAxis() {
-    const { periodRange, dataRun } = this.props;
-    const { maxTimeSeries } = dataRun;
-    const { width, height } = this.state;
-    const { xCoord, yCoord } = getScale(width, height, maxTimeSeries);
+    const { periodRange } = this.props;
+    const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
 
     // if there's a zoom level
@@ -217,8 +256,7 @@ class FocusChart extends Component<Props, State> {
       return;
     }
 
-    const { width, height } = this.state;
-    const { xCoord } = getScale(width, height, this.props.dataRun.maxTimeSeries);
+    const { xCoord } = this.getScale();
     let zoomValue = d3.event.transform;
 
     if (zoomValue === 1) {
@@ -245,11 +283,11 @@ class FocusChart extends Component<Props, State> {
   }
 
   updateChartZoomOnSelectPeriod() {
-    const { width, height } = this.state;
+    const { width } = this.state;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
     const { selectedPeriod, setPeriodRange, dataRun, reviewRange } = this.props;
     const { maxTimeSeries } = dataRun;
-    const { xCoord } = getScale(width, height, maxTimeSeries);
+    const { xCoord } = this.getScale();
     const { dateRangeStart, dateRangeStop } = getSelectedRange(selectedPeriod, reviewRange, maxTimeSeries);
 
     const startRange = xCoord(dateRangeStart * 1000);
@@ -277,8 +315,8 @@ class FocusChart extends Component<Props, State> {
 
   drawChartData() {
     const { width, height } = this.state;
-    const { dataRun, isPredictionVisible, periodRange } = this.props;
-    const { maxTimeSeries, eventWindows, timeSeries, timeseriesPred } = dataRun;
+    const { dataRun, isPredictionVisible } = this.props;
+    const { eventWindows, timeSeries, timeseriesPred } = dataRun;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
 
     return (
@@ -292,10 +330,8 @@ class FocusChart extends Component<Props, State> {
           </defs>
           <g className="chart-data" clipPath="url(#focusClip)">
             <g className="wawe-data">
-              <path className="chart-wawes" d={drawLine(timeSeries, periodRange, maxTimeSeries)} />
-              {isPredictionVisible && (
-                <path className="predictions" d={drawLine(timeseriesPred, periodRange, maxTimeSeries)} />
-              )}
+              <path className="chart-wawes" d={this.drawLine(timeSeries)} />
+              {isPredictionVisible && <path className="predictions" d={this.drawLine(timeseriesPred)} />}
             </g>
             <rect className="zoom" width={focusChartWidth} height={height} />
             {eventWindows.map(currentEvent => this.renderEvents(currentEvent))}
