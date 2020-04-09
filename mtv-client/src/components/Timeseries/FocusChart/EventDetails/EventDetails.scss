@@ -26,6 +26,7 @@
 
     .row{
         margin-bottom: 10px;
+        position: relative;
         li {
             display: inline-block;
             margin: 0 16px 0 0
@@ -34,6 +35,47 @@
         &.select-holder{
             .tag-select {
                 width: 175px;
+            }
+        }
+
+        i{
+            &.score-info{
+                background-color: #fff;
+                font-size: 8px;
+                color: #000;
+                border-radius: 52%;
+                display: inline-block;
+                margin-left: 6px;
+                width: 12px;
+                height: 12px;
+                text-align: center;
+                vertical-align: top;
+                line-height: 13px;
+                font-style: normal;
+                cursor: pointer;
+            }
+        }
+
+        .tooltip-info{
+            font-size: 12px;
+            background: rgba(103, 106, 130, 1);
+            padding: 8px 14px;
+            border-radius: 4px;
+            border-bottom-left-radius: 0;
+            position: absolute;
+            z-index: 999;
+            color: #fff;
+            text-transform: capitalize;
+            top: -75px;
+            right: -3px;
+            white-space: nowrap;
+            width: 195px;
+            li{
+                display: block;
+            }
+            p{
+                font-size: 12px;
+                margin: 0 0 5px 0;
             }
         }
     }
@@ -133,6 +175,23 @@
                     outline: none;
                 }
             }
+        }
+    }
+
+    input[type="text"] {
+        background: #2C3034;
+        border: 1px solid #979797;
+        width: 54px;
+        height: 33px;
+        border-radius: 2px;
+        margin-left: 3px;
+        color: #fff;
+        font-size: 14px;
+        box-sizing: border-box;
+        padding: 3px;
+        text-align: center;
+        &:focus{
+            outline: none
         }
     }
 }

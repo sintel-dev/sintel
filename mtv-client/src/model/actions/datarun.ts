@@ -116,7 +116,6 @@ export function updateEventDetailsAction(updatedEventDetails) {
   return function (dispatch, getState) {
     const isAddingNewEvent = getIsAddingNewEvents(getState());
     let currentEventDetails = getCurrentEventDetails(getState());
-
     if (isAddingNewEvent) {
       currentEventDetails = getNewEventDetails(getState());
     }
@@ -135,7 +134,7 @@ export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { comments } = updatedEventDetails;
-    const { start_time, stop_time, tag } = updatedEventDetails;
+    const { start_time, stop_time, score, tag } = updatedEventDetails;
 
     const start = start_time / 1000;
     const stop = stop_time / 1000;
@@ -143,7 +142,7 @@ export function saveEventDetailsAction() {
     const payload = {
       start_time: start,
       stop_time: stop,
-      score: 0,
+      score,
       tag,
       event_id: updatedEventDetails.id,
     };

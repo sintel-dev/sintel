@@ -37,7 +37,7 @@ class Experiment extends Component<Props> {
             <div className="overview-wrapper scroll-style" id="overview-wrapper">
               {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
                 // @ts-ignore
-                processedDataruns.map(datarun => <Datarun datarun={datarun} key={datarun.id} />)
+                processedDataruns.map((datarun) => <Datarun datarun={datarun} key={datarun.id} />)
               ) : (
                 <p>No datarun for current experiment</p>
               )}
@@ -64,7 +64,4 @@ const mapDispatch = (dispatch: Function) => ({
   onSelectExperiment: (history, experiment: string) => dispatch(selectExperiment(history, experiment)),
 });
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapState,
-  mapDispatch,
-)(Experiment);
+export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Experiment);
