@@ -96,9 +96,9 @@ class Reset(Resource):
         @apiParam {String} email email address.
         """
 
-        res, status = auth_utils.verify_auth()
-        if status == 401:
-            return res, status
+        # res, status = auth_utils.verify_auth()
+        # if status == 401:
+        #     return res, status
 
         body = request.json
         try:
