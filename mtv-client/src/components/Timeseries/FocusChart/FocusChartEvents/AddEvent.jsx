@@ -42,8 +42,8 @@ class AddEvents extends Component {
   getScale(width = this.state.width, height = this.state.height) {
     const { dataRun } = this.props;
     const { maxTimeSeries } = dataRun;
-    const [minTX, maxTX] = d3.extent(maxTimeSeries, time => time[0]);
-    const [minTY, maxTY] = d3.extent(maxTimeSeries, time => time[1]);
+    const [minTX, maxTX] = d3.extent(maxTimeSeries, (time) => time[0]);
+    const [minTY, maxTY] = d3.extent(maxTimeSeries, (time) => time[1]);
     const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
     const drawableHeight = height - 3.5 * CHART_MARGIN;
 
@@ -74,8 +74,8 @@ class AddEvents extends Component {
 
     const line = d3
       .line()
-      .x(d => xCoord(d[0]))
-      .y(d => yCoord(d[1]));
+      .x((d) => xCoord(d[0]))
+      .y((d) => yCoord(d[1]));
     return line(data);
   }
 
@@ -125,7 +125,10 @@ class AddEvents extends Component {
 
     const brushInstance = d3
       .brushX()
-      .extent([[0, 0], [width - 59, height - 3.5 * CHART_MARGIN]])
+      .extent([
+        [0, 0],
+        [width - 59, height - 3.5 * CHART_MARGIN],
+      ])
       .on('brush start', () => {
         normalizeHanlers('brush-instance');
       })
@@ -135,8 +138,8 @@ class AddEvents extends Component {
         const { newEventDetails } = this.props;
         const [selection_start, selection_end] = d3.event.selection;
         const startIndex =
-          timeSeries.findIndex(element => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
-        const stopIndex = timeSeries.findIndex(element => xCoord.invert(selection_end).getTime() - element[0] < 0);
+          timeSeries.findIndex((element) => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
+        const stopIndex = timeSeries.findIndex((element) => xCoord.invert(selection_end).getTime() - element[0] < 0);
 
         if (startIndex !== -1 && stopIndex !== -1) {
           const eventDetails = {
@@ -173,16 +176,16 @@ class AddEvents extends Component {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     dataRun: getDatarunDetails(state),
     isAddingNewEvent: getIsAddingNewEvents(state),
     periodRange: getSelectedPeriodRange(state),
     isEditingEventRange: getIsEditingEventRange(state),
     currentEventDetails: getCurrentEventDetails(state),
   }),
-  dispatch => ({
-    updateNewEventDetails: eventDetails => dispatch(updateNewEventDetailsAction(eventDetails)),
-    updateEventDetails: eventDetails => dispatch(updateEventDetailsAction(eventDetails)),
+  (dispatch) => ({
+    updateNewEventDetails: (eventDetails) => dispatch(updateNewEventDetailsAction(eventDetails)),
+    updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
     openEventDetailsPopup: () => dispatch(openEventDetailsPopupAction()),
   }),
 )(AddEvents);
