@@ -12,7 +12,6 @@ export interface LogoutProps {
 
 class Logout extends Component<LogoutProps> {
   componentDidMount() {
-    debugger;
     this.props.userLogout();
     window.location.href = '/';
   }
