@@ -7,24 +7,9 @@ import Experiment from '../Timeseries/Overview/Experiment';
 
 const transtitionTimeOut = { enter: 1000, exit: 1000 };
 
-export interface DashboardProps {
-  location: {
-    pathname: string;
-  };
-}
-
-const Dashboard = (props: DashboardProps) => {
+const Dashboard = (props) => {
   const { location } = props;
   const animateDirection = location.pathname === '/' ? 'animate-left' : 'animate-right';
-  // return (
-  //   <div id="content-wrapper">
-  //     <Header />
-  //     <Switch>
-  //       <Route path="/experiment/:id" exact component={Experiment} />
-  //       <Route path="/" component={Landing} />
-  //     </Switch>
-  //   </div>
-  // );
   return (
     <div id="content-wrapper">
       <Header />
@@ -38,7 +23,7 @@ const Dashboard = (props: DashboardProps) => {
           transitionname="page-slider"
         >
           <div className={animateDirection}>
-            <Switch>
+            <Switch location={location}>
               <Route path="/experiment/:id" exact component={Experiment} />
               <Route path="/" component={Landing} />
             </Switch>
