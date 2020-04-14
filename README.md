@@ -26,28 +26,13 @@ The Restful APIs documentation: http://45.77.5.58/apidoc/
 
 Before you begin we recommend you read about the basic building blocks that assemble the **MTV**:
 
-- **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run.
-- **Flask (>=1.0.2)** - The best way to understand express is through its [Official Website](http://flask.pocoo.org/), which has a good [Tutorial](http://flask.pocoo.org/docs/1.0/tutorial/). We use [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/) as an extension of Flask to quickly build [REST APIs](https://www.restapitutorial.com/).
-- **Typescript (>=3.0)** - Typescript's [Official Documentation](https://www.typescriptlang.org/docs/home.html) is a great starting point.
-- **MongoDB (>=3.6)** - Go through [MongoDB Official Website](http://mongodb.org/) and proceed to their [Official Manual](http://docs.mongodb.org/manual/), which should help you understand NoSQL and MongoDB better.
-
-
-
 ## Prerequisites
-
 Make sure you have installed all of the following prerequisites on your development machine:
-
+- **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run.
+- **Python pip(>=19)** - [Download & install python pip](https://pip.pypa.io/en/stable/)
 - **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
-
 - **Node.js (>= 10.0.0)** - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. Make sure to install gulp-cli globally after the installation of Node.js.
-
-  ```bash
-  $ npm install --quiet -g gulp-cli
-  ```
-
 - **MongoDB** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
-
-
 
 ## Get Started
 
@@ -83,15 +68,14 @@ Once you've downloaded the MTV repository and installed all the prerequisites, y
 
 ```bash
 $ make install
-$ make install-theme
+$ cd mtv-client && npm install
 ```
 
-This command will install all the dependencies needed for the application (server-end and client-end) to run. For development, use the following command instead, which will install some additional
+This command will install all the dependencies needed for the application (server-end) to run. For development, use the following command instead, which will install some additional
 dependencies for code linting and testing
 
 ```bash
 $ make install-develop
-$ make install-theme
 ```
 
 
@@ -124,7 +108,9 @@ Please activate your virtualenv for MTV first, and then use the following comman
 $ mtv run -v
 ```
 
-Your application should run on **port 3000** with the ***production*** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your browser (Chrome). The following list the optional arguments for `mtv run`
+Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome).
+
+The following list the optional arguments for `mtv run`
 
 ```
 usage: mtv run [-h] [-l LOGFILE] [-v] [-P PORT] [-E ENV]
@@ -141,7 +127,7 @@ optional arguments:
 
 ### Development
 
-The server-end code and client-end code are in two separate folders, namely,` <project-home>/mtv` and `<project-home>/client` 
+The server-end code and client-end code are in two separate folders, namely,` <project-home>/mtv` and `<project-home>/mtv-client`
 
 Run the following command for server-end development
 
@@ -152,8 +138,8 @@ $ mtv run -E development -v
 Run the following command for client-end development
 
 ```bash
-$ cd client
-$ gulp
+$ cd mtv-client
+$ npm start
 ```
 
 
@@ -190,13 +176,13 @@ $ gulp
   $ docker-compose down -v
   ```
 
-  
+
 
 ## Production deploy in local secure environment
 
 - Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 
-- Download MTV project and put the MTV docker image into the project direction 
+- Download MTV project and put the MTV docker image into the project direction
 
 - Enter the MTV folder and install the docker image by running
 
@@ -225,3 +211,9 @@ $ gulp
   ```bash
   $ docker-compose stop
   ```
+
+## Additional Resources
+  - [Install python Mac OS](https://www.python.org/downloads/mac-osx/)
+  - [Install python Ubuntu](https://linuxize.com/post/how-to-install-python-3-7-on-ubuntu-18-04/)
+  - [Install anaconda](https://docs.anaconda.com/anaconda/install/)
+  - [Install python virtual environment](https://virtualenv.pypa.io/en/latest/)
