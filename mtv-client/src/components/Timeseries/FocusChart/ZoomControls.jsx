@@ -5,7 +5,7 @@ import { faArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { getZoomMode, getIsEditingEventRange } from '../../../model/selectors/datarun';
 import { zoomOnClick, zoomToggleAction } from '../../../model/actions/datarun';
 
-const ZoomControls = props => (
+const ZoomControls = (props) => (
   <div>
     <ul>
       <li>
@@ -16,7 +16,7 @@ const ZoomControls = props => (
             name="zoomMode"
             id="zoomMode"
             checked={props.isZoomEnabled}
-            onChange={event => !props.isEditingEventRange && props.zoomToggle(event.target.checked)}
+            onChange={(event) => !props.isEditingEventRange && props.zoomToggle(event.target.checked)}
           />
         </label>
       </li>
@@ -35,12 +35,12 @@ const ZoomControls = props => (
 );
 
 export default connect(
-  state => ({
+  (state) => ({
     isZoomEnabled: getZoomMode(state),
     isEditingEventRange: getIsEditingEventRange(state),
   }),
-  dispatch => ({
-    zoom: direction => dispatch(zoomOnClick(direction)),
-    zoomToggle: mode => dispatch(zoomToggleAction(mode)),
+  (dispatch) => ({
+    zoom: (direction) => dispatch(zoomOnClick(direction)),
+    zoomToggle: (mode) => dispatch(zoomToggleAction(mode)),
   }),
 )(ZoomControls);

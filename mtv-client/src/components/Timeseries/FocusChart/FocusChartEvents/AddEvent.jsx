@@ -20,7 +20,7 @@ import { getWrapperSize, normalizeHanlers } from '../FocusChartUtils';
 
 const { CHART_MARGIN, TRANSLATE_LEFT, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
-class AddEvents extends Component {
+export class AddEvents extends Component {
   componentDidMount() {
     const { width, height } = getWrapperSize();
     this.setState({

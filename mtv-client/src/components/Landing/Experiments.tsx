@@ -29,7 +29,7 @@ type renderExperimentProps = {
   onSelectExperiment: typeof props.onSelectExperiment;
 };
 
-const Experiments: React.FC<Props> = ({
+export const Experiments: React.FC<Props> = ({
   isExperimentsLoading,
   filteredExperiments,
   onSelectExperiment,
@@ -104,7 +104,7 @@ const countDatarunEvents = (experiment) => {
   return dataruns.map((datarun) => datarun.events.length).reduce((item, accumulator) => item + accumulator, 0);
 };
 
-const Experiment: React.FC<renderExperimentProps> = ({
+export const Experiment: React.FC<renderExperimentProps> = ({
   experiment,
   tagStats,
   matrixScale,

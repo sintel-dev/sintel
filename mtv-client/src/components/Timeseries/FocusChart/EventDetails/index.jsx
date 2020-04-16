@@ -34,7 +34,7 @@ const renderInfoTooltip = () => (
     </ul>
   </div>
 );
-class EventDetails extends Component {
+export class EventDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
