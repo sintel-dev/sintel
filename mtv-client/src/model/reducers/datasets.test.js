@@ -13,20 +13,21 @@ describe('Testing dataset reducer', () => {
     });
   });
 
-  it('Should handle GET_DATASETS_SUCCESS', () => {
+  it('Should handle FETCH_DATASETS_SUCCESS', () => {
     const successAction = {
-      type: 'GET_DATASETS_SUCCESS',
+      type: 'FETCH_DATASETS_SUCCESS',
       result: { datasets },
     };
+
     expect(datasetsReducer(undefined, successAction)).toEqual({
       isDatasetLoading: false,
       dataSetsList: datasets,
     });
   });
 
-  it('Should handle GET_DATASETS_FAILURE', () => {
+  it('Should handle FETCH_DATASETS_FAILURE', () => {
     const errAction = {
-      type: 'GET_DATASETS_FAILURE',
+      type: 'FETCH_DATASETS_FAILURE',
       datasets,
     };
 

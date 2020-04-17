@@ -12,7 +12,7 @@ type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
 
-const Header: React.FC<Props> = (props) => {
+export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
   let history = useHistory();
   const currentView = history.location.pathname;

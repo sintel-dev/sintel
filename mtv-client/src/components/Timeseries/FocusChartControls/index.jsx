@@ -23,7 +23,7 @@ const formatOptionLabel = ({ label, icon }) => (
   </div>
 );
 
-const FocusChartControls = props => (
+const FocusChartControls = (props) => (
   <div className="chart-controls" id="chartControls">
     <div className="linechart-controls switch-control">
       <div className="row">
@@ -43,7 +43,7 @@ const FocusChartControls = props => (
             type="checkbox"
             id="showPredictions"
             checked={props.isPredictionEnabled}
-            onChange={event => props.togglePredictions(event.target.checked)}
+            onChange={(event) => props.togglePredictions(event.target.checked)}
           />
           <span className="switch" />
           Show Predictions
@@ -72,13 +72,13 @@ FocusChartControls.propTypes = {
 };
 
 export default connect(
-  state => ({
+  (state) => ({
     isPredictionEnabled: isPredictionEnabled(state),
     isAddingEvent: getIsAddingNewEvents(state),
   }),
-  dispatch => ({
-    togglePredictions: event => dispatch(togglePredictionsAction(event)),
-    addNewEvent: isAddingEvent => dispatch(addNewEventAction(isAddingEvent)),
-    filterByTags: tags => dispatch(filterEventsByTagAction(tags)),
+  (dispatch) => ({
+    togglePredictions: (event) => dispatch(togglePredictionsAction(event)),
+    addNewEvent: (isAddingEvent) => dispatch(addNewEventAction(isAddingEvent)),
+    filterByTags: (tags) => dispatch(filterEventsByTagAction(tags)),
   }),
 )(FocusChartControls);

@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pipeline test Should render pipeline without crashing 1`] = `
+<div
+  class="cell "
+>
+  <h3>
+    lstm
+  </h3>
+  <div
+    class="item-data"
+  >
+    <ul>
+      <li>
+        DC: 2019-10-17
+      </li>
+      <li>
+        By: null
+      </li>
+    </ul>
+  </div>
+</div>
+`;

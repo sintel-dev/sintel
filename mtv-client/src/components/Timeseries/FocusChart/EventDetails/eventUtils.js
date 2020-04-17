@@ -30,9 +30,9 @@ export const formatOptionLabel = ({ label, icon }) => (
   </div>
 );
 
-export const RenderComments = eventComments =>
+export const RenderComments = (eventComments) =>
   eventComments.comments && eventComments.comments.length ? (
-    eventComments.comments.map(comment => (
+    eventComments.comments.map((comment) => (
       <div key={comment.id} className="comment">
         <p>
           <span>{(comment.created_by && comment.created_by) || 'Anonymous'}: </span> {comment.text}
@@ -43,7 +43,7 @@ export const RenderComments = eventComments =>
     <p>This event has no comments</p>
   );
 
-export const selectedOption = selectedLabel =>
+export const selectedOption = (selectedLabel) =>
   selectedLabel === null || selectedLabel === 'Untagged'
     ? 'Select a tag'
     : grouppedOptions
