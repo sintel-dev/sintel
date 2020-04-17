@@ -6,6 +6,7 @@ import { configureStore } from '../store';
 import * as pipelines from '../../tests/testmocks/pipelines';
 import * as experiments from '../../tests/testmocks/experiments';
 import * as datasets from '../../tests/testmocks/datasets';
+import * as useractions from './users';
 
 describe('async actions', () => {
   const store = configureStore();
@@ -13,7 +14,11 @@ describe('async actions', () => {
     fetchMock.restore();
   });
 
-  it('Creates GET_PIPELINES when fetching pipelines', async () => {
+  it('Authenticate the user', async () => {
+    await store.dispatch(useractions.onUserLoginAction({ email: 'sergiu.ojoc@bytex.ro', password: 'S5T6RMAZ' }));
+  });
+
+  it('Creates FETCH_PIPELINES when fetching pipelines', async () => {
     fetchMock.getOnce('/api/v1/pipelines', {
       body: { pipelines },
     });
@@ -27,7 +32,7 @@ describe('async actions', () => {
     expect(storeState.pipelineList).toEqual(response.pipelines);
   });
 
-  it('Creates GET_EXPERIMENTS when fetching experiments', async () => {
+  it('Creates FETCH_EXPERIMENTS when fetching experiments', async () => {
     fetchMock.getOnce('/api/v1/experiments', {
       body: { experiments },
       headers: { 'content-type': 'application/json' },
@@ -42,7 +47,7 @@ describe('async actions', () => {
     expect(storeState.experimentsList).toEqual(response.experiments);
   });
 
-  it('creates GET_DATASETS when fetching datasets', async () => {
+  it('creates FETCH_DATASETS when fetching datasets', async () => {
     fetchMock.getOnce('/api/v1/datasets', {
       body: { datasets: datasets.datasets },
       headers: { 'content-type': 'application/json' },
@@ -58,11 +63,29 @@ describe('async actions', () => {
     expect(storeState.isDatasetLoading).toEqual(false);
   });
 
-  it('Should handle selectPipeline when there is a previously selected pipeline', () => {
+  it('Should handle SELECT_PIPELINE', () => {
     store.dispatch(actions.selectPipeline('cyclegan'));
     expect(store.getState().pipelines.selectedPipelineName).toEqual('cyclegan');
 
     store.dispatch(actions.selectPipeline('lstm'));
     expect(store.getState().pipelines.selectedPipelineName).toEqual('lstm');
+  });
+
+  it('Should handle FETCH_PROJECTS', async () => {
+    const promise = await store.dispatch(actions.fetchProjects());
+    const storeState = store.getState().projects;
+    expect(storeState.selectedProject).toEqual(promise[0].experiments[0].project);
+  });
+
+  it('Should handle SELECT_PROJECT', () => {
+    store.dispatch(actions.selectProject('MSL'));
+    expect(store.getState().projects.selectedProject).toEqual('MSL');
+
+    store.dispatch(actions.selectProject('SMAP'));
+    expect(store.getState().projects.selectedProject).toEqual('SMAP');
+  });
+
+  it('Deauthenticate the user', async () => {
+    await store.dispatch(useractions.onUserLogoutAction());
   });
 });
