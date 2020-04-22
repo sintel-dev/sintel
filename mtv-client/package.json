@@ -7,8 +7,10 @@
     "start": "PORT=4200 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "jesttest": "jest test --watch",
     "eject": "react-scripts eject",
-    "coverage": "npm test -- --coverage --updateSnapshot"
+    "coverage:snapshots": "NODE_ENV=test npm test -- --coverage --updateSnapshot",
+    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -79,7 +81,6 @@
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
-    "fetch-mock": "^9.3.1",
     "prettier": "^2.0.4"
   },
   "jest": {
