@@ -1,0 +1,23 @@
+.footer-wrapper {
+  color: #dbdbdb;
+  display: flex;
+  font-size: 15px;
+  justify-content: center;
+  line-height: 18px;
+  margin: 30px 0;
+  text-align: center;
+
+  + .footer-wrapper {
+    margin-top: 0;
+  }
+
+  a {
+    color: #dbdbdb;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  p {
+    margin: 0;
+  }
+}

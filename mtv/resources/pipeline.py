@@ -1,6 +1,7 @@
 import logging
 
 from flask_restful import Resource
+from mtv.resources.auth_utils import verify_auth
 
 from mtv import model
 
@@ -38,6 +39,9 @@ class Pipeline(Resource):
         @apiSuccess {Object} mlpipeline.outputs Primitive outputs.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         document = model.Pipeline.find_one(name=pipeline_name)
 
         if document is None:
@@ -76,6 +80,9 @@ class Pipelines(Resource):
         @apiSuccess {Object} pipelines.mlpipeline.outputs Primitive outputs.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         documents = model.Pipeline.find()
 
         try:

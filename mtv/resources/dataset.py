@@ -3,6 +3,8 @@ import logging
 from flask_restful import Resource
 
 from mtv import model
+from mtv.resources.auth_utils import verify_auth
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +34,9 @@ class Dataset(Resource):
         @apiSuccess {String} entity_id Dataset entity_id.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         document = model.Dataset.find_one(name=dataset_name)
 
         if document is None:
@@ -65,6 +70,9 @@ class Datasets(Resource):
         @apiSuccess {String} datasets.entity_id Dataset entity_id.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         documents = model.Dataset.find()
 
         try:

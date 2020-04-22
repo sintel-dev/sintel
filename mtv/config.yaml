@@ -3,29 +3,39 @@
 
 # mtv
 host: 'localhost' # mongodb server address
-port: 27017  # mongodb server port
-db: 'mtv'  # database name
-username:  # for auth
-password:  # for auth
+port: 27017 # mongodb server port
+db: 'mtv' # database name
+username: # for auth
+password: # for auth
 
 # orion
-or_host: 'localhost'   # mongodb server address
-or_port: 27017  # mongodb server port
-or_db: 'orion'  # database name
-or_username:  # for auth
-or_password:  # for auth
+or_host: 'localhost' # mongodb server address
+or_port: 27017 # mongodb server port
+or_db: 'orion' # database name
+or_username: # for auth
+or_password: # for auth
 
 # docker
-dk_host: 'db'   # mongodb server address
-dk_port: 27017  # mongodb server port
-dk_db: 'mtv'  # database name
-dk_username:  # for auth
-dk_password:  # for auth
-
+dk_host: 'db' # mongodb server address
+dk_port: 27017 # mongodb server port
+dk_db: 'mtv' # database name
+dk_username: # for auth
+dk_password: # for auth
 
 # FLASK ENV
 #===================================
-server_port: 3000   # the port that flask application is running on
-ENV: 'production'  # development, production, testing
-DEBUG:  False
-TESTING:  False
+server_port: 3000 # the port that flask application is running on
+ENV: 'production' # development, production, testing
+DEBUG: False
+TESTING: False
+
+# FLASK MAIL
+#===================================
+MAIL_SERVER: 'smtp.gmail.com'
+MAIL_PORT: 465
+MAIL_USERNAME: 'ucenter.mtv@gmail.com'
+
+# Google AUTH
+#===================================
+GOOGLE_CLIENT_ID: '772078202631-vln87t531hbn366s8kjk84nn2vab2p32.apps.googleusercontent.com'
+GOOGLE_DISCOVERY_URL: 'https://accounts.google.com/.well-known/openid-configuration'

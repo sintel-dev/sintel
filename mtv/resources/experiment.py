@@ -3,6 +3,7 @@ import logging
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
+from mtv.resources.auth_utils import verify_auth
 
 from mtv import model
 
@@ -92,6 +93,9 @@ class Experiment(Resource):
         @apiSuccess {String} dataruns.events.tag Event tag.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         # validate experiment_id
         validate_result = validate_experiment_id(experiment_id)
         if validate_result[1] == 400:
@@ -140,6 +144,9 @@ class Experiments(Resource):
         @apiSuccess {String} experiments.dataruns.events.tag Event tag.
         """
 
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
         project = request.args.get('project', None)
 
         query = dict()
