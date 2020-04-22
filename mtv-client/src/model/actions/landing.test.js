@@ -1,4 +1,4 @@
-import fetchMock from 'fetch-mock';
+import mockAxios from 'axios';
 import * as actions from './landing';
 import { configureStore } from '../store';
 
@@ -6,22 +6,24 @@ import { configureStore } from '../store';
 import * as pipelines from '../../tests/testmocks/pipelines';
 import * as experiments from '../../tests/testmocks/experiments';
 import * as datasets from '../../tests/testmocks/datasets';
-import * as useractions from './users';
+import * as datarun from '../../tests/testmocks/dataRun';
 
-describe('async actions', () => {
+describe('Landing async actions ->', () => {
   const store = configureStore();
-  afterEach(() => {
-    fetchMock.restore();
-  });
 
-  it('Authenticate the user', async () => {
-    await store.dispatch(useractions.onUserLoginAction({ email: 'sergiu.ojoc@bytex.ro', password: 'S5T6RMAZ' }));
+  it('Test FETCH_EXPERIMENTS experiments', async () => {
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({ data: experiments }));
+
+    const promise = store.dispatch(actions.fetchExperiments());
+    expect(store.getState().experiments.isExperimentsLoading).toBe(true);
+
+    const response = await promise;
+    expect(store.getState().experiments.experimentsList).toEqual(response.experiments);
+    expect(store.getState().experiments.isExperimentsLoading).toBe(false);
   });
 
   it('Creates FETCH_PIPELINES when fetching pipelines', async () => {
-    fetchMock.getOnce('/api/v1/pipelines', {
-      body: { pipelines },
-    });
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({ data: pipelines }));
 
     const promise = store.dispatch(actions.fetchPipelines());
     let storeState = store.getState().pipelines;
@@ -30,37 +32,18 @@ describe('async actions', () => {
     const response = await promise;
     storeState = store.getState().pipelines;
     expect(storeState.pipelineList).toEqual(response.pipelines);
+    expect(storeState.isPipelinesLoading).toEqual(false);
   });
 
-  it('Creates FETCH_EXPERIMENTS when fetching experiments', async () => {
-    fetchMock.getOnce('/api/v1/experiments', {
-      body: { experiments },
-      headers: { 'content-type': 'application/json' },
-    });
-
-    const promise = store.dispatch(actions.fetchExperiments());
-    let storeState = store.getState().experiments;
-    expect(storeState.isExperimentsLoading).toEqual(true);
-
-    const response = await promise;
-    storeState = store.getState().experiments;
-    expect(storeState.experimentsList).toEqual(response.experiments);
-  });
-
-  it('creates FETCH_DATASETS when fetching datasets', async () => {
-    fetchMock.getOnce('/api/v1/datasets', {
-      body: { datasets: datasets.datasets },
-      headers: { 'content-type': 'application/json' },
-    });
+  it('Creates FETCH_DATASETS when fetching datasets', async () => {
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({ data: datasets }));
 
     const promise = store.dispatch(actions.fetchDatasets());
-    let storeState = store.getState().datasets;
-    expect(storeState.isDatasetLoading).toEqual(true);
+    expect(store.getState().datasets.isDatasetLoading).toBe(true);
 
     const response = await promise;
-    storeState = store.getState().datasets;
-    expect(storeState.dataSetsList).toEqual(response.datasets);
-    expect(storeState.isDatasetLoading).toEqual(false);
+    expect(store.getState().datasets.isDatasetLoading).toBe(false);
+    expect(store.getState().datasets.dataSetsList).toBe(response.datasets);
   });
 
   it('Should handle SELECT_PIPELINE', () => {
@@ -71,10 +54,17 @@ describe('async actions', () => {
     expect(store.getState().pipelines.selectedPipelineName).toEqual('lstm');
   });
 
-  it('Should handle FETCH_PROJECTS', async () => {
-    const promise = await store.dispatch(actions.fetchProjects());
-    const storeState = store.getState().projects;
-    expect(storeState.selectedProject).toEqual(promise[0].experiments[0].project);
+  it('Should handle SELECT_EXPERIMENT', async () => {
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({ data: datarun }));
+
+    const promise = store.dispatch(actions.selectExperiment(null, '5da80104abc56689357439e5'));
+    expect(store.getState().experiments.isExperimentsLoading).toBe(false);
+    expect(store.getState().experiments.selectedExperimentID).toBe('5da80104abc56689357439e5');
+    expect(store.getState().selectedExperimentData.isExperimentDataLoading).toBe(true);
+
+    const result = await promise;
+    expect(store.getState().selectedExperimentData.isExperimentDataLoading).toBe(false);
+    expect(store.getState().selectedExperimentData.data.dataRun).toEqual(result.dataRun);
   });
 
   it('Should handle SELECT_PROJECT', () => {
@@ -83,9 +73,5 @@ describe('async actions', () => {
 
     store.dispatch(actions.selectProject('SMAP'));
     expect(store.getState().projects.selectedProject).toEqual('SMAP');
-  });
-
-  it('Deauthenticate the user', async () => {
-    await store.dispatch(useractions.onUserLogoutAction());
   });
 });

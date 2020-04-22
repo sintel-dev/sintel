@@ -22,7 +22,6 @@ import {
 
 export function fetchExperiments() {
   return function (dispatch) {
-    dispatch({ type: 'FETCH_EXPERIMENTS_REQUEST' });
     const action: FetchExperimentsAction = {
       type: FETCH_EXPERIMENTS,
       promise: API.experiments.all(),
@@ -107,10 +106,10 @@ export function selectExperiment(history: any, experimentID: string) {
     };
 
     dispatch(action);
-    dispatch(fetchDatarunsByExperimentID());
     dispatch({
       type: SELECT_DATARUN,
       datarunID: '',
     });
+    return dispatch(fetchDatarunsByExperimentID());
   };
 }
