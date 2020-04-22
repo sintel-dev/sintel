@@ -58,7 +58,7 @@ load-db-mtv: init-db
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
-docker-db-up: init-db	## download and 
+docker-db-up: init-db	## download and
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	docker-compose -f docker-compose-db.yml up

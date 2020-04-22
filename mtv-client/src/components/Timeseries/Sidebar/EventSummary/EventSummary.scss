@@ -1,0 +1,111 @@
+@import '../../../../assets/sass/form.scss';
+.event-summary{
+    text-transform: uppercase;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #60666C;
+    padding: 16px 0 0 0;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #26282E;
+
+
+    .event-header {
+        padding: 0 16px;
+    }
+    .tooltip-data {
+        font-size: 12px;
+        background: rgba(103, 106, 130, 0.8);
+        padding: 10px;
+        border-radius: 4px;
+        border-bottom-left-radius: 0;
+        position: absolute;
+        z-index: 999;
+        color: #fff;
+        text-transform: capitalize;
+        top: -37px;
+        left: 0;
+        white-space: nowrap;
+        display: none;
+        transition: all .2s ease-in-out;
+    }
+    table{
+        border-collapse: collapse;
+        width: 100%;
+        th {
+            text-align: left;
+            font-weight: normal;
+            padding: 0 5px 0 16px;
+        }
+        td{
+            text-align: center;
+            height: 38px;
+            position: relative;
+            &.highlighted{
+                background-color: rgba(35, 36, 43, 0.5);
+                cursor: pointer;
+                .tooltip-data{
+                    display: block;
+                }
+            }
+
+            &:last-child{
+                .tooltip-data{
+                    left: auto;
+                    right: 0;
+                    border-bottom-left-radius: 3px;
+                    border-bottom-right-radius: 0;
+                }
+            }
+        }
+        .row-light{
+            background: #2C3034
+        }
+
+        tr:last-child{
+            th{
+                border-bottom-left-radius: 4px;
+            }
+            td{
+                &:last-child{
+                    border-bottom-right-radius: 4px;
+                }
+            }
+        }
+    }
+
+    .event-header {
+        height: 40px;
+        line-height: 27px;
+        .left-wrapper{
+            float: left;
+        }
+        .right-wrapper{
+            float: right
+        }
+        button{
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            outline: none;
+            span{
+                display: inline-block;
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .summary-details {
+        display: none;
+        &.active{
+            display: block;
+        }
+        .indicator{
+            width: 7px;
+            height: 7px;
+            margin: 0 10px;
+        }
+    }
+
+}
