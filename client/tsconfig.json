@@ -1,24 +1,35 @@
 {
-    "compilerOptions": {
-        // "target": "es2015",
-        "target": "es5",
-         "lib" : ["es2015", "es2015.iterable", "dom"],
-        "module": "commonjs",
-        "typeRoots": [
-            "./node_modules/@types"
-        ],
-        "moduleResolution": "node",
-        "noImplicitAny": false,
-        "experimentalDecorators": true,
-        "sourceMap": true,
-        "alwaysStrict": true,
-        "removeComments": true
-    },
-    "include": [
-        "src/**/*",
-        "tests/**/*"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "checkJs": false
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ],
+  "include": [
+    "src"
+  ]
 }

@@ -6,7 +6,7 @@ module.exports = {
   tabWidth: 2,
   overrides: [
     {
-      files: ['*.less', '*.css'],
+      files: ['*.scss', '*.css'],
       options: {
         tabWidth: 4,
       },
