@@ -95,8 +95,8 @@ class MTVExplorer:
         LOGGER.info(colored('Starting up FLASK APP in {} mode'.format(env),
                             'yellow'))
 
-        LOGGER.info(colored('Available on:', 'yellow')
-                    + '  http://0.0.0.0:' + colored(port, 'green'))
+        LOGGER.info(colored('APIs are available on:', 'yellow')
+                    + '  http://localhost:' + colored(port, 'green') + '/')
 
         if env == 'development':
             app.run(debug=True, port=port)

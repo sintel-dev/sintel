@@ -33,9 +33,15 @@ TESTING: False
 #===================================
 MAIL_SERVER: 'smtp.gmail.com'
 MAIL_PORT: 465
-MAIL_USERNAME: 'ucenter.mtv@gmail.com'
+MAIL_USERNAME: 'ExampleMtv@gmail.com'
 
 # Google AUTH
 #===================================
-GOOGLE_CLIENT_ID: '772078202631-vln87t531hbn366s8kjk84nn2vab2p32.apps.googleusercontent.com'
+GOOGLE_CLIENT_ID: '536177420923-v4kofl71n9893tkq4atb38mt03b29c9a.apps.googleusercontent.com'
 GOOGLE_DISCOVERY_URL: 'https://accounts.google.com/.well-known/openid-configuration'
+
+# Private Keys
+USE_SYS_ENV_KEYS: False
+MAIL_PASSWORD: '8vn1las1lsh;]q1vn'
+GOOGLE_CLIENT_SECRET: 'BfGdYei31fvroh_mpUQzxdM_'
+AUTH_KEY: “YT#XA&00ALKlkjG)JAN<[XC”

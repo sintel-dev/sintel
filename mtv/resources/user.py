@@ -14,6 +14,8 @@ from mtv.resources import auth_utils
 LOGGER = logging.getLogger(__name__)
 
 
+
+
 class Signup(Resource):
     def post(self):
         """
@@ -134,6 +136,16 @@ class Signout(Resource):
         return {}, 204
 
 
+class GoogleAuthentication(Resource):
+    def post(self):
+        body = request.json
+
+        # import pudb;
+        # pudb.set_trace();
+        # Temporarily addressed google auth
+        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
+        return token
+
 class GoogleLogin(Resource):
     """
         @api {post} /auth/google_login/ google login
@@ -155,17 +167,6 @@ class GoogleLogin(Resource):
             scope=["openid", "email", "profile"],
         )
         return redirect(request_uri)
-
-
-class GoogleAuthentication(Resource):
-    def post(self):
-        body = request.json
-
-        # import pudb;
-        # pudb.set_trace();
-        # Temporarily addressed google auth
-        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
-        return token
 
 class GoogleLoginCallback(Resource):
     """
@@ -191,12 +192,15 @@ class GoogleLoginCallback(Resource):
             redirect_url=request.base_url,
             code=code
         )
+        if g['config']['USE_SYS_ENV_KEYS']:
+            GOOGLE_CLIENT_SECRET = g['config']['GOOGLE_CLIENT_SECRET']
+        else:
+            GOOGLE_CLIENT_SECRET = os.environ['GOOGLE_CLIENT_SECRET']
         token_response = requests.post(
             token_url,
             headers=headers,
             data=body,
-            auth=(g['config']['GOOGLE_CLIENT_ID'], os.environ['GOOGLE_CLIENT_SECRET']),
-            # auth=(g['config']['GOOGLE_CLIENT_ID'], g['config']['GOOGLE_CLIENT_SECRET']),
+            auth=(g['config']['GOOGLE_CLIENT_ID'], GOOGLE_CLIENT_SECRET)
         )
 
         # Parse the tokens!

@@ -28,11 +28,10 @@ Before you begin we recommend you read about the basic building blocks that asse
 
 ## Prerequisites
 Make sure you have installed all of the following prerequisites on your development machine:
-- **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run.
-- **Python pip(>=19)** - [Download & install python pip](https://pip.pypa.io/en/stable/)
+- **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run. To this end, [Anaconda python](https://www.anaconda.com/distribution/#download-section) is suggested to maintain the virtual environments. 
 - **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
 - **Node.js (>= 10.0.0)** - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. Make sure to install gulp-cli globally after the installation of Node.js.
-- **MongoDB** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
+- **MongoDB (>= 3.6)** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
 
 ## Get Started
 
@@ -60,15 +59,12 @@ $ rm mtv.zip
 
 Don't forget to rename **mtv-master** after your project name.
 
-
-
 ### Quick Install
 
 Once you've downloaded the MTV repository and installed all the prerequisites, you're just a few steps away from running your application. To install the project, create a virtualenv and execute
 
 ```bash
 $ make install
-$ cd mtv-client && npm install
 ```
 
 This command will install all the dependencies needed for the application (server-end) to run. For development, use the following command instead, which will install some additional
@@ -90,38 +86,29 @@ $ make load-db-mtv
 
 This will download and restore the dataset into MongoDB.
 
-##### Working with Orion to generate your own data
+##### Working with [Orion](https://github.com/D3-AI/Orion) to generate your own data
 
-Once the required data is generated using Orion, you simple type the following command to sync the data from Orion to MTV. Note that you can configure the mongodb in the file `./mtv/config.yaml`.
+Once the required data is generated using Orion, you can type the following command to update the data from Orion to MTV-supported formats. Note that you can configure the mongodb in the file `./mtv/config.yaml`.
 
 ```bash
 $ mtv update db -v
 ```
 
 
-
 ### Running Your Application
 
-Please activate your virtualenv for MTV first, and then use the following command to run the application.
+Please activate your virtualenv for MTV first, and then launch the server:
 
 ```bash
 $ mtv run -v
 ```
 
-Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome).
-
-The following list the optional arguments for `mtv run`
-
+Then launch the client:
+```bash
+$ cd client 
+$ npm start
 ```
-usage: mtv run [-h] [-l LOGFILE] [-v] [-P PORT] [-E ENV]
-
-optional arguments:
-  -h, --help             show this help message and exit
-  -l, --logfile LOGFILE  Name of the logfile. If not given, log to stdout.
-  -v, --verbose          Be verbose. Use -vv for increased verbosity.
-  -P PORT, --port PORT   Flask server port
-  -E ENV, --env ENV      Flask environment
-```
+Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome recommended).
 
 
 
@@ -177,8 +164,7 @@ $ npm start
   ```
 
 
-
-## Production deploy in local secure environment
+## Production deploy with Docker in local secure environment
 
 - Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 

@@ -12,6 +12,7 @@ from mtv import g
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+
 def get_google_provider_cfg():
     """ for google auth  """
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()
@@ -32,14 +33,20 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
 
 
 def generate_auth_token(id, expiration=600):
-    s = Serializer(os.environ['AUTH_KEY'], expires_in=expiration)
-    # s = Serializer(g['config']['AUTH_KEY'], expires_in=expiration)
+    if g['config']['USE_SYS_ENV_KEYS']:
+        AUTH_KEY = os.environ['AUTH_KEY']
+    else:
+        AUTH_KEY = g['config']['AUTH_KEY']
+    s = Serializer(AUTH_KEY, expires_in=expiration)
     return s.dumps({'id': id})
 
 
 def decode_auth_token(token):
-    s = Serializer(os.environ['AUTH_KEY'])
-    # s = Serializer(g['config']['AUTH_KEY'])
+    if g['config']['USE_SYS_ENV_KEYS']:
+        AUTH_KEY = os.environ['AUTH_KEY']
+    else:
+        AUTH_KEY = g['config']['AUTH_KEY']
+    s = Serializer(AUTH_KEY)
     try:
         data = s.loads(token)
         return data['id']
@@ -66,12 +73,16 @@ def verify_auth():
 
 
 def send_mail(subject, body, receiver):
+    if g['config']['USE_SYS_ENV_KEYS']:
+        MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
+    else:
+        MAIL_PASSWORD = g['config']['MAIL_PASSWORD']
+
     cf = g['app'].config
     port = cf['MAIL_PORT']
     smtp_server = cf['MAIL_SERVER']
     sender = cf['MAIL_USERNAME']
-    # password = cf['MAIL_PASSWORD']
-    password = os.environ['MAIL_PASSWORD']
+    password = MAIL_PASSWORD
     message = 'Subject: {}\n\n{}'.format(subject, body)
 
     context = ssl.create_default_context()
