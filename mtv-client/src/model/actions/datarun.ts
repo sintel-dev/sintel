@@ -31,6 +31,7 @@ import {
   TOGGLE_ZOOM,
   SET_CURRENT_PERIOD_LEVEL,
   REVIEW_PERIOD_LEVEL,
+  TOGGLE_EVENT_MODE,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -109,6 +110,12 @@ export function getEventComments() {
 export function togglePredictionsAction(event) {
   return function (dispatch) {
     dispatch({ type: TOGGLE_PREDICTION_MODE, isPredictionEnabled: event });
+  };
+}
+
+export function toggleEventModeAction(mode) {
+  return function (dispatch) {
+    dispatch({ type: TOGGLE_EVENT_MODE, isEventModeEnabled: mode });
   };
 }
 

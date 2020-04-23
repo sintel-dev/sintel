@@ -7,7 +7,7 @@ import { fromMonthToIndex } from '../../../../model/utils/Utils';
 import './EventSummary.scss';
 
 const renderTagIcon = () =>
-  tagSeq.map(currentTag => (
+  tagSeq.map((currentTag) => (
     <td key={currentTag}>
       <span className="tooltip-data">
         <i key={fromTagToClassName(currentTag)} className={`indicator ${fromTagToClassName(currentTag)}`} />
@@ -19,41 +19,41 @@ const renderTagIcon = () =>
 
 const countEventsPerTag = (tag, events) => {
   const currentEvents = Object.values(events);
-  return currentEvents.filter(currentEvent => currentEvent.tag === tag).length;
+  return currentEvents.filter((currentEvent) => currentEvent.tag === tag).length;
 };
 
 const renderTagEvents = (isPeriodLevelSelected, grouppedEvents) => {
   if (!isPeriodLevelSelected || grouppedEvents === undefined) {
-    return tagSeq.map(currentTag => <td key={currentTag}>-</td>);
+    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
   }
-  return tagSeq.map(currentTag => <td key={currentTag}>{countEventsPerTag(currentTag, grouppedEvents.events)}</td>);
+  return tagSeq.map((currentTag) => <td key={currentTag}>{countEventsPerTag(currentTag, grouppedEvents.events)}</td>);
 };
 
 const renderTagEventsPerMonth = (isPeriodLevelSelected, month, monthEvents) => {
   if (!isPeriodLevelSelected || month === '' || monthEvents === undefined) {
-    return tagSeq.map(currentTag => <td key={currentTag}>-</td>);
+    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
   }
   const currentMonthEvents = monthEvents.months[fromMonthToIndex(month)];
   return (
     currentMonthEvents &&
-    tagSeq.map(currentTag => <td key={currentTag}>{countEventsPerTag(currentTag, currentMonthEvents.events)}</td>)
+    tagSeq.map((currentTag) => <td key={currentTag}>{countEventsPerTag(currentTag, currentMonthEvents.events)}</td>)
   );
 };
 
 const handleColHover = () => {
   const td = document.querySelectorAll('.summary-details td');
 
-  td.forEach(currentTd => {
-    currentTd.addEventListener('mouseover', function() {
+  td.forEach((currentTd) => {
+    currentTd.addEventListener('mouseover', function () {
       const index = this.cellIndex + 1;
-      document.querySelectorAll(`td:nth-child(${index})`).forEach(hoveredTd => {
+      document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
         hoveredTd.classList.add('highlighted');
       });
     });
 
-    currentTd.addEventListener('mouseleave', function() {
+    currentTd.addEventListener('mouseleave', function () {
       const index = this.cellIndex + 1;
-      document.querySelectorAll(`td:nth-child(${index})`).forEach(hoveredTd => {
+      document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
         hoveredTd.classList.remove('highlighted');
       });
     });
