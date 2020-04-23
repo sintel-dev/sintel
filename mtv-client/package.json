@@ -49,6 +49,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-select": "^3.1.0",
+    "react-sortablejs": "^2.0.11",
     "react-transition-group": "^4.3.0",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
