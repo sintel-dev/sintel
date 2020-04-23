@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { ReactSortable } from 'react-sortablejs';
 import FocusChart from '../FocusChart/FocusChart';
 import { getSelectedExperimentData, getProcessedDataRuns } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
@@ -11,6 +12,9 @@ import { selectExperiment } from '../../../model/actions/landing';
 import { getSelectedExperiment } from '../../../model/selectors/projects';
 import './Overview.scss';
 
+export interface LocalState {
+  dataRuns: Array<any>;
+}
 type ownProps = {
   location: any;
 };
@@ -18,7 +22,14 @@ type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps & ownProps;
 
-class Experiment extends Component<Props> {
+class Experiment extends Component<Props, LocalState> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataRuns: [],
+    };
+  }
+
   componentDidMount() {
     const { currenteExperimentID } = this.props;
     const experimentID = this.props.location.pathname.split('/')[2];
@@ -28,16 +39,35 @@ class Experiment extends Component<Props> {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.processedDataruns !== prevProps.processedDataruns) {
+      this.setState({
+        dataRuns: this.props.processedDataruns,
+      });
+    }
+  }
+
   render() {
-    const { experimentData, processedDataruns } = this.props;
+    const { experimentData } = this.props;
+    const { dataRuns } = this.state;
     return (
       <div className="experiment">
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           <div className="left-sidebar">
             <div className="overview-wrapper scroll-style" id="overview-wrapper">
-              {!experimentData.isExperimentDataLoading && experimentData.data.dataruns.length ? (
-                // @ts-ignore
-                processedDataruns.map((datarun) => <Datarun datarun={datarun} key={datarun.id} />)
+              {dataRuns.length ? (
+                <ul>
+                  <ReactSortable
+                    handle=".grip"
+                    animation={250}
+                    list={dataRuns}
+                    setList={(newState) => this.setState({ dataRuns: newState })}
+                  >
+                    {dataRuns.map((item) => (
+                      <Datarun datarun={item} key={item.id} />
+                    ))}
+                  </ReactSortable>
+                </ul>
               ) : (
                 <p>No datarun for current experiment</p>
               )}
