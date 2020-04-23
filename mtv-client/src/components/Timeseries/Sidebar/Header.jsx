@@ -7,8 +7,10 @@ import {
   getSelectedPeriodLevel,
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
+  getIsEventModeEnabled,
 } from '../../../model/selectors/datarun';
-import { reviewPeriodAction } from '../../../model/actions/datarun';
+import { reviewPeriodAction, toggleEventModeAction } from '../../../model/actions/datarun';
+import './Header.scss';
 
 const showPeriod = (selectedPeriodLevel) => {
   let periodString = 'YY/MM';
@@ -26,9 +28,46 @@ const showPeriod = (selectedPeriodLevel) => {
   );
 };
 
-const Header = ({ dataRun, setReviewRange, reviewRange, selectedPeriodLevel, isEditingEventRange, grouppedEvents }) => (
+const SidebarHeading = ({ signalName, toggleEvent, isEventModeEnabled }) => (
+  <div className="sidebar-heading">
+    <ul>
+      <li className="signal-title">{signalName}</li>
+      <li>
+        <div className="switch-control">
+          <div className="row">
+            <label htmlFor="toggleEvents">
+              <input
+                type="checkbox"
+                id="toggleEvents"
+                onChange={(event) => toggleEvent(event.target.checked)}
+                checked={isEventModeEnabled}
+              />
+              <span className="switch" />
+              Show Events
+            </label>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+);
+
+const Header = ({
+  dataRun,
+  setReviewRange,
+  reviewRange,
+  selectedPeriodLevel,
+  isEditingEventRange,
+  grouppedEvents,
+  toggleEventsMode,
+  isEventModeEnabled,
+}) => (
   <div className="period-control">
-    <div className="sidebar-heading">{dataRun.signal}</div>
+    <SidebarHeading
+      signalName={dataRun.signal}
+      toggleEvent={toggleEventsMode}
+      isEventModeEnabled={isEventModeEnabled}
+    />
     <EventSummary selectedPeriodLevel={selectedPeriodLevel} grouppedEvents={grouppedEvents} />
     <div>
       {showPeriod(selectedPeriodLevel)}
@@ -75,8 +114,10 @@ export default connect(
     selectedPeriodLevel: getSelectedPeriodLevel(state),
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
+    isEventModeEnabled: getIsEventModeEnabled(state),
   }),
   (dispatch) => ({
     setReviewRange: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
+    toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
   }),
 )(Header);

@@ -24,6 +24,7 @@ export const getZoomCounter = (state) => state.datarun.zoomCounter;
 export const getZoomMode = (state) => state.datarun.zoomMode;
 export const getReviewPeriod = (state) => state.datarun.reviewPeriod;
 export const getSelectedPeriodLevel = (state) => state.datarun.periodLevel;
+export const getIsEventModeEnabled = (state) => state.datarun.isEventModeEnabled;
 
 const filterDatarunPeriod = (period, periodLevel, reviewPeriod) => {
   const { month, year } = periodLevel;

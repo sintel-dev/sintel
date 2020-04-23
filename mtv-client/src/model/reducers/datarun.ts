@@ -25,6 +25,7 @@ const initialState: DatarunState = {
   periodLevel: {},
   isPeriodLevelSelected: false,
   reviewPeriod: null,
+  isEventModeEnabled: true,
 };
 
 /**
@@ -56,6 +57,10 @@ function GET_EVENT_COMMENTS_SUCCESS(nextState, { eventComments }) {
 
 function TOGGLE_PREDICTION_MODE(nextState, { isPredictionEnabled }) {
   nextState.isPredictionEnabled = isPredictionEnabled;
+}
+
+function TOGGLE_EVENT_MODE(nextState, { isEventModeEnabled }) {
+  nextState.isEventModeEnabled = isEventModeEnabled;
 }
 
 function IS_CHANGING_EVENT_RANGE(nextState, { isEditingEventRange }) {
@@ -118,4 +123,5 @@ export default createReducer<DatarunState>(initialState, {
   TOGGLE_ZOOM,
   SET_CURRENT_PERIOD_LEVEL,
   REVIEW_PERIOD_LEVEL,
+  TOGGLE_EVENT_MODE,
 });
