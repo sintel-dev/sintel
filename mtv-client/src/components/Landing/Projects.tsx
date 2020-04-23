@@ -15,7 +15,7 @@ const Projects: React.FC<Props> = ({ projects, isProjectsLoading, onSelectProjec
     <div className="item-wrapper">
       <Loader isLoading={isProjectsLoading}>
         {projects && projects.length ? (
-          projects.map((project, index) => renderProject({ project, index, onSelectProject, selectedProjectName }))
+          projects.map((project, index) => RenderProject({ project, index, onSelectProject, selectedProjectName }))
         ) : (
           <p>No datasets have been found</p>
         )}
@@ -32,7 +32,12 @@ type renderProjectProps = {
   selectedProjectName: typeof props.selectedProjectName;
 };
 
-const renderProject: React.FC<renderProjectProps> = ({ project, index, onSelectProject, selectedProjectName }) => {
+export const RenderProject: React.FC<renderProjectProps> = ({
+  project,
+  index,
+  onSelectProject,
+  selectedProjectName,
+}) => {
   const activeClass = project.name === selectedProjectName ? 'active' : '';
   return (
     <div className={`cell ${activeClass}`} key={index} onClick={() => onSelectProject(project.name)}>

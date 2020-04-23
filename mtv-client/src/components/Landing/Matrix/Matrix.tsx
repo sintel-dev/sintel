@@ -24,7 +24,7 @@ interface LocalState {
   height: number;
 }
 
-class Matrix extends Component<Props, LocalState> {
+export class Matrix extends Component<Props, LocalState> {
   constructor(props) {
     super(props);
     this.state = {

@@ -2,10 +2,10 @@ import pipelinesReducer from './pipelines';
 import { pipelines } from '../../tests/testmocks/pipelines';
 
 describe('Testing pipelines reducers', () => {
-  it('Should handle GET_PIPELINES_REQUEST', () => {
+  it('Should handle FETCH_PIPELINES_REQUEST', () => {
     expect(
       pipelinesReducer(undefined, {
-        type: 'GET_PIPELINES_REQUEST',
+        type: 'FETCH_PIPELINES_REQUEST',
       }),
     ).toEqual({
       isPipelinesLoading: true,
@@ -14,9 +14,9 @@ describe('Testing pipelines reducers', () => {
     });
   });
 
-  it('Should handle GET_PIPELINES_SUCCESS', () => {
+  it('Should handle FETCH_PIPELINES_SUCCESS', () => {
     const successAction = {
-      type: 'GET_PIPELINES_SUCCESS',
+      type: 'FETCH_PIPELINES_SUCCESS',
       result: { pipelines },
     };
     expect(pipelinesReducer(undefined, successAction)).toEqual({
@@ -26,9 +26,9 @@ describe('Testing pipelines reducers', () => {
     });
   });
 
-  it('Should handle GET_PIPELINES_FAILURE', () => {
+  it('Should handle FETCH_PIPELINES_FAILURE', () => {
     const errAction = {
-      type: 'GET_PIPELINES_FAILURE',
+      type: 'FETCH_PIPELINES_FAILURE',
       isPipelinesLoading: false,
       result: { pipelines },
     };

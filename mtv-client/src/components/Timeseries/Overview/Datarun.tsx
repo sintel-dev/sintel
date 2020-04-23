@@ -37,7 +37,4 @@ const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
   onSelectDatarun: (datarunID: string) => dispatch(selectDatarun(datarunID)),
 });
 
-export default connect<StateProps, DispatchProps, OwnProps, RootState>(
-  mapState,
-  mapDispatch,
-)(Datarun);
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapState, mapDispatch)(Datarun);
