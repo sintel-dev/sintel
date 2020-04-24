@@ -242,6 +242,7 @@ class DrawChart extends Component<ChartProps, ChartState> {
 
     const selection = d3.selectAll('.overview-brush .selection');
 
+    // @TODO - investigate unexpected behavior of tooltip
     selection
       .on('mouseover', () => this.renderTooltip())
       .on('mouseout', () => this.destroyTooltip())

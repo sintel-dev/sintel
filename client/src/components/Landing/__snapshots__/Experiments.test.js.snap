@@ -1,206 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Testing experiments component Should render experiments component 1`] = `
-<div
-  class="item-row scroll-style"
-  id="experiments"
->
-  <h2>
-    Experiments
-  </h2>
+exports[`Testing experiments component -> Should render experiments without crashing 1`] = `
+Array [
   <div
-    class="item-wrapper"
+    class="cell active"
   >
+    <h3>
+      #1 SMAP_set1_lstm
+    </h3>
     <div
-      class="cell "
+      class="item-data"
     >
-      <h3>
-        #1 SMAP_set1_lstm
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 10
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
+      <ul>
+        <li>
+          Signals: 1
+        </li>
+        <li>
+          Events: 1
+        </li>
+        <li>
+          DC: 2019-10-17
+        </li>
+        <li>
+          By: null
+        </li>
+      </ul>
+      Matrix component
     </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #2 SMAP_set1_cyclegan
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 10
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #3 SMAP_set2_lstm
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 3
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #4 SMAP_set2_cyclegan
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 3
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #5 SMAP_set3_lstm
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 1
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #6 SMAP_set3_cyclegan
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 1
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #7 MSL_set1_lstm
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 4
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #8 MSL_set1_cyclegan
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 4
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #9 MSL_set2_lstm
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 1
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="cell "
-    >
-      <h3>
-        #10 MSL_set2_cyclegan
-      </h3>
-      <div
-        class="item-data"
-      >
-        <ul>
-          <li>
-            Signals: 1
-          </li>
-          <li>
-            DC: 2019-10-17
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+  </div>,
+  ",",
+]
 `;

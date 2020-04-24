@@ -9,6 +9,7 @@ import {
   getReviewPeriod,
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
+  getIsEventModeEnabled,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
@@ -133,7 +134,7 @@ class Sidebar extends Component {
 
   drawData() {
     const { width, radius } = this.state;
-    const { setPeriodRange, dataRun, isEditingEventRange, grouppedEvents } = this.props;
+    const { setPeriodRange, dataRun, isEditingEventRange, grouppedEvents, isEventModeEnabled } = this.props;
 
     return (
       width > 0 &&
@@ -167,8 +168,9 @@ class Sidebar extends Component {
                 <text className="radial-text" y={radius + 15} x={0}>
                   {currentPeriod.name}
                 </text>
-                {arcData.length &&
-                  arcData.map(arc => (
+                {isEventModeEnabled &&
+                  arcData.length &&
+                  arcData.map((arc) => (
                     <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
                   ))}
               </g>
@@ -196,7 +198,7 @@ class Sidebar extends Component {
     return (
       period[0].level === 'day' && (
         <ul className="week-days">
-          {weekDays.map(currentDay => (
+          {weekDays.map((currentDay) => (
             <li style={{ width: `${cellWidth}px` }} key={currentDay}>
               {currentDay}
             </li>
@@ -246,16 +248,17 @@ class Sidebar extends Component {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     experimentData: getSelectedExperimentData(state),
     dataRun: getDatarunDetails(state),
     selectedPeriodLevel: getSelectedPeriodLevel(state),
     reviewRange: getReviewPeriod(state),
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
+    isEventModeEnabled: getIsEventModeEnabled(state),
   }),
-  dispatch => ({
-    setPeriodRange: periodLevel => dispatch(setPeriodLevelAction(periodLevel)),
-    reviewPeriod: periodLevel => dispatch(reviewPeriodAction(periodLevel)),
+  (dispatch) => ({
+    setPeriodRange: (periodLevel) => dispatch(setPeriodLevelAction(periodLevel)),
+    reviewPeriod: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
   }),
 )(Sidebar);

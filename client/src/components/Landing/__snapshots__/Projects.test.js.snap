@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Projects test Should render project without crashing 1`] = `
+<div
+  class="cell "
+>
+  <h3>
+    SMAP
+  </h3>
+  <div
+    class="item-data"
+  >
+    <ul>
+      <li>
+        55 Signals
+      </li>
+      <li>
+         unique pipelines
+      </li>
+    </ul>
+    <ul
+      class="last"
+    >
+      <li>
+        6 experiments
+      </li>
+    </ul>
+  </div>
+</div>
+`;

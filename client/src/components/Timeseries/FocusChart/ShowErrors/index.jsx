@@ -29,13 +29,13 @@ class ShowErrors extends Component {
     const { timeseriesErr } = this.props.datarun;
     const { xCoord } = getScale(width, height, timeseriesErr);
     const yRange = d3.scaleLinear().range([0, height - 10]);
-    yRange.domain(d3.extent(timeseriesErr, tmsData => tmsData[1]));
+    yRange.domain(d3.extent(timeseriesErr, (tmsData) => tmsData[1]));
 
     let area = d3
       .area()
-      .x(d => xCoord(d[0]))
-      .y0(d => -yRange(d[1]) / 2)
-      .y1(d => yRange(d[1]) / 2);
+      .x((d) => xCoord(d[0]))
+      .y0((d) => -yRange(d[1]) / 2)
+      .y1((d) => yRange(d[1]) / 2);
 
     return { area };
   }
@@ -46,11 +46,7 @@ class ShowErrors extends Component {
     const errWrapper = chart.append('g').attr('class', 'err-group');
     chart.attr('width', width).attr('height', height);
 
-    errWrapper
-      .append('path')
-      .datum(this.props.datarun.timeseriesErr)
-      .attr('class', 'err-data')
-      .attr('d', area);
+    errWrapper.append('path').datum(this.props.datarun.timeseriesErr).attr('class', 'err-data').attr('d', area);
   }
 
   drawBackground() {
@@ -63,23 +59,11 @@ class ShowErrors extends Component {
       .attr('y1', '0%')
       .attr('y2', '0');
 
-    gradient
-      .append('stop')
-      .attr('offset', '0%')
-      .attr('stop-color', '#1A1B20')
-      .attr('stop-opacity', 1);
+    gradient.append('stop').attr('offset', '0%').attr('stop-color', '#1A1B20').attr('stop-opacity', 1);
 
-    gradient
-      .append('stop')
-      .attr('offset', '50%')
-      .attr('stop-color', '#1A1B20')
-      .attr('stop-opacity', 0);
+    gradient.append('stop').attr('offset', '50%').attr('stop-color', '#1A1B20').attr('stop-opacity', 0);
 
-    gradient
-      .append('stop')
-      .attr('offset', '100%')
-      .attr('stop-color', '#1A1B20')
-      .attr('stop-opacity', 1);
+    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#1A1B20').attr('stop-opacity', 1);
 
     errGroup
       .append('rect')
@@ -98,18 +82,20 @@ class ShowErrors extends Component {
     const zoom = d3
       .zoom()
       .scaleExtent([1, Infinity])
-      .translateExtent([[0, 0], [width, height]])
-      .extent([[0, 0], [width, height]]);
+      .translateExtent([
+        [0, 0],
+        [width, height],
+      ])
+      .extent([
+        [0, 0],
+        [width, height],
+      ]);
 
     if (isZoomReady) {
       return { zoom };
     }
 
-    errGroup
-      .append('rect')
-      .attr('class', 'err-zoom')
-      .attr('width', '100%')
-      .attr('height', height);
+    errGroup.append('rect').attr('class', 'err-zoom').attr('width', '100%').attr('height', height);
     d3.select('.err-zoom').call(zoom);
     return { zoom };
   }
@@ -127,16 +113,14 @@ class ShowErrors extends Component {
     // getArea() cannot be used here
     const area = d3
       .area()
-      .x(data => xCoord(data[0]))
-      .y0(data => -yRange(data[1]) / 2)
-      .y1(data => yRange(data[1]) / 2);
+      .x((data) => xCoord(data[0]))
+      .y0((data) => -yRange(data[1]) / 2)
+      .y1((data) => yRange(data[1]) / 2);
 
     xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
-    yRange.domain(d3.extent(timeseriesErr, tmsData => tmsData[1]));
+    yRange.domain(d3.extent(timeseriesErr, (tmsData) => tmsData[1]));
 
-    d3.select('.err-data')
-      .datum(timeseriesErr)
-      .attr('d', area);
+    d3.select('.err-data').datum(timeseriesErr).attr('d', area);
     d3.select('.err-zoom').call(zoom.transform, zoomValue);
   }
 
@@ -170,7 +154,7 @@ ShowErrors.propTypes = {
   periodRange: PropTypes.object,
 };
 
-export default connect(state => ({
+export default connect((state) => ({
   periodRange: getSelectedPeriodRange(state),
   datarun: getDatarunDetails(state),
 }))(ShowErrors);
