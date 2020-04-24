@@ -7,8 +7,10 @@
     "start": "PORT=4200 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "jesttest": "jest test --watch",
     "eject": "react-scripts eject",
-    "clean": "rm -rf node_modules/"
+    "coverage:snapshots": "NODE_ENV=test npm test -- --coverage --updateSnapshot",
+    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -30,9 +32,13 @@
     "@types/redux-logger": "^3.0.7",
     "axios": "^0.19.2",
     "d3": "^5.15.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
     "eslint-plugin-prettier": "^3.1.2",
     "immer": "^6.0.3",
     "js-cookie": "^2.2.1",
+    "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
     "node-sass": "^4.13.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
@@ -43,6 +49,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-select": "^3.1.0",
+    "react-sortablejs": "^2.0.11",
     "react-transition-group": "^4.3.0",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
@@ -67,6 +74,7 @@
     ]
   },
   "devDependencies": {
+    "enzyme-to-json": "^3.4.4",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.10.1",
@@ -75,5 +83,10 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "prettier": "^2.0.4"
+  },
+  "jest": {
+    "snapshotSerializers": [
+      "<rootDir>/node_modules/enzyme-to-json/serializer"
+    ]
   }
 }

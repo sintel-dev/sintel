@@ -42,14 +42,14 @@ type State = {
   zoom?: object;
 };
 
-class FocusChart extends Component<Props, State> {
+export class FocusChart extends Component<Props, State> {
   private zoom: any;
 
   constructor(props) {
     super(props);
     this.state = {
-      width: 0,
-      height: 0,
+      width: 200, // unit tests value
+      height: 200, // unit tests value
       isTooltipVisible: false,
       eventData: {},
     };

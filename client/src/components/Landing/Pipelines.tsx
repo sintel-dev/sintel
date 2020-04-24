@@ -9,7 +9,7 @@ type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps;
 
-const Pipelines: React.FC<Props> = props => {
+const Pipelines: React.FC<Props> = (props) => {
   const { onSelectPipeline, selectedPipeline, pipelinesData } = props;
   const { pipelineList, isPipelinesLoading } = pipelinesData;
 
@@ -20,7 +20,7 @@ const Pipelines: React.FC<Props> = props => {
         <Loader isLoading={isPipelinesLoading}>
           {pipelineList.length ? (
             pipelineList.map((pipeline, index) =>
-              renderPipeline({ pipeline, index, onSelectPipeline, selectedPipeline }),
+              RenderPipeline({ pipeline, index, onSelectPipeline, selectedPipeline }),
             )
           ) : (
             <p>No pipelines have been found</p>
@@ -39,7 +39,12 @@ type renderPipelineProps = {
   selectedPipeline: typeof props.selectedPipeline;
 };
 
-const renderPipeline: React.FC<renderPipelineProps> = ({ pipeline, index, onSelectPipeline, selectedPipeline }) => {
+export const RenderPipeline: React.FC<renderPipelineProps> = ({
+  pipeline,
+  index,
+  onSelectPipeline,
+  selectedPipeline,
+}) => {
   const activeClass = selectedPipeline === pipeline.name ? 'active' : '';
 
   return (
@@ -61,7 +66,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = (dispatch: Function) => ({
-  onSelectPipeline: pipelineName => dispatch(selectPipeline(pipelineName)),
+  onSelectPipeline: (pipelineName) => dispatch(selectPipeline(pipelineName)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Pipelines);
