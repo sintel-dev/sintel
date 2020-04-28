@@ -18,6 +18,7 @@ export const TOGGLE_ZOOM = 'TOGGLE_ZOOM';
 export const SET_CURRENT_PERIOD_LEVEL = 'SET_CURRENT_PERIOD_LEVEL';
 export const REVIEW_PERIOD_LEVEL = 'REVIEW_PERIOD_LEVEL';
 export const TOGGLE_EVENT_MODE = 'TOGGLE_EVENT_MODE';
+export const UPLOAD_JSON_EVENTS = 'UPLOAD_JSON_EVENTS';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
