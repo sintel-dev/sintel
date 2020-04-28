@@ -32,6 +32,7 @@ import {
   SET_CURRENT_PERIOD_LEVEL,
   REVIEW_PERIOD_LEVEL,
   TOGGLE_EVENT_MODE,
+  UPLOAD_JSON_EVENTS,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -260,6 +261,13 @@ export function saveNewEventAction() {
         });
       })
       .catch((err) => dispatch({ type: ADDING_NEW_EVENT_RESULT, result: err }));
+  };
+}
+
+export function loadEventsFromJsonAction(jsonFiles) {
+  return async function (dispatch) {
+    // @TODO - implement it when backend is ready
+    return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
   };
 }
 

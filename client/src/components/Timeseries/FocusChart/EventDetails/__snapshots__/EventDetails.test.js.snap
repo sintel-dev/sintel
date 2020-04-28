@@ -12,7 +12,7 @@ exports[`Testing event Details component -> Should render event details without 
       x
     </button>
     <div
-      class="row"
+      class="event-row"
     >
       <label>
         Signal: 
@@ -22,7 +22,7 @@ exports[`Testing event Details component -> Should render event details without 
       </span>
     </div>
     <div
-      class="row"
+      class="event-row"
     >
       <label>
         Severity Score:
@@ -32,7 +32,7 @@ exports[`Testing event Details component -> Should render event details without 
       </span>
     </div>
     <div
-      class="row"
+      class="event-row"
     >
       <label>
         From:
@@ -42,7 +42,7 @@ exports[`Testing event Details component -> Should render event details without 
       </span>
     </div>
     <div
-      class="row"
+      class="event-row"
     >
       <label>
         To:
@@ -58,7 +58,7 @@ exports[`Testing event Details component -> Should render event details without 
       </button>
     </div>
     <div
-      class="row"
+      class="event-row"
     >
       <label
         for="sevScore"
@@ -80,7 +80,7 @@ exports[`Testing event Details component -> Should render event details without 
       </i>
     </div>
     <div
-      class="row select-holder"
+      class="event-row select-holder"
     >
       <div
         class="tag-select css-2b097c-container"
@@ -149,7 +149,7 @@ exports[`Testing event Details component -> Should render event details without 
       </div>
     </div>
     <div
-      class="row form-group"
+      class="event-row form-group"
     >
       <label
         for="comment"
@@ -193,7 +193,7 @@ exports[`Testing event Details component -> Should render event details without 
       </div>
     </div>
     <div
-      class="row "
+      class="event-row "
     >
       <ul>
         <li>

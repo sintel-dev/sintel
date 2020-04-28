@@ -84,26 +84,26 @@ export class EventDetails extends Component {
             <button type="button" className="close" onClick={closeEventDetails}>
               x
             </button>
-            <div className="row">
+            <div className="event-row">
               <label>Signal: </label>
               <span>{currentEventDetails.signal}</span>
             </div>
-            <div className="row">
+            <div className="event-row">
               <label>Severity Score:</label>
               <span>{currentEventDetails.score}</span>
             </div>
-            <div className="row">
+            <div className="event-row">
               <label>From:</label>
               <span>{new Date(currentEventDetails.start_time).toUTCString()}</span>
             </div>
-            <div className="row">
+            <div className="event-row">
               <label>To:</label>
               <span>{new Date(currentEventDetails.stop_time).toUTCString()}</span>
               <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
                 Modify
               </button>
             </div>
-            <div className="row">
+            <div className="event-row">
               {this.state.isTooltipVisible && renderInfoTooltip()}
               <label htmlFor="sevScore">Severity Score: </label>
               <input
@@ -124,7 +124,7 @@ export class EventDetails extends Component {
                 i
               </i>
             </div>
-            <div className="row select-holder">
+            <div className="event-row select-holder">
               <Select
                 onChange={(tag) => changeEventTag(tag)}
                 formatOptionLabel={formatOptionLabel}
@@ -135,7 +135,7 @@ export class EventDetails extends Component {
                 value={selectedOption(currentEventDetails.tag)}
               />
             </div>
-            <div className="row form-group">
+            <div className="event-row form-group">
               <label htmlFor="comment">Comment</label>
               <div className="comment-area">
                 <div className="comment-wrapper scroll-style">
@@ -154,7 +154,7 @@ export class EventDetails extends Component {
                 />
               </div>
             </div>
-            <div className="row ">
+            <div className="event-row ">
               <ul>
                 {!isAddingNewEvent && (
                   <li>
