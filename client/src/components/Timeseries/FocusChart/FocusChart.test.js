@@ -9,24 +9,43 @@ jest.mock('./ZoomControls', () => () => 'Zoom Controls Component');
 jest.mock('./FocusChartEvents/AddEvent', () => () => 'Add Event Component');
 
 describe('Testing FocusChart component ->', () => {
-  const focusChartProps = {
-    dataRun,
-    isPredictionVisible: false,
-    isTooltipVisible: false,
-    periodRange: {
-      zoomValue: 1,
-      eventRange: (2)[(0, 0)],
-    },
-    reviewRange: null,
-    zoomCounter: 0,
-    zoomDirection: '',
-    isEditingRange: false,
-    width: 300,
-    height: 100,
-  };
-  const mountedFocusChart = renderWithStore({}, <FocusChart {...focusChartProps} />);
-
   it('Should render FocusChart without crashing', () => {
+    const focusChartProps = {
+      dataRun,
+      isPredictionVisible: false,
+      isTooltipVisible: false,
+      periodRange: {
+        zoomValue: 1,
+        eventRange: (2)[(0, 0)],
+      },
+      reviewRange: null,
+      zoomCounter: 0,
+      zoomDirection: '',
+      isEditingRange: false,
+      width: 300,
+      height: 100,
+    };
+    const mountedFocusChart = renderWithStore({}, <FocusChart {...focusChartProps} />);
+    expect(mountedFocusChart).toMatchSnapshot();
+  });
+
+  it('Should render focuschart predictions', () => {
+    const focusChartProps = {
+      dataRun,
+      isPredictionVisible: false,
+      isTooltipVisible: false,
+      periodRange: {
+        zoomValue: 1,
+        eventRange: (2)[(0, 0)],
+      },
+      reviewRange: null,
+      zoomCounter: 0,
+      zoomDirection: '',
+      isEditingRange: false,
+      width: 300,
+      height: 100,
+    };
+    const mountedFocusChart = renderWithStore({}, <FocusChart {...focusChartProps} />);
     expect(mountedFocusChart).toMatchSnapshot();
   });
 

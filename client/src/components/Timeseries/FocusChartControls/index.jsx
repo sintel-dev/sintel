@@ -36,7 +36,7 @@ class FocusChartControls extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isUploadModalVisible: true,
+      isUploadModalVisible: false,
     };
   }
 
