@@ -1,41 +1,26 @@
 @import '../../../assets/sass/colors';
+@import '../../../assets/sass/modal';
+
 button, input, div{
     outline: none;
 }
+
 // Overwrite modal defaults
 .upload-modal {
     border-radius: 4px;
-    .modal-header{
-        border-bottom: none;
-        font-size: 20px;
-        padding: 30px;
-
-        .close{
-            text-shadow: none;
-            &.close:hover{
-                color: #fff;
-            }
-        }
-    }
     button{
         color: #fff;
         font-weight: normal;
-        outline: none
+        outline: none;
+        cursor: pointer;
     }
-    .modal-content{
-        background: $second-color;
-        .modal-body{
-            padding: 0 30px;
-        }
-    }
+
     .modal-footer{
-        border-top: none;
-        color: #fff;
-        font-size: 14px;
         li{
             display: inline-block;
             margin-right: 5px;
         }
+
         button{
             background: transparent;
             border: none;
@@ -43,21 +28,22 @@ button, input, div{
             border-radius: 4px;
             color: #fff;
         }
-        .btn-controls{
-            &.load{
-                li{
-                    margin-right: 16px;
-                }
-                button{
-                    text-transform: uppercase;
-                    &.upload{
-                        background: #2474F4;
-                        opacity: 1;
-                        &:disabled{
-                            cursor: not-allowed;
-                            opacity: 0.5;
-                        }
-                    }
+        li{
+            margin-right: 6px;
+
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+
+        button{
+            text-transform: uppercase;
+            &.upload{
+                background: #2474F4;
+                opacity: 1;
+                &:disabled{
+                    cursor: not-allowed;
+                    opacity: 0.5;
                 }
             }
         }
@@ -70,9 +56,10 @@ button, input, div{
     .drop-zone {
         border: 2px dashed #787C9D;
         padding: 16px;
+        border-radius: 5px;
         p{
             cursor: pointer;
-            margin-bottom: 0;
+            margin: 0;
             text-align: center;
             span{
                 color: #0073FD
