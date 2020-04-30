@@ -1,41 +1,72 @@
 @import '../../../assets/sass/colors';
+@import '../../../assets/sass/modal';
+
 button, input, div{
     outline: none;
 }
+
 // Overwrite modal defaults
 .upload-modal {
     border-radius: 4px;
-    .modal-header{
-        border-bottom: none;
-        font-size: 20px;
-        padding: 30px;
-
-        .close{
-            text-shadow: none;
-            &.close:hover{
-                color: #fff;
-            }
-        }
-    }
     button{
         color: #fff;
         font-weight: normal;
-        outline: none
+        outline: none;
+        cursor: pointer;
     }
-    .modal-content{
-        background: $second-color;
-        .modal-body{
-            padding: 0 30px;
+
+    .upload-info {
+        label{
+            cursor: pointer;
+            position: relative;
+            padding-left: 25px;
+
+            &:before, &:after {
+                position: absolute;
+            }
+
+            &:before{
+                content: "";
+                top: 2px;
+                left: 0px;
+                width: 12px;
+                height: 12px;
+                border: 1px solid #fff;
+            }
+
+            &:after {
+                font-size: 12px;
+                text-align: center;
+                content: "\2713";
+                line-height: 11px;
+                left: 2px;
+                top: 4px;
+                opacity: 0;
+                transition: all .2s ease-in-out;
+            }
+
+        }
+
+        input{
+            &[type="checkbox"] {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                position: absolute;
+
+                &:checked + label:after {
+                    opacity: 1;
+                }
+            }
         }
     }
+
     .modal-footer{
-        border-top: none;
-        color: #fff;
-        font-size: 14px;
         li{
             display: inline-block;
             margin-right: 5px;
         }
+
         button{
             background: transparent;
             border: none;
@@ -43,25 +74,27 @@ button, input, div{
             border-radius: 4px;
             color: #fff;
         }
-        .btn-controls{
-            &.load{
-                li{
-                    margin-right: 16px;
-                }
-                button{
-                    text-transform: uppercase;
-                    &.upload{
-                        background: #2474F4;
-                        opacity: 1;
-                        &:disabled{
-                            cursor: not-allowed;
-                            opacity: 0.5;
-                        }
-                    }
+        li{
+            margin-right: 6px;
+
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+
+        button{
+            text-transform: uppercase;
+            &.upload{
+                background: #2474F4;
+                opacity: 1;
+                &:disabled{
+                    cursor: not-allowed;
+                    opacity: 0.5;
                 }
             }
         }
     }
+
     pre{
         margin-top: 30px;
         background: $main-color !important;
@@ -70,9 +103,10 @@ button, input, div{
     .drop-zone {
         border: 2px dashed #787C9D;
         padding: 16px;
+        border-radius: 5px;
         p{
             cursor: pointer;
-            margin-bottom: 0;
+            margin: 0;
             text-align: center;
             span{
                 color: #0073FD
