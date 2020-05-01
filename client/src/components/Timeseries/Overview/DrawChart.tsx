@@ -176,7 +176,10 @@ class DrawChart extends Component<ChartProps, ChartState> {
       zoomValue,
     };
 
-    this.renderTooltip();
+    if(d3.event && d3.event.sourceEvent.type !== 'zoom') {
+      this.initTooltip();
+      this.updateTooltipCoords();
+    }
 
     selection && this.props.onChangePeriod(selectedRange);
   }
@@ -233,41 +236,9 @@ class DrawChart extends Component<ChartProps, ChartState> {
     );
   }
 
-  initTooltip() {
+  initTooltip(){
     const { eventRange } = this.props.selectedPeriod;
-    const isBrushCreated = eventRange[0] !== 0 || eventRange[1] !== 0;
-    if (!isBrushCreated) {
-      return;
-    }
-
-    const selection = d3.selectAll('.overview-brush .selection');
-
-    // @TODO - investigate unexpected behavior of tooltip
-    selection
-      .on('mouseover', () => this.renderTooltip())
-      .on('mouseout', () => this.destroyTooltip())
-      .on('mousemove', () => this.updateTooltipCoords())
-      .on('mousedown', () => this.updateTooltipCoords());
-  }
-
-  updateTooltipCoords() {
-    const { clientX, clientY } = d3.event;
-    const tooltip = document.getElementById('brushTooltip');
-    tooltip.setAttribute('style', `left: ${clientX + 10}px; top: ${clientY + 10}px`);
-  }
-
-  destroyTooltip() {
-    document.getElementById('brushTooltip').classList.remove('active');
-    document.getElementById('brushTooltip').innerHTML = '';
-  }
-
-  renderTooltip() {
-    const { eventRange } = this.props.selectedPeriod;
-
     const rootTooltip = document.getElementById('brushTooltip');
-    let leftCoord = 0;
-    let topCoord = 0;
-
     const { xCoord } = this.getScale();
     const startDate = formatDate(new Date(xCoord.invert(eventRange[0]).getTime()));
     const endDate = formatDate(new Date(xCoord.invert(eventRange[1]).getTime()));
@@ -280,15 +251,38 @@ class DrawChart extends Component<ChartProps, ChartState> {
 
     rootTooltip.classList.add('active');
     rootTooltip.innerHTML = tooltipDOM;
-    this.updateTooltipCoords();
-    if (d3.event.sourceEvent === undefined) {
-      this.updateTooltipCoords();
-    } else {
-      leftCoord = d3.event.sourceEvent.clientX;
-      topCoord = d3.event.sourceEvent.clientY;
-      rootTooltip.setAttribute('style', `left: ${leftCoord + 10}px; top: ${topCoord + 10}px`);
+  }
+
+  handleTooltip() {
+    const { eventRange } = this.props.selectedPeriod;
+    const isBrushCreated = eventRange[0] !== 0 || eventRange[1] !== 0;
+    if (!isBrushCreated) {
+      return;
+    }
+
+    const selection = d3.selectAll('.overview-brush .selection');
+
+    selection
+      .on('mouseover', () => this.initTooltip())
+      .on('mouseout', () => this.destroyTooltip())
+      .on('mousemove', () => this.updateTooltipCoords());
+  }
+
+  updateTooltipCoords() {
+    const {clientX, clientY } = d3.event.sourceEvent ? d3.event.sourceEvent : d3.event;
+
+    const tooltip = document.getElementById('brushTooltip');
+
+    if(clientX !== undefined && clientY !== undefined) {
+      tooltip.setAttribute('style', `left: ${clientX + 10}px; top: ${clientY + 10}px`);
     }
   }
+
+  destroyTooltip() {
+    document.getElementById('brushTooltip').classList.remove('active');
+    document.getElementById('brushTooltip').innerHTML = '';
+  }
+
 
   render() {
     const { width, height } = this.state;
@@ -302,7 +296,8 @@ class DrawChart extends Component<ChartProps, ChartState> {
             width={width}
             height={height}
             id={this.props.dataRun.id}
-            onMouseMove={() => this.initTooltip()}
+            onMouseOver={() => this.handleTooltip()}
+            onMouseOut={() => this.destroyTooltip()}
             transform="translate(9,3)"
           />
         </svg>
