@@ -9,12 +9,6 @@ current_api_version = '/api/v1/'
 
 def add_routes(app):
 
-    # add index.html
-    @app.route('/')
-    @app.route('/index')
-    def index():
-        return render_template('index.html')
-
     # configure RESTful APIs
     api = Api(app)
 

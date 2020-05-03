@@ -34,16 +34,9 @@ RUN apt-get install -y python3-pip python3-dev \
  && cd /usr/local/bin \
  && ln -s /usr/bin/python3 python \
  && pip3 install --upgrade pip
-# install node
-RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-RUN sudo apt-get install -yq nodejs \
- && apt-get clean \
+
+RUN apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-
-# install global npm packages
-RUN npm install --quiet -g gulp-cli
-
 
 # copy our application code
 ADD . /mtv
@@ -51,7 +44,6 @@ WORKDIR /mtv
 
 # install application packages for python and node
 RUN make install
-RUN cd ./client && npm install && npm run build
 
 
 
