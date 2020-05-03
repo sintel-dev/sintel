@@ -10,7 +10,7 @@
 
 
 # start from base
-FROM ubuntu:latest
+FROM ubuntu:18.04
 LABEL maintainer="Dongyu Liu <windliudy@gmail.com>"
 
 
@@ -51,7 +51,7 @@ WORKDIR /mtv
 
 # install application packages for python and node
 RUN make install
-RUN cd ./client && npm install && npm run build:prod
+RUN cd ./client && npm install && npm run build
 
 
 

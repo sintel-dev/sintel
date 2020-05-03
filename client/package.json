@@ -10,7 +10,8 @@
     "jesttest": "jest test --watch",
     "eject": "react-scripts eject",
     "coverage:snapshots": "NODE_ENV=test npm test -- --coverage --updateSnapshot",
-    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false"
+    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false",
+    "clean": "rm -rf node_modules && rm -rf build"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

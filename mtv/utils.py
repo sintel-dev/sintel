@@ -36,7 +36,7 @@ def read_config(path_to_config):
     dictionary = None
 
     try:
-        with open(path_to_config, "r") as f:
+        with open(path_to_config, "r", encoding="utf-8") as f:
             dictionary = load(f.read(), Loader=Loader)
     except Exception:
         LOGGER.exception('Error loading config file {}'.format(path_to_config))
