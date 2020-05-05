@@ -34,12 +34,15 @@ help:
 # ----------------------- session: install ----------------------- #
 
 .PHONY: install
-install: clean-build clean-pyc ## install the packages for running mtv
+install: clean-build clean-pyc clean-client ## install the packages for running mtv
 	pip install -e .
+	$(MAKE) init-db && 	$(MAKE) load-db-mtv
+	cd client && npm install --production && npm run build
 
 .PHONY: install-develop
-install-develop: clean-build clean-pyc ## install the package in editable mode and dependencies for development
+install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
+	cd client && npm install
 
 .PHONY: init-db
 init-db: clean-db
@@ -168,7 +171,7 @@ publish: dist ## package and upload a release
 
 .PHONY: clean
 clean: clean-build clean-pyc clean-test clean-coverage \
-	   clean-logs clean-docs
+	   clean-logs clean-docs clean-client
 
 .PHONY: clean-build
 clean-build: ## remove build artifacts
@@ -205,10 +208,11 @@ clean-docs: ## remove previously built docs
 	rm -f docs/api/*.rst
 	-$(MAKE) -C docs clean 2>/dev/null  # this fails if sphinx is not yet installed
 
+.PHONY: clean-client
+clean-client: ## remove build artifacts under ./client
+	npm -C client run clean
 
 .PHONY: clean-db
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
-
-
