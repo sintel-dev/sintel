@@ -33,6 +33,7 @@ import {
   REVIEW_PERIOD_LEVEL,
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
+  EVENT_UPDATE_STATUS,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -71,6 +72,7 @@ export function setActiveEventAction(eventID) {
   return function (dispatch) {
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: eventID });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
+    dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: null });
     dispatch(getEventComments());
   };
 }
@@ -169,21 +171,38 @@ export function saveEventDetailsAction() {
     }
 
     if (updatedEventDetails.id) {
-      await API.events.update(updatedEventDetails.id, payload).then(async () => {
-        await API.events.all('events').then((response) => {
-          const { events } = response;
-          const datarun = getDatarunDetails(getState());
-          const filteredEvents = events.filter((event) => event.datarun === datarun.id);
-
-          const selectedExperimentData = getSelectedExperimentData(getState());
-          const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === datarun.id);
+      await API.events
+        .update(updatedEventDetails.id, payload)
+        .then(async () => {
           dispatch({
-            type: UPDATE_DATARUN_EVENTS,
-            newDatarunEvents: filteredEvents,
-            datarunIndex,
+            type: EVENT_UPDATE_STATUS,
+            eventUpdateStatus: 'success',
           });
-        });
-      });
+
+          await API.events.all('events').then((response) => {
+            const { events } = response;
+            const datarun = getDatarunDetails(getState());
+            const filteredEvents = events.filter((event) => event.datarun === datarun.id);
+
+            const selectedExperimentData = getSelectedExperimentData(getState());
+            const datarunIndex = selectedExperimentData.data.dataruns.findIndex(
+              (dataItem) => dataItem.id === datarun.id,
+            );
+            dispatch({
+              type: UPDATE_DATARUN_EVENTS,
+              newDatarunEvents: filteredEvents,
+              datarunIndex,
+            });
+
+            setTimeout(function () {
+              dispatch({
+                type: EVENT_UPDATE_STATUS,
+                eventUpdateStatus: null,
+              });
+            }, 3000);
+          });
+        })
+        .catch(() => dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: 'error' }));
     } else {
       dispatch(saveNewEventAction());
     }
