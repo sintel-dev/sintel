@@ -26,6 +26,7 @@ export const getReviewPeriod = (state) => state.datarun.reviewPeriod;
 export const getSelectedPeriodLevel = (state) => state.datarun.periodLevel;
 export const getIsEventModeEnabled = (state) => state.datarun.isEventModeEnabled;
 export const getUploadEventsStatus = (state) => state.datarun.uploadEventsStatus;
+export const getUpdateEventStatus = (state) => state.datarun.eventUpdateStatus;
 
 const filterDatarunPeriod = (period, periodLevel, reviewPeriod) => {
   const { month, year } = periodLevel;
