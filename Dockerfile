@@ -43,8 +43,8 @@ ADD . /mtv
 WORKDIR /mtv
 
 # install application packages for python and node
-RUN make install
-
+# RUN make install
+RUN pip install -e .
 
 
 # Set system environment variables if any
