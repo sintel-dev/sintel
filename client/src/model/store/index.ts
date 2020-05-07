@@ -9,7 +9,11 @@ const loggerMiddleware = createLogger({
   collapsed: true,
 });
 
-const middleWares = [thunkMiddleWare, api, loggerMiddleware];
+let middleWares = [thunkMiddleWare, api, loggerMiddleware];
+
+if (process.env.NODE_ENV === 'production') {
+  middleWares = [thunkMiddleWare, api];
+}
 
 export function configureStore(initialState = {}) {
   return createStore(dashBoardReducers, initialState, composeWithDevTools(applyMiddleware(...middleWares)));
