@@ -27,6 +27,7 @@ const initialState: DatarunState = {
   reviewPeriod: null,
   isEventModeEnabled: true,
   uploadEventsStatus: null,
+  eventUpdateStatus: null,
 };
 
 /**
@@ -111,6 +112,10 @@ function UPLOAD_JSON_EVENTS(nextState, { uploadEventsStatus }) {
   nextState.uploadEventsStatus = uploadEventsStatus;
 }
 
+function EVENT_UPDATE_STATUS(nextState, { eventUpdateStatus }) {
+  nextState.eventUpdateStatus = eventUpdateStatus;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -130,4 +135,5 @@ export default createReducer<DatarunState>(initialState, {
   REVIEW_PERIOD_LEVEL,
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
+  EVENT_UPDATE_STATUS,
 });

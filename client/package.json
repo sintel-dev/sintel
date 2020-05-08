@@ -10,7 +10,9 @@
     "jesttest": "jest test --watch",
     "eject": "react-scripts eject",
     "coverage:snapshots": "NODE_ENV=test npm test -- --coverage --updateSnapshot",
-    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false"
+    "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false",
+    "clean": "rm -rf node_modules && rm -rf build",
+    "serve": "serve -s build -p 4200"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -60,6 +62,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
+    "serve": "^11.3.0",
     "typescript": "^3.8.3"
   },
   "eslintConfig": {

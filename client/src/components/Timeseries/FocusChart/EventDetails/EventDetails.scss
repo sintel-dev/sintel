@@ -78,6 +78,28 @@
                 margin: 0 0 5px 0;
             }
         }
+
+        .btn-wrapper {
+            p{
+                margin: 0;
+                padding: 0;
+                &.success, &.error {
+                    svg{
+                        margin-right: 6px;
+                    }
+                }
+                &.success {
+                    path {
+                        fill: $green-color
+                    }
+                }
+                &.error {
+                    path {
+                        fill: $red-color;
+                    }
+                }
+            }
+        }
     }
 
     button{

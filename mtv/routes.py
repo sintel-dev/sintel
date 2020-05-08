@@ -8,8 +8,6 @@ current_api_version = '/api/v1/'
 
 
 def add_routes(app):
-
-    # add index.html
     @app.route('/')
     @app.route('/index')
     def index():

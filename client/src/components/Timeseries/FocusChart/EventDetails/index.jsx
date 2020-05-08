@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faExclamation } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 
 import {
@@ -19,6 +21,7 @@ import {
   getIsPopupOpen,
   getNewEventDetails,
   getIsAddingNewEvents,
+  getUpdateEventStatus,
 } from '../../../../model/selectors/datarun';
 
 import Loader from '../../../Common/Loader';
@@ -56,6 +59,7 @@ export class EventDetails extends Component {
       newEventDetails,
       isAddingNewEvent,
       updateNewEventDetails,
+      eventUpdateStatus,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -154,8 +158,8 @@ export class EventDetails extends Component {
                 />
               </div>
             </div>
-            <div className="event-row ">
-              <ul>
+            <div className="event-row">
+              <ul className="btn-wrapper">
                 {!isAddingNewEvent && (
                   <li>
                     <button type="button" className="danger" onClick={deleteEvent}>
@@ -168,6 +172,21 @@ export class EventDetails extends Component {
                     Save
                   </button>
                 </li>
+                {eventUpdateStatus !== null && (
+                  <li>
+                    {eventUpdateStatus === 'success' ? (
+                      <p className="success">
+                        <FontAwesomeIcon icon={faCheck} />
+                        Event successfuly saved
+                      </p>
+                    ) : (
+                      <p className="error">
+                        <FontAwesomeIcon icon={faExclamation} />
+                        Event update error
+                      </p>
+                    )}
+                  </li>
+                )}
               </ul>
             </div>
           </div>
@@ -192,6 +211,7 @@ export default connect(
     isPopupOpen: getIsPopupOpen(state),
     newEventDetails: getNewEventDetails(state),
     isAddingNewEvent: getIsAddingNewEvents(state),
+    eventUpdateStatus: getUpdateEventStatus(state),
   }),
   (dispatch) => ({
     closeEventDetails: () => dispatch(closeEventModal()),
