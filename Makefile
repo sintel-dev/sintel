@@ -36,7 +36,8 @@ help:
 .PHONY: install
 install: clean-build clean-pyc clean-client ## install the packages for running mtv
 	pip install -e .
-	cd client && npm install --production
+	$(MAKE) init-db && 	$(MAKE) load-db-mtv
+	cd client && npm install --production && npm run build
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
@@ -215,5 +216,3 @@ clean-client: ## remove build artifacts under ./client
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
-
-
