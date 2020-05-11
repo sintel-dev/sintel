@@ -16,7 +16,13 @@ export const filteringTags = createSelector(
       return [];
     }
 
-    return filterTags.map((tag) => tag.value);
+    const tags = filterTags.map((tag) => tag.value);
+
+    if (tags.includes('Untagged')) {
+      tags.push(null);
+    }
+
+    return tags;
   },
 );
 
