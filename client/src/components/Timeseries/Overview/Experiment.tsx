@@ -37,6 +37,9 @@ class Experiment extends Component<Props, LocalState> {
     if (currenteExperimentID !== experimentID) {
       this.props.onSelectExperiment(this.props.location, experimentID);
     }
+    this.setState({
+      dataRuns: this.props.processedDataruns,
+    });
   }
 
   componentDidUpdate(prevProps) {
