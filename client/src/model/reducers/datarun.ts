@@ -28,6 +28,8 @@ const initialState: DatarunState = {
   isEventModeEnabled: true,
   uploadEventsStatus: null,
   eventUpdateStatus: null,
+  isTranscriptSupported: false,
+  isSpeechInProgress: false,
 };
 
 /**
@@ -116,6 +118,14 @@ function EVENT_UPDATE_STATUS(nextState, { eventUpdateStatus }) {
   nextState.eventUpdateStatus = eventUpdateStatus;
 }
 
+function SET_TRANSCRIPT_STATUS(nextState, { isTranscriptSupported }) {
+  nextState.isTranscriptSupported = isTranscriptSupported;
+}
+
+function SPEECH_STATUS(nextState, { isSpeechInProgress }) {
+  nextState.isSpeechInProgress = isSpeechInProgress;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -136,4 +146,6 @@ export default createReducer<DatarunState>(initialState, {
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
   EVENT_UPDATE_STATUS,
+  SET_TRANSCRIPT_STATUS,
+  SPEECH_STATUS,
 });
