@@ -82,7 +82,7 @@ export class EventDetails extends Component {
     };
 
     return (
-      <div className={`events-wrapper ${isActive}`}>
+      <div className={`events-wrapper scroll-style ${isActive}`}>
         {currentEventDetails && (
           <div>
             <button type="button" className="close" onClick={closeEventDetails}>
@@ -152,8 +152,8 @@ export class EventDetails extends Component {
                 <textarea
                   id="comment"
                   placeholder="Enter your comment..."
-                  value={updatedEventDetails.comments}
-                  onChange={(event) => updateEventDetails({ comments: event.target.value })}
+                  value={updatedEventDetails.commentsDraft}
+                  onChange={(event) => updateEventDetails({ commentsDraft: event.target.value })}
                   readOnly={isAddingNewEvent}
                 />
               </div>

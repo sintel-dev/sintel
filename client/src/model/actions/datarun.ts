@@ -79,19 +79,16 @@ export function setActiveEventAction(eventID) {
 
 export function closeEventModal() {
   return async function (dispatch, getState) {
-    const dataRun = getDatarunDetails(getState());
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     const currentEventDetails = getCurrentEventDetails(getState());
-    await API.events.all('events').then((response) => {
-      const { events } = response;
-      const filteredEvents = events.filter((currentEvent) => currentEvent.datarun === dataRun.id);
-      const eventData = filteredEvents.find((currentEvent) => currentEvent.id === currentEventDetails.id);
-      let { start_time, stop_time } = eventData;
 
+    await API.events.find(`${currentEventDetails.id}/`).then((response) => {
+      const { start_time, stop_time } = response;
       dispatch({
         type: UPDATE_EVENT_DETAILS,
-        eventDetails: { ...eventData, start_time: start_time * 1000, stop_time: stop_time * 1000 },
+        eventDetails: { ...response, start_time: start_time * 1000, stop_time: stop_time * 1000 },
       });
-      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+
       dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
       dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
       dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
@@ -143,7 +140,7 @@ export function isEditingEventRangeAction(eventState) {
 export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
-    const { comments } = updatedEventDetails;
+    const { commentsDraft } = updatedEventDetails;
     const { start_time, stop_time, score, tag } = updatedEventDetails;
 
     const start = start_time / 1000;
@@ -157,17 +154,17 @@ export function saveEventDetailsAction() {
       event_id: updatedEventDetails.id,
     };
 
-    if (comments) {
+    if (commentsDraft && commentsDraft.length) {
       const commentData = {
         event_id: updatedEventDetails.id,
-        text: comments,
-        created_by: null, // no logged in user yet
+        text: commentsDraft,
+        created_by: null, // no particular details about the logged in user
       };
 
       // posting comments
       await API.comments.create(commentData);
       dispatch(getEventComments());
-      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...updatedEventDetails, comments: '' } });
+      dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...updatedEventDetails, commentsDraft: '' } });
     }
 
     if (updatedEventDetails.id) {
@@ -293,25 +290,26 @@ export function loadEventsFromJsonAction(jsonFiles) {
 export function deleteEventAction() {
   return async function (dispatch, getState) {
     const currentEventDetails = getCurrentEventDetails(getState());
-    const datarunID = currentEventDetails.datarun;
+    const currentDatarun = getDatarunDetails(getState());
+    const remainingEvents = currentDatarun.events.filter((currentEvent) => currentEvent.id !== currentEventDetails.id);
     const selectedExperimentData = getSelectedExperimentData(getState());
-    const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === datarunID);
+    const datarunIndex = selectedExperimentData.data.dataruns.findIndex(
+      (dataItem) => dataItem.id === currentDatarun.id,
+    );
 
-    await API.events.delete(currentEventDetails.id).then(async () => {
-      await API.events.all(datarunID).then((datarunEvents) => {
-        const newDatarunEvents = datarunEvents.events.filter((event) => event.datarun === datarunID);
+    // @TODO - implement delete comments as wel.
+    // Investigate why server response is 405 when deleting comment
+    // dispatch(deleteEventComments());
 
-        // @TODO - address the case when the deleted comment is the last one
-        // also delete the event from the top linechart
-        dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
-        dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
-        dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
-        dispatch({
-          type: UPDATE_DATARUN_EVENTS,
-          newDatarunEvents,
-          datarunIndex,
-        });
+    await API.events.delete(currentEventDetails.id).then(() => {
+      dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
+      dispatch({
+        type: UPDATE_DATARUN_EVENTS,
+        newDatarunEvents: remainingEvents,
+        datarunIndex,
       });
+
+      dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     });
   };
 }
