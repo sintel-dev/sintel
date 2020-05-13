@@ -73,6 +73,13 @@ export function setActiveEventAction(eventID) {
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: eventID });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
     dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: null });
+
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      dispatch({ type: 'SET_TRANSCRIPT_STATUS', isTranscriptSupported: true });
+    } else {
+      dispatch({ type: 'SET_TRANSCRIPT_STATUS', isTranscriptSupported: false });
+    }
+
     dispatch(getEventComments());
   };
 }
@@ -368,5 +375,30 @@ export function setPeriodLevelAction(newPeriod) {
 export function reviewPeriodAction(period) {
   return function (dispatch) {
     dispatch({ type: REVIEW_PERIOD_LEVEL, isPeriodLevelSelected: true, reviewPeriod: period });
+  };
+}
+
+export function recordCommentAction() {
+  return function (dispatch, getState) {
+    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const { commentsDraft } = updatedEventDetails;
+    dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
+
+    // @ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition();
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+
+    recognition.start();
+    recognition.onresult = function (event) {
+      const current = event.resultIndex;
+      const { transcript } = event.results[current][0];
+      const comments = commentsDraft ? `${commentsDraft} ${transcript}.` : transcript;
+      dispatch(updateEventDetailsAction({ commentsDraft: comments }));
+      dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: false });
+    };
   };
 }

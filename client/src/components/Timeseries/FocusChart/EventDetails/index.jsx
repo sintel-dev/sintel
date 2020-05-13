@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faExclamation, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 
 import {
@@ -12,6 +12,7 @@ import {
   closeEventModal,
   deleteEventAction,
   updateNewEventDetailsAction,
+  recordCommentAction,
 } from '../../../../model/actions/datarun';
 
 import {
@@ -22,6 +23,8 @@ import {
   getNewEventDetails,
   getIsAddingNewEvents,
   getUpdateEventStatus,
+  getIsTranscriptSupported,
+  getIsSpeechInProgress,
 } from '../../../../model/selectors/datarun';
 
 import Loader from '../../../Common/Loader';
@@ -60,6 +63,9 @@ export class EventDetails extends Component {
       isAddingNewEvent,
       updateNewEventDetails,
       eventUpdateStatus,
+      recordComment,
+      isTranscriptSupported,
+      isSpeechInProgress,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -140,7 +146,19 @@ export class EventDetails extends Component {
               />
             </div>
             <div className="event-row form-group">
-              <label htmlFor="comment">Comment</label>
+              <ul className="form-intro">
+                <li>
+                  <label htmlFor="comment">Comment</label>
+                </li>
+                <li>
+                  {isTranscriptSupported && (
+                    <button type="button" onClick={() => recordComment()} disabled={isSpeechInProgress}>
+                      <FontAwesomeIcon icon={faMicrophone} />
+                    </button>
+                  )}
+                </li>
+              </ul>
+
               <div className="comment-area">
                 <div className="comment-wrapper scroll-style">
                   {(!isAddingNewEvent && (
@@ -212,6 +230,8 @@ export default connect(
     newEventDetails: getNewEventDetails(state),
     isAddingNewEvent: getIsAddingNewEvents(state),
     eventUpdateStatus: getUpdateEventStatus(state),
+    isTranscriptSupported: getIsTranscriptSupported(state),
+    isSpeechInProgress: getIsSpeechInProgress(state),
   }),
   (dispatch) => ({
     closeEventDetails: () => dispatch(closeEventModal()),
@@ -220,5 +240,6 @@ export default connect(
     editEventRange: (eventState) => dispatch(isEditingEventRangeAction(eventState)),
     deleteEvent: () => dispatch(deleteEventAction()),
     updateNewEventDetails: (details) => dispatch(updateNewEventDetailsAction(details)),
+    recordComment: () => dispatch(recordCommentAction()),
   }),
 )(EventDetails);
