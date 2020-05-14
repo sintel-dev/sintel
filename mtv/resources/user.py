@@ -140,8 +140,6 @@ class GoogleAuthentication(Resource):
     def post(self):
         body = request.json
 
-        # import pudb;
-        # pudb.set_trace();
         # Temporarily addressed google auth
         token = auth_utils.generate_auth_token(str(body['gid'])).decode()
         return token

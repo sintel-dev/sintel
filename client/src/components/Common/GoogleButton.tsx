@@ -33,6 +33,7 @@ export class GoogleButton extends Component<GoogleButtonProps> {
           onSuccess={responseGoogleSucces}
           onFailure={responseGoogleSucces}
           cookiePolicy="single_host_origin"
+          onAutoLoadFinished={message => message}
         >
           {this.props.text}
         </GoogleLogin>
