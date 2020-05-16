@@ -6,15 +6,15 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:3001",
-            "webRoot": "${workspaceFolder}/mtv-client"
+            "webRoot": "${workspaceFolder}/client"
         },
         {
             "name": "Debug All CRA Tests",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/mtv-client/node_modules/.bin/react-scripts",
+            "runtimeExecutable": "${workspaceRoot}/client/node_modules/.bin/react-scripts",
             "args": ["test", "--runInBand", "--no-cache", "--watchAll=false"],
-            "cwd": "${workspaceRoot}/mtv-client",
+            "cwd": "${workspaceRoot}/client",
             "protocol": "inspector",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
@@ -25,7 +25,7 @@
             "name": "Debug Current CRA Test",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/mtv-client/node_modules/.bin/react-scripts",
+            "runtimeExecutable": "${workspaceRoot}/client/node_modules/.bin/react-scripts",
             "args": [
                 "test",
                 "${fileBasenameNoExtension}",
@@ -33,7 +33,7 @@
                 "--no-cache",
                 "--watchAll=false"
             ],
-            "cwd": "${workspaceRoot}/mtv-client",
+            "cwd": "${workspaceRoot}/client",
             "protocol": "inspector",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

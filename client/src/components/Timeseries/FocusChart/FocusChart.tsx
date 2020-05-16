@@ -48,8 +48,8 @@ export class FocusChart extends Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
-      width: 200, // unit tests value
-      height: 200, // unit tests value
+      width: 0,
+      height: 0,
       isTooltipVisible: false,
       eventData: {},
     };

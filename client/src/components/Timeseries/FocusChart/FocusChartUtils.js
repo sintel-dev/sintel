@@ -15,8 +15,8 @@ export const getWrapperSize = () => {
 };
 
 export const getScale = (width, height, datarun) => {
-  const [minTX, maxTX] = d3.extent(datarun, time => time[0]);
-  const [minTY, maxTY] = d3.extent(datarun, time => time[1]);
+  const [minTX, maxTX] = d3.extent(datarun, (time) => time[0]);
+  const [minTY, maxTY] = d3.extent(datarun, (time) => time[1]);
   const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
   const drawableHeight = height - 3.5 * CHART_MARGIN;
 
@@ -48,12 +48,12 @@ export const drawLine = (data, periodRange, maxTimeSeries) => {
 
   const line = d3
     .line()
-    .x(d => xCoord(d[0]))
-    .y(d => yCoord(d[1]));
+    .x((d) => xCoord(d[0]))
+    .y((d) => yCoord(d[1]));
   return line(data);
 };
 
-export const normalizeHanlers = chart => {
+export const normalizeHanlers = (chart) => {
   const brushHandlers = d3.selectAll(`.${chart} rect.handle`);
   const overlay = d3.select(`.${chart} .selection`);
 
@@ -69,10 +69,10 @@ export const normalizeHanlers = chart => {
 
   const { height } = getWrapperSize();
   brushHandlers
-    .attr('y', function() {
+    .attr('y', function () {
       return height / 2 - height / 6;
     })
-    .attr('height', function() {
+    .attr('height', function () {
       return height / 4;
     })
     .attr('ry', 3);
