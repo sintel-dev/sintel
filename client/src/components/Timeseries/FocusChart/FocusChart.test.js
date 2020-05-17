@@ -12,15 +12,6 @@ jest.mock('./ZoomControls', () => () => 'Zoom Controls Component');
 jest.mock('./FocusChartEvents/AddEvent', () => () => 'Add Event Component');
 
 describe('Testing FocusChart component -> ', () => {
-  beforeAll(() => {
-    chartUtils.getWrapperSize = jest.fn().mockReturnValue({ width: 300, height: 300 });
-    utils.formatDate = jest.fn().mockReturnValue({
-      startDate: {
-        day: 'mon',
-      },
-    });
-  });
-
   const focusChartProps = {
     dataRun,
     isPredictionVisible: false,
@@ -32,7 +23,17 @@ describe('Testing FocusChart component -> ', () => {
     zoomCounter: 0,
     zoomDirection: '',
     isEditingRange: false,
+    setPeriodRange: jest.fn().mockReturnValue({ eventRange: [200, 300], zoomValue: 2.33 }),
   };
+
+  beforeAll(() => {
+    chartUtils.getWrapperSize = jest.fn().mockReturnValue({ width: 300, height: 300 });
+    utils.formatDate = jest.fn().mockReturnValue({
+      startDate: {
+        day: 'mon',
+      },
+    });
+  });
 
   it('Set focus chart dimensions in state', () => {
     const mountedFocusChart = shallow(<FocusChart {...focusChartProps} />);
@@ -71,8 +72,31 @@ describe('Testing FocusChart component -> ', () => {
     expect(mountedFocusChart.instance().state.isTooltipVisible).toBe(true);
   });
 
-  // should handle zoom
-  // test zoom presence
-  // toogle zoom
-  // update zoom on click
+  it('Should handle updateZoomOnClick method', () => {
+    const spy = jest.spyOn(FocusChart.prototype, 'updateZoomOnClick');
+    const mountedFocusChart = mount(<FocusChart {...focusChartProps} zoomCounter={0} />);
+    mountedFocusChart.setProps({ zoomCounter: 1, zoomDirection: 'In' });
+    mountedFocusChart.update();
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Should handle toggleZoom method', () => {
+    const spy = jest.spyOn(FocusChart.prototype, 'toggleZoom');
+    const mountedFocusChart = mount(<FocusChart {...focusChartProps} />);
+    mountedFocusChart.setProps({ isEditingRange: true });
+    mountedFocusChart.update();
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    mountedFocusChart.setProps({ isEditingRange: false });
+    mountedFocusChart.update();
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
+  it('Should handle updateChartZoomOnSelectPeriod method', () => {
+    const spy = jest.spyOn(FocusChart.prototype, 'updateChartZoomOnSelectPeriod');
+    const mountedFocusChart = mount(<FocusChart {...focusChartProps} />);
+    mountedFocusChart.setProps({ selectedPeriod: { year: 2009, month: '' } });
+    mountedFocusChart.update();
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
 });
