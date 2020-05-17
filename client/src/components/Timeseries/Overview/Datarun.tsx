@@ -15,7 +15,7 @@ type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
 type Props = StateProps & DispatchProps & OwnProps;
 
-const Datarun: React.FC<Props> = ({ datarun, onSelectDatarun, selectedDatarunID, isEditingEventRange }) => {
+export const Datarun: React.FC<Props> = ({ datarun, onSelectDatarun, selectedDatarunID, isEditingEventRange }) => {
   const activeClass = datarun.id === selectedDatarunID ? 'active' : '';
   return (
     <div className={`time-row ${activeClass}`} onClick={() => !isEditingEventRange && onSelectDatarun(datarun.id)}>
