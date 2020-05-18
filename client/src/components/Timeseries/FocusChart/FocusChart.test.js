@@ -23,6 +23,7 @@ describe('Testing FocusChart component -> ', () => {
     zoomCounter: 0,
     zoomDirection: '',
     isEditingRange: false,
+    isZoomEnabled: true,
     setPeriodRange: jest.fn().mockReturnValue({ eventRange: [200, 300], zoomValue: 2.33 }),
   };
 
