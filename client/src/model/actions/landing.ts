@@ -18,6 +18,7 @@ import {
   FETCH_DATARUNS_BY_EXPERIMENT_ID,
   FecthDatarunsByExperimentIDAction,
   SELECT_DATARUN,
+  FETCH_EXPERIMENT_DATA,
 } from '../types';
 
 export function fetchExperiments() {
@@ -99,13 +100,22 @@ export function selectPipeline(selectedPipelineName: string) {
 }
 
 export function selectExperiment(history: any, experimentID: string) {
-  return function (dispatch) {
+  return async function (dispatch) {
+    // @TODO - combine this action with fetchExpAction
     const action: SelectExperimentAction = {
       type: SELECT_EXPERIMENT,
       selectedExperimentID: experimentID,
     };
 
     dispatch(action);
+
+    const fetchExpAction = {
+      type: FETCH_EXPERIMENT_DATA,
+      promise: API.experiments.find(`${experimentID}/`),
+    };
+
+    dispatch(fetchExpAction);
+
     dispatch({
       type: SELECT_DATARUN,
       datarunID: '',
