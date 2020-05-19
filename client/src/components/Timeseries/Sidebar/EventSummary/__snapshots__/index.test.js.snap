@@ -1,0 +1,282 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing Event Summary component ->  Should render without crashing 1`] = `
+<div
+  className="event-summary"
+>
+  <div
+    className="event-header"
+  >
+    <div
+      className="left-wrapper"
+    >
+      <span>
+        Overview Events Table
+      </span>
+    </div>
+    <div
+      className="right-wrapper"
+    >
+      <button
+        id="toggleSummary"
+        onClick={[Function]}
+        type="button"
+      >
+        <span>
+          HIDE
+        </span>
+        <FontAwesomeIcon
+          border={false}
+          className=""
+          fixedWidth={false}
+          flip={null}
+          icon={
+            Object {
+              "icon": Array [
+                320,
+                512,
+                Array [],
+                "f054",
+                "M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z",
+              ],
+              "iconName": "chevron-right",
+              "prefix": "fas",
+            }
+          }
+          inverse={false}
+          listItem={false}
+          mask={null}
+          pull={null}
+          pulse={false}
+          rotation={null}
+          size={null}
+          spin={false}
+          swapOpacity={false}
+          symbol={false}
+          title=""
+          transform={null}
+        />
+      </button>
+    </div>
+    <div
+      className="clear"
+    />
+  </div>
+  <div
+    className="summary-details active"
+  >
+    <table>
+      <tbody>
+        <tr
+          className="row-light"
+        >
+          <th>
+            event tag
+          </th>
+          <td
+            key="Investigate"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator investigate"
+                key="investigate"
+              />
+              Investigate
+            </span>
+            <i
+              className="indicator investigate"
+              key="investigate"
+            />
+          </td>
+          <td
+            key="Do not Investigate"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator not_investigate"
+                key="not_investigate"
+              />
+              Do not Investigate
+            </span>
+            <i
+              className="indicator not_investigate"
+              key="not_investigate"
+            />
+          </td>
+          <td
+            key="Postpone"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator postpone"
+                key="postpone"
+              />
+              Postpone
+            </span>
+            <i
+              className="indicator postpone"
+              key="postpone"
+            />
+          </td>
+          <td
+            key="Problem"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator problem"
+                key="problem"
+              />
+              Problem
+            </span>
+            <i
+              className="indicator problem"
+              key="problem"
+            />
+          </td>
+          <td
+            key="Previously seen"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator seen"
+                key="seen"
+              />
+              Previously seen
+            </span>
+            <i
+              className="indicator seen"
+              key="seen"
+            />
+          </td>
+          <td
+            key="Normal"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator normal"
+                key="normal"
+              />
+              Normal
+            </span>
+            <i
+              className="indicator normal"
+              key="normal"
+            />
+          </td>
+          <td
+            key="Untagged"
+          >
+            <span
+              className="tooltip-data"
+            >
+              <i
+                className="indicator untagged"
+                key="untagged"
+              />
+              Untagged
+            </span>
+            <i
+              className="indicator untagged"
+              key="untagged"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Year
+          </th>
+          <td
+            key="Investigate"
+          >
+            -
+          </td>
+          <td
+            key="Do not Investigate"
+          >
+            -
+          </td>
+          <td
+            key="Postpone"
+          >
+            -
+          </td>
+          <td
+            key="Problem"
+          >
+            -
+          </td>
+          <td
+            key="Previously seen"
+          >
+            -
+          </td>
+          <td
+            key="Normal"
+          >
+            -
+          </td>
+          <td
+            key="Untagged"
+          >
+            -
+          </td>
+        </tr>
+        <tr
+          className="row-light"
+        >
+          <th>
+            Month
+          </th>
+          <td
+            key="Investigate"
+          >
+            -
+          </td>
+          <td
+            key="Do not Investigate"
+          >
+            -
+          </td>
+          <td
+            key="Postpone"
+          >
+            -
+          </td>
+          <td
+            key="Problem"
+          >
+            -
+          </td>
+          <td
+            key="Previously seen"
+          >
+            -
+          </td>
+          <td
+            key="Normal"
+          >
+            -
+          </td>
+          <td
+            key="Untagged"
+          >
+            -
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+`;
