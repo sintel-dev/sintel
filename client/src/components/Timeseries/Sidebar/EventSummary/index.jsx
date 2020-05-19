@@ -40,32 +40,36 @@ const renderTagEventsPerMonth = (isPeriodLevelSelected, month, monthEvents) => {
   );
 };
 
-const handleColHover = () => {
-  const td = document.querySelectorAll('.summary-details td');
-
-  td.forEach((currentTd) => {
-    currentTd.addEventListener('mouseover', function () {
-      const index = this.cellIndex + 1;
-      document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
-        hoveredTd.classList.add('highlighted');
-      });
-    });
-
-    currentTd.addEventListener('mouseleave', function () {
-      const index = this.cellIndex + 1;
-      document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
-        hoveredTd.classList.remove('highlighted');
-      });
-    });
-  });
-};
-
 class EventSummary extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isSummaryVisible: true,
     };
+    this.toggleSummaryDetails = this.toggleSummaryDetails.bind(this);
+  }
+
+  componentDidMount() {
+    this.handleColHover();
+  }
+
+  handleColHover() {
+    const td = document.querySelectorAll('.summary-details td');
+    td.forEach((currentTd) => {
+      currentTd.addEventListener('mouseover', function () {
+        const index = this.cellIndex + 1;
+        document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
+          hoveredTd.classList.add('highlighted');
+        });
+      });
+
+      currentTd.addEventListener('mouseleave', function () {
+        const index = this.cellIndex + 1;
+        document.querySelectorAll(`td:nth-child(${index})`).forEach((hoveredTd) => {
+          hoveredTd.classList.remove('highlighted');
+        });
+      });
+    });
   }
 
   toggleSummaryDetails() {
@@ -87,7 +91,7 @@ class EventSummary extends Component {
             <span>Overview Events Table</span>
           </div>
           <div className="right-wrapper">
-            <button type="button" onClick={() => this.toggleSummaryDetails()}>
+            <button type="button" onClick={this.toggleSummaryDetails} id="toggleSummary">
               <span>{buttonText}</span>
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -95,7 +99,6 @@ class EventSummary extends Component {
           <div className="clear" />
         </div>
         <div className={`summary-details ${activeSummary}`}>
-          {handleColHover()}
           <table>
             <tbody>
               <tr className="row-light">

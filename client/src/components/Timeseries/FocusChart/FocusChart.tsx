@@ -20,6 +20,7 @@ import {
   getZoomCounter,
   getZoomOnClickDirection,
   getIsEditingEventRange,
+  getZoomMode,
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -48,8 +49,8 @@ export class FocusChart extends Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
-      width: 200, // unit tests value
-      height: 200, // unit tests value
+      width: 0,
+      height: 0,
       isTooltipVisible: false,
       eventData: {},
     };
@@ -324,9 +325,14 @@ export class FocusChart extends Component<Props, State> {
 
   drawChartData() {
     const { width, height } = this.state;
-    const { dataRun, isPredictionVisible } = this.props;
+    const { dataRun, isPredictionVisible, isZoomEnabled } = this.props;
     const { eventWindows, timeSeries, timeseriesPred } = dataRun;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+
+    const zoomProps = {
+      width: isZoomEnabled ? focusChartWidth : 0,
+      height: isZoomEnabled ? height : 0,
+    };
 
     return (
       width > 0 &&
@@ -342,7 +348,7 @@ export class FocusChart extends Component<Props, State> {
               <path className="chart-wawes" d={this.drawLine(timeSeries)} />
               {isPredictionVisible && <path className="predictions" d={this.drawLine(timeseriesPred)} />}
             </g>
-            <rect className="zoom" width={focusChartWidth} height={height} />
+            <rect className="zoom" {...zoomProps} />
             {eventWindows.map((currentEvent) => this.renderEvents(currentEvent))}
           </g>
           <g className="chart-axis">
@@ -383,6 +389,7 @@ const mapState = (state: RootState) => ({
   zoomCounter: getZoomCounter(state),
   zoomDirection: getZoomOnClickDirection(state),
   isEditingRange: getIsEditingEventRange(state),
+  isZoomEnabled: getZoomMode(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
