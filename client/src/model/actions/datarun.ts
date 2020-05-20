@@ -183,6 +183,7 @@ export function saveEventDetailsAction() {
             eventUpdateStatus: 'success',
           });
 
+          // @TODO - make a sinle API call with find instead of all
           await API.events.all('events').then((response) => {
             const { events } = response;
             const datarun = getDatarunDetails(getState());

@@ -245,3 +245,5 @@ export const getProcessedMatrixData = createSelector([getFilteredExperiments], (
 
   return { scale, tagStats: tagStatsList[0] };
 });
+
+export const getCurrentExperimentDetails = (state) => state.experiments.experimentDetails;

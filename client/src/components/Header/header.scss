@@ -70,4 +70,91 @@
         cursor: pointer;
         outline: none;
     }
+
+    .exp-info{
+        float: left;
+        font-family: 'Roboto';
+
+        ul{
+            width: 200px;
+            display: inline-block;
+            font-size: 16px;
+            border: 1px solid rgba(151,151,151,0.5);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+            padding: 5px 15px;
+            margin: 8px 0 0 50px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #282A30;
+
+            &:hover{
+                span{
+                    path{
+                        fill: #fff;
+                    }
+                }
+            }
+
+            li{
+                position: relative;
+
+                span{
+                    float: right;
+
+                    path{
+                        fill: #979797;
+                        transition: all .2s ease-in-out;
+                    }
+
+                    &:last-child{
+                        font-weight: normal;
+                    }
+                }
+
+                ul{
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                    border-top: none;
+                    position: absolute;
+                    left: -16px;
+                    margin: 4px 0 0 0;
+                    z-index: -100;
+                    padding: 10px 15px;
+                    transition: all .2s ease-in-out;
+                    opacity: 0;
+                    top: 21px;
+                }
+
+                &.active{
+                    border-bottom: none;
+                    box-shadow: none;
+
+                    ul{
+                        z-index: 1;
+                        opacity: 1;
+                    }
+
+                    span{
+                        path{
+                            fill: #fff;
+                        }
+                    }
+                }
+
+                li{
+                    display: flex;
+                    cursor: initial;
+                    font-size: 14px;
+                    text-transform: none;
+                    margin-bottom: 8px;
+
+                    span{
+                        flex: 1;
+                    }
+                }
+            }
+        }
+
+    }
 }

@@ -2,6 +2,7 @@ import { DatarunDataType } from './datarun';
 
 export const FETCH_EXPERIMENTS = 'FETCH_EXPERIMENTS';
 export const SELECT_EXPERIMENT = 'SELECT_EXPERIMENT';
+export const FETCH_EXPERIMENT_DATA = 'FETCH_EXPERIMENT_DATA';
 
 export type FetchExperimentsAction = {
   type: typeof FETCH_EXPERIMENTS;
@@ -22,6 +23,8 @@ export type ExperimentState = {
   isExperimentsLoading: boolean;
   experimentsList: ExperimentDataType[];
   selectedExperimentID: string;
+  isExperimentDataLoading: boolean;
+  experimentDetails: ExperimentDataType[];
 };
 
 /**
