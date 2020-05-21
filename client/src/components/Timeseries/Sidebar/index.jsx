@@ -60,7 +60,7 @@ class Sidebar extends Component {
 
   setGlyphRadius() {
     const { width, rowSpacing } = this.state;
-    const { nCols } = this.getColAmount();
+    const nCols = this.getColAmount();
     const { dataRun } = this.props;
     const { period } = dataRun;
     const { colSpacing } = this.getColSpacing(period);
@@ -70,7 +70,7 @@ class Sidebar extends Component {
     let height = nRows * (radius * 2 + rowSpacing);
 
     if (period[0].level === 'day') {
-      height += radius * 3 + rowSpacing;
+      height += radius * 3.4 + rowSpacing;
     }
 
     this.setState({
@@ -82,7 +82,7 @@ class Sidebar extends Component {
 
   getFeatureCellCoords(currentPeriod, index) {
     const { width, colSpacing, rowSpacing, radius } = this.state;
-    const { nCols } = this.getColAmount();
+    const nCols = this.getColAmount();
     const glyphCell = width / nCols;
     const colIteration = index % nCols > 0 ? index % nCols : 0;
     const rowIteration = Math.floor(index / nCols);
@@ -107,29 +107,19 @@ class Sidebar extends Component {
   }
 
   getColAmount() {
-    const { selectedPeriodLevel, reviewRange } = this.props;
+    const { dataRun } = this.props;
+    const { period } = dataRun;
 
-    let nCols = 3;
-    if (!reviewRange) {
-      if (selectedPeriodLevel.year) {
-        nCols = 4;
-      }
-      if (selectedPeriodLevel.month) {
-        nCols = 7;
-      }
-    } else {
-      if (reviewRange === 'year') {
-        nCols = 3;
-      }
-      if (reviewRange === 'month') {
-        nCols = 4;
-      }
-      if (reviewRange === 'day') {
-        nCols = 7;
-      }
+    const { level } = period[0];
+
+    switch (level) {
+      case 'month':
+        return 4;
+      case 'day':
+        return 7;
+      default:
+        return 3;
     }
-
-    return { nCols };
   }
 
   drawData() {
@@ -192,7 +182,7 @@ class Sidebar extends Component {
     const { period } = dataRun;
     const { width } = this.state;
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const { nCols } = this.getColAmount();
+    const nCols = this.getColAmount();
     const cellWidth = width / nCols;
 
     return (

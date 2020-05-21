@@ -31,6 +31,7 @@ export type SetTimeseriesPeriodAction = {
   eventRange: {
     eventRange: Array<number>;
     zoomValue: object;
+    timeStamp: Array<number>;
   };
 };
 
@@ -42,6 +43,7 @@ export type DatarunState = {
   selectedPeriodRange: {
     eventRange: Array<number>;
     zoomValue: object;
+    timeStamp: Array<number>;
   };
   activeEventID: string | null;
   isEventCommentsLoading: boolean;

@@ -19,6 +19,7 @@ import {
   FecthDatarunsByExperimentIDAction,
   SELECT_DATARUN,
   FETCH_EXPERIMENT_DATA,
+  SET_TIMESERIES_PERIOD,
 } from '../types';
 
 export function fetchExperiments() {
@@ -119,6 +120,16 @@ export function selectExperiment(history: any, experimentID: string) {
     dispatch({
       type: SELECT_DATARUN,
       datarunID: '',
+    });
+
+    dispatch(action);
+    dispatch({
+      type: SET_TIMESERIES_PERIOD,
+      eventRange: {
+        eventRange: [0, 0],
+        timeStamp: [0, 0],
+        zoomValue: 1,
+      },
     });
     return dispatch(fetchDatarunsByExperimentID());
   };
