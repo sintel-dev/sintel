@@ -119,11 +119,10 @@
                     position: absolute;
                     left: -16px;
                     margin: 4px 0 0 0;
-                    z-index: -100;
                     padding: 10px 15px;
                     transition: all .2s ease-in-out;
-                    opacity: 0;
                     top: 21px;
+                    display: none;
                 }
 
                 &.active{
@@ -131,8 +130,7 @@
                     box-shadow: none;
 
                     ul{
-                        z-index: 1;
-                        opacity: 1;
+                        display: block;
                     }
 
                     span{

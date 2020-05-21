@@ -53,7 +53,11 @@ export function selectDatarun(datarunID: string) {
   };
 }
 
-export function setTimeseriesPeriod(eventRange: { eventRange: any; zoomValue: any }) {
+export function setTimeseriesPeriod(eventRange: {
+  eventRange: Array<number>;
+  zoomValue: any;
+  timeStamp: Array<number>;
+}) {
   return function (dispatch, getState) {
     const currentRange = getSelectedPeriodRange(getState());
     if (JSON.stringify(eventRange.eventRange) === JSON.stringify(currentRange.eventRange)) {

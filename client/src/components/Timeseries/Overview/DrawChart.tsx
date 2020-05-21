@@ -171,9 +171,14 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
     const zoomValue = d3.zoomIdentity.scale(focusWidth / (eventRange[1] - eventRange[0])).translate(-eventRange[0], 0);
 
+    const { xCoord } = this.getScale();
+    const xCoordCopy = xCoord.copy();
+    const timeStamp = zoomValue.rescaleX(xCoordCopy).domain();
+
     const selectedRange = {
       eventRange,
       zoomValue,
+      timeStamp: [new Date(timeStamp[0]).getTime(), new Date(timeStamp[1]).getTime()],
     };
 
     if (d3.event && d3.event.sourceEvent.type !== 'zoom') {
@@ -315,7 +320,8 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = (dispatch: Function) => ({
   onSelectDatarun: (datarunID: string) => dispatch(selectDatarun(datarunID)),
-  onChangePeriod: (period: { eventRange: Array<number>; zoomValue: object }) => dispatch(setTimeseriesPeriod(period)),
+  onChangePeriod: (period: { eventRange: Array<number>; zoomValue: object; timeStamp: Array<number> }) =>
+    dispatch(setTimeseriesPeriod(period)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(DrawChart);

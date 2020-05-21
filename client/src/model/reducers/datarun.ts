@@ -7,6 +7,7 @@ const initialState: DatarunState = {
     // @ts-ignore
     zoomValue: 1,
     eventRange: [0, 0],
+    timeStamp: [0, 0],
   },
   activeEventID: null,
   isEventCommentsLoading: true,
