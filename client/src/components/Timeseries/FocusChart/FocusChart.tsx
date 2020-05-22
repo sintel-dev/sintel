@@ -91,7 +91,9 @@ export class FocusChart extends Component<Props, State> {
   getScale() {
     const { width, height } = this.state;
     const { dataRun } = this.props;
-    const { maxTimeSeries } = dataRun;
+
+    const { maxTimeSeries, timeSeries } = dataRun;
+    const [minDtTX, maxDtTX] = d3.extent(timeSeries, (time: Array<number>) => time[0]);
     const [minTX, maxTX] = d3.extent(maxTimeSeries, (time: Array<number>) => time[0]);
     const [minTY, maxTY] = d3.extent(maxTimeSeries, (time: Array<number>) => time[1]);
     const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
@@ -100,16 +102,20 @@ export class FocusChart extends Component<Props, State> {
     const xCoord = d3.scaleTime().range([0, drawableWidth]);
     const yCoord = d3.scaleLinear().range([drawableHeight, 0]);
 
+    const minDtX = Math.min(MIN_VALUE, minDtTX);
+    const maxDtX = Math.max(MAX_VALUE, maxDtTX);
+
     const minX = Math.min(MIN_VALUE, minTX);
     const maxX = Math.max(MAX_VALUE, maxTX);
 
     const minY = Math.min(MIN_VALUE, minTY);
     const maxY = Math.max(MAX_VALUE, maxTY);
 
+    const maxDtXCood = xCoord.domain([minDtX, maxDtX]);
     xCoord.domain([minX, maxX]);
     yCoord.domain([minY, maxY]);
 
-    return { xCoord, yCoord };
+    return { xCoord, yCoord, maxDtXCood };
   }
 
   drawLine(data) {
@@ -279,7 +285,7 @@ export class FocusChart extends Component<Props, State> {
       zoomValue,
     };
 
-    this.props.setPeriodRange(periodRange);
+    this.rangeToTimestamp(periodRange);
   }
 
   toggleZoom() {
@@ -292,6 +298,17 @@ export class FocusChart extends Component<Props, State> {
     }
   }
 
+  rangeToTimestamp(periodRange) {
+    const { zoomValue } = periodRange;
+    const { maxDtXCood } = this.getScale();
+    const xCoordCopy = maxDtXCood.copy();
+    // @ts-ignore
+    const timeStamp = zoomValue.rescaleX(xCoordCopy.copy()).domain();
+    const timestampStart = new Date(timeStamp[0]).getTime();
+    const timestampStop = new Date(timeStamp[1]).getTime();
+    this.props.setPeriodRange({ ...periodRange, timeStamp: [timestampStart, timestampStop] });
+  }
+
   updateChartZoomOnSelectPeriod() {
     const { width } = this.state;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
@@ -302,12 +319,18 @@ export class FocusChart extends Component<Props, State> {
 
     const startRange = xCoord(dateRangeStart * 1000);
     const stopRange = xCoord(dateRangeStop * 1000);
-
     const zoomValue = d3.zoomIdentity.scale(focusChartWidth / (stopRange - startRange)).translate(-startRange, 0);
+
+    const xCoordCopy = xCoord.copy();
+    const timeStamp = zoomValue.rescaleX(xCoordCopy).domain();
+    const timestampStart = new Date(timeStamp[0]).getTime();
+    const timestampStop = new Date(timeStamp[1]).getTime();
+
     selectedPeriod &&
       setPeriodRange({
         eventRange: [startRange, stopRange],
         zoomValue,
+        timeStamp: [timestampStart, timestampStop],
       });
   }
 

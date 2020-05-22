@@ -64,8 +64,10 @@
                     background: $btn-blue;
                     color: #fff;
                 }
-                &:disabled{
+                &:disabled, &.active:disabled{
                     opacity: 0.4;
+                    background-color: rgba(0, 0, 0, 0.4);
+                    color: rgba(255, 255, 255, 0.5);
                     cursor: not-allowed;
                 }
             }
