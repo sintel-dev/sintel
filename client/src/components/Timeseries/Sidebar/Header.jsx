@@ -8,8 +8,9 @@ import {
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
   getIsEventModeEnabled,
+  getIsTimeSyncModeEnabled,
 } from '../../../model/selectors/datarun';
-import { reviewPeriodAction, toggleEventModeAction } from '../../../model/actions/datarun';
+import { reviewPeriodAction, toggleEventModeAction, toggleTimeSyncModeAction } from '../../../model/actions/datarun';
 import './Header.scss';
 
 const showPeriod = (selectedPeriodLevel) => {
@@ -28,7 +29,7 @@ const showPeriod = (selectedPeriodLevel) => {
   );
 };
 
-const SidebarHeading = ({ signalName, toggleEvent, isEventModeEnabled }) => (
+const SidebarHeading = ({ signalName, toggleEvent, isEventModeEnabled, toggleTimeSync, isTimeSyncEnabled }) => (
   <div className="sidebar-heading">
     <ul>
       <li className="signal-title">{signalName}</li>
@@ -48,6 +49,22 @@ const SidebarHeading = ({ signalName, toggleEvent, isEventModeEnabled }) => (
           </div>
         </div>
       </li>
+      <li>
+        <div className="switch-control">
+          <div className="row">
+            <label htmlFor="toggleTimeSync">
+              <input
+                type="checkbox"
+                id="toggleTimeSync"
+                onChange={(event) => toggleTimeSync(event.target.checked)}
+                checked={isTimeSyncEnabled}
+              />
+              <span className="switch" />
+              Sync Time Ranges
+            </label>
+          </div>
+        </div>
+      </li>
     </ul>
   </div>
 );
@@ -61,12 +78,16 @@ const Header = ({
   grouppedEvents,
   toggleEventsMode,
   isEventModeEnabled,
+  toggleTimeSync,
+  isTimeSyncEnabled,
 }) => (
   <div className="period-control">
     <SidebarHeading
       signalName={dataRun.signal}
       toggleEvent={toggleEventsMode}
       isEventModeEnabled={isEventModeEnabled}
+      toggleTimeSync={toggleTimeSync}
+      isTimeSyncEnabled={isTimeSyncEnabled}
     />
     <EventSummary selectedPeriodLevel={selectedPeriodLevel} grouppedEvents={grouppedEvents} />
     <div>
@@ -115,9 +136,11 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
+    isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
   }),
   (dispatch) => ({
     setReviewRange: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
+    toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
   }),
 )(Header);
