@@ -20,6 +20,7 @@ export const REVIEW_PERIOD_LEVEL = 'REVIEW_PERIOD_LEVEL';
 export const TOGGLE_EVENT_MODE = 'TOGGLE_EVENT_MODE';
 export const UPLOAD_JSON_EVENTS = 'UPLOAD_JSON_EVENTS';
 export const EVENT_UPDATE_STATUS = 'EVENT_UPDATE_STATUS';
+export const TOGGLE_TIME_SYNC_RANGE = 'TOGGLE_TIME_SYNC_RANGE';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;

@@ -34,6 +34,7 @@ import {
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
   EVENT_UPDATE_STATUS,
+  TOGGLE_TIME_SYNC_RANGE,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -127,6 +128,15 @@ export function togglePredictionsAction(event) {
 export function toggleEventModeAction(mode) {
   return function (dispatch) {
     dispatch({ type: TOGGLE_EVENT_MODE, isEventModeEnabled: mode });
+  };
+}
+
+export function toggleTimeSyncModeAction(syncMode) {
+  return function (dispatch) {
+    dispatch({
+      type: TOGGLE_TIME_SYNC_RANGE,
+      isTimeSyncModeEnabled: syncMode,
+    });
   };
 }
 

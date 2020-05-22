@@ -29,6 +29,7 @@ export const getUploadEventsStatus = (state) => state.datarun.uploadEventsStatus
 export const getUpdateEventStatus = (state) => state.datarun.eventUpdateStatus;
 export const getIsTranscriptSupported = (state) => state.datarun.isTranscriptSupported;
 export const getIsSpeechInProgress = (state) => state.datarun.isSpeechInProgress;
+export const getIsTimeSyncModeEnabled = (state) => state.datarun.isTimeSyncModeEnabled;
 
 // @TODO - check to see if it's really needed
 const filterDatarunPeriod = (period, periodLevel, reviewPeriod) => {
@@ -125,15 +126,25 @@ export const getFilteredPeriodRange = createSelector(
 );
 
 export const getDatarunDetails = createSelector(
-  [getSelectedDatarun, getUpdatedEventsDetails, getFilteredPeriodRange],
-  (dataRun, updatedEventDetails, filteredRange) => {
-    let { events, eventWindows, timeSeries } = dataRun;
+  [
+    getSelectedDatarun,
+    getSelectedPeriodLevel,
+    getReviewPeriod,
+    getUpdatedEventsDetails,
+    getFilteredPeriodRange,
+    getIsTimeSyncModeEnabled,
+  ],
+  (dataRun, periodLevel, reviewPeriod, updatedEventDetails, filteredRange, isTimeSyncEnabled) => {
+    let { period, events, eventWindows, timeSeries } = dataRun;
     let currentEventIndex = events.findIndex((windowEvent) => windowEvent.id === updatedEventDetails.id);
+
     if (currentEventIndex !== -1) {
       updateEventDetails(updatedEventDetails, timeSeries, currentEventIndex, eventWindows);
     }
 
-    const completeDataRun = { ...dataRun, period: filteredRange };
+    const selectedPeriod = isTimeSyncEnabled ? filteredRange : filterDatarunPeriod(period, periodLevel, reviewPeriod);
+
+    const completeDataRun = { ...dataRun, period: selectedPeriod };
     return completeDataRun;
   },
 );

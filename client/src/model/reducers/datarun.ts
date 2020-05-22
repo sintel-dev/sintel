@@ -31,6 +31,7 @@ const initialState: DatarunState = {
   eventUpdateStatus: null,
   isTranscriptSupported: false,
   isSpeechInProgress: false,
+  isTimeSyncModeEnabled: true,
 };
 
 /**
@@ -127,6 +128,10 @@ function SPEECH_STATUS(nextState, { isSpeechInProgress }) {
   nextState.isSpeechInProgress = isSpeechInProgress;
 }
 
+function TOGGLE_TIME_SYNC_RANGE(nextState, { isTimeSyncModeEnabled }) {
+  nextState.isTimeSyncModeEnabled = isTimeSyncModeEnabled;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -149,4 +154,5 @@ export default createReducer<DatarunState>(initialState, {
   EVENT_UPDATE_STATUS,
   SET_TRANSCRIPT_STATUS,
   SPEECH_STATUS,
+  TOGGLE_TIME_SYNC_RANGE,
 });
