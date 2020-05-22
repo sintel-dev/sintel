@@ -25,6 +25,8 @@ export const toTimestamp = function (strDate) {
   return datum / 1000;
 };
 
+const getEventTag = (currentTag) => (currentTag === null || currentTag === 'None' ? 'Untagged' : currentTag);
+
 export const groupEventsByTimestamp = (events) => {
   let result = {};
   events.forEach((event) => {
@@ -41,7 +43,7 @@ export const groupEventsByTimestamp = (events) => {
         id: event.id,
         start_time: start_time >= yearStartDate ? start_time : yearStartDate,
         stop_time: stop_time <= yearStopDate ? stop_time : yearStopDate,
-        tag: event.tag,
+        tag: getEventTag(event.tag),
         score: event.score,
       };
 
@@ -68,7 +70,7 @@ export const groupEventsByTimestamp = (events) => {
           id: event.id,
           start_time: start_time >= monthDateStart ? start_time : monthDateStart,
           stop_time: stop_time <= monthDateStop ? stop_time : monthDateStop,
-          tag: event.tag,
+          tag: getEventTag(event.tag),
           score: event.score,
           days: {},
         };
@@ -94,7 +96,7 @@ export const groupEventsByTimestamp = (events) => {
             id: event.id,
             start_time: start_time >= dayDateStart ? start_time : dayDateStart,
             stop_time: stop_time <= dayDateStop ? stop_time : dayDateStop,
-            tag: event.tag,
+            tag: getEventTag(event.tag),
             score: event.score,
           };
 

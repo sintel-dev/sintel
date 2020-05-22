@@ -96,6 +96,7 @@ const Header = ({
         <li>
           <button
             type="button"
+            disabled={isTimeSyncEnabled}
             onClick={() => !isEditingEventRange && setReviewRange('year')}
             className={reviewRange === 'year' || reviewRange === null ? 'active' : ''}
           >
@@ -107,7 +108,7 @@ const Header = ({
             type="button"
             onClick={() => !isEditingEventRange && setReviewRange('month')}
             className={reviewRange === 'month' ? 'active' : ''}
-            disabled={reviewRange === null}
+            disabled={reviewRange === null || isTimeSyncEnabled}
           >
             Month
           </button>
@@ -117,7 +118,7 @@ const Header = ({
             type="button"
             onClick={() => !isEditingEventRange && setReviewRange('day')}
             className={reviewRange === 'day' ? 'active' : ''}
-            disabled={reviewRange === null || selectedPeriodLevel.month === ''}
+            disabled={reviewRange === null || selectedPeriodLevel.month === '' || isTimeSyncEnabled}
           >
             Day
           </button>
