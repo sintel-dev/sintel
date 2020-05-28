@@ -34,7 +34,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
     const yearHasEvents = periodEvents && periodEvents[currentPeriod.name];
     if (yearHasEvents) {
       const yearEvents = periodEvents[currentPeriod.name].events;
-      Object.values(yearEvents).forEach(event => {
+      Object.values(yearEvents).forEach((event) => {
         const { start_time, stop_time, tag, id } = event;
         base = new Date(Number(currentPeriod.name)).getTime() / 1000;
         arcStart = ((start_time - base) / secondsInMonth) * circleMonths;
@@ -48,13 +48,13 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
 
   if (level === 'month') {
     const year = currentPeriod.parent.name;
-    const monthEvents = periodEvents[year] && periodEvents[year].months[periodIndex + 1];
+    const monthEvents = periodEvents[year] && periodEvents[year].months[fromMonthToIndex(currentPeriod.name)];
     if (monthEvents !== undefined) {
-      Object.values(monthEvents.events).forEach(event => {
+      Object.values(monthEvents.events).forEach((event) => {
         const { start_time, stop_time, tag, id } = event;
         const daysInMonth = new Date(Number(year), periodIndex + 1, 0).getDate();
         const circleDays = (2 * Math.PI) / daysInMonth;
-        base = new Date(year, periodIndex + 1).getTime() / 1000;
+        base = new Date(year, fromMonthToIndex(currentPeriod.name)).getTime() / 1000;
         arcStart = ((start_time - base) / secondsInDay) * circleDays;
         arcStop = ((stop_time - base) / secondsInDay) * circleDays;
 
@@ -93,17 +93,13 @@ export const getDataScale = (innerRadius, outerRadius, periodRange) => {
     .range([0, 2 * Math.PI])
     .domain([0, periodRange.length - 0.08]);
 
-  const scaleRadius = d3
-    .scaleLinear()
-    .range([innerRadius, outerRadius])
-    .clamp(true)
-    .domain([0, 1.2]);
+  const scaleRadius = d3.scaleLinear().range([innerRadius, outerRadius]).clamp(true).domain([0, 1.2]);
 
   const area = d3
     .areaRadial()
     .angle((d, i) => scaleAngle(i))
     .innerRadius(() => scaleRadius(0))
-    .outerRadius(d => scaleRadius(d))
+    .outerRadius((d) => scaleRadius(d))
     .curve(d3.curveCardinalClosed);
 
   const area0 = d3
