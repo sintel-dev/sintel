@@ -181,7 +181,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
       timeStamp: [new Date(timeStamp[0]).getTime(), new Date(timeStamp[1]).getTime()],
     };
 
-    if (d3.event && d3.event.sourceEvent.type !== 'zoom') {
+    if (d3.event && d3.event.sourceEvent && d3.event.sourceEvent.type !== 'zoom') {
       this.initTooltip();
       this.updateTooltipCoords();
     }
