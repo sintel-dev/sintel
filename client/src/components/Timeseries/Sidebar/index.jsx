@@ -12,7 +12,7 @@ import {
   getIsEventModeEnabled,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
-import { setPeriodLevelAction, reviewPeriodAction } from '../../../model/actions/datarun';
+import { setPeriodRangeAction, reviewPeriodAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
 
 class Sidebar extends Component {
@@ -132,6 +132,7 @@ class Sidebar extends Component {
       dataRun.period.map((currentPeriod, periodIndex) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
+
         return (
           <g key={currentPeriod.name}>
             <g
@@ -248,7 +249,7 @@ export default connect(
     isEventModeEnabled: getIsEventModeEnabled(state),
   }),
   (dispatch) => ({
-    setPeriodRange: (periodLevel) => dispatch(setPeriodLevelAction(periodLevel)),
+    setPeriodRange: (periodLevel) => dispatch(setPeriodRangeAction(periodLevel)),
     reviewPeriod: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
   }),
 )(Sidebar);

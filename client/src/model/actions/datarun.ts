@@ -3,7 +3,6 @@ import {
   getUpdatedEventsDetails,
   getDatarunDetails,
   getZoomCounter,
-  getSelectedPeriodLevel,
   getNewEventDetails,
   getIsAddingNewEvents,
   getSelectedPeriodRange,
@@ -356,9 +355,8 @@ export function zoomToggleAction(zoomMode) {
   };
 }
 
-export function setPeriodLevelAction(newPeriod) {
-  return function (dispatch, getState) {
-    const currentPeriod = getSelectedPeriodLevel(getState());
+export function setPeriodRangeAction(newPeriod) {
+  return function (dispatch) {
     if (newPeriod.level !== 'day') {
       if (newPeriod.level === 'year') {
         dispatch({
@@ -377,7 +375,7 @@ export function setPeriodLevelAction(newPeriod) {
           type: SET_CURRENT_PERIOD_LEVEL,
           isPeriodLevelSelected: true,
           periodLevel: {
-            ...currentPeriod,
+            year: newPeriod.parent.name,
             month: newPeriod.name,
           },
         });

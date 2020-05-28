@@ -9,17 +9,22 @@ import {
   getGrouppedDatarunEvents,
   getIsEventModeEnabled,
   getIsTimeSyncModeEnabled,
+  getFilteredPeriodRange,
 } from '../../../model/selectors/datarun';
 import { reviewPeriodAction, toggleEventModeAction, toggleTimeSyncModeAction } from '../../../model/actions/datarun';
 import './Header.scss';
 
-const showPeriod = (selectedPeriodLevel) => {
+const showPeriod = (filteredPeriodRange) => {
   let periodString = 'YY/MM';
-  if (selectedPeriodLevel.year) {
-    periodString = periodString.replace('YY', selectedPeriodLevel.year);
+  const { level } = filteredPeriodRange[0];
+
+  if (level === 'month') {
+    periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
   }
-  if (selectedPeriodLevel.month) {
-    periodString = periodString.replace('MM', selectedPeriodLevel.month);
+
+  if (level === 'day') {
+    periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
+    periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
   }
 
   return (
@@ -80,6 +85,7 @@ const Header = ({
   isEventModeEnabled,
   toggleTimeSync,
   isTimeSyncEnabled,
+  filteredPeriodRange,
 }) => (
   <div className="period-control">
     <SidebarHeading
@@ -89,9 +95,13 @@ const Header = ({
       toggleTimeSync={toggleTimeSync}
       isTimeSyncEnabled={isTimeSyncEnabled}
     />
-    <EventSummary selectedPeriodLevel={selectedPeriodLevel} grouppedEvents={grouppedEvents} />
+    <EventSummary
+      selectedPeriodLevel={selectedPeriodLevel}
+      grouppedEvents={grouppedEvents}
+      filteredPeriodRange={filteredPeriodRange}
+    />
     <div>
-      {showPeriod(selectedPeriodLevel)}
+      {showPeriod(filteredPeriodRange)}
       <ul className="period-filter">
         <li>
           <button
@@ -138,9 +148,10 @@ export default connect(
     grouppedEvents: getGrouppedDatarunEvents(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
     isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
+    filteredPeriodRange: getFilteredPeriodRange(state),
   }),
   (dispatch) => ({
-    setReviewRange: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
+    setReviewRange: (reviewRange) => dispatch(reviewPeriodAction(reviewRange)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
     toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
   }),

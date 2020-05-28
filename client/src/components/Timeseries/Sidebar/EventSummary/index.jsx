@@ -22,23 +22,8 @@ const countEventsPerTag = (tag, events) => {
   return currentEvents.filter((currentEvent) => currentEvent.tag === tag).length;
 };
 
-const renderTagEvents = (isPeriodLevelSelected, grouppedEvents) => {
-  if (!isPeriodLevelSelected || grouppedEvents === undefined) {
-    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
-  }
-  return tagSeq.map((currentTag) => <td key={currentTag}>{countEventsPerTag(currentTag, grouppedEvents.events)}</td>);
-};
-
-const renderTagEventsPerMonth = (isPeriodLevelSelected, month, monthEvents) => {
-  if (!isPeriodLevelSelected || month === '' || monthEvents === undefined) {
-    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
-  }
-  const currentMonthEvents = monthEvents.months[fromMonthToIndex(month)];
-  return (
-    currentMonthEvents &&
-    tagSeq.map((currentTag) => <td key={currentTag}>{countEventsPerTag(currentTag, currentMonthEvents.events)}</td>)
-  );
-};
+const renderTagEvents = (events) =>
+  tagSeq.map((currentTag) => <td key={currentTag}>{(events && countEventsPerTag(currentTag, events)) || '-'}</td>);
 
 class EventSummary extends Component {
   constructor(props) {
@@ -79,11 +64,48 @@ class EventSummary extends Component {
     });
   }
 
+  getTimeRangeEvents() {
+    const { grouppedEvents, filteredPeriodRange } = this.props;
+    const { level } = filteredPeriodRange[0];
+
+    let eventsPerRange = {
+      perYear: null,
+      perMonth: null,
+    };
+
+    if (level === 'month') {
+      const year = filteredPeriodRange[0].parent.name;
+      if (grouppedEvents[year]) {
+        eventsPerRange = {
+          perYear: grouppedEvents[year].events,
+        };
+      }
+    }
+
+    if (level === 'day') {
+      const year = filteredPeriodRange[0].parent.parent.name;
+      const month = filteredPeriodRange[0].parent.name;
+
+      if (grouppedEvents[year]) {
+        eventsPerRange = {
+          perYear: grouppedEvents[year].events,
+          perMonth:
+            (grouppedEvents[year].months &&
+              grouppedEvents[year].months[fromMonthToIndex(month)] &&
+              grouppedEvents[year].months[fromMonthToIndex(month)].events) ||
+            null,
+        };
+      }
+    }
+
+    return eventsPerRange;
+  }
+
   render() {
-    const { selectedPeriodLevel, grouppedEvents } = this.props;
-    const isPeriodLevelSelected = Object.keys(selectedPeriodLevel).length !== 0;
+    const eventsPerRange = this.getTimeRangeEvents();
     const activeSummary = this.state.isSummaryVisible ? 'active' : '';
     const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
+
     return (
       <div className="event-summary">
         <div className="event-header">
@@ -107,15 +129,11 @@ class EventSummary extends Component {
               </tr>
               <tr>
                 <th>Year</th>
-                {renderTagEvents(isPeriodLevelSelected, grouppedEvents[selectedPeriodLevel.year])}
+                {renderTagEvents(eventsPerRange.perYear)}
               </tr>
               <tr className="row-light">
                 <th>Month</th>
-                {renderTagEventsPerMonth(
-                  isPeriodLevelSelected && isPeriodLevelSelected.month !== '',
-                  selectedPeriodLevel.month,
-                  grouppedEvents[selectedPeriodLevel.year],
-                )}
+                {renderTagEvents(eventsPerRange.perMonth)}
               </tr>
             </tbody>
           </table>
