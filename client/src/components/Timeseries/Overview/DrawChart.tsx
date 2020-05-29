@@ -155,7 +155,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
   handleBrushSelection() {
     const { isEditingEvent, isAddingNewEvent } = this.props;
     const selection = d3.event.selection && d3.event.selection;
-    if (selection === null || isEditingEvent || isAddingNewEvent) {
+    if (selection === null || isEditingEvent || isAddingNewEvent || selection[0] === selection[1]) {
       return;
     }
     const { ratio } = this.getRatio();
