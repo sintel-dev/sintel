@@ -5,14 +5,14 @@ import Loader from '../../Common/Loader';
 import Header from './Header';
 import {
   getDatarunDetails,
-  getSelectedPeriodLevel,
-  getReviewPeriod,
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
   getIsEventModeEnabled,
+  getIsTimeSyncModeEnabled,
+  getScrollHistory,
 } from '../../../model/selectors/datarun';
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
-import { setPeriodRangeAction, reviewPeriodAction } from '../../../model/actions/datarun';
+import { setPeriodRangeAction, setScrollHistoryAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
 
 class Sidebar extends Component {
@@ -109,7 +109,6 @@ class Sidebar extends Component {
   getColAmount() {
     const { dataRun } = this.props;
     const { period } = dataRun;
-
     const { level } = period[0];
 
     switch (level) {
@@ -124,7 +123,7 @@ class Sidebar extends Component {
 
   drawData() {
     const { width, radius } = this.state;
-    const { setPeriodRange, dataRun, isEditingEventRange, grouppedEvents, isEventModeEnabled } = this.props;
+    const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled } = this.props;
 
     return (
       width > 0 &&
@@ -132,21 +131,17 @@ class Sidebar extends Component {
       dataRun.period.map((currentPeriod, periodIndex) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
-
+        const { name, bins } = currentPeriod;
         return (
-          <g key={currentPeriod.name}>
+          <g key={name}>
             <g
-              className="feature-cell"
+              className={`feature-cell level-${currentPeriod.level}`}
               transform={`translate(${horizontalShift}, ${verticalShift})`}
-              onClick={() => !isEditingEventRange && setPeriodRange(currentPeriod)}
+              onClick={() => currentPeriod.level !== 'day' && setPeriodRange(currentPeriod)}
             >
-              <path
-                id={`path_${currentPeriod.name}`}
-                d={this.getPathData(currentPeriod.bins)}
-                className="feature-area radial-cursor"
-              />
-              <clipPath id={`clip_${currentPeriod.name}`}>
-                <use href={`#path_${currentPeriod.name}`} />
+              <path id={`path_${name}`} d={this.getPathData(bins)} className="feature-area radial-cursor" />
+              <clipPath id={`clip_${name}`}>
+                <use href={`#path_${name}`} />
               </clipPath>
               <g className="target">
                 <circle r={radius} />
@@ -157,7 +152,7 @@ class Sidebar extends Component {
                 <line y1={-radius} y2={radius} />
 
                 <text className="radial-text" y={radius + 15} x={0}>
-                  {currentPeriod.name}
+                  {name}
                 </text>
                 {isEventModeEnabled &&
                   arcData.length &&
@@ -165,12 +160,7 @@ class Sidebar extends Component {
                     <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
                   ))}
               </g>
-              <circle
-                r={radius * 0.85}
-                className="wrapper"
-                fill="url(#blueGradient)"
-                clipPath={`url(#clip_${currentPeriod.name})`}
-              />
+              <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} />
             </g>
           </g>
         );
@@ -242,14 +232,14 @@ export default connect(
   (state) => ({
     experimentData: getSelectedExperimentData(state),
     dataRun: getDatarunDetails(state),
-    selectedPeriodLevel: getSelectedPeriodLevel(state),
-    reviewRange: getReviewPeriod(state),
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
+    isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
+    scrollHistory: getScrollHistory(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodLevel) => dispatch(setPeriodRangeAction(periodLevel)),
-    reviewPeriod: (periodLevel) => dispatch(reviewPeriodAction(periodLevel)),
+    setScrollHistory: (period) => dispatch(setScrollHistoryAction(period)),
   }),
 )(Sidebar);

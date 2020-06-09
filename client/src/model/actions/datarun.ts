@@ -7,6 +7,9 @@ import {
   getIsAddingNewEvents,
   getSelectedPeriodRange,
   isDatarunIDSelected,
+  getSelectedPeriodLevel,
+  getIsTimeSyncModeEnabled,
+  getScrollHistory,
 } from '../selectors/datarun';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
@@ -29,11 +32,11 @@ import {
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
   SET_CURRENT_PERIOD_LEVEL,
-  REVIEW_PERIOD_LEVEL,
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
   EVENT_UPDATE_STATUS,
   TOGGLE_TIME_SYNC_RANGE,
+  SET_SCROLL_HISTORY,
 } from '../types';
 
 export function selectDatarun(datarunID: string) {
@@ -131,11 +134,77 @@ export function toggleEventModeAction(mode) {
 }
 
 export function toggleTimeSyncModeAction(syncMode) {
-  return function (dispatch) {
+  return function (dispatch, getState) {
+    let periodLevel = getSelectedPeriodLevel(getState());
+    const scrollHistory = getScrollHistory(getState());
     dispatch({
       type: TOGGLE_TIME_SYNC_RANGE,
       isTimeSyncModeEnabled: syncMode,
     });
+
+    if (!syncMode) {
+      if (scrollHistory.level === 'year') {
+        dispatch(setReviewPeriodAction(null));
+      }
+      if (scrollHistory.level === 'month') {
+        const { year } = scrollHistory;
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          periodLevel: {
+            year,
+            month: null,
+            level: 'year',
+          },
+        });
+      }
+
+      if (scrollHistory.level === 'day') {
+        const { year, month } = scrollHistory;
+        dispatch({
+          type: SET_CURRENT_PERIOD_LEVEL,
+          periodLevel: {
+            year,
+            month,
+            level: 'month',
+          },
+        });
+      }
+    }
+
+    if (syncMode) {
+      const { level } = periodLevel;
+      if (level === null) {
+        dispatch({
+          type: SET_SCROLL_HISTORY,
+          scrollHistory: {
+            ...scrollHistory,
+            level: 'year',
+          },
+        });
+      }
+
+      if (level === 'year') {
+        dispatch({
+          type: SET_SCROLL_HISTORY,
+          scrollHistory: {
+            ...scrollHistory,
+            year: periodLevel.year,
+            level: 'month',
+          },
+        });
+      }
+
+      if (level === 'month') {
+        dispatch({
+          type: SET_SCROLL_HISTORY,
+          scrollHistory: {
+            year: periodLevel.year,
+            month: periodLevel.month,
+            level: 'day',
+          },
+        });
+      }
+    }
   };
 }
 
@@ -355,39 +424,66 @@ export function zoomToggleAction(zoomMode) {
   };
 }
 
-export function setPeriodRangeAction(newPeriod) {
+export function setPeriodRangeAction(periodRange) {
   return function (dispatch) {
-    if (newPeriod.level !== 'day') {
-      if (newPeriod.level === 'year') {
-        dispatch({
-          type: SET_CURRENT_PERIOD_LEVEL,
-          isPeriodLevelSelected: true,
-          periodLevel: {
-            year: newPeriod.name,
-            month: '',
-          },
-        });
-        dispatch(reviewPeriodAction('month'));
-      }
+    const { level } = periodRange;
 
-      if (newPeriod.level === 'month') {
-        dispatch({
-          type: SET_CURRENT_PERIOD_LEVEL,
-          isPeriodLevelSelected: true,
-          periodLevel: {
-            year: newPeriod.parent.name,
-            month: newPeriod.name,
-          },
-        });
-        dispatch(reviewPeriodAction('day'));
-      }
+    if (level === 'year') {
+      const year = periodRange.name;
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        periodLevel: {
+          year,
+          month: null,
+          level: 'year',
+        },
+      });
+    }
+
+    if (level === 'month') {
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        periodLevel: {
+          year: periodRange.parent.name,
+          month: periodRange.name,
+          level: 'month',
+        },
+      });
+    }
+
+    if (level === 'day') {
+      dispatch({
+        type: SET_CURRENT_PERIOD_LEVEL,
+        periodLevel: {
+          year: periodRange.parent.parent.name,
+          month: periodRange.parent.name,
+          level: 'day',
+        },
+      });
     }
   };
 }
 
-export function reviewPeriodAction(period) {
+export function setReviewPeriodAction(level) {
+  return function (dispatch, getState) {
+    const isTimeSyncModeEnabled = getIsTimeSyncModeEnabled(getState());
+    const currentPeriod = isTimeSyncModeEnabled ? getScrollHistory(getState()) : getSelectedPeriodLevel(getState());
+    dispatch({
+      type: SET_CURRENT_PERIOD_LEVEL,
+      periodLevel: {
+        ...currentPeriod,
+        level,
+      },
+    });
+  };
+}
+
+export function setScrollHistoryAction(period) {
   return function (dispatch) {
-    dispatch({ type: REVIEW_PERIOD_LEVEL, isPeriodLevelSelected: true, reviewPeriod: period });
+    dispatch({
+      type: SET_SCROLL_HISTORY,
+      scrollHistory: period,
+    });
   };
 }
 

@@ -78,34 +78,26 @@ export const normalizeHanlers = (chart) => {
     .attr('ry', 3);
 };
 
-export const getSelectedRange = (selectedPeriod, reviewRange, maxTimeSeries) => {
+export const getSelectedRange = (selectedPeriod, maxTimeSeries) => {
   let dateRangeStart = 0;
   let dateRangeStop = 0;
 
-  if (selectedPeriod.year) {
-    const { year } = selectedPeriod;
+  const { level, year, month } = selectedPeriod;
+  if (level === 'year') {
     dateRangeStart = toTimestamp(`01/01/${year} 00:00:00`);
     dateRangeStop = toTimestamp(`12/31/${year} 23:59:59`);
   }
 
-  if (selectedPeriod.month !== '') {
-    const { year, month } = selectedPeriod;
+  if (level === 'month') {
     const monthIndex = fromMonthToIndex(month);
     const maxMonthDays = maxDaysInMonth(year, monthIndex);
-
     dateRangeStart = toTimestamp(`${monthIndex}/01/${year} 00:00:00`);
     dateRangeStop = toTimestamp(`${monthIndex}/${maxMonthDays}/${year} 23:59:59`);
   }
 
-  if (reviewRange === 'year') {
+  if (level === null) {
     dateRangeStart = maxTimeSeries[0][0] / 1000;
     dateRangeStop = maxTimeSeries[maxTimeSeries.length - 1][0] / 1000;
-  }
-
-  if (reviewRange === 'month') {
-    const { year } = selectedPeriod;
-    dateRangeStart = toTimestamp(`01/01/${year} 00:00:00`);
-    dateRangeStop = toTimestamp(`12/31/${year} 23:59:59`);
   }
 
   return { dateRangeStart, dateRangeStop };

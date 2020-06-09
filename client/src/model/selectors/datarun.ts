@@ -22,7 +22,6 @@ export const getAddingNewEventStatus = (state) => state.datarun.addingNewEvent;
 export const getZoomOnClickDirection = (state) => state.datarun.zoomDirection;
 export const getZoomCounter = (state) => state.datarun.zoomCounter;
 export const getZoomMode = (state) => state.datarun.zoomMode;
-export const getReviewPeriod = (state) => state.datarun.reviewPeriod;
 export const getSelectedPeriodLevel = (state) => state.datarun.periodLevel;
 export const getIsEventModeEnabled = (state) => state.datarun.isEventModeEnabled;
 export const getUploadEventsStatus = (state) => state.datarun.uploadEventsStatus;
@@ -30,32 +29,22 @@ export const getUpdateEventStatus = (state) => state.datarun.eventUpdateStatus;
 export const getIsTranscriptSupported = (state) => state.datarun.isTranscriptSupported;
 export const getIsSpeechInProgress = (state) => state.datarun.isSpeechInProgress;
 export const getIsTimeSyncModeEnabled = (state) => state.datarun.isTimeSyncModeEnabled;
+export const getScrollHistory = (state) => state.datarun.scrollHistory;
 
-// @TODO - check to see if it's really needed
-const filterDatarunPeriod = (period, periodLevel, reviewPeriod) => {
-  const { month, year } = periodLevel;
+export const getSelectedDatarunID = createSelector(
+  [getSelectedExperimentData, isDatarunIDSelected],
+  (selectedExperimentData, selectedDatarunID): string =>
+    selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
+);
 
-  let periodData = period;
-  const filterByYear = () => period.find((currentPeriod) => currentPeriod.name === year).children;
-  const filterByMonth = () => periodData.find((monthLevel) => monthLevel.name === month).children;
-
-  if (year) {
-    periodData = filterByYear();
-  }
-  if (month) {
-    periodData = filterByMonth();
-  }
-
-  if (reviewPeriod) {
-    if (reviewPeriod === 'year') {
-      periodData = period;
-    }
-    if (reviewPeriod === 'month') {
-      periodData = filterByYear();
-    }
-  }
-  return periodData;
-};
+export const getSelectedDatarun = createSelector(
+  [getProcessedDataRuns, getSelectedDatarunID],
+  (processedDataruns, selectedDatarunID) => {
+    // @ts-ignore
+    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarunID);
+    return dataRun;
+  },
+);
 
 const updateEventDetails = (updatedEventDetails, timeSeries, eventIndex, eventWindows) => {
   let { start_time, stop_time, tag } = updatedEventDetails;
@@ -68,21 +57,6 @@ const updateEventDetails = (updatedEventDetails, timeSeries, eventIndex, eventWi
   eventWindows[eventIndex][4] = tag;
 };
 
-export const getSelectedDatarunID = createSelector(
-  [getSelectedExperimentData, isDatarunIDSelected],
-  (selectedExperimentData, selectedDatarunID): string =>
-    selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
-);
-
-const getSelectedDatarun = createSelector(
-  [getProcessedDataRuns, getSelectedDatarunID],
-  (processedDataruns, selectedDatarunID) => {
-    // @ts-ignore
-    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarunID);
-    return dataRun;
-  },
-);
-
 const filterByTimeRange = (range, stack) => {
   if (range[0] === 0 && range[1] === 0) {
     return stack;
@@ -91,8 +65,10 @@ const filterByTimeRange = (range, stack) => {
   const yearStart = new Date(range[0]).getFullYear();
   const yearEnd = new Date(range[1]).getFullYear();
 
-  let filterByYear = stack.filter((stackItem) =>
-    yearStart !== yearEnd ? stackItem.name >= yearStart && stackItem.name <= yearEnd : stackItem.name === yearStart,
+  const filterByYear = stack.filter((currentYear) =>
+    yearStart !== yearEnd
+      ? currentYear.name >= yearStart && currentYear.name <= yearEnd
+      : currentYear.name === yearStart,
   );
 
   if (filterByYear.length === 1) {
@@ -115,34 +91,51 @@ const filterByTimeRange = (range, stack) => {
   return filterByYear;
 };
 
+export const getFilterDatarunPeriod = createSelector(
+  [getSelectedDatarun, getSelectedPeriodLevel],
+  (dataRun, periodLevel) => {
+    const { level, year, month } = periodLevel;
+    const { period } = dataRun;
+
+    const filterByYear = () => period.find((currentPeriod) => currentPeriod.name === year).children;
+    const filterByMonth = () => filterByYear().find((monthLevel) => monthLevel.name === month).children;
+
+    switch (level) {
+      case 'year':
+        return filterByYear();
+      case 'month':
+        return filterByMonth();
+      default:
+        return period;
+    }
+  },
+);
+
 export const getFilteredPeriodRange = createSelector(
   [getSelectedDatarun, getSelectedPeriodRange],
   (dataRun, periodRange) => {
     const { period } = dataRun;
-
-    const filteredPeriod = filterByTimeRange(periodRange.timeStamp, period);
-    return filteredPeriod;
+    let filteredRange = filterByTimeRange(periodRange.timeStamp, period);
+    return filteredRange;
   },
 );
 
 export const getDatarunDetails = createSelector(
   [
     getSelectedDatarun,
-    getSelectedPeriodLevel,
-    getReviewPeriod,
     getUpdatedEventsDetails,
     getFilteredPeriodRange,
     getIsTimeSyncModeEnabled,
+    getFilterDatarunPeriod,
   ],
-  (dataRun, periodLevel, reviewPeriod, updatedEventDetails, filteredRange, isTimeSyncEnabled) => {
-    let { period, events, eventWindows, timeSeries } = dataRun;
+  (dataRun, updatedEventDetails, filteredRange, isTimeSyncEnabled, filteredDatarunPeriod) => {
+    let { events, eventWindows, timeSeries } = dataRun;
     let currentEventIndex = events.findIndex((windowEvent) => windowEvent.id === updatedEventDetails.id);
 
     if (currentEventIndex !== -1) {
       updateEventDetails(updatedEventDetails, timeSeries, currentEventIndex, eventWindows);
     }
-
-    const selectedPeriod = isTimeSyncEnabled ? filteredRange : filterDatarunPeriod(period, periodLevel, reviewPeriod);
+    const selectedPeriod = isTimeSyncEnabled ? filteredRange : filteredDatarunPeriod;
 
     const completeDataRun = { ...dataRun, period: selectedPeriod };
     return completeDataRun;

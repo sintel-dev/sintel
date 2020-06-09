@@ -4,7 +4,6 @@ import createReducer from '../store/createReducer';
 const initialState: DatarunState = {
   selectedDatarunID: '',
   selectedPeriodRange: {
-    // @ts-ignore
     zoomValue: 1,
     eventRange: [0, 0],
     timeStamp: [0, 0],
@@ -23,15 +22,23 @@ const initialState: DatarunState = {
   zoomDirection: '',
   zoomCounter: 0,
   zoomMode: true,
-  periodLevel: {},
-  isPeriodLevelSelected: false,
-  reviewPeriod: null,
+  periodLevel: {
+    year: null,
+    month: null,
+    day: null,
+    level: null,
+  },
   isEventModeEnabled: true,
   uploadEventsStatus: null,
   eventUpdateStatus: null,
   isTranscriptSupported: false,
   isSpeechInProgress: false,
   isTimeSyncModeEnabled: true,
+  scrollHistory: {
+    year: null,
+    month: null,
+    level: 'year',
+  },
 };
 
 /**
@@ -103,15 +110,6 @@ function TOGGLE_ZOOM(nextState, { zoomMode }) {
   nextState.zoomMode = zoomMode;
 }
 
-function SET_CURRENT_PERIOD_LEVEL(nextState, { isPeriodLevelSelected, periodLevel }) {
-  nextState.isPeriodLevelSelected = isPeriodLevelSelected;
-  nextState.periodLevel = periodLevel;
-}
-
-function REVIEW_PERIOD_LEVEL(nextState, { reviewPeriod }) {
-  nextState.reviewPeriod = reviewPeriod;
-}
-
 function UPLOAD_JSON_EVENTS(nextState, { uploadEventsStatus }) {
   nextState.uploadEventsStatus = uploadEventsStatus;
 }
@@ -132,6 +130,14 @@ function TOGGLE_TIME_SYNC_RANGE(nextState, { isTimeSyncModeEnabled }) {
   nextState.isTimeSyncModeEnabled = isTimeSyncModeEnabled;
 }
 
+function SET_CURRENT_PERIOD_LEVEL(nextState, { periodLevel }) {
+  nextState.periodLevel = periodLevel;
+}
+
+function SET_SCROLL_HISTORY(nextState, { scrollHistory }) {
+  nextState.scrollHistory = scrollHistory;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -148,11 +154,11 @@ export default createReducer<DatarunState>(initialState, {
   ZOOM_ON_CLICK,
   TOGGLE_ZOOM,
   SET_CURRENT_PERIOD_LEVEL,
-  REVIEW_PERIOD_LEVEL,
   TOGGLE_EVENT_MODE,
   UPLOAD_JSON_EVENTS,
   EVENT_UPDATE_STATUS,
   SET_TRANSCRIPT_STATUS,
   SPEECH_STATUS,
   TOGGLE_TIME_SYNC_RANGE,
+  SET_SCROLL_HISTORY,
 });
