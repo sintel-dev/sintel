@@ -16,11 +16,12 @@ import {
   getSelectedPeriodRange,
   getIsAddingNewEvents,
   getSelectedPeriodLevel,
-  getReviewPeriod,
   getZoomCounter,
   getZoomOnClickDirection,
   getIsEditingEventRange,
   getZoomMode,
+  getIsTimeSyncModeEnabled,
+  getScrollHistory,
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -76,7 +77,7 @@ export class FocusChart extends Component<Props, State> {
       this.updateZoom();
     }
 
-    if (prevProps.selectedPeriod !== this.props.selectedPeriod || prevProps.reviewRange !== this.props.reviewRange) {
+    if (prevProps.selectedPeriod !== this.props.selectedPeriod) {
       this.updateChartZoomOnSelectPeriod();
     }
     if (prevProps.zoomCounter !== this.props.zoomCounter) {
@@ -123,7 +124,6 @@ export class FocusChart extends Component<Props, State> {
     const { zoomValue } = periodRange;
     const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
-    // @ts-ignore
     if (zoomValue !== 1) {
       // @ts-ignore
       xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
@@ -182,7 +182,6 @@ export class FocusChart extends Component<Props, State> {
     const event = timeSeries.slice(startIndex, stopIndex + 1);
 
     // if there's a zoom level
-    // @ts-ignore
     if (periodRange.zoomValue !== 1) {
       // @ts-ignore
       xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
@@ -229,7 +228,6 @@ export class FocusChart extends Component<Props, State> {
     const xCoordCopy = xCoord.copy();
 
     // if there's a zoom level
-    // @ts-ignore
     if (periodRange.zoomValue !== 1) {
       // @ts-ignore
       xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
@@ -302,7 +300,6 @@ export class FocusChart extends Component<Props, State> {
     const { zoomValue } = periodRange;
     const { maxDtXCood } = this.getScale();
     const xCoordCopy = maxDtXCood.copy();
-    // @ts-ignore
     const timeStamp = zoomValue.rescaleX(xCoordCopy.copy()).domain();
     const timestampStart = new Date(timeStamp[0]).getTime();
     const timestampStop = new Date(timeStamp[1]).getTime();
@@ -312,12 +309,12 @@ export class FocusChart extends Component<Props, State> {
   updateChartZoomOnSelectPeriod() {
     const { width } = this.state;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
-    const { selectedPeriod, setPeriodRange, dataRun, reviewRange } = this.props;
+    const { selectedPeriod, setPeriodRange, dataRun } = this.props;
     const { maxTimeSeries } = dataRun;
     const { xCoord } = this.getScale();
-    const { dateRangeStart, dateRangeStop } = getSelectedRange(selectedPeriod, reviewRange, maxTimeSeries);
+    const { dateRangeStart, dateRangeStop } = getSelectedRange(selectedPeriod, maxTimeSeries);
 
-    const startRange = xCoord(dateRangeStart * 1000);
+    const startRange = xCoord(dateRangeStart * 1000) < 0 ? 0 : xCoord(dateRangeStart * 1000);
     const stopRange = xCoord(dateRangeStop * 1000);
     const zoomValue = d3.zoomIdentity.scale(focusChartWidth / (stopRange - startRange)).translate(-startRange, 0);
 
@@ -408,11 +405,12 @@ const mapState = (state: RootState) => ({
   periodRange: getSelectedPeriodRange(state),
   isAddingNewEvent: getIsAddingNewEvents(state),
   selectedPeriod: getSelectedPeriodLevel(state),
-  reviewRange: getReviewPeriod(state),
   zoomCounter: getZoomCounter(state),
   zoomDirection: getZoomOnClickDirection(state),
   isEditingRange: getIsEditingEventRange(state),
   isZoomEnabled: getZoomMode(state),
+  isTimeSyncEnbled: getIsTimeSyncModeEnabled(state),
+  scrollHistory: getScrollHistory(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

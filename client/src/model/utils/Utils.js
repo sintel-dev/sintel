@@ -1,7 +1,7 @@
 export const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const fromMonthToIndex = (month) => months.indexOf(month) + 1;
 export const fromIndexToMonth = (monthIndex) => months[monthIndex];
-export const maxDaysInMonth = (currentYear, currentMonth) => new Date(currentYear, currentMonth, 0).getDate();
+export const maxDaysInMonth = (currentYear, monthIndex) => new Date(currentYear, monthIndex, 0).getDate();
 
 export function formatDate(date) {
   let hours = date.getHours();

@@ -33,6 +33,10 @@
         .radial-cursor{
             fill: transparent;
         }
+
+        &.level-day{
+            cursor: default;
+        }
     }
 
     .period-control{

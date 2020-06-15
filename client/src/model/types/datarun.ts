@@ -16,11 +16,11 @@ export const SET_FILTER_TAGS = 'SET_FILTER_TAGS';
 export const ZOOM_ON_CLICK = 'ZOOM_ON_CLICK';
 export const TOGGLE_ZOOM = 'TOGGLE_ZOOM';
 export const SET_CURRENT_PERIOD_LEVEL = 'SET_CURRENT_PERIOD_LEVEL';
-export const REVIEW_PERIOD_LEVEL = 'REVIEW_PERIOD_LEVEL';
 export const TOGGLE_EVENT_MODE = 'TOGGLE_EVENT_MODE';
 export const UPLOAD_JSON_EVENTS = 'UPLOAD_JSON_EVENTS';
 export const EVENT_UPDATE_STATUS = 'EVENT_UPDATE_STATUS';
 export const TOGGLE_TIME_SYNC_RANGE = 'TOGGLE_TIME_SYNC_RANGE';
+export const SET_SCROLL_HISTORY = 'SET_SCROLL_HISTORY';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -31,7 +31,7 @@ export type SetTimeseriesPeriodAction = {
   type: typeof SET_TIMESERIES_PERIOD;
   eventRange: {
     eventRange: Array<number>;
-    zoomValue: object;
+    zoomValue: object | number;
     timeStamp: Array<number>;
   };
 };
@@ -43,7 +43,7 @@ export type DatarunState = {
   selectedDatarunID: string;
   selectedPeriodRange: {
     eventRange: Array<number>;
-    zoomValue: object;
+    zoomValue: object | number;
     timeStamp: Array<number>;
   };
   activeEventID: string | null;
@@ -60,9 +60,23 @@ export type DatarunState = {
   zoomDirection: '';
   zoomCounter: number;
   zoomMode: boolean;
-  periodLevel: object;
-  isPeriodLevelSelected: boolean;
-  reviewPeriod: null | string;
+  periodLevel: {
+    year: number | null;
+    month: string | null;
+    day: string | null;
+    level: string | null;
+  };
+  isEventModeEnabled: boolean;
+  uploadEventsStatus: null | boolean;
+  eventUpdateStatus: null | string;
+  isTranscriptSupported: boolean;
+  isSpeechInProgress: boolean;
+  isTimeSyncModeEnabled: boolean;
+  scrollHistory: {
+    year: null | string;
+    month: null | string;
+    level: string;
+  };
 };
 
 /**
