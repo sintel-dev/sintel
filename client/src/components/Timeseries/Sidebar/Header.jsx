@@ -150,37 +150,30 @@ class Header extends Component {
       isTimeSyncEnabled,
     } = this.props;
 
-    const btnYearProps = () => {
-      const getIsActive = () => (isTimeSyncEnabled ? scrollHistory.level === 'year' : currentPeriod.level === null);
-      const props = {
-        className: getIsActive() ? 'active' : '',
-        onClick: () => !isEditingEventRange && setReviewPeriod(null),
+    const getBtnProps = (button) => {
+      const getParentLevel = () => (button === 'day' ? 'month' : 'year');
+      const getIsActive = () => {
+        if (button === 'year') {
+          return isTimeSyncEnabled ? scrollHistory.level === 'year' : currentPeriod.level === null;
+        }
+        return isTimeSyncEnabled
+          ? scrollHistory.level === button
+          : currentPeriod.level === getParentLevel() || currentPeriod.level === getParentLevel();
       };
 
-      return props;
-    };
-
-    const btnMonthProps = () => {
-      const getIsActive = () => (isTimeSyncEnabled ? scrollHistory.level === 'month' : currentPeriod.level === 'year');
-      const getIsDisabled = () => (isTimeSyncEnabled ? scrollHistory.year === null : currentPeriod.year === null);
-      const props = {
-        className: getIsActive() ? 'active' : '',
-        disabled: getIsDisabled(),
-        onClick: () => !isEditingEventRange && setReviewPeriod('year'),
+      const getIsDisabled = () => {
+        if (button === 'year') {
+          return false;
+        }
+        return isTimeSyncEnabled ? scrollHistory[getParentLevel()] === null : currentPeriod[getParentLevel()] === null;
       };
 
-      return props;
-    };
-
-    const btnDayProps = () => {
-      const getIsActive = () => (isTimeSyncEnabled ? scrollHistory.level === 'day' : currentPeriod.level === 'month');
-      const getIsDisabled = () => (isTimeSyncEnabled ? scrollHistory.month === null : currentPeriod.month === null);
-      const props = {
+      return {
         className: getIsActive() ? 'active' : '',
         disabled: getIsDisabled(),
-        onClick: () => !isEditingEventRange && setReviewPeriod('month'),
+        onClick: () =>
+          !isEditingEventRange && button === 'year' ? setReviewPeriod(null) : setReviewPeriod(getParentLevel()),
       };
-      return props;
     };
 
     return (
@@ -195,17 +188,17 @@ class Header extends Component {
           {this.showPeriod()}
           <ul className="period-filter">
             <li>
-              <button type="button" {...btnYearProps()}>
+              <button type="button" {...getBtnProps('year')}>
                 Year
               </button>
             </li>
             <li>
-              <button type="button" {...btnMonthProps()}>
+              <button type="button" {...getBtnProps('month')}>
                 Month
               </button>
             </li>
             <li>
-              <button type="button" {...btnDayProps()}>
+              <button type="button" {...getBtnProps('day')}>
                 Day
               </button>
             </li>
