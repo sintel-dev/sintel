@@ -27,9 +27,12 @@ import {
   getIsSpeechInProgress,
 } from '../../../../model/selectors/datarun';
 
+import { toggleAggregationModal } from '../../../../model/actions/aggregationLevels';
+
 import Loader from '../../../Common/Loader';
 import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
 import './EventDetails.scss';
+import AggregationLevels from '../../AggregationLevels';
 
 const renderInfoTooltip = () => (
   <div className="tooltip-info">
@@ -66,6 +69,7 @@ export class EventDetails extends Component {
       recordComment,
       isTranscriptSupported,
       isSpeechInProgress,
+      toggleAggregationLevels,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -81,7 +85,6 @@ export class EventDetails extends Component {
 
     const updateEventScore = ({ target }) => {
       const eventScore = target.value;
-      // eslint-disable-next-line no-restricted-globals
       if (!isNaN(eventScore) && eventScore <= 10) {
         updateEventDetails({ score: eventScore });
       }
@@ -91,6 +94,9 @@ export class EventDetails extends Component {
       <div className={`events-wrapper scroll-style ${isActive}`}>
         {currentEventDetails && (
           <div>
+            <button type="button" onClick={() => toggleAggregationLevels(true)}>
+              Open aggregation levels
+            </button>
             <button type="button" className="close" onClick={closeEventDetails}>
               x
             </button>
@@ -209,6 +215,7 @@ export class EventDetails extends Component {
             </div>
           </div>
         )}
+        <AggregationLevels />
       </div>
     );
   }
@@ -241,5 +248,6 @@ export default connect(
     deleteEvent: () => dispatch(deleteEventAction()),
     updateNewEventDetails: (details) => dispatch(updateNewEventDetailsAction(details)),
     recordComment: () => dispatch(recordCommentAction()),
+    toggleAggregationLevels: (state) => dispatch(toggleAggregationModal(state)),
   }),
 )(EventDetails);

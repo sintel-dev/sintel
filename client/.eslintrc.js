@@ -36,6 +36,7 @@ module.exports = {
   },
   plugins: ['react', 'react-hooks'],
   rules: {
+    "no-restricted-globals": 'off',
     'prettier/prettier': ['error'],
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
