@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { RootState, DatarunDataType } from '../types';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
-import { groupEventsByTimestamp, fromIndexToMonth, fromMonthToIndex } from '../utils/Utils';
+import { groupEventsByTimestamp, fromMonthToIndex } from '../utils/Utils';
 
 // @TODO - set state: RootState
 const getActiveEventID = (state) => state.datarun.activeEventID;
