@@ -112,7 +112,7 @@ class UploadEvents extends Component<Props, State> {
               <p>Your .JSON file should follow this example:</p>
               <SyntaxHighlighter style={dracula}>{codeString}</SyntaxHighlighter>
               <div className="upload-info">
-                <input type="checkbox" id="hideInfo"></input>
+                <input type="checkbox" id="hideInfo" />
                 <label htmlFor="hideInfo">Do not show me again</label>
               </div>
             </div>
