@@ -1,34 +1,5 @@
 import React from 'react';
-
-const optionsKnown = [
-  { label: 'Investigate', icon: 'investigate' },
-  { label: 'Do not Investigate', icon: 'not_investigate' },
-  { label: 'Postpone', icon: 'postpone' },
-];
-
-const optionsUnknown = [
-  { label: 'Problem', icon: 'problem' },
-  { label: 'Previously seen', icon: 'seen' },
-  { label: 'Normal', icon: 'normal' },
-];
-
-export const grouppedOptions = [
-  {
-    label: 'Known',
-    options: optionsKnown,
-  },
-  {
-    label: 'Unknown',
-    options: optionsUnknown,
-  },
-];
-
-export const formatOptionLabel = ({ label, icon }) => (
-  <div className="select-row">
-    <i className={`select ${icon}`} />
-    {label}
-  </div>
-);
+import { grouppedOptions } from '../../../Common/Dropdown';
 
 export const RenderComments = (eventComments) =>
   eventComments.comments && eventComments.comments.length ? (

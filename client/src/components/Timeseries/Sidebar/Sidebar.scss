@@ -8,6 +8,8 @@
     padding: 30px 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
+    position: relative;
+    overflow: hidden;
 
     .feature-cell {
         cursor: pointer;

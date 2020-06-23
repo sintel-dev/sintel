@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Select from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faExclamation, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
-
+import { toggleSimilarShapesModalAction } from 'src/model/actions/similarShapes';
+import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
 import {
   updateEventDetailsAction,
   saveEventDetailsAction,
@@ -26,13 +26,13 @@ import {
   getIsTranscriptSupported,
   getIsSpeechInProgress,
 } from '../../../../model/selectors/datarun';
-
 import { toggleAggregationModal } from '../../../../model/actions/aggregationLevels';
-
 import Loader from '../../../Common/Loader';
-import { formatOptionLabel, grouppedOptions, RenderComments, selectedOption } from './eventUtils';
-import './EventDetails.scss';
+import { RenderComments, selectedOption } from './eventUtils';
 import AggregationLevels from '../../AggregationLevels';
+import Dropdown from '../../../Common/Dropdown';
+import { CloseIcon, SearchIcon, AggregationIcon } from '../../../Common/icons';
+import './EventDetails.scss';
 
 const renderInfoTooltip = () => (
   <div className="tooltip-info">
@@ -70,6 +70,8 @@ export class EventDetails extends Component {
       isTranscriptSupported,
       isSpeechInProgress,
       toggleAggregationLevels,
+      toggleSimilarShapesModal,
+      isSimilarShapesOpen,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -94,11 +96,14 @@ export class EventDetails extends Component {
       <div className={`events-wrapper scroll-style ${isActive}`}>
         {currentEventDetails && (
           <div>
-            <button type="button" onClick={() => toggleAggregationLevels(true)}>
-              Open aggregation levels
+            <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
+              <AggregationIcon />
+            </button>{' '}
+            <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
+              <SearchIcon />
             </button>
             <button type="button" className="close" onClick={closeEventDetails}>
-              x
+              <CloseIcon />
             </button>
             <div className="event-row">
               <label>Signal: </label>
@@ -141,14 +146,10 @@ export class EventDetails extends Component {
               </i>
             </div>
             <div className="event-row select-holder">
-              <Select
+              <Dropdown
                 onChange={(tag) => changeEventTag(tag)}
-                formatOptionLabel={formatOptionLabel}
-                options={grouppedOptions}
-                className="tag-select"
-                classNamePrefix="tag-options"
-                placeholder="Select a tag"
                 value={selectedOption(currentEventDetails.tag)}
+                isGrouppedOptions
               />
             </div>
             <div className="event-row form-group">
@@ -239,6 +240,7 @@ export default connect(
     eventUpdateStatus: getUpdateEventStatus(state),
     isTranscriptSupported: getIsTranscriptSupported(state),
     isSpeechInProgress: getIsSpeechInProgress(state),
+    isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
   }),
   (dispatch) => ({
     closeEventDetails: () => dispatch(closeEventModal()),
@@ -249,5 +251,6 @@ export default connect(
     updateNewEventDetails: (details) => dispatch(updateNewEventDetailsAction(details)),
     recordComment: () => dispatch(recordCommentAction()),
     toggleAggregationLevels: (state) => dispatch(toggleAggregationModal(state)),
+    toggleSimilarShapesModal: (modalState) => dispatch(toggleSimilarShapesModalAction(modalState)),
   }),
 )(EventDetails);

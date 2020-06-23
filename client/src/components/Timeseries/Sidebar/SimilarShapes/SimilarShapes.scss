@@ -1,0 +1,79 @@
+.similar-shapes{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #2C3034;
+    z-index: 99;
+    padding: 0 16px;
+    font-family: 'Roboto';
+    transform: translateX(100%);
+    transition: all 0.2s ease-in-out;
+
+    &.active{
+        transform: translateX(0)
+    }
+
+    h3{
+        font-size: 20px;
+    }
+
+    button{
+        &.close{
+            background: #23242B;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            line-height: 10px;
+            top: 12px;
+            right: 15px;
+        }
+    }
+
+    .select-controls{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+
+        .tag-select {
+            width: 100%;
+        }
+    }
+
+    .shape-details{
+        background: #23242B;
+        padding: 16px;
+        border-radius: 12px;
+        display: flex;
+
+        .info{
+            width: 54%;
+            li{
+                margin-bottom: 10px;
+
+                span{
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin-right: 8px;
+                    display: inline-block;
+                    &:last-child{
+                        color: #B5B5B5
+                    }
+                }
+            }
+
+            .tag-select {
+                .tag-options__control{
+                    background: #23242B !important;
+                    box-shadow: none;
+                }
+            }
+        }
+
+        .drawings{
+            width: 120px;
+            width: 45%;
+        }
+    }
+}

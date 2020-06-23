@@ -14,6 +14,7 @@ import {
 import { getWrapperSize, drawArc, getDataScale } from './SidebarUtils';
 import { setPeriodRangeAction, setScrollHistoryAction } from '../../../model/actions/datarun';
 import './Sidebar.scss';
+import SimilarShapes from './SimilarShapes';
 
 class Sidebar extends Component {
   constructor(...props) {
@@ -203,9 +204,9 @@ class Sidebar extends Component {
   render() {
     const { experimentData } = this.props;
     const { width, height } = this.state;
-
     return (
       <div className="right-sidebar">
+        <SimilarShapes />
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           <Header />
           <div id="dataWrapper" className="data-wrapper">
