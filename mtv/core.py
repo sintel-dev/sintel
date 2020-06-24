@@ -14,14 +14,14 @@ from termcolor import colored
 from oauthlib.oauth2 import WebApplicationClient
 
 from mtv import g
-from mtv.db import db
+from mtv.db import utils as DBUtils
 from mtv.routes import add_routes
 from mtv.utils import import_object
 
 LOGGER = logging.getLogger(__name__)
 
 
-class MTVExplorer:
+class MTV:
 
     def __init__(self, cf, docker):
         self._cf = cf.copy()
@@ -60,21 +60,25 @@ class MTVExplorer:
         g['client'] = WebApplicationClient(self._cf['GOOGLE_CLIENT_ID'])
         return app
 
-    def update_db(self):
+    def update_db(self, utc):
 
         # copy from orion
-        db.copy_from(
+        DBUtils.copy_from_partial(
+            cols=['comment', 'datarun', 'dataset', 'event',
+                  'experiment', 'pipeline', 'signal', 'signalrun', 'template'],
             fromdb=self._cf['or_db'],
             todb=self._cf['db'],
             fromhost=self._cf['or_host'],
             fromport=self._cf['or_port'],
             tohost=self._cf['host'],
-            toport=self._cf['port']
+            toport=self._cf['port'],
+            exp_filter=self._cf['experiment_list']
         )
 
-        # update col "prediction" and "raw"
-        db_cli = MongoClient(self._cf['or_host'], port=self._cf['or_port'])
-        db.update_db(GridFS(db_cli[self._cf['or_db']]))
+        # update collection "prediction" and "raw"
+        orion_db_client = MongoClient(self._cf['or_host'], port=self._cf['or_port'])
+        DBUtils.update_db(GridFS(orion_db_client[self._cf['or_db']]),
+                          utc, exp_filter=self._cf['experiment_list'])
 
     def run_server(self, env, port):
 

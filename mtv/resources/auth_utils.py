@@ -12,7 +12,6 @@ from mtv import g
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
 def get_google_provider_cfg():
     """ for google auth  """
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()
@@ -57,6 +56,8 @@ def decode_auth_token(token):
 
 
 def verify_auth():
+    return {'message:' 'login successfully'}, 204
+
     # uid = request.args.get('uid', None)
     token = request.headers.get('Authorization')
 

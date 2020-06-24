@@ -1,6 +1,6 @@
 import argparse
 
-from mtv.explorer import MTVExplorer
+from mtv.core import MTV
 from mtv.utils import read_config, setup_logging
 
 
@@ -12,7 +12,7 @@ def _run(explorer, args):
 
 
 def _update_db(explorer, args):
-    explorer.update_db()
+    explorer.update_db(args.utc)
 
 
 def get_parser():
@@ -56,6 +56,8 @@ def get_parser():
     # mtv update db
     update_db = update_model.add_parser('db', parents=[common],
                                         help='Add raw data')
+    update_db.add_argument('--utc', action='store_true',
+                           help='whether to use UTC time')
     update_db.set_defaults(function=_update_db)
 
     # mtv add
@@ -78,6 +80,6 @@ def main():
 
     setup_logging(args.verbose, args.logfile)
     config = read_config('./mtv/config.yaml')
-    explorer = MTVExplorer(config, args.docker)
+    explorer = MTV(config, args.docker)
 
     args.function(explorer, args)

@@ -94,9 +94,9 @@ export class EventDetails extends Component {
       <div className={`events-wrapper scroll-style ${isActive}`}>
         {currentEventDetails && (
           <div>
-            <button type="button" onClick={() => toggleAggregationLevels(true)}>
+            {/* <button type="button" onClick={() => toggleAggregationLevels(true)}>
               Open aggregation levels
-            </button>
+            </button> */}
             <button type="button" className="close" onClick={closeEventDetails}>
               x
             </button>

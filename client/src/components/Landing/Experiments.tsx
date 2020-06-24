@@ -118,7 +118,7 @@ export const Experiment: React.FC<renderExperimentProps> = ({
   return (
     <div className={`cell ${activeClass}`} key={index} onClick={() => history.push(`/experiment/${experiment.id}`)}>
       <h3>
-        #{index + 1} {experiment.dataset}_{experiment.pipeline}
+        {/* #{index + 1} {experiment.dataset}_{experiment.pipeline} */}#{index + 1} {experiment.name}
       </h3>
       <div className="item-data">
         <ul>

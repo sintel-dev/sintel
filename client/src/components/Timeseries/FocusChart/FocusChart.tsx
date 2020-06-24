@@ -176,8 +176,8 @@ export class FocusChart extends Component<Props, State> {
     const xCoordCopy = xCoord.copy();
     const commentHeight = height - 3.5 * CHART_MARGIN;
 
-    let startIndex = currentEvent[0];
-    let stopIndex = currentEvent[1];
+    let startIndex = Math.max(currentEvent[0], 0);
+    let stopIndex = Math.max(currentEvent[1], 0);
 
     const event = timeSeries.slice(startIndex, stopIndex + 1);
 

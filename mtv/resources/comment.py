@@ -3,7 +3,7 @@ import logging
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
-from mtv import model
+from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
 from mtv.resources.auth_utils import verify_auth
 
@@ -37,7 +37,7 @@ class Comment(Resource):
             LOGGER.exception(e)
             return {'message': str(e)}, 400
 
-        document = model.Comment.find_one(id=cid)
+        document = schema.Annotation.find_one(id=cid)
 
         if document is None:
             LOGGER.exception('Error getting comment. '
@@ -49,7 +49,7 @@ class Comment(Resource):
         return {
             "id": str(document.id),
             "event": str(document.event.id),
-            "text": document.text,
+            "text": document.comment,
             "created_by": document.created_by
         }
 
@@ -95,7 +95,7 @@ class Comment(Resource):
             LOGGER.exception(e)
             return {'message': str(e)}, 400
 
-        document = model.Comment.find_one(id=cid)
+        document = schema.Annotation.find_one(id=cid)
         if document is None:
             LOGGER.exception('Error updating the comment. '
                              'Comment %s does not exist.', comment_id)
@@ -104,12 +104,12 @@ class Comment(Resource):
             }, 400
         else:
             try:
-                document.text = text
+                document.comment = text
                 document.save()
                 return {
                     "id": str(document.id),
                     "event": str(document.event.id),
-                    "text": document.text,
+                    "text": document.comment,
                     "created_by": document.created_by
                 }
             except Exception as e:
@@ -153,14 +153,14 @@ class Comments(Resource):
             LOGGER.exception(e)
             return {'message': str(e)}, 400
 
-        documents = model.Comment.find(event=eid)
+        documents = schema.Annotation.find(event=eid)
 
         comments = []
         for document in documents:
             comments.append({
                 "id": str(document.id),
                 "event": event_id,
-                "text": document.text,
+                "text": document.comment,
                 "created_by": document.created_by
             })
 
@@ -209,7 +209,7 @@ class Comments(Resource):
             LOGGER.exception(e)
             return {'message': str(e)}, 400
 
-        target_event = model.Event.find_one(id=eid)
+        target_event = schema.Event.find_one(id=eid)
         if target_event is None:
             LOGGER.exception('Error creating comments.'
                              'Event {} does not exist.'.format(event_id))
@@ -217,12 +217,12 @@ class Comments(Resource):
 
         comment = {
             'event': eid,
-            'text': text,
+            'comment': text,
             'created_by': created_by
         }
 
         try:
-            model.Comment.insert(**comment)
+            schema.Annotation.insert(**comment)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

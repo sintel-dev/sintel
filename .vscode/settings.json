@@ -28,6 +28,10 @@
         "editor.tabSize": 4,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "[py]": {
+        "editor.tabSize": 4,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "eslint.validate": [
         "javascript",
         "javascriptreact",

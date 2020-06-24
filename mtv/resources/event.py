@@ -4,7 +4,7 @@ from bson import ObjectId
 from flask import request
 from flask_restful import Resource
 
-from mtv import model
+from mtv.db import schema
 from mtv.resources.datarun import validate_datarun_id
 from mtv.resources.auth_utils import verify_auth
 
@@ -14,13 +14,13 @@ LOGGER = logging.getLogger(__name__)
 
 def get_event(event_doc):
     comments = list()
-    comment_docs = model.Comment.find(event=event_doc.id)
+    comment_docs = schema.Annotation.find(event=event_doc.id)
 
     if comment_docs is not None:
         for comment_doc in comment_docs:
             comment = {
                 'id': str(comment_doc.id),
-                'text': comment_doc.text,
+                'text': comment_doc.comment,
                 'insert_time': comment_doc.insert_time.isoformat(),
                 'created_by': comment_doc.created_by
             }
@@ -31,9 +31,9 @@ def get_event(event_doc):
         'insert_time': event_doc.insert_time.isoformat(),
         'start_time': event_doc.start_time,
         'stop_time': event_doc.stop_time,
-        'score': event_doc.score,
+        'score': event_doc.severity,
         'tag': event_doc.tag,
-        'datarun': str(event_doc.datarun.id),
+        'datarun': str(event_doc.signalrun.id),
         'comments': comments
     }
 
@@ -45,7 +45,7 @@ def validate_event_id(event_id):
         LOGGER.exception(e)
         return {'message': str(e)}, 400
 
-    event_doc = model.Event.find_one(id=eid)
+    event_doc = schema.Event.find_one(id=eid)
 
     if event_doc is None:
         LOGGER.exception('Event %s does not exist.', event_id)
@@ -242,9 +242,9 @@ class Events(Resource):
                 return validate_result
 
             datarun_doc = validate_result[0]
-            query['datarun'] = datarun_doc.id
+            query['signalrun'] = datarun_doc.id
 
-        event_docs = model.Event.find(**query).order_by('+start_time')
+        event_docs = schema.Event.find(**query).order_by('+start_time')
         if event_docs is None:
             return []
 
@@ -316,11 +316,11 @@ class Events(Resource):
 
         # create and return event
         try:
-            d['datarun'] = d['datarun_id']
+            d['signalrun'] = d['datarun_id']
             del d['datarun_id']
             if d['tag'] == 'untagged':
                 del d['tag']
-            event_doc = model.Event.insert(**d)
+            event_doc = schema.Event.insert(**d)
             res = get_event(event_doc)
         except Exception as e:
             LOGGER.exception('Error creating event. ' + str(e))
