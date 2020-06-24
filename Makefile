@@ -146,9 +146,13 @@ view-docs: docs ## view docs in browser
 serve-docs: view-docs ## compile the docs watching for changes
 	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
 
-.PHONY: api-docs
-api-docs:	## generate server API docs
-	apidoc -i mtv\\resources\\ -o apidoc\\
+.PHONY: apidoc
+apidoc:	## generate server API docs
+	apidoc -i mtv/resources -o apidoc/
+
+.PHONY: view-apidoc
+view-apidoc:	## view server API docs
+	$(BROWSER) apidoc/index.html
 
 # -------------------- session: release ---------------------- #
 
