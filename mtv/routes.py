@@ -60,5 +60,9 @@ def add_routes(app):
     api.add_resource(ctrl.signal.Signal, current_api_version + 'signals/<string:signal_name>/')
     api.add_resource(ctrl.signal.Signals, current_api_version + 'signals/')
 
+    # computing resources
+    api.add_resource(ctrl.computing.SimilarWindows,
+                     current_api_version + 'computings/similar_windows/')
+
     # test
     api.add_resource(ctrl.test.Test, current_api_version + 'test/')
