@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
@@ -202,11 +203,11 @@ class Sidebar extends Component {
   };
 
   render() {
-    const { experimentData } = this.props;
+    const { experimentData, isSimilarShapesOpen } = this.props;
     const { width, height } = this.state;
     return (
       <div className="right-sidebar">
-        <SimilarShapes />
+        {isSimilarShapesOpen && <SimilarShapes />}
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           <Header />
           <div id="dataWrapper" className="data-wrapper">
@@ -238,6 +239,7 @@ export default connect(
     isEventModeEnabled: getIsEventModeEnabled(state),
     isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
     scrollHistory: getScrollHistory(state),
+    isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodLevel) => dispatch(setPeriodRangeAction(periodLevel)),
