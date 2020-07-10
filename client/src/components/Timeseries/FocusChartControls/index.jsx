@@ -1,30 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import * as fileDownload from 'react-file-download';
 import UploadEvents from '../UploadEvents';
 import { togglePredictionsAction, addNewEventAction, filterEventsByTagAction } from '../../../model/actions/datarun';
 import { isPredictionEnabled, getIsAddingNewEvents, getDatarunDetails } from '../../../model/selectors/datarun';
 import { UploadIcon, DownloadIcon } from '../../Common/icons';
+import Dropdown from '../../Common/Dropdown';
 import './FocusChartControls.scss';
-
-const filterOptions = [
-  { value: 'Investigate', label: 'Investigate', icon: 'investigate', isFixed: true },
-  { value: 'Do not Investigate', label: 'Do not Investigate', icon: 'not_investigate', isFixed: true },
-  { value: 'Postpone', label: 'Postpone', icon: 'postpone', isFixed: true },
-  { value: 'Problem', label: 'Problem', icon: 'problem', isFixed: true },
-  { value: 'Previously seen', label: 'Previously seen', icon: 'seen', isFixed: true },
-  { value: 'Normal', label: 'Normal', icon: 'normal', isFixed: true },
-  { value: 'Untagged', label: 'Untagged', icon: 'untagged', isFixed: true },
-];
-
-const formatOptionLabel = ({ label, icon }) => (
-  <div className="select-row">
-    <i className={`select ${icon}`} />
-    {label}
-  </div>
-);
 
 const downloadAsJSON = (datarunDetails) => {
   const { events } = datarunDetails;
@@ -56,6 +39,13 @@ class FocusChartControls extends Component {
       datarunDetails,
     } = this.props;
 
+    const dropDownProps = {
+      isMulti: true,
+      closeMenuOnSelect: false,
+      placeholder: 'All tags',
+      onChange: filterByTags,
+    };
+
     return (
       <div className="chart-controls" id="chartControls">
         <div className="linechart-controls switch-control">
@@ -84,17 +74,7 @@ class FocusChartControls extends Component {
           </div>
         </div>
         <div className="tag-wrapper">
-          <Select
-            isSearchable={false}
-            isMulti
-            closeMenuOnSelect={false}
-            classNamePrefix="tag-options"
-            className="tag-select"
-            formatOptionLabel={formatOptionLabel}
-            options={filterOptions}
-            placeholder="All tags"
-            onChange={filterByTags}
-          />
+          <Dropdown {...dropDownProps} />
         </div>
         <div className="download-wrapper">
           <button type="button" onClick={() => this.setState({ isUploadModalVisible: true })}>
