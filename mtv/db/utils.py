@@ -24,6 +24,8 @@ def _exp_is_in(exp, exp_filter):
 
 
 def _exp_is_in_for_mgeng(exp, exp_filter):
+    if exp_filter is None:
+        return True
     for f in exp_filter:
         name = f.get('name', None)
         exp_id = f.get('id', None)
@@ -306,6 +308,7 @@ def update_db(fs, utc=True, exp_filter=None):
         try:
             cc += 1
             LOGGER.info('{}/{}: Processing signalrun {}'.format(cc, total, signalrun.id))
+            LOGGER.info('Pipeline name %s', signalrun.datarun.pipeline.name)
             if not _exp_is_in_for_mgeng(signalrun.datarun.experiment, exp_filter):
                 continue
 

@@ -136,6 +136,15 @@ export class FocusChart extends Component<Props, State> {
     return line(data);
   }
 
+  drawStepLine(data) {
+    let dataStep = [];
+    for (let i = 0; i < data.length - 1; i++) {
+      dataStep.push([data[i][0], data[i][1]]);
+      dataStep.push([data[i][0], data[i + 1][1]]);
+    }
+    return this.drawLine(dataStep);
+  }
+
   renderEventTooltip() {
     const { eventData } = this.state;
     const startDate = formatDate(eventData.startDate);
@@ -213,7 +222,8 @@ export class FocusChart extends Component<Props, State> {
         }}
         onMouseLeave={() => this.setState({ isTooltipVisible: false })}
       >
-        <path className="evt-highlight" d={this.drawLine(event)} />
+        <path className="evt-highlight" d={this.drawStepLine(event)} />
+        {/* <path className="evt-highlight" d={this.drawLine(event)} /> */}
         <g className="event-comment">
           <rect className="evt-area" width={commentWidth} height={commentHeight} y={0} x={translateComment} />
           <rect className="evt-comment" height="10" width={commentWidth} y="0" x={translateComment} fill={tagColor} />
@@ -365,8 +375,10 @@ export class FocusChart extends Component<Props, State> {
           </defs>
           <g className="chart-data" clipPath="url(#focusClip)">
             <g className="wawe-data">
-              <path className="chart-wawes" d={this.drawLine(timeSeries)} />
-              {isPredictionVisible && <path className="predictions" d={this.drawLine(timeseriesPred)} />}
+              <path className="chart-wawes" d={this.drawStepLine(timeSeries)} />
+              {/* <path className="chart-wawes" d={this.drawLine(timeSeries)} /> */}
+              {isPredictionVisible && <path className="predictions" d={this.drawStepLine(timeseriesPred)} />}
+              {/* {isPredictionVisible && <path className="predictions" d={this.drawLine(timeseriesPred)} />} */}
             </g>
             <rect className="zoom" {...zoomProps} />
             {eventWindows.map((currentEvent) => this.renderEvents(currentEvent))}
