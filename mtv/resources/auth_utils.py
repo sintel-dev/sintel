@@ -12,7 +12,6 @@ from mtv import g
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
 def get_google_provider_cfg():
     """ for google auth  """
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()
@@ -73,7 +72,7 @@ def verify_auth():
 
 
 def send_mail(subject, body, receiver):
-    if g['config']['USE_SYS_ENV_KEYS']:
+    if g['config']['USE_SYS_ENV_KEYS'] is None:
         MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     else:
         MAIL_PASSWORD = g['config']['MAIL_PASSWORD']
