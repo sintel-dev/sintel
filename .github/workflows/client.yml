@@ -5,9 +5,9 @@ name: Client CI
 
 on:
   push:
-    branches: ['*']
+    branches: [master, master-dev]
   pull_request:
-    branches: [master]
+    branches: [master, master-dev]
 
 jobs:
   build:
