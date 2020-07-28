@@ -5,26 +5,26 @@ export const SELECT_EXPERIMENT = 'SELECT_EXPERIMENT';
 export const FETCH_EXPERIMENT_DATA = 'FETCH_EXPERIMENT_DATA';
 
 export type FetchExperimentsAction = {
-  type: typeof FETCH_EXPERIMENTS;
-  promise: Promise<ExperimentsResponse>;
-  result?: ExperimentsResponse; // only exist when promise gets resolved
-  error?: string; // only exist when promise gets rejected
+    type: typeof FETCH_EXPERIMENTS;
+    promise: Promise<ExperimentsResponse>;
+    result?: ExperimentsResponse; // only exist when promise gets resolved
+    error?: string; // only exist when promise gets rejected
 };
 
 export type SelectExperimentAction = {
-  type: typeof SELECT_EXPERIMENT;
-  selectedExperimentID: string;
+    type: typeof SELECT_EXPERIMENT;
+    selectedExperimentID: string;
 };
 
 /**
  * Experiment State format
  */
 export type ExperimentState = {
-  isExperimentsLoading: boolean;
-  experimentsList: ExperimentDataType[];
-  selectedExperimentID: string;
-  isExperimentDataLoading: boolean;
-  experimentDetails: ExperimentDataType[];
+    isExperimentsLoading: boolean;
+    experimentsList: ExperimentDataType[];
+    selectedExperimentID: string;
+    isExperimentDataLoading: boolean;
+    experimentDetails: ExperimentDataType[];
 };
 
 /**
@@ -32,13 +32,13 @@ export type ExperimentState = {
  * API: find | delete | create | update
  */
 export type ExperimentDataType = {
-  id: string;
-  project: string;
-  dataset: string;
-  date_creation: string;
-  created_by: string;
-  pipeline: string;
-  dataruns: DatarunDataType[];
+    id: string;
+    project: string;
+    dataset: string;
+    date_creation: string;
+    created_by: string;
+    pipeline: string;
+    dataruns: DatarunDataType[];
 };
 
 /**
@@ -46,5 +46,5 @@ export type ExperimentDataType = {
  * API: all
  */
 export type ExperimentsResponse = {
-  experiments: ExperimentDataType[];
+    experiments: ExperimentDataType[];
 };

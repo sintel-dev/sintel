@@ -6,17 +6,17 @@ import { EventDataType } from './event';
 export type RootState = ReturnType<typeof rootReducer>;
 
 export type DataResponse = {
-  datasets: DatasetDataType[];
-  dataruns: DatarunDataType[];
-  events: Array<EventDataType[]>;
-  predictions: Array<{
-    names: string[];
-    data: Array<number[]>;
-    offset: number;
-  }>;
-  raws: Array<{
-    data: Array<Array<{ means: number[]; counts: number[] }>>;
-  }>;
+    datasets: DatasetDataType[];
+    dataruns: DatarunDataType[];
+    events: Array<EventDataType[]>;
+    predictions: Array<{
+        names: string[];
+        data: Array<number[]>;
+        offset: number;
+    }>;
+    raws: Array<{
+        data: Array<Array<{ means: number[]; counts: number[] }>>;
+    }>;
 };
 
 // every reducer has its own type file

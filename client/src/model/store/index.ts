@@ -6,17 +6,17 @@ import dashBoardReducers from '../reducers/index';
 import { api } from './middlewares';
 
 const loggerMiddleware = createLogger({
-  collapsed: true,
+    collapsed: true,
 });
 
 let middleWares = [thunkMiddleWare, api, loggerMiddleware];
 
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
-  middleWares = [thunkMiddleWare, api];
+    middleWares = [thunkMiddleWare, api];
 }
 
 export function configureStore(initialState = {}) {
-  return createStore(dashBoardReducers, initialState, composeWithDevTools(applyMiddleware(...middleWares)));
+    return createStore(dashBoardReducers, initialState, composeWithDevTools(applyMiddleware(...middleWares)));
 }
 
 const store = configureStore();

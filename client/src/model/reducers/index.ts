@@ -9,14 +9,14 @@ import users from './users';
 import aggregationLevels from './aggregationLevels';
 
 const dashBoardReducers = combineReducers({
-  users,
-  projects,
-  datasets,
-  pipelines,
-  experiments,
-  selectedExperimentData,
-  datarun,
-  aggregationLevels,
+    users,
+    projects,
+    datasets,
+    pipelines,
+    experiments,
+    selectedExperimentData,
+    datarun,
+    aggregationLevels,
 });
 
 export default dashBoardReducers;

@@ -45,8 +45,6 @@ type State = {
 };
 
 export class FocusChart extends Component<Props, State> {
-  private zoom: any;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -89,6 +87,8 @@ export class FocusChart extends Component<Props, State> {
     }
   }
 
+  private zoom: any;
+
   getScale() {
     const { width, height } = this.state;
     const { dataRun } = this.props;
@@ -125,8 +125,7 @@ export class FocusChart extends Component<Props, State> {
     const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
     if (zoomValue !== 1) {
-      // @ts-ignore
-      xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+      xCoord.domain((zoomValue as any).rescaleX(xCoordCopy).domain());
     }
 
     const line = d3
@@ -183,8 +182,7 @@ export class FocusChart extends Component<Props, State> {
 
     // if there's a zoom level
     if (periodRange.zoomValue !== 1) {
-      // @ts-ignore
-      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+      xCoord.domain((periodRange.zoomValue as any).rescaleX(xCoordCopy).domain());
     }
 
     const commentWidth = Math.max(xCoord(timeSeries[stopIndex][0]) - xCoord(timeSeries[startIndex][0]));
@@ -229,8 +227,7 @@ export class FocusChart extends Component<Props, State> {
 
     // if there's a zoom level
     if (periodRange.zoomValue !== 1) {
-      // @ts-ignore
-      xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
+      xCoord.domain((periodRange.zoomValue as any).rescaleX(xCoordCopy).domain());
     }
     const xAxis = d3.axisBottom(xCoord);
     const yAxis = d3.axisLeft(yCoord);

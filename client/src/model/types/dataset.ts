@@ -1,18 +1,18 @@
 export const FETCH_DATASETS = 'FETCH_DATASETS';
 
 export type FetchDatasetsAction = {
-  type: typeof FETCH_DATASETS;
-  promise: Promise<DatasetsResponse>;
-  result?: DatasetsResponse; // only exist when promise gets resolved
-  error?: string; // only exist when promise gets rejected
+    type: typeof FETCH_DATASETS;
+    promise: Promise<DatasetsResponse>;
+    result?: DatasetsResponse; // only exist when promise gets resolved
+    error?: string; // only exist when promise gets rejected
 };
 
 /**
  * Dataset State format
  */
 export type DatasetsState = {
-  isDatasetLoading: boolean;
-  dataSetsList: DatasetDataType[];
+    isDatasetLoading: boolean;
+    dataSetsList: DatasetDataType[];
 };
 
 /**
@@ -20,10 +20,10 @@ export type DatasetsState = {
  * API: find | delete | create | update
  */
 export type DatasetDataType = {
-  id: string;
-  insert_time: string;
-  name: string;
-  entity_id?: string;
+    id: string;
+    insert_time: string;
+    name: string;
+    entity_id?: string;
 };
 
 /**
@@ -31,5 +31,5 @@ export type DatasetDataType = {
  * API: all
  */
 export type DatasetsResponse = {
-  datasets: DatasetDataType[];
+    datasets: DatasetDataType[];
 };

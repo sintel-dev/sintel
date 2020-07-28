@@ -28,10 +28,10 @@ export function onUserResetPassKey(userEmail) {
     dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'loading' });
     await axios
       .post(`${API_URL}users/reset/`, userEmail)
-      .then((response) => {
+      .then(() => {
         dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'success' });
       })
-      .catch((err) => dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'fail' }));
+      .catch(() => dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'fail' }));
   };
 }
 
