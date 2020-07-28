@@ -373,7 +373,6 @@ export function saveNewEventAction() {
 }
 
 export function loadEventsFromJsonAction(jsonFiles) {
-    jsonFiles;
     return async function (dispatch) {
         // @TODO - implement it when backend is ready
         return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
