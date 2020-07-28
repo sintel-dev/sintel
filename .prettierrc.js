@@ -3,19 +3,34 @@ module.exports = {
   trailingComma: 'all',
   singleQuote: true,
   printWidth: 120,
-  tabWidth: 2,
+  tabWidth: 4,
   overrides: [
+    //   js
+    {
+      files: ['*.js', '*.jsx', '*.tsx'],
+      options: {
+        tabWidth: 2,
+      },
+    },
+    //   css
     {
       files: ['*.scss', '*.css'],
       options: {
         tabWidth: 4,
       },
     },
+    // html
     {
       files: '*.html',
       options: {
         tabWidth: 2,
         singleQuote: false,
+      },
+    },
+    {
+      files: ['*.yml'],
+      options: {
+        tabWidth: 2,
       },
     },
   ],

@@ -5,7 +5,6 @@ import os
 
 from bson import ObjectId
 from yaml import load
-from mtv import g
 
 try:
     from yaml import CLoader as Loader
