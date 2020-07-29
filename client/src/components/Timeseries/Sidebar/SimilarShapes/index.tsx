@@ -60,7 +60,7 @@ class SimilarShapes extends Component<Props, {}> {
 
   onTagSelect(tag) {
     // Yet to be implemented
-    console.log(tag, 'Similar shapes');
+    return tag;
   }
 
   drawLine(data) {

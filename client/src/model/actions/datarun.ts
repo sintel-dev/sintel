@@ -373,7 +373,8 @@ export function saveNewEventAction() {
   };
 }
 
-export function loadEventsFromJsonAction(jsonFiles) {
+// export function loadEventsFromJsonAction(jsonFiles) {
+export function loadEventsFromJsonAction() {
   return async function (dispatch) {
     // @TODO - implement it when backend is ready
     return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
@@ -496,8 +497,7 @@ export function recordCommentAction() {
     const { commentsDraft } = updatedEventDetails;
     dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
 
-    // @ts-ignore
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;

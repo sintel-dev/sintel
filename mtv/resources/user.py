@@ -1,19 +1,15 @@
-import random
-import string
-import logging
 import json
-import requests
+import logging
 import os
 
+import requests
+from flask import redirect, request
 from flask_restful import Resource
-from flask import Flask, request, redirect, url_for
-from mtv import model, g
+
+from mtv import g, model
 from mtv.resources import auth_utils
 
-
 LOGGER = logging.getLogger(__name__)
-
-
 
 
 class Signup(Resource):
@@ -144,6 +140,7 @@ class GoogleAuthentication(Resource):
         token = auth_utils.generate_auth_token(str(body['gid'])).decode()
         return token
 
+
 class GoogleLogin(Resource):
     """
         @api {post} /auth/google_login/ google login
@@ -165,6 +162,7 @@ class GoogleLogin(Resource):
             scope=["openid", "email", "profile"],
         )
         return redirect(request_uri)
+
 
 class GoogleLoginCallback(Resource):
     """
