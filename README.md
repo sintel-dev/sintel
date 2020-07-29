@@ -194,7 +194,14 @@ $ npm start
 
 ## Additional Resources
 
+<<<<<<< HEAD
+
+-   [Install python Mac OS](https://www.python.org/downloads/mac-osx/)
+-   [Install python Ubuntu](https://linuxize.com/post/how-to-install-python-3-7-on-ubuntu-18-04/)
+-   [Install anaconda](https://docs.anaconda.com/anaconda/install/)
+-   # [Install python virtual environment](https://virtualenv.pypa.io/en/latest/)
 -   [Install python Mac OS](https://www.python.org/downloads/mac-osx/)
 -   [Install python Ubuntu](https://linuxize.com/post/how-to-install-python-3-7-on-ubuntu-18-04/)
 -   [Install anaconda](https://docs.anaconda.com/anaconda/install/)
 -   [Install python virtual environment](https://virtualenv.pypa.io/en/latest/)
+    > > > > > > > master
