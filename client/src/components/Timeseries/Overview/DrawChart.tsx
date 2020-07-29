@@ -36,8 +36,6 @@ type DispatchProps = ReturnType<typeof mapDispatch>;
 type ChartProps = StateProps & DispatchProps & Props;
 
 export class DrawChart extends Component<ChartProps, ChartState> {
-  private brush: any;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -82,6 +80,8 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     }
   }
 
+  private brush: any;
+
   getScale(width = this.state.width, height = this.state.height) {
     const { maxTimeSeries } = this.props.dataRun;
 
@@ -125,8 +125,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
     brushInstance
       .on('mousedown', function () {
-        // @ts-ignore
-        self.handleBrushClick(this.getAttribute('id'));
+        self.handleBrushClick((this as HTMLElement).getAttribute('id'));
       })
       .on('dblclick', function () {
         d3.select(this).call(self.brush.move, xCoord.range());
@@ -301,7 +300,9 @@ export class DrawChart extends Component<ChartProps, ChartState> {
             height={height}
             id={this.props.dataRun.id}
             onMouseOver={() => this.handleTooltip()}
+            onFocus={() => undefined}
             onMouseOut={() => this.destroyTooltip()}
+            onBlur={() => undefined}
             transform="translate(9,3)"
           />
         </svg>

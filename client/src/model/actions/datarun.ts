@@ -373,12 +373,14 @@ export function saveNewEventAction() {
   };
 }
 
+/* eslint-disable  @typescript-eslint/no-unused-vars, no-unused-vars */
 export function loadEventsFromJsonAction(jsonFiles) {
   return async function (dispatch) {
     // @TODO - implement it when backend is ready
     return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
   };
 }
+/* eslint-enable  @typescript-eslint/no-unused-vars, no-unused-vars */
 
 export function deleteEventAction() {
   return async function (dispatch, getState) {
@@ -496,8 +498,7 @@ export function recordCommentAction() {
     const { commentsDraft } = updatedEventDetails;
     dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
 
-    // @ts-ignore
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;

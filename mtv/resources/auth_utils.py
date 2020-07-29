@@ -1,15 +1,15 @@
-import requests
+import os
+import random
 import smtplib
 import ssl
 import string
-import random
-import os
 
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+import requests
 from flask import request
+from itsdangerous import BadSignature, SignatureExpired
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 from mtv import g
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_google_provider_cfg():
