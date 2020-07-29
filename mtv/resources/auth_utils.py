@@ -11,6 +11,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from mtv import g
 
+
 def get_google_provider_cfg():
     """ for google auth  """
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()

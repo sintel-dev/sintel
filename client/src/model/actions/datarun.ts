@@ -373,13 +373,14 @@ export function saveNewEventAction() {
   };
 }
 
-// export function loadEventsFromJsonAction(jsonFiles) {
-export function loadEventsFromJsonAction() {
+/* eslint-disable  @typescript-eslint/no-unused-vars, no-unused-vars */
+export function loadEventsFromJsonAction(jsonFiles) {
   return async function (dispatch) {
     // @TODO - implement it when backend is ready
     return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
   };
 }
+/* eslint-enable  @typescript-eslint/no-unused-vars, no-unused-vars */
 
 export function deleteEventAction() {
   return async function (dispatch, getState) {

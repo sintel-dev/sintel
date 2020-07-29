@@ -54,5 +54,9 @@
     "python.pythonPath": "/Users/dyu/anaconda3/envs/mtv/bin/python",
     "code-runner.executorMap": {
         "python": "$pythonPath -u $fullFileName"
-    }
+    },
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Args": ["--max-line-length=100", "--ignore=W503"]
 }
