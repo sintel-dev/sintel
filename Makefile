@@ -42,6 +42,7 @@ install: clean-build clean-pyc clean-client ## install the packages for running 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
+	$(MAKE) init-db && 	$(MAKE) load-db-mtv
 	cd client && npm install && npm run build
 
 .PHONY: init-db
@@ -56,6 +57,7 @@ load-db-mtv: init-db
 	rm -f -r db-instance/data/mtv/
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
+	mongo mtv --eval "db.dropDatabase()"
 	mongorestore --db mtv ./db-instance/data/mtv/
 
 # ------------------ session: docker installation ------------------- #
