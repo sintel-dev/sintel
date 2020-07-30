@@ -18,6 +18,7 @@ requirements = [
     'termcolor==1.1.0',
     'PyYAML==5.1',
     'passlib==1.7.2',
+    'tqdm==4.48.0',
 
     # Auth
     'oauthlib==3.1.0',
@@ -31,6 +32,7 @@ requirements = [
     'Flask==1.0.2',
     'Flask-Cors==3.0.7',
     'Flask-RESTful==0.3.7',
+    'requests==2.24.0',
     'Werkzeug==0.15.3',
     'gevent==1.2.2',
 

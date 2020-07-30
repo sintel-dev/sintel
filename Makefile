@@ -42,7 +42,7 @@ install: clean-build clean-pyc clean-client ## install the packages for running 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	cd client && npm install
+	cd client && npm install && npm run build
 
 .PHONY: init-db
 init-db: clean-db
@@ -60,29 +60,29 @@ load-db-mtv: init-db
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
-docker-db-up: init-db	## download and
+docker-db-up: init-db			## download data and load them into mongodb  
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	docker-compose -f docker-compose-db.yml up
 
 .PHONY: docker-up
-docker-up: 				## set up
+docker-up: 				## set up all the application containers
 	docker-compose up -d
 
-.PHONY: docker-start
-docker-start:
-	docker-compose start
-
 .PHONY: docker-stop
-docker-stop:
+docker-stop:			## stops running containers without removing them.
 	docker-compose stop
+
+.PHONY: docker-start
+docker-start:			## starts the stopped containers again
+	docker-compose start
 
 .PHONY: docker-down
 docker-down: 			## remove containers, volumes, and networks
 	docker-compose down -v
 
 .PHONY: docker-clean
-docker-clean: 			## remove containers, volumes, networks, and images
+docker-clean: 		## remove containers, volumes, networks, and images
 	docker-compose down -v --rmi all
 
 # ----------------------- session: test ----------------------- #
