@@ -105,8 +105,7 @@ $ mtv run -v
 
 Then launch the client:
 ```bash
-$ cd client 
-$ npm start
+$ npm -C client start 
 ```
 Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome recommended).
 
