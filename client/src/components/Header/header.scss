@@ -51,18 +51,18 @@
         }
     }
 
-    .user-opts{
+    .user-opts {
         float: right;
         line-height: 40px;
-        a{
+        a {
             text-decoration: none;
-            &:hover{
+            &:hover {
                 text-decoration: underline;
             }
         }
     }
 
-    .logout-button{
+    .logout-button {
         background-color: transparent;
         font-size: 16px;
         border: none;
@@ -71,48 +71,49 @@
         outline: none;
     }
 
-    .exp-info{
+    .exp-info {
         float: left;
         font-family: 'Roboto';
 
-        ul{
+        ul {
             width: 200px;
             display: inline-block;
             font-size: 16px;
-            border: 1px solid rgba(151,151,151,0.5);
+            border: 1px solid rgba(151, 151, 151, 0.5);
             border-radius: 4px;
-            box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+                0 1px 10px 0 rgba(0, 0, 0, 0.12);
             padding: 5px 15px;
-            margin: 8px 0 0 50px;
+            margin: 0 0 0 50px;
             cursor: pointer;
             font-weight: bold;
-            background: #282A30;
+            background: #282a30;
 
-            &:hover{
-                span{
-                    path{
+            &:hover {
+                span {
+                    path {
                         fill: #fff;
                     }
                 }
             }
 
-            li{
+            li {
                 position: relative;
 
-                span{
+                span {
                     float: right;
 
-                    path{
+                    path {
                         fill: #979797;
-                        transition: all .2s ease-in-out;
+                        transition: all 0.2s ease-in-out;
                     }
 
-                    &:last-child{
+                    &:last-child {
                         font-weight: normal;
                     }
                 }
 
-                ul{
+                ul {
                     border-top-left-radius: 0;
                     border-top-right-radius: 0;
                     border-top: none;
@@ -120,39 +121,57 @@
                     left: -16px;
                     margin: 4px 0 0 0;
                     padding: 10px 15px;
-                    transition: all .2s ease-in-out;
+                    transition: all 0.2s ease-in-out;
                     top: 21px;
                     display: none;
                 }
 
-                &.active{
+                &.active {
                     border-bottom: none;
                     box-shadow: none;
 
-                    ul{
+                    ul {
                         display: block;
                     }
 
-                    span{
-                        path{
+                    span {
+                        path {
                             fill: #fff;
                         }
                     }
                 }
 
-                li{
+                li {
                     display: flex;
                     cursor: initial;
                     font-size: 14px;
                     text-transform: none;
                     margin-bottom: 8px;
 
-                    span{
+                    span {
                         flex: 1;
                     }
                 }
             }
         }
+    }
 
+    .header-left-wrapper,
+    .header-right-wrapper {
+        margin-top: 8px;
+    }
+
+    .header-left-wrapper {
+        float: left;
+    }
+    .header-right-wrapper {
+        float: right;
+        width: 500px;
+    }
+
+    @media screen and (min-width: 1201px) {
+        .header-left-wrapper {
+            width: calc(100% - 615px);
+        }
     }
 }
