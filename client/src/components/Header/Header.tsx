@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './header.scss';
 import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,7 +9,9 @@ import { getIsTimeSyncModeEnabled } from 'src/model/selectors/datarun';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { onUserLogoutAction } from '../../model/actions/users';
 import { RootState } from '../../model/types';
+import { VerticalDots, DownloadIcon, UploadIcon, LineIcon, StepIcon } from '../Common/icons';
 import Dropdown from '../Common/Dropdown';
+import './header.scss';
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -87,6 +88,36 @@ export const Header: React.FC<Props> = (props) => {
                 </li>
               </ul>
             </div>
+            <ul className="data-ops">
+              <li>
+                <button type="button" className="toggle-data-ops">
+                  <VerticalDots />
+                </button>
+                <ul>
+                  <li>
+                    <UploadIcon />
+                    Import .JSON File
+                  </li>
+                  <li>
+                    <DownloadIcon />
+                    Save Events as .JSON File
+                  </li>
+                  <li className="view-options">
+                    <span>Chart Style</span>
+                    <div className="switch-control-wrapper">
+                      <button type="button">
+                        <LineIcon />
+                        Line
+                      </button>
+                      <button type="button">
+                        <StepIcon />
+                        Step
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
             <div className="tag-wrapper">
               <Dropdown {...dropDownProps} />
             </div>
