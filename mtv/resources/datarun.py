@@ -5,9 +5,8 @@ from flask import request
 from flask_restful import Resource
 
 from mtv import model
-from mtv.resources.experiment import validate_experiment_id
 from mtv.resources.auth_utils import verify_auth
-
+from mtv.resources.experiment import validate_experiment_id
 
 LOGGER = logging.getLogger(__name__)
 

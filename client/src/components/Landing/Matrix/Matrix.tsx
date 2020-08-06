@@ -281,8 +281,8 @@ export class Matrix extends Component<Props, LocalState> {
   }
 }
 
-const mapState = (state: RootState) => ({});
+const mapState = () => ({});
 
-const mapDispatch = (dispatch: Function) => ({});
+const mapDispatch = () => ({});
 
 export default connect<StateProps, DispatchProps, ownProps, RootState>(mapState, mapDispatch)(Matrix);

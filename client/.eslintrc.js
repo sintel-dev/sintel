@@ -1,3 +1,5 @@
+const { off } = require('process');
+
 module.exports = {
   env: {
     browser: true,
@@ -41,6 +43,8 @@ module.exports = {
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-this-alias': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'jsx-a11y/label-has-for': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'jsx-a11y/click-events-have-key-events': 'off',
@@ -64,6 +68,12 @@ module.exports = {
     'react/jsx-indent': 'warn',
     'react/state-in-constructor': 'off',
     'react/destructuring-assignment': 'off',
+    'react/sort-comp': [
+      1,
+      {
+        order: ['static-methods', 'lifecycle', 'everything-else', 'render'],
+      },
+    ],
     'object-shorthand': 'warn',
     'prefer-destructuring': [
       'warn',
@@ -97,12 +107,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     camelcase: 'off',
     'no-useless-constructor': 'off',
-    '@typescript-eslint/no-this-alias': 'off',
-    'react/sort-comp': [
-      1,
-      {
-        order: ['static-methods', 'lifecycle', 'everything-else', 'render'],
-      },
-    ],
+    'import/no-named-as-default': 'off',
   },
 };

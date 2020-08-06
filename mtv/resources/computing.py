@@ -1,13 +1,12 @@
 import logging
 
+import pandas as pd
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
 
 from mtv import model
-from mtv.resources.auth_utils import verify_auth
 from mtv.computings import similar_windows
-import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
 
@@ -44,7 +43,7 @@ class SimilarWindows(Resource):
         try:
             start = float(start)
             end = float(end)
-        except:
+        except BaseException:
             LOGGER.exception('Error searching similar windows: wrong arg types.')
 
         doc = model.Prediction.find_one(datarun=ObjectId(datarun_id))
