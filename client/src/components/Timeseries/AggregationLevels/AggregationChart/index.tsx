@@ -29,11 +29,10 @@ class AggregationChart extends Component<StateProps, State> {
 
   componentDidMount() {
     const { width } = getAggregationChartCoords();
-    this.setState({
-      width,
-    });
+    this.setState({ width });
   }
 
+  /* eslint-disable react/no-did-update-set-state */
   componentDidUpdate() {
     this.renderChartAxis();
     const { width } = getAggregationChartCoords();
@@ -46,6 +45,7 @@ class AggregationChart extends Component<StateProps, State> {
       );
     }
   }
+  /* eslint-enable react/no-did-update-set-state */
 
   parseDataInterval(data) {
     const { currentAggregationLevel } = this.props;

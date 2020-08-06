@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { RootState, DatarunDataType } from '../types';
+import { RootState } from '../types';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 import { groupEventsByTimestamp, fromMonthToIndex } from '../utils/Utils';
@@ -37,11 +37,11 @@ export const getSelectedDatarunID = createSelector(
     selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
 );
 
+type ProcessedDatarun = ReturnType<typeof getProcessedDataRuns>[0];
 export const getSelectedDatarun = createSelector(
   [getProcessedDataRuns, getSelectedDatarunID],
   (processedDataruns, selectedDatarunID) => {
-    // @ts-ignore
-    const dataRun = processedDataruns.find((datarun: DatarunDataType) => datarun.id === selectedDatarunID);
+    const dataRun = processedDataruns.find((datarun: ProcessedDatarun) => datarun.id === selectedDatarunID);
     return dataRun;
   },
 );

@@ -29,12 +29,13 @@ export const Header: React.FC<Props> = (props) => {
   const [isInfoOpen, toggleInfo] = useState(false);
   const activeClass = isInfoOpen ? 'active' : '';
 
-  window.addEventListener('click', (evt: any) => {
+  window.addEventListener('click', (evt: Event) => {
     if (currentView === '/') {
       return null;
     }
     const dropdown = document.querySelector('.exp-info');
-    dropdown && !dropdown.contains(evt.target) && toggleInfo(false);
+    dropdown && !dropdown.contains(evt.target as Node) && toggleInfo(false);
+    return null;
   });
 
   return (

@@ -1,9 +1,10 @@
 
+import numpy as np
+from dtw import dtw as dtwc
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.preprocessing import MinMaxScaler
-from dtw import dtw as dtwc
 from tqdm import tqdm
-import numpy as np
+
 # note: this algorithm is O(n^4)! (since dtw is O(n^3))
 
 
@@ -32,7 +33,7 @@ def euclidean(df, start_ts, end_ts):
     def euclidean_dist(v1, v2):
         return sum((p - q)**2 for p, q in zip(v1, v2)) ** .5
 
-    scaler = MinMaxScaler()
+    MinMaxScaler()
     x = np.array(segment['value'].values)
     x_ = minmax(x)
     for i in tqdm(range(0, len(df) - window)):
@@ -62,8 +63,8 @@ def euclidean(df, start_ts, end_ts):
         if flag:
             no_overlap.append(first_shape)
 
-    windows = [{'start': df.index[d['id']], 'end': df.index[d['id'] +
-                                                            window - 1], 'cost': d['cost']} for d in no_overlap]
+    windows = [{'start': df.index[d['id']], 'end': df.index[d['id'] + window - 1],
+                'cost': d['cost']} for d in no_overlap]
 
     return windows
 
@@ -113,5 +114,6 @@ def dtw(df, start_ts, end_ts):
     # for d in no_overlap:
     #     print(d)
         # print(d['id'], d['id'] + window, df[d['id']]['timestamp'])
-    # windows = [{'start': df[d['id']]['timestamp'], 'end': df[d['id']+window]['timestamp']} for d in no_overlap]
+    # windows = [{'start': df[d['id']]['timestamp'], 'end': df[d['id']+window]['timestamp']}
+    # for d in no_overlap]
     return []

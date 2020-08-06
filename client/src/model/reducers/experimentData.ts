@@ -3,13 +3,11 @@ import { ExperimentDataState, FecthDatarunsByExperimentIDAction } from '../types
 
 const initialState: ExperimentDataState = {
   isExperimentDataLoading: true,
-  // @ts-ignore
   data: null,
 };
 
 function FETCH_DATARUNS_BY_EXPERIMENT_ID_REQUEST(nextState: ExperimentDataState) {
   nextState.isExperimentDataLoading = true;
-  // @ts-ignore
   nextState.data = null;
 }
 
@@ -18,17 +16,14 @@ function FETCH_DATARUNS_BY_EXPERIMENT_ID_SUCCESS(
   action: FecthDatarunsByExperimentIDAction,
 ) {
   nextState.isExperimentDataLoading = false;
-  // @ts-ignore
   nextState.data = action.result;
 }
 
 function FETCH_DATARUNS_BY_EXPERIMENT_ID_FAILURE(nextState: ExperimentDataState) {
   nextState.isExperimentDataLoading = false;
-  // @ts-ignore
   nextState.data = null;
 }
 
-// @ts-ignore
 function UPDATE_DATARUN_EVENTS(nextState, { newDatarunEvents, datarunIndex }) {
   nextState.data.dataruns[datarunIndex].events = newDatarunEvents;
 }

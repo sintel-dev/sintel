@@ -32,12 +32,12 @@ export const Datarun: React.FC<Props> = ({ datarun, onSelectDatarun, selectedDat
   );
 };
 
-const mapState = (state: RootState, ownProps: OwnProps) => ({
+const mapState = (state: RootState) => ({
   selectedDatarunID: getSelectedDatarunID(state),
   isEditingEventRange: getIsEditingEventRange(state),
 });
 
-const mapDispatch = (dispatch: Function, ownProps: OwnProps) => ({
+const mapDispatch = (dispatch: Function) => ({
   onSelectDatarun: (datarunID: string) => dispatch(selectDatarun(datarunID)),
 });
 

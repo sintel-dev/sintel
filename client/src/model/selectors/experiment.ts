@@ -213,7 +213,7 @@ export const getProcessedMatrixData = createSelector([getFilteredExperiments], (
   let maxScore = Number.MIN_SAFE_INTEGER;
   let tagStatsList = [];
 
-  filteredExperiments.forEach((currentExperiment, experimentIndex) => {
+  filteredExperiments.forEach((currentExperiment) => {
     const { dataruns } = currentExperiment;
     let tagStats: { [index: string]: number } = {};
     for (let i = 0; i < 7; i += 1) {
