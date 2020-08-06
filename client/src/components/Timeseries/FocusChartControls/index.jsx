@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as fileDownload from 'react-file-download';
 import UploadEvents from '../UploadEvents';
-import { togglePredictionsAction, addNewEventAction, filterEventsByTagAction } from '../../../model/actions/datarun';
+import { togglePredictionsAction, addNewEventAction } from '../../../model/actions/datarun';
 import { isPredictionEnabled, getIsAddingNewEvents, getDatarunDetails } from '../../../model/selectors/datarun';
 import { UploadIcon, DownloadIcon } from '../../Common/icons';
-import Dropdown from '../../Common/Dropdown';
+
 import './FocusChartControls.scss';
 
 const downloadAsJSON = (datarunDetails) => {
@@ -30,21 +30,7 @@ class FocusChartControls extends Component {
   }
 
   render() {
-    const {
-      isAddingEvent,
-      togglePredictions,
-      filterByTags,
-      addNewEvent,
-      isEnabledPrediction,
-      datarunDetails,
-    } = this.props;
-
-    const dropDownProps = {
-      isMulti: true,
-      closeMenuOnSelect: false,
-      placeholder: 'All tags',
-      onChange: filterByTags,
-    };
+    const { isAddingEvent, togglePredictions, addNewEvent, isEnabledPrediction, datarunDetails } = this.props;
 
     return (
       <div className="chart-controls" id="chartControls">
@@ -72,9 +58,6 @@ class FocusChartControls extends Component {
               Show Predictions
             </label>
           </div>
-        </div>
-        <div className="tag-wrapper">
-          <Dropdown {...dropDownProps} />
         </div>
         <div className="download-wrapper">
           <button type="button" onClick={() => this.setState({ isUploadModalVisible: true })}>
@@ -107,6 +90,5 @@ export default connect(
   (dispatch) => ({
     togglePredictions: (event) => dispatch(togglePredictionsAction(event)),
     addNewEvent: (isAddingEvent) => dispatch(addNewEventAction(isAddingEvent)),
-    filterByTags: (tags) => dispatch(filterEventsByTagAction(tags)),
   }),
 )(FocusChartControls);
