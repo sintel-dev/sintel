@@ -7,13 +7,11 @@ import {
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
   getIsEventModeEnabled,
-  getIsTimeSyncModeEnabled,
   getFilteredPeriodRange,
   getScrollHistory,
 } from '../../../model/selectors/datarun';
 import {
   toggleEventModeAction,
-  toggleTimeSyncModeAction,
   setPeriodRangeAction,
   setScrollHistoryAction,
   setReviewPeriodAction,
@@ -65,7 +63,7 @@ class Header extends Component {
   }
 
   renderHeadingControls() {
-    const { dataRun, isEventModeEnabled, toggleEventsMode, toggleTimeSync, isTimeSyncEnabled } = this.props;
+    const { dataRun, isEventModeEnabled, toggleEventsMode } = this.props;
     const { signal } = dataRun;
     return (
       <div className="sidebar-heading">
@@ -83,22 +81,6 @@ class Header extends Component {
                   />
                   <span className="switch" />
                   Show Events
-                </label>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className="switch-control">
-              <div className="row">
-                <label htmlFor="toggleTimeSync">
-                  <input
-                    type="checkbox"
-                    id="toggleTimeSync"
-                    onChange={(event) => toggleTimeSync(event.target.checked)}
-                    checked={isTimeSyncEnabled}
-                  />
-                  <span className="switch" />
-                  Sync Time Ranges
                 </label>
               </div>
             </div>
@@ -217,7 +199,6 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
-    isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
     filteredPeriodRange: getFilteredPeriodRange(state),
     currentPeriod: getSelectedPeriodLevel(state),
     scrollHistory: getScrollHistory(state),
@@ -225,7 +206,6 @@ export default connect(
   (dispatch) => ({
     setPeriodRange: (periodRange) => dispatch(setPeriodRangeAction(periodRange)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
-    toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
     setScrollHistory: (period) => dispatch(setScrollHistoryAction(period)),
     setReviewPeriod: (period) => dispatch(setReviewPeriodAction(period)),
   }),

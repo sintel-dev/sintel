@@ -5,7 +5,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faChevronLeft, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentExperimentDetails } from 'src/model/selectors/experiment';
-import { filterEventsByTagAction } from 'src/model/actions/datarun';
+import { filterEventsByTagAction, toggleTimeSyncModeAction } from 'src/model/actions/datarun';
+import { getIsTimeSyncModeEnabled } from 'src/model/selectors/datarun';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { onUserLogoutAction } from '../../model/actions/users';
 import { RootState } from '../../model/types';
@@ -17,7 +18,7 @@ type Props = StateProps & DispatchProps;
 
 export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
-  const { experimentDetails, filterByTags } = props;
+  const { experimentDetails, isTimeSyncEnabled, filterByTags, toggleTimeSync } = props;
   let location = useLocation();
 
   const currentView = location.pathname;
@@ -93,6 +94,20 @@ export const Header: React.FC<Props> = (props) => {
         )}
 
         <div className="header-right-wrapper">
+          <div className="switch-control reversed">
+            <div className="row">
+              <label htmlFor="toggleTimeSync">
+                Sync Time Ranges
+                <input
+                  type="checkbox"
+                  id="toggleTimeSync"
+                  onChange={(event) => toggleTimeSync(event.target.checked)}
+                  checked={isTimeSyncEnabled}
+                />
+                <span className="switch" />
+              </label>
+            </div>
+          </div>
           <ul className="user-opts">
             <li>
               <button type="button" onClick={logoutUser} className="logout-button">
@@ -110,11 +125,13 @@ export const Header: React.FC<Props> = (props) => {
 const mapState = (state: RootState) => ({
   selectedExperimentID: getSelectedExperiment(state),
   experimentDetails: getCurrentExperimentDetails(state),
+  isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   userLogout: () => dispatch(onUserLogoutAction()),
   filterByTags: (tags) => dispatch(filterEventsByTagAction(tags)),
+  toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Header);
