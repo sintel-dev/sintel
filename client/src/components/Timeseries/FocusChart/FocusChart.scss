@@ -30,7 +30,7 @@
             &.evt-highlight {
                 stroke: $yellow-color;
             }
-            &.predictions{
+            &.predictions {
                 stroke: #b9782d;
                 fill: none;
             }
@@ -41,35 +41,36 @@
         cursor: move;
     }
 
-    .event-comment{
+    .similar-shape,
+    .event-comment {
         cursor: pointer;
-        .evt-area{
+        .evt-area {
             fill: #777;
             stroke-width: 0;
             fill-opacity: 0.5;
         }
     }
 
-    .zoomControlsHolder{
+    .zoomControlsHolder {
         position: absolute;
         bottom: 36px;
         right: 15px;
-        li{
+        li {
             display: inline-block;
             margin-right: 6px;
             margin-bottom: 6px;
-            &:first-child{
+            &:first-child {
                 text-align: right;
                 display: block;
                 font-size: 18px;
             }
 
-            label{
-
+            label {
                 line-height: 28px;
             }
 
-            label, button {
+            label,
+            button {
                 border: 1px solid #979797;
                 border-radius: 4px;
                 cursor: pointer;
@@ -80,26 +81,26 @@
                 text-align: center;
             }
         }
-        input{
-            &[type="checkbox"]{
+        input {
+            &[type='checkbox'] {
                 position: absolute;
                 opacity: 0;
             }
         }
-        button{
+        button {
             background: transparent;
             border: none;
             color: #fff;
             text-align: center;
             outline: none;
 
-            span{
+            span {
                 line-height: 14px;
                 display: inline-block;
                 font-size: 25px;
             }
 
-            &:disabled{
+            &:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
             }
@@ -115,36 +116,36 @@
         position: fixed;
         z-index: 999;
 
-        text{
+        text {
             color: #fff;
         }
 
-        &.active{
+        &.active {
             display: block;
         }
 
-        li{
+        li {
             display: flex;
             justify-content: space-between;
-            span{
+            span {
                 flex-flow: column;
             }
         }
     }
 
-    .brush-instance{
+    .brush-instance {
         .selection {
             stroke: none;
         }
 
-        .handle{
+        .handle {
             fill: #b3bbd3;
             display: block;
         }
     }
 
-    .focuschart-brush{
-        .selection{
+    .focuschart-brush {
+        .selection {
             fill: none;
         }
     }
