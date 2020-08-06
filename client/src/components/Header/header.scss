@@ -53,7 +53,7 @@
 
     .user-opts {
         float: right;
-        line-height: 40px;
+
         a {
             text-decoration: none;
             &:hover {
@@ -156,17 +156,15 @@
         }
     }
 
-    .header-left-wrapper,
-    .header-right-wrapper {
+    .header-left-wrapper {
+        float: left;
         margin-top: 8px;
     }
 
-    .header-left-wrapper {
-        float: left;
-    }
     .header-right-wrapper {
         float: right;
-        width: 500px;
+        width: 455px;
+        margin-top: 13px;
     }
 
     @media screen and (min-width: 1201px) {
