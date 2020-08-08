@@ -157,24 +157,32 @@
         }
     }
 
-    .data-ops {
+    .data-opts {
         float: left;
         position: relative;
         .toggle-data-ops {
             cursor: pointer;
             border-radius: 4px;
-            background: #1e1e1e;
+            background: transparent;
             border: none;
             width: 32px;
             height: 32px;
             line-height: 25px;
-
-            &.active {
-                background: #23242b;
+            transition: all 0.2s ease-in-out;
+            &:hover {
+                background: #1e1e1e;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 4px 5px rgba(0, 0, 0, 0.04),
                     0px 1px 10px rgba(0, 0, 0, 0.02);
             }
+            &:disabled {
+                &,
+                &:hover {
+                    cursor: not-allowed;
+                    background: transparent;
+                }
+            }
         }
+
         button {
             border: none;
             background: transparent;
@@ -182,6 +190,7 @@
             cursor: pointer;
         }
         ul {
+            display: none;
             position: absolute;
             z-index: 9;
             top: 40px;
@@ -201,6 +210,7 @@
                 border-bottom: 1px solid rgba(#d8d8d8, 0.1);
                 transition: all 0.2s ease-in-out;
                 cursor: pointer;
+                font-size: 14px;
                 &:hover {
                     &:not(.view-options) {
                         background: rgba(#d8d8d8, 0.1);
@@ -254,6 +264,16 @@
                         }
                     }
                 }
+            }
+        }
+        &.active {
+            ul {
+                display: block;
+            }
+            .toggle-data-ops {
+                background: #1e1e1e;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 4px 5px rgba(0, 0, 0, 0.04),
+                    0px 1px 10px rgba(0, 0, 0, 0.02);
             }
         }
     }

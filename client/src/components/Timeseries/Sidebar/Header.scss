@@ -1,19 +1,18 @@
 @import '../../../assets/sass/form';
 
-.sidebar-heading{
-    ul{
+.sidebar-heading {
+    ul {
         float: none;
     }
 
-    li{
+    li {
         margin-right: 10px;
-        vertical-align: middle;
-        &.signal-title{
+        &.signal-title {
             font-size: 20px;
         }
     }
 
-    .switch-control{
+    .switch-control {
         font-size: 14px;
     }
 }

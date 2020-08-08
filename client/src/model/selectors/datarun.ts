@@ -33,14 +33,23 @@ export const getScrollHistory = (state) => state.datarun.scrollHistory;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],
-  (selectedExperimentData, selectedDatarunID): string =>
-    selectedDatarunID || selectedExperimentData.data.dataruns[0].id,
+  (selectedExperimentData, selectedDatarunID): string => {
+    const { isExperimentDataLoading } = selectedExperimentData;
+    if (isExperimentDataLoading) {
+      return null;
+    }
+    return selectedDatarunID || selectedExperimentData.data.dataruns[0].id;
+  },
 );
 
 type ProcessedDatarun = ReturnType<typeof getProcessedDataRuns>[0];
+
 export const getSelectedDatarun = createSelector(
   [getProcessedDataRuns, getSelectedDatarunID],
   (processedDataruns, selectedDatarunID) => {
+    if (selectedDatarunID === null) {
+      return null;
+    }
     const dataRun = processedDataruns.find((datarun: ProcessedDatarun) => datarun.id === selectedDatarunID);
     return dataRun;
   },
@@ -94,6 +103,10 @@ const filterByTimeRange = (range, stack) => {
 export const getFilterDatarunPeriod = createSelector(
   [getSelectedDatarun, getSelectedPeriodLevel],
   (dataRun, periodLevel) => {
+    if (dataRun === null) {
+      return null;
+    }
+
     const { level, year, month } = periodLevel;
     const { period } = dataRun;
 
@@ -114,6 +127,9 @@ export const getFilterDatarunPeriod = createSelector(
 export const getFilteredPeriodRange = createSelector(
   [getSelectedDatarun, getSelectedPeriodRange],
   (dataRun, periodRange) => {
+    if (dataRun === null) {
+      return null;
+    }
     const { period } = dataRun;
     let filteredRange = filterByTimeRange(periodRange.timeStamp, period);
     return filteredRange;
@@ -129,6 +145,9 @@ export const getDatarunDetails = createSelector(
     getFilterDatarunPeriod,
   ],
   (dataRun, updatedEventDetails, filteredRange, isTimeSyncEnabled, filteredDatarunPeriod) => {
+    if (dataRun === null) {
+      return null;
+    }
     let { events, eventWindows, timeSeries } = dataRun;
     let currentEventIndex = events.findIndex((windowEvent) => windowEvent.id === updatedEventDetails.id);
 

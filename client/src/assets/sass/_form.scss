@@ -1,5 +1,6 @@
 @import './colors.scss';
 .switch-control {
+    display: inline-block;
     label {
         cursor: pointer;
     }
@@ -7,9 +8,6 @@
     div.row {
         display: inline-block;
         margin-right: 25px;
-        // &:last-child{
-        //     margin-right: 0;
-        // }
 
         input[type='checkbox'] {
             display: none;

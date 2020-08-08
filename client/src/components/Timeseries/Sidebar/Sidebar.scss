@@ -5,7 +5,7 @@
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding: 30px 10px 10px 10px;
+    padding: 20px 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
     position: relative;
@@ -14,50 +14,49 @@
     .feature-cell {
         cursor: pointer;
         .target {
-            circle, line{
+            circle,
+            line {
                 stroke: rgba(218, 227, 245, 0.3);
                 fill: transparent;
             }
             .target-info {
-                fill: #CED8FB;
+                fill: #ced8fb;
             }
-
         }
         .feature-area {
             stroke: #687ba3;
         }
-        .radial-text{
-            fill: #8A9097;
+        .radial-text {
+            fill: #8a9097;
             font-size: 13px;
             text-anchor: middle;
         }
 
-        .radial-cursor{
+        .radial-cursor {
             fill: transparent;
         }
 
-        &.level-day{
+        &.level-day {
             cursor: default;
         }
     }
 
-    .period-control{
-        // border-bottom: 1px solid #484E53;
+    .period-control {
         padding-bottom: 20px;
         margin-bottom: 10px;
-        .sidebar-heading{
+        .sidebar-heading {
             display: inline-block;
-            font-size: 20px;
             font-weight: bold;
         }
-        ul{
+        ul {
             float: right;
         }
-        li{
+        li {
             display: inline-block;
+            vertical-align: middle;
         }
-        .period-filter{
-            button{
+        .period-filter {
+            button {
                 background-color: rgba(0, 0, 0, 0.4);
                 color: rgba(255, 255, 255, 0.5);
                 transition: all 0.2s ease-in-out;
@@ -70,7 +69,8 @@
                     background: $btn-blue;
                     color: #fff;
                 }
-                &:disabled, &.active:disabled{
+                &:disabled,
+                &.active:disabled {
                     opacity: 0.4;
                     background-color: rgba(0, 0, 0, 0.4);
                     color: rgba(255, 255, 255, 0.5);
@@ -79,37 +79,37 @@
             }
         }
     }
-    .zoom{
+    .zoom {
         fill: transparent;
         cursor: move;
     }
 
-    .event-summary{
+    .event-summary {
         margin: 30px 0 25px 0;
     }
-    .period-info{
+    .period-info {
         display: inline-block;
 
-        p{
+        p {
             margin: 0;
             padding: 0;
             line-height: 34px;
         }
     }
 
-    .data-wrapper{
-        .wrapper-container{
+    .data-wrapper {
+        .wrapper-container {
             overflow-y: auto;
             overflow-x: hidden;
         }
 
-        .week-days{
+        .week-days {
             padding-bottom: 5px;
-            li{
+            li {
                 display: inline-block;
                 text-align: center;
                 font-size: 13px;
-                color: #8A9097;
+                color: #8a9097;
             }
         }
     }
