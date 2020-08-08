@@ -7,11 +7,13 @@ import {
   getIsEditingEventRange,
   getGrouppedDatarunEvents,
   getIsEventModeEnabled,
+  getIsTimeSyncModeEnabled,
   getFilteredPeriodRange,
   getScrollHistory,
 } from '../../../model/selectors/datarun';
 import {
   toggleEventModeAction,
+  // toggleTimeSyncModeAction,
   setPeriodRangeAction,
   setScrollHistoryAction,
   setReviewPeriodAction,
@@ -199,6 +201,7 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
     grouppedEvents: getGrouppedDatarunEvents(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
+    isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
     filteredPeriodRange: getFilteredPeriodRange(state),
     currentPeriod: getSelectedPeriodLevel(state),
     scrollHistory: getScrollHistory(state),
