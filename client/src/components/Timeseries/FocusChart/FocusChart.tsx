@@ -180,7 +180,6 @@ export class FocusChart extends Component<Props, State> {
     const { start, end } = shape;
 
     if (periodRange.zoomValue !== 1) {
-      // @ts-ignore
       xCoord.domain(periodRange.zoomValue.rescaleX(xCoordCopy).domain());
     }
 

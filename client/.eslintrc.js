@@ -38,6 +38,7 @@ module.exports = {
   },
   plugins: ['react', 'react-hooks'],
   rules: {
+    'jsx-a11y/no-noninteractive-element-interactions': 'off',
     'no-restricted-globals': 'off',
     'prettier/prettier': ['error'],
     '@typescript-eslint/camelcase': 'off',

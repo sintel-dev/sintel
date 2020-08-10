@@ -37,7 +37,7 @@ export const filterOptions = [
 export const formatOptionLabel = ({ label, icon }) => (
   <div className="select-row">
     <i className={`select ${icon}`} />
-    {label}
+    <span>{label}</span>
   </div>
 );
 
