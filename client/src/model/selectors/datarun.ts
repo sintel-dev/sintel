@@ -132,7 +132,8 @@ export const getFilteredPeriodRange = createSelector(
     }
     const { period } = dataRun;
     let filteredRange = filterByTimeRange(periodRange.timeStamp, period);
-    return filteredRange;
+
+    return filteredRange.length ? filteredRange : period;
   },
 );
 
