@@ -125,7 +125,7 @@ export const Header: React.FC<Props> = (props) => {
                   <li className="view-options">
                     <span>Chart Style</span>
                     <div className="switch-control-wrapper">
-                      <button type="button">
+                      <button type="button" className="active">
                         <LineIcon />
                         Line
                       </button>

@@ -87,8 +87,10 @@
             padding: 5px 15px;
             margin: 0 0 0 50px;
             cursor: pointer;
-            font-weight: bold;
-            background: #282a30;
+
+            ul {
+                background: #2c3034;
+            }
 
             &:hover {
                 span {

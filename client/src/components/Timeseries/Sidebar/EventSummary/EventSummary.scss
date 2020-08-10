@@ -1,14 +1,13 @@
 @import '../../../../assets/sass/form.scss';
-.event-summary{
+.event-summary {
     text-transform: uppercase;
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #60666C;
-    padding: 16px 0 0 0;
+    border: 1px solid rgba(96, 102, 108, 0.5);
+    padding: 10px 0 0 0;
     border-radius: 4px;
     font-size: 12px;
-    background: #26282E;
-
+    background: #26282e;
 
     .event-header {
         padding: 0 16px;
@@ -27,9 +26,9 @@
         left: 0;
         white-space: nowrap;
         display: none;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
     }
-    table{
+    table {
         border-collapse: collapse;
         width: 100%;
         th {
@@ -37,20 +36,20 @@
             font-weight: normal;
             padding: 0 5px 0 16px;
         }
-        td{
+        td {
             text-align: center;
             height: 38px;
             position: relative;
-            &.highlighted{
+            &.highlighted {
                 background-color: rgba(35, 36, 43, 0.5);
                 cursor: pointer;
-                .tooltip-data{
+                .tooltip-data {
                     display: block;
                 }
             }
 
-            &:last-child{
-                .tooltip-data{
+            &:last-child {
+                .tooltip-data {
                     left: auto;
                     right: 0;
                     border-bottom-left-radius: 3px;
@@ -58,16 +57,16 @@
                 }
             }
         }
-        .row-light{
-            background: #2C3034
+        .row-light {
+            background: #2c3034;
         }
 
-        tr:last-child{
-            th{
+        tr:last-child {
+            th {
                 border-bottom-left-radius: 4px;
             }
-            td{
-                &:last-child{
+            td {
+                &:last-child {
                     border-bottom-right-radius: 4px;
                 }
             }
@@ -77,35 +76,29 @@
     .event-header {
         height: 40px;
         line-height: 27px;
-        .left-wrapper{
-            float: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .wrapper {
+            padding-bottom: 8px;
         }
-        .right-wrapper{
-            float: right
-        }
-        button{
-            background: transparent;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            outline: none;
-            span{
-                display: inline-block;
-                margin-right: 10px;
-            }
+        .left-wrapper {
+            font-size: 20px;
+            font-weight: bold;
         }
     }
 
     .summary-details {
         display: none;
-        &.active{
+
+        &.active {
             display: block;
         }
-        .indicator{
+        .indicator {
             width: 7px;
             height: 7px;
             margin: 0 10px;
         }
     }
-
 }
