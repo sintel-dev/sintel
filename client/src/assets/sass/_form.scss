@@ -51,6 +51,12 @@
     }
 
     &.reversed {
+        .row {
+            &,
+            .switch {
+                margin-right: 0;
+            }
+        }
         .switch {
             margin-left: 13px;
             margin-right: 0;
@@ -82,7 +88,7 @@
 
     .tag-options__placeholder {
         color: #fff !important;
-        font-size: 13px;
+        font-size: 16px;
     }
 
     .tag-options__indicator-separator {
