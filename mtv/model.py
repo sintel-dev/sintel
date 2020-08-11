@@ -109,7 +109,7 @@ class User(Document, MongoUtils):
     email = fields.StringField(required=True)
     password = fields.StringField()
     gid = fields.StringField()
-    picture = fields.StringField()
+    picture = fields.StringField()  # can be base64 format or image url
 
 
 class Dataset(Document, MongoUtils):

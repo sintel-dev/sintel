@@ -18,7 +18,7 @@ export function googleRegisterAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       dispatch({ type: 'GOOGLE_USER_REGISTER', googleRegisterStatus: 'success' });
-      Cookies.set(SESSION_TOKEN, response.data);
+      Cookies.set(SESSION_TOKEN, response.data.data.token);
     });
   };
 }
@@ -82,7 +82,7 @@ export function onUserLogoutAction() {
 export function googleLoginAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
-      Cookies.set(SESSION_TOKEN, response.data);
+      Cookies.set(SESSION_TOKEN, response.data.data.token);
       dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
     });
   };
