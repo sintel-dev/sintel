@@ -9,7 +9,6 @@ from flask import request
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-
 from mtv import g
 
 

@@ -5,11 +5,10 @@ import os
 import requests
 from flask import redirect, request
 from flask_restful import Resource
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from mtv import g, model
 from mtv.resources import auth_utils
-from werkzeug.security import generate_password_hash, check_password_hash
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -151,9 +150,9 @@ class GoogleAuthentication(Resource):
 
             # if not exist -> write into db
             if (not model.User.find_one(email=user['email'])
-               and not model.User.find_one(gid=user['gid'])):
+                    and not model.User.find_one(gid=user['gid'])):
                 model.User.insert(**user)
-            
+
             # TODO: currently gid is not fully used
             db_user = model.User.find_one(email=user['email'])
             if db_user:
