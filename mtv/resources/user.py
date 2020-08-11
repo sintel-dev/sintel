@@ -8,6 +8,8 @@ from flask_restful import Resource
 
 from mtv import g, model
 from mtv.resources import auth_utils
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ class Signup(Resource):
         body = request.json
         try:
             password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
+            password_encrypted = generate_password_hash(password)
             user = dict()
             user['email'] = body['email']
             user['name'] = body['name']
@@ -66,7 +68,7 @@ class Signin(Resource):
             email = body['email']
             password = body['password']
             user = model.User.find_one(email=email)
-            if user and auth_utils.check_password_hash(user.password, password):
+            if user and check_password_hash(user.password, password):
                 token = auth_utils.generate_auth_token(str(user.id)).decode()
                 return {
                     'data': {
@@ -101,7 +103,7 @@ class Reset(Resource):
         body = request.json
         try:
             password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
+            password_encrypted = generate_password_hash(password)
             email = body['email']
             user = model.User.find_one(email=email)
             if user:
@@ -136,9 +138,37 @@ class GoogleAuthentication(Resource):
     def post(self):
         body = request.json
 
-        # Temporarily addressed google auth
-        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
-        return token
+        # signup
+        try:
+            user = dict()
+            user['email'] = body.get('email', None)
+            user['name'] = body.get('name', None)
+            user['gid'] = body.get('gid', None)
+            user['picture'] = body.get('picture', None)
+
+            if (user['email'] is None or user['gid'] is None or user['name'] is None):
+                raise('user information is missing')
+
+            # if not exist -> write into db
+            if (not model.User.find_one(email=user['email'])
+               and not model.User.find_one(gid=user['gid'])):
+                model.User.insert(**user)
+            
+            # TODO: currently gid is not fully used
+            db_user = model.User.find_one(email=user['email'])
+            if db_user:
+                token = auth_utils.generate_auth_token(str(db_user.id)).decode()
+                return {
+                    'data': {
+                        'uid': str(db_user.id),
+                        'name': db_user.name,
+                        'email': db_user.email,
+                        # 'picture': db_user.picture,
+                        'token': token
+                    }
+                }, 200
+        except Exception as e:
+            return {'message': str(e)}, 401
 
 
 class GoogleLogin(Resource):
