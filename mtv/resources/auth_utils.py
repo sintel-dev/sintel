@@ -56,6 +56,8 @@ def decode_auth_token(token):
 
 
 def verify_auth():
+    return {'message:' 'login successfully'}, 204
+
     # uid = request.args.get('uid', None)
     token = request.headers.get('Authorization')
 

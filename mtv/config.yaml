@@ -45,3 +45,13 @@ USE_SYS_ENV_KEYS: False
 MAIL_PASSWORD: '8vn1las1lsh;]q1vn'
 GOOGLE_CLIENT_SECRET: '6Y3tUZbPCZHM9okPLbWB_OXK'
 AUTH_KEY: 'YT#XA&00ALKlkjG)JAN<[XC'
+
+# Experiment List
+experiment_list:
+    # None for all
+    # - { name: 'OneSignalEPS' }
+    # - { name: 'OneSignalACS' }
+    # - { name: 'OneSignalTCS' }
+    # - { name: 'OneSignalENV' }
+    # - { name: 'DifferentAggMethods' }
+    # - { name: 'DifferentADs-11125' }

@@ -39,6 +39,7 @@ export type ExperimentDataType = {
   created_by: string;
   pipeline: string;
   dataruns: DatarunDataType[];
+  name?: string;
 };
 
 /**

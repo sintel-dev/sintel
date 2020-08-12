@@ -7,7 +7,8 @@ from flask import redirect, request
 from flask_restful import Resource
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from mtv import g, model
+from mtv import g
+from mtv.db import schema
 from mtv.resources import auth_utils
 
 LOGGER = logging.getLogger(__name__)
@@ -33,10 +34,10 @@ class Signup(Resource):
             user['email'] = body['email']
             user['name'] = body['name']
             user['password'] = password_encrypted
-            if (model.User.find_one(email=user['email'])):
+            if (schema.User.find_one(email=user['email'])):
                 raise('email already exist')
 
-            model.User.insert(**user)
+            schema.User.insert(**user)
             auth_utils.send_mail('MTV: your password', password, user['email'])
             return {'message': 'password has been sent to your email'}, 200
         except Exception as e:
@@ -66,7 +67,7 @@ class Signin(Resource):
         try:
             email = body['email']
             password = body['password']
-            user = model.User.find_one(email=email)
+            user = schema.User.find_one(email=email)
             if user and check_password_hash(user.password, password):
                 token = auth_utils.generate_auth_token(str(user.id)).decode()
                 return {
@@ -104,7 +105,7 @@ class Reset(Resource):
             password = auth_utils.generate_password()
             password_encrypted = generate_password_hash(password)
             email = body['email']
-            user = model.User.find_one(email=email)
+            user = schema.User.find_one(email=email)
             if user:
                 user['password'] = password_encrypted
                 user.save()
@@ -149,12 +150,12 @@ class GoogleAuthentication(Resource):
                 raise('user information is missing')
 
             # if not exist -> write into db
-            if (not model.User.find_one(email=user['email'])
-                    and not model.User.find_one(gid=user['gid'])):
-                model.User.insert(**user)
+            if (not schema.User.find_one(email=user['email'])
+                    and not schema.User.find_one(gid=user['gid'])):
+                schema.User.insert(**user)
 
             # TODO: currently gid is not fully used
-            db_user = model.User.find_one(email=user['email'])
+            db_user = schema.User.find_one(email=user['email'])
             if db_user:
                 token = auth_utils.generate_auth_token(str(db_user.id)).decode()
                 return {
@@ -256,8 +257,8 @@ class GoogleLoginCallback(Resource):
         user['gid'] = unique_id
         user['picture'] = picture
 
-        if (not model.User.find_one(email=user['email'])):
-            model.User.insert(**user)
+        if (not schema.User.find_one(email=user['email'])):
+            schema.User.insert(**user)
 
         # return redirect(url_for('index'))
         return redirect('http://127.0.0.1:3001/')
