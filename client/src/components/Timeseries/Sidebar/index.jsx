@@ -19,13 +19,13 @@ class Sidebar extends Component {
       sections: [
         {
           key: 'periodicalView',
-          isOpen: true,
+          isOpen: false,
           title: 'Periodical View',
           component: <PeriodicalView />,
         },
         {
           key: 'signalView',
-          isOpen: false,
+          isOpen: true,
           title: 'Signal Annotations',
           component: <SignalAnnotations />,
         },
