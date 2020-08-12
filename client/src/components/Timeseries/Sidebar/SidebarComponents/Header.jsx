@@ -12,13 +12,13 @@ import {
   getIsTimeSyncModeEnabled,
   getFilteredPeriodRange,
   getScrollHistory,
-} from '../../../model/selectors/datarun';
+} from '../../../../model/selectors/datarun';
 import {
   toggleEventModeAction,
   setPeriodRangeAction,
   setScrollHistoryAction,
   setReviewPeriodAction,
-} from '../../../model/actions/datarun';
+} from '../../../../model/actions/datarun';
 
 class Header extends Component {
   constructor(props) {
@@ -170,7 +170,7 @@ class Header extends Component {
 
     return (
       <div className="period-control">
-        {this.renderHeadingControls()}
+        {/* {this.renderHeadingControls()} */}
         <EventSummary
           selectedPeriodLevel={selectedPeriodLevel}
           grouppedEvents={grouppedEvents}
