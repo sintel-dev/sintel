@@ -1,17 +1,15 @@
 import logging
 import os
 import sys
-import smtplib
-import ssl
 
 from flask import Flask
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 from gridfs import GridFS
 from mongoengine import connect
+from oauthlib.oauth2 import WebApplicationClient
 from pymongo import MongoClient
 from termcolor import colored
-from oauthlib.oauth2 import WebApplicationClient
 
 from mtv import g
 from mtv.db import utils as DBUtils

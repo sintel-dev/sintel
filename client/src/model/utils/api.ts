@@ -45,6 +45,8 @@ export class RestClient {
 
   public data: Resource<any, DataResponse>;
 
+  public similar_windows: Resource<any, DataResponse>;
+
   /**
    *
    * @param config AxiosRequestConfig
@@ -62,6 +64,7 @@ export class RestClient {
     this.events = new Resource(this.server, 'events/');
     this.comments = new Resource(this.server, 'comments/');
     this.data = new Resource(this.server, 'data/');
+    this.similar_windows = new Resource(this.server, 'computings/similar_windows/');
     this.server.interceptors.request.use(this.requestInterceptor);
     this.server.interceptors.response.use(this.responseSuccessInterceptor, this.responseFailInterceptor);
   }
@@ -95,5 +98,5 @@ export class RestClient {
 }
 
 export default new RestClient({
-  baseURL: 'http://127.0.0.1:3000/api/v1/',
+  baseURL: API_URL,
 });

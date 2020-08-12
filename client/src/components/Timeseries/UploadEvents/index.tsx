@@ -82,7 +82,8 @@ class UploadEvents extends Component<Props, State> {
 
   onRemoveFile(file) {
     const { currentFiles } = this.state;
-    currentFiles.map((currentFile) => {
+
+    currentFiles.forEach((currentFile) => {
       if (currentFile === file) {
         currentFiles.splice(currentFile, 1);
       }

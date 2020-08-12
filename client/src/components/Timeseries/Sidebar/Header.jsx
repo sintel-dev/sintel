@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import EventSummary from './EventSummary';
 import {
   getDatarunDetails,
@@ -13,14 +15,20 @@ import {
 } from '../../../model/selectors/datarun';
 import {
   toggleEventModeAction,
-  toggleTimeSyncModeAction,
   setPeriodRangeAction,
   setScrollHistoryAction,
   setReviewPeriodAction,
 } from '../../../model/actions/datarun';
-import './Header.scss';
 
 class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSummaryVisible: true,
+    };
+    this.toggleSummaryDetails = this.toggleSummaryDetails.bind(this);
+  }
+
   componentDidUpdate(prevProps) {
     const { isTimeSyncEnabled, filteredPeriodRange, setScrollHistory, scrollHistory } = this.props;
 
@@ -64,44 +72,24 @@ class Header extends Component {
     }
   }
 
+  toggleSummaryDetails() {
+    const { isSummaryVisible } = this.state;
+    this.setState({
+      isSummaryVisible: !isSummaryVisible,
+    });
+  }
+
   renderHeadingControls() {
-    const { dataRun, isEventModeEnabled, toggleEventsMode, toggleTimeSync, isTimeSyncEnabled } = this.props;
-    const { signal } = dataRun;
+    const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
     return (
       <div className="sidebar-heading">
         <ul>
-          <li className="signal-title">{signal}</li>
+          <li className="signal-title">Periodical View</li>
           <li>
-            <div className="switch-control">
-              <div className="row">
-                <label htmlFor="toggleEvents">
-                  <input
-                    type="checkbox"
-                    id="toggleEvents"
-                    onChange={(event) => toggleEventsMode(event.target.checked)}
-                    checked={isEventModeEnabled}
-                  />
-                  <span className="switch" />
-                  Show Events
-                </label>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className="switch-control">
-              <div className="row">
-                <label htmlFor="toggleTimeSync">
-                  <input
-                    type="checkbox"
-                    id="toggleTimeSync"
-                    onChange={(event) => toggleTimeSync(event.target.checked)}
-                    checked={isTimeSyncEnabled}
-                  />
-                  <span className="switch" />
-                  Sync Time Ranges
-                </label>
-              </div>
-            </div>
+            <button type="button" onClick={this.toggleSummaryDetails} id="toggleSummary">
+              <span>{buttonText}</span>
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
           </li>
         </ul>
       </div>
@@ -139,6 +127,7 @@ class Header extends Component {
   }
 
   render() {
+    const { isSummaryVisible } = this.state;
     const {
       setReviewPeriod,
       selectedPeriodLevel,
@@ -148,6 +137,9 @@ class Header extends Component {
       currentPeriod,
       scrollHistory,
       isTimeSyncEnabled,
+      isEventModeEnabled,
+      toggleEventsMode,
+      dataRun,
     } = this.props;
 
     const getBtnProps = (button) => {
@@ -183,9 +175,11 @@ class Header extends Component {
           selectedPeriodLevel={selectedPeriodLevel}
           grouppedEvents={grouppedEvents}
           filteredPeriodRange={filteredPeriodRange}
+          signalName={dataRun.signal}
+          isOpen={isSummaryVisible}
+          isTimeSyncEnabled={isTimeSyncEnabled}
         />
-        <div>
-          {this.showPeriod()}
+        <div className="period-wrapper">
           <ul className="period-filter">
             <li>
               <button type="button" {...getBtnProps('year')}>
@@ -201,6 +195,24 @@ class Header extends Component {
               <button type="button" {...getBtnProps('day')}>
                 Day
               </button>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <div className="switch-control reversed">
+                <div className="row">
+                  <label htmlFor="toggleEvents">
+                    Show Events
+                    <input
+                      type="checkbox"
+                      id="toggleEvents"
+                      onChange={(event) => toggleEventsMode(event.target.checked)}
+                      checked={isEventModeEnabled}
+                    />
+                    <span className="switch" />
+                  </label>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -225,7 +237,6 @@ export default connect(
   (dispatch) => ({
     setPeriodRange: (periodRange) => dispatch(setPeriodRangeAction(periodRange)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
-    toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
     setScrollHistory: (period) => dispatch(setScrollHistoryAction(period)),
     setReviewPeriod: (period) => dispatch(setReviewPeriodAction(period)),
   }),

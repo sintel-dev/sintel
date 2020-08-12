@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 from pymongo import MongoClient
-from bson import ObjectId
 
 from mtv.db import schema
 
@@ -195,7 +194,7 @@ def _update_prediction(signalrun, v):
                     v['y_hat'][i][0],
                     v['es'][i]
                 ])
-            except Exception as e:
+            except Exception:
                 print(idx, type(idx))
 
         # convert format

@@ -3,9 +3,9 @@ import logging
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
-from mtv.resources.auth_utils import verify_auth
 
 from mtv.db import schema
+from mtv.resources.auth_utils import verify_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,8 @@ def get_experiment(experiment_doc):
             event_docs = schema.Event.find(signalrun=signalrun_doc.id)
             if event_docs is not None:
                 for event_doc in event_docs:
-                    annotation_doc = schema.Annotation.find_one(event=event_doc.id)
+                    # TODO
+                    # annotation_doc = schema.Annotation.find_one(event=event_doc.id)
                     signalrun['events'].append({
                         'start_time': event_doc.start_time,
                         'stop_time': event_doc.stop_time,

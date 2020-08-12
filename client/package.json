@@ -12,7 +12,9 @@
     "coverage:snapshots": "NODE_ENV=test npm test -- --coverage --updateSnapshot",
     "coverage:report": "NODE_ENV=test npm t -- --coverage --watchAll=false",
     "clean": "rm -rf node_modules && rm -rf build",
-    "serve": "serve -s build -p 4200"
+    "serve": "serve -s build -p 4200",
+    "lint": "eslint -c .eslintrc.js 'src/**/*{.ts,.tsx}'",
+    "lint:fix": "eslint --fix -c .eslintrc.js 'src/**/*{.ts,.tsx}'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

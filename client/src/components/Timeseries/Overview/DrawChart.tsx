@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { connect } from 'react-redux';
+import {
+  getIsSimilarShapesModalOpen,
+  getIsSimilarShapesLoading,
+  getSimilarShapesCoords,
+} from 'src/model/selectors/similarShapes';
 import { RootState, DatarunDataType } from '../../../model/types';
 import { formatDate } from '../../../model/utils/Utils';
 import { FocusChartConstants } from '../FocusChart/Constants';
@@ -10,6 +15,7 @@ import {
   getIsEditingEventRange,
   getIsAddingNewEvents,
   getIsPopupOpen,
+  getSelectedDatarunID,
 } from '../../../model/selectors/datarun';
 import { setTimeseriesPeriod, selectDatarun } from '../../../model/actions/datarun';
 
@@ -36,8 +42,6 @@ type DispatchProps = ReturnType<typeof mapDispatch>;
 type ChartProps = StateProps & DispatchProps & Props;
 
 export class DrawChart extends Component<ChartProps, ChartState> {
-  private brush: any;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -82,6 +86,8 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     }
   }
 
+  private brush: any;
+
   getScale(width = this.state.width, height = this.state.height) {
     const { timeSeries, maxTimeSeries } = this.props.dataRun;
 
@@ -125,8 +131,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
     brushInstance
       .on('mousedown', function () {
-        // @ts-ignore
-        self.handleBrushClick(this.getAttribute('id'));
+        self.handleBrushClick((this as HTMLElement).getAttribute('id'));
       })
       .on('dblclick', function () {
         d3.select(this).call(self.brush.move, xCoord.range());
@@ -220,14 +225,25 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     !isEditingEvent && !isAddingNewEvent && !isPopupOpen && this.props.onSelectDatarun(dataRunID);
   }
 
-  drawEvent(event, timeSeries) {
+  drawEvent(event) {
+    const { timeSeries } = this.props.dataRun;
     const eventData: Array<number> = timeSeries.slice(event[0], event[1] + 2);
     return <path key={event[3]} className="wave-event" d={this.drawLine(eventData)} />;
   }
 
+  renderSimilarShapes(shape) {
+    const { start, end } = shape;
+
+    return (
+      <g className="similar-shape" key={start}>
+        {this.drawEvent([start, end])}
+      </g>
+    );
+  }
+
   drawData() {
     const { width, height, offset } = this.state;
-    const { dataRun } = this.props;
+    const { dataRun, isSimilarShapesLoading, isSimilarShapesOpen, similarShapesCoords, selectedDatarunID } = this.props;
     const { eventWindows, timeSeries } = dataRun;
 
     return (
@@ -235,7 +251,11 @@ export class DrawChart extends Component<ChartProps, ChartState> {
       height > 0 && (
         <g className="event-wrapper" transform={`translate(${offset.left}, ${offset.top})`}>
           <path className="wave-data" d={this.drawLine(timeSeries)} />
-          {eventWindows.length > 0 && eventWindows.map((windowEvent) => this.drawEvent(windowEvent, timeSeries))}
+          {eventWindows.length > 0 && eventWindows.map((windowEvent) => this.drawEvent(windowEvent))}
+          {isSimilarShapesOpen &&
+            !isSimilarShapesLoading &&
+            dataRun.id === selectedDatarunID &&
+            similarShapesCoords.map((currentShape) => this.renderSimilarShapes(currentShape))}
         </g>
       )
     );
@@ -301,7 +321,9 @@ export class DrawChart extends Component<ChartProps, ChartState> {
             height={height}
             id={this.props.dataRun.id}
             onMouseOver={() => this.handleTooltip()}
+            onFocus={() => undefined}
             onMouseOut={() => this.destroyTooltip()}
+            onBlur={() => undefined}
             transform="translate(9,3)"
           />
         </svg>
@@ -316,6 +338,10 @@ const mapState = (state: RootState) => ({
   isEditingEvent: getIsEditingEventRange(state),
   isAddingNewEvent: getIsAddingNewEvents(state),
   isPopupOpen: getIsPopupOpen(state),
+  isSimilarShapesLoading: getIsSimilarShapesLoading(state),
+  isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+  similarShapesCoords: getSimilarShapesCoords(state),
+  selectedDatarunID: getSelectedDatarunID(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

@@ -4,14 +4,14 @@
 # mtv
 host: 'localhost' # mongodb server address
 port: 27017 # mongodb server port
-db: 'mtv-test' # database name
+db: 'mtv' # database name
 username: # for auth
 password: # for auth
 
 # orion
 or_host: 'localhost' # mongodb server address
 or_port: 27017 # mongodb server port
-or_db: 'orion-test' # database name
+or_db: 'orion' # database name
 or_username: # for auth
 or_password: # for auth
 
@@ -48,9 +48,10 @@ AUTH_KEY: 'YT#XA&00ALKlkjG)JAN<[XC'
 
 # Experiment List
 experiment_list:
-    - { name: 'OneSignalEPS', created_by: 'dyu' }
-    - { name: 'OneSignalACS', created_by: 'dyu' }
-    - { name: 'OneSignalTCS', created_by: 'dyu' }
-    - { name: 'OneSignalENV', created_by: 'dyu' }
-    - { name: 'DifferentAggMethods', created_by: 'dyu' }
-    - { name: 'DifferentADs-11125', created_by: 'dyu' }
+    # None for all
+    # - { name: 'OneSignalEPS' }
+    # - { name: 'OneSignalACS' }
+    # - { name: 'OneSignalTCS' }
+    # - { name: 'OneSignalENV' }
+    # - { name: 'DifferentAggMethods' }
+    # - { name: 'DifferentADs-11125' }

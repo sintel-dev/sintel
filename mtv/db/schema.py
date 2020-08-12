@@ -11,6 +11,7 @@ This module contains the classes that define the Orion Database Schema:
     * Event
     * EventInteraction
     * Annotation
+    * User
 """
 
 import logging
@@ -332,3 +333,11 @@ class Prediction(MTVDocument):
             'signalrun'
         ]
     }
+
+
+class User(MTVDocument):
+    name = fields.StringField(required=True)
+    email = fields.StringField(required=True)
+    password = fields.StringField()
+    gid = fields.StringField()
+    picture = fields.StringField()  # can be base64 format or image url

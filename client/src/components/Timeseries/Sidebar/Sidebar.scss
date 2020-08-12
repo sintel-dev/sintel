@@ -5,57 +5,74 @@
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding: 30px 10px 10px 10px;
+    padding: 20px 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
+    position: relative;
+    overflow: hidden;
 
     .feature-cell {
         cursor: pointer;
         .target {
-            circle, line{
+            circle,
+            line {
                 stroke: rgba(218, 227, 245, 0.3);
                 fill: transparent;
             }
             .target-info {
-                fill: #CED8FB;
+                fill: #ced8fb;
             }
-
         }
         .feature-area {
             stroke: #687ba3;
         }
-        .radial-text{
-            fill: #8A9097;
+        .radial-text {
+            fill: #8a9097;
             font-size: 13px;
             text-anchor: middle;
         }
 
-        .radial-cursor{
+        .radial-cursor {
             fill: transparent;
         }
 
-        &.level-day{
+        &.level-day {
             cursor: default;
         }
     }
 
-    .period-control{
-        // border-bottom: 1px solid #484E53;
-        padding-bottom: 20px;
-        margin-bottom: 10px;
-        .sidebar-heading{
-            display: inline-block;
-            font-size: 20px;
-            font-weight: bold;
+    .period-control {
+        .sidebar-heading {
+            .signal-title {
+                font-size: 16px;
+            }
+            button {
+                background: transparent;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                outline: none;
+                span {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+            }
         }
-        ul{
-            float: right;
+        ul {
+            display: flex;
+            justify-content: space-between;
         }
-        li{
-            display: inline-block;
+        li {
+            vertical-align: middle;
+            &:first-child button {
+                border-radius: 4px 0px 0px 4px;
+            }
+            &:last-child button {
+                border-radius: 0px 4px 4px 0px;
+            }
         }
-        .period-filter{
-            button{
+        .period-filter {
+            button {
                 background-color: rgba(0, 0, 0, 0.4);
                 color: rgba(255, 255, 255, 0.5);
                 transition: all 0.2s ease-in-out;
@@ -68,7 +85,8 @@
                     background: $btn-blue;
                     color: #fff;
                 }
-                &:disabled, &.active:disabled{
+                &:disabled,
+                &.active:disabled {
                     opacity: 0.4;
                     background-color: rgba(0, 0, 0, 0.4);
                     color: rgba(255, 255, 255, 0.5);
@@ -77,37 +95,45 @@
             }
         }
     }
-    .zoom{
+
+    .period-wrapper {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        align-items: center;
+    }
+
+    .zoom {
         fill: transparent;
         cursor: move;
     }
 
-    .event-summary{
-        margin: 30px 0 25px 0;
+    .event-summary {
+        margin: 16px 0 25px 0;
     }
-    .period-info{
-        display: inline-block;
 
-        p{
+    .period-info {
+        p {
             margin: 0;
             padding: 0;
             line-height: 34px;
+            font-size: 16px;
         }
     }
 
-    .data-wrapper{
-        .wrapper-container{
+    .data-wrapper {
+        .wrapper-container {
             overflow-y: auto;
             overflow-x: hidden;
         }
 
-        .week-days{
+        .week-days {
             padding-bottom: 5px;
-            li{
+            li {
                 display: inline-block;
                 text-align: center;
                 font-size: 13px;
-                color: #8A9097;
+                color: #8a9097;
             }
         }
     }

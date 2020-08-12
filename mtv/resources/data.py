@@ -7,7 +7,6 @@ from flask_restful import Resource
 from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
 
-
 LOGGER = logging.getLogger(__name__)
 
 

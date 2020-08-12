@@ -1,19 +1,17 @@
-import random
-import string
-import logging
 import json
-import requests
+import logging
 import os
 
+import requests
+from flask import redirect, request
 from flask_restful import Resource
-from flask import Flask, request, redirect, url_for
-from mtv import model, g
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from mtv import g
+from mtv.db import schema
 from mtv.resources import auth_utils
 
-
 LOGGER = logging.getLogger(__name__)
-
-
 
 
 class Signup(Resource):
@@ -31,15 +29,15 @@ class Signup(Resource):
         body = request.json
         try:
             password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
+            password_encrypted = generate_password_hash(password)
             user = dict()
             user['email'] = body['email']
             user['name'] = body['name']
             user['password'] = password_encrypted
-            if (model.User.find_one(email=user['email'])):
+            if (schema.User.find_one(email=user['email'])):
                 raise('email already exist')
 
-            model.User.insert(**user)
+            schema.User.insert(**user)
             auth_utils.send_mail('MTV: your password', password, user['email'])
             return {'message': 'password has been sent to your email'}, 200
         except Exception as e:
@@ -69,8 +67,8 @@ class Signin(Resource):
         try:
             email = body['email']
             password = body['password']
-            user = model.User.find_one(email=email)
-            if user and auth_utils.check_password_hash(user.password, password):
+            user = schema.User.find_one(email=email)
+            if user and check_password_hash(user.password, password):
                 token = auth_utils.generate_auth_token(str(user.id)).decode()
                 return {
                     'data': {
@@ -105,9 +103,9 @@ class Reset(Resource):
         body = request.json
         try:
             password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
+            password_encrypted = generate_password_hash(password)
             email = body['email']
-            user = model.User.find_one(email=email)
+            user = schema.User.find_one(email=email)
             if user:
                 user['password'] = password_encrypted
                 user.save()
@@ -140,9 +138,38 @@ class GoogleAuthentication(Resource):
     def post(self):
         body = request.json
 
-        # Temporarily addressed google auth
-        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
-        return token
+        # signup
+        try:
+            user = dict()
+            user['email'] = body.get('email', None)
+            user['name'] = body.get('name', None)
+            user['gid'] = body.get('gid', None)
+            user['picture'] = body.get('picture', None)
+
+            if (user['email'] is None or user['gid'] is None or user['name'] is None):
+                raise('user information is missing')
+
+            # if not exist -> write into db
+            if (not schema.User.find_one(email=user['email'])
+                    and not schema.User.find_one(gid=user['gid'])):
+                schema.User.insert(**user)
+
+            # TODO: currently gid is not fully used
+            db_user = schema.User.find_one(email=user['email'])
+            if db_user:
+                token = auth_utils.generate_auth_token(str(db_user.id)).decode()
+                return {
+                    'data': {
+                        'uid': str(db_user.id),
+                        'name': db_user.name,
+                        'email': db_user.email,
+                        # 'picture': db_user.picture,
+                        'token': token
+                    }
+                }, 200
+        except Exception as e:
+            return {'message': str(e)}, 401
+
 
 class GoogleLogin(Resource):
     """
@@ -165,6 +192,7 @@ class GoogleLogin(Resource):
             scope=["openid", "email", "profile"],
         )
         return redirect(request_uri)
+
 
 class GoogleLoginCallback(Resource):
     """
@@ -229,8 +257,8 @@ class GoogleLoginCallback(Resource):
         user['gid'] = unique_id
         user['picture'] = picture
 
-        if (not model.User.find_one(email=user['email'])):
-            model.User.insert(**user)
+        if (not schema.User.find_one(email=user['email'])):
+            schema.User.insert(**user)
 
         # return redirect(url_for('index'))
         return redirect('http://127.0.0.1:3001/')

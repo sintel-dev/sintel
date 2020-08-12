@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { tagSeq, fromTagToClassName } from '../../../Landing/utils';
 import { fromMonthToIndex } from '../../../../model/utils/Utils';
 
@@ -26,14 +24,6 @@ const renderTagEvents = (events) =>
   tagSeq.map((currentTag) => <td key={currentTag}>{(events && countEventsPerTag(currentTag, events)) || '-'}</td>);
 
 class EventSummary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSummaryVisible: true,
-    };
-    this.toggleSummaryDetails = this.toggleSummaryDetails.bind(this);
-  }
-
   componentDidMount() {
     this.handleColHover();
   }
@@ -54,13 +44,6 @@ class EventSummary extends Component {
           hoveredTd.classList.remove('highlighted');
         });
       });
-    });
-  }
-
-  toggleSummaryDetails() {
-    const { isSummaryVisible } = this.state;
-    this.setState({
-      isSummaryVisible: !isSummaryVisible,
     });
   }
 
@@ -101,24 +84,48 @@ class EventSummary extends Component {
     return eventsPerRange;
   }
 
+  showPeriod() {
+    const { filteredPeriodRange, selectedPeriodLevel, isTimeSyncEnabled } = this.props;
+    let periodString = 'YY/MM';
+
+    if (isTimeSyncEnabled) {
+      const { level } = filteredPeriodRange[0];
+      if (level === 'month') {
+        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
+      }
+
+      if (level === 'day') {
+        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
+        periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
+      }
+    } else {
+      if (selectedPeriodLevel.year) {
+        periodString = periodString.replace('YY', selectedPeriodLevel.year);
+      }
+      if (selectedPeriodLevel.month) {
+        periodString = periodString.replace('MM', selectedPeriodLevel.month);
+      }
+    }
+
+    return (
+      <div className="period-info">
+        <p>{periodString}</p>
+      </div>
+    );
+  }
+
   render() {
+    const { isOpen } = this.props;
     const eventsPerRange = this.getTimeRangeEvents();
-    const activeSummary = this.state.isSummaryVisible ? 'active' : '';
-    const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
+    const activeSummary = isOpen ? 'active' : '';
 
     return (
       <div className="event-summary">
         <div className="event-header">
-          <div className="left-wrapper">
-            <span>Overview Events Table</span>
+          <div className="left-wrapper wrapper">
+            <span>{this.props.signalName}</span>
           </div>
-          <div className="right-wrapper">
-            <button type="button" onClick={this.toggleSummaryDetails} id="toggleSummary">
-              <span>{buttonText}</span>
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
-          <div className="clear" />
+          <div className="right-wrapper wrapper">{this.showPeriod()}</div>
         </div>
         <div className={`summary-details ${activeSummary}`}>
           <table>

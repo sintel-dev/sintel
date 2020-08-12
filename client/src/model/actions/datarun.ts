@@ -38,6 +38,7 @@ import {
   TOGGLE_TIME_SYNC_RANGE,
   SET_SCROLL_HISTORY,
 } from '../types';
+import { toggleSimilarShapesModalAction } from './similarShapes';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -53,6 +54,7 @@ export function selectDatarun(datarunID: string) {
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+    dispatch(toggleSimilarShapesModalAction(false));
   };
 }
 
@@ -107,6 +109,7 @@ export function closeEventModal() {
       dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
       dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
       dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
+      dispatch(toggleSimilarShapesModalAction(false));
     });
   };
 }
@@ -370,12 +373,14 @@ export function saveNewEventAction() {
   };
 }
 
+/* eslint-disable  @typescript-eslint/no-unused-vars, no-unused-vars */
 export function loadEventsFromJsonAction(jsonFiles) {
   return async function (dispatch) {
     // @TODO - implement it when backend is ready
     return dispatch({ type: UPLOAD_JSON_EVENTS, uploadEventsStatus: 'success' });
   };
 }
+/* eslint-enable  @typescript-eslint/no-unused-vars, no-unused-vars */
 
 export function deleteEventAction() {
   return async function (dispatch, getState) {
@@ -493,8 +498,7 @@ export function recordCommentAction() {
     const { commentsDraft } = updatedEventDetails;
     dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
 
-    // @ts-ignore
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;

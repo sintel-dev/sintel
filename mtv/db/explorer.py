@@ -5,11 +5,9 @@ a simple programatic access to creating and reading objects in the MTV Database.
 """
 import json
 import logging
-import os
 
 from gridfs import GridFS
 from mongoengine import connect
-from mongoengine.errors import NotUniqueError
 from pymongo.database import Database
 
 from mtv.db import schema
@@ -202,103 +200,6 @@ class DBExplorer:
     # ###### #
     # Signal #
     # ###### #
-
-    def add_signal(self, name, dataset, data_location=None, start_time=None,
-                   stop_time=None, timestamp_column=None, value_column=None):
-        """Add a new Signal object to the database.
-
-        The signal needs to be given a name and be associated to a Dataset.
-
-        Args:
-            name (str):
-                Name of the Signal.
-            dataset (Dataset or ObjectID or str):
-                Dataset object which the created Signal belongs to or the
-                corresponding ObjectId.
-            data_location (str):
-                Path to the CSV containing the Signal data. If the signal is
-                one of the signals provided by Orion, this can be omitted and
-                the signal will be loaded based on the signal name.
-            start_time (int):
-                Optional. Minimum timestamp to use for this signal. If not provided
-                this defaults to the minimum timestamp found in the signal data.
-            stop_time (int):
-                Optional. Maximum timestamp to use for this signal. If not provided
-                this defaults to the maximum timestamp found in the signal data.
-            timestamp_column (int):
-                Optional. Index of the timestamp column.
-            value_column (int):
-                Optional. Index of the value column.
-
-        Raises:
-            NotUniqueError:
-                If a Signal with the same name already exists for this Dataset.
-
-        Returns:
-            Signal
-        """
-        data_location = data_location or name
-        data = load_signal(data_location, None, timestamp_column, value_column)
-        timestamps = data['timestamp']
-        if not start_time:
-            start_time = timestamps.min()
-
-        if not stop_time:
-            stop_time = timestamps.max()
-
-        dataset = self.get_dataset(dataset)
-
-        return schema.Signal.insert(
-            name=name,
-            dataset=dataset,
-            start_time=start_time,
-            stop_time=stop_time,
-            data_location=data_location,
-            timestamp_column=timestamp_column,
-            value_column=value_column,
-            created_by=self.user
-        )
-
-    def add_signals(self, dataset, signals_path=None, start_time=None,
-                    stop_time=None, timestamp_column=None, value_column=None):
-        """Add a multiple Signal objects to the database.
-
-        All the signals will be added to the Dataset using the CSV filename
-        as their name.
-
-        Args:
-            dataset (Dataset or ObjectID or str):
-                Dataset object which the created Signals belongs to or the
-                corresponding ObjectId.
-            signals_path (str):
-                Path to the folder where the signals can be found. All the CSV
-                files in this folder will be added.
-            start_time (int):
-                Optional. Minimum timestamp to use for these signals. If not provided
-                this defaults to the minimum timestamp found in the signal data.
-            stop_time (int):
-                Optional. Maximum timestamp to use for these signals. If not provided
-                this defaults to the maximum timestamp found in the signal data.
-            timestamp_column (int):
-                Optional. Index of the timestamp column.
-            value_column (int):
-                Optional. Index of the value column.
-        """
-        for filename in os.listdir(signals_path):
-            if filename.endswith('.csv'):
-                signal_name = filename[:-4]   # remove from filename .csv
-                try:
-                    self.add_signal(
-                        name=signal_name,
-                        dataset=dataset,
-                        data_location=os.path.join(signals_path, filename),
-                        start_time=start_time,
-                        stop_time=stop_time,
-                        timestamp_column=timestamp_column,
-                        value_column=value_column,
-                    )
-                except NotUniqueError:
-                    pass
 
     def get_signals(self, name=None, dataset=None, created_by=None):
         """Query the Signals collection.

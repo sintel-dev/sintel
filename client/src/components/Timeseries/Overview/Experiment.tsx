@@ -42,6 +42,7 @@ class Experiment extends Component<Props, LocalState> {
     });
   }
 
+  /* eslint-disable react/no-did-update-set-state */
   componentDidUpdate(prevProps) {
     if (this.props.processedDataruns !== prevProps.processedDataruns) {
       this.setState({
@@ -49,6 +50,7 @@ class Experiment extends Component<Props, LocalState> {
       });
     }
   }
+  /* eslint-enable react/no-did-update-set-state */
 
   render() {
     const { experimentData } = this.props;

@@ -18,6 +18,7 @@ requirements = [
     'termcolor==1.1.0',
     'PyYAML==5.1',
     'passlib==1.7.2',
+    'tqdm==4.48.0',
 
     # Auth
     'oauthlib==3.1.0',
@@ -26,11 +27,14 @@ requirements = [
     # Math
     'numpy>=1.15.4,<1.17',
     'pandas>=0.23.4,<0.25',
+    'dtw >= 1.4.0',
+    'scikit-learn>=0.22.2',
 
     # Flask
     'Flask==1.0.2',
     'Flask-Cors==3.0.7',
     'Flask-RESTful==0.3.7',
+    'requests==2.24.0',
     'Werkzeug==0.15.3',
     'gevent==1.2.2',
 
@@ -66,7 +70,7 @@ development_requirements = [
 
     # style check
     'flake8>=3.5.0',
-    'isort>=4.3.4',
+    'isort>=4.3.4,<5.0.0',
 
     # fix style issues
     'autoflake>=1.1',

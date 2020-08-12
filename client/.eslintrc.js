@@ -1,3 +1,5 @@
+const { off } = require('process');
+
 module.exports = {
   env: {
     browser: true,
@@ -36,11 +38,14 @@ module.exports = {
   },
   plugins: ['react', 'react-hooks'],
   rules: {
-    "no-restricted-globals": 'off',
+    'jsx-a11y/no-noninteractive-element-interactions': 'off',
+    'no-restricted-globals': 'off',
     'prettier/prettier': ['error'],
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-this-alias': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'jsx-a11y/label-has-for': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'jsx-a11y/click-events-have-key-events': 'off',
@@ -64,6 +69,12 @@ module.exports = {
     'react/jsx-indent': 'warn',
     'react/state-in-constructor': 'off',
     'react/destructuring-assignment': 'off',
+    'react/sort-comp': [
+      1,
+      {
+        order: ['static-methods', 'lifecycle', 'everything-else', 'render'],
+      },
+    ],
     'object-shorthand': 'warn',
     'prefer-destructuring': [
       'warn',
@@ -72,7 +83,7 @@ module.exports = {
       },
     ],
     'prefer-const': 'off',
-    'import/extensions':'off',
+    'import/extensions': 'off',
     'no-unused-expressions': 'off',
     'object-curly-newline': 'off',
     'no-use-before-define': 'off',
@@ -80,8 +91,8 @@ module.exports = {
     'arrow-parens': 'off',
     'space-before-function-paren': 'off',
     'func-names': 'off',
-    'react/prefer-stateless-function':'off',
-    'react/static-property-placement':'off',
+    'react/prefer-stateless-function': 'off',
+    'react/static-property-placement': 'off',
     indent: 'off',
     'implicit-arrow-linebreak': 'off',
     'function-paren-newline': 'off',
@@ -97,12 +108,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     camelcase: 'off',
     'no-useless-constructor': 'off',
-    '@typescript-eslint/no-this-alias': 'off',
-    'react/sort-comp': [
-      1,
-      {
-        order: ['static-methods', 'lifecycle', 'everything-else', 'render'],
-      },
-    ],
+    'import/no-named-as-default': 'off',
   },
 };

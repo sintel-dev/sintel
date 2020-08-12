@@ -7,6 +7,7 @@ import selectedExperimentData from './experimentData';
 import datarun from './datarun';
 import users from './users';
 import aggregationLevels from './aggregationLevels';
+import similarShapes from './similarShapes';
 
 const dashBoardReducers = combineReducers({
   users,
@@ -17,6 +18,7 @@ const dashBoardReducers = combineReducers({
   selectedExperimentData,
   datarun,
   aggregationLevels,
+  similarShapes,
 });
 
 export default dashBoardReducers;

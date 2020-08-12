@@ -11,10 +11,10 @@ The demo data is a modified version of the NASA data found here:
 https://s3-us-west-2.amazonaws.com/telemanom/data.zip
 """
 
+import csv
 import json
 import logging
 import os
-import csv
 
 import numpy as np
 import pandas as pd

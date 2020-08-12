@@ -18,7 +18,7 @@ export function googleRegisterAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       dispatch({ type: 'GOOGLE_USER_REGISTER', googleRegisterStatus: 'success' });
-      Cookies.set(SESSION_TOKEN, response.data);
+      Cookies.set(SESSION_TOKEN, response.data.data.token);
     });
   };
 }
@@ -28,10 +28,10 @@ export function onUserResetPassKey(userEmail) {
     dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'loading' });
     await axios
       .post(`${API_URL}users/reset/`, userEmail)
-      .then((response) => {
+      .then(() => {
         dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'success' });
       })
-      .catch((err) => dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'fail' }));
+      .catch(() => dispatch({ type: 'RESET_PASSWORD_STATUS', passwordResetStatus: 'fail' }));
   };
 }
 
@@ -82,7 +82,7 @@ export function onUserLogoutAction() {
 export function googleLoginAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
-      Cookies.set(SESSION_TOKEN, response.data);
+      Cookies.set(SESSION_TOKEN, response.data.data.token);
       dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
     });
   };

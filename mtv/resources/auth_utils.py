@@ -1,15 +1,15 @@
-import requests
+import os
+import random
 import smtplib
 import ssl
 import string
-import random
-import os
 
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+import requests
 from flask import request
+from itsdangerous import BadSignature, SignatureExpired
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 from mtv import g
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_google_provider_cfg():
@@ -31,7 +31,7 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def generate_auth_token(id, expiration=600):
+def generate_auth_token(id, expiration=3600):
     if g['config']['USE_SYS_ENV_KEYS']:
         AUTH_KEY = os.environ['AUTH_KEY']
     else:
@@ -74,7 +74,7 @@ def verify_auth():
 
 
 def send_mail(subject, body, receiver):
-    if g['config']['USE_SYS_ENV_KEYS']:
+    if g['config']['USE_SYS_ENV_KEYS'] is None:
         MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     else:
         MAIL_PASSWORD = g['config']['MAIL_PASSWORD']
