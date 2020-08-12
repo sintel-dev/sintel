@@ -2,7 +2,7 @@ import logging
 
 from flask_restful import Resource
 
-from mtv import model
+from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
 
 LOGGER = logging.getLogger(__name__)
@@ -14,7 +14,8 @@ def get_pipeline(pipeline_doc):
         'insert_time': pipeline_doc.insert_time.isoformat(),
         'name': pipeline_doc.name,
         'created_by': pipeline_doc.created_by,
-        'mlpipeline': pipeline_doc.mlpipeline
+        # TODO syntex error position
+        # 'mlpipeline': pipeline_doc.json
     }
 
 
@@ -42,7 +43,7 @@ class Pipeline(Resource):
         res, status = verify_auth()
         if status == 401:
             return res, status
-        document = model.Pipeline.find_one(name=pipeline_name)
+        document = schema.Template.find_one(name=pipeline_name)
 
         if document is None:
             LOGGER.exception('Error getting pipeline. '
@@ -83,7 +84,7 @@ class Pipelines(Resource):
         res, status = verify_auth()
         if status == 401:
             return res, status
-        documents = model.Pipeline.find()
+        documents = schema.Template.find()
 
         try:
             pipelines = [get_pipeline(document) for document in documents]

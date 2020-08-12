@@ -31,7 +31,7 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def generate_auth_token(id, expiration=600):
+def generate_auth_token(id, expiration=3600):
     if g['config']['USE_SYS_ENV_KEYS']:
         AUTH_KEY = os.environ['AUTH_KEY']
     else:
@@ -56,6 +56,8 @@ def decode_auth_token(token):
 
 
 def verify_auth():
+    return {'message:' 'login successfully'}, 204
+
     # uid = request.args.get('uid', None)
     token = request.headers.get('Authorization')
 

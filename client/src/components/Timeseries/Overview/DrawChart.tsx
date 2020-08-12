@@ -89,7 +89,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
   private brush: any;
 
   getScale(width = this.state.width, height = this.state.height) {
-    const { maxTimeSeries } = this.props.dataRun;
+    const { timeSeries, maxTimeSeries } = this.props.dataRun;
 
     let minValue = Number.MAX_SAFE_INTEGER;
     let maxValue = Number.MIN_SAFE_INTEGER;
@@ -102,7 +102,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     maxValue = Math.max(maxValue, timeSeriesMax);
 
     xCoord.domain([minValue, maxValue]);
-    yCoord.domain([-1, 1]);
+    yCoord.domain(d3.extent(timeSeries, (t) => t[1]));
 
     return { xCoord, yCoord };
   }

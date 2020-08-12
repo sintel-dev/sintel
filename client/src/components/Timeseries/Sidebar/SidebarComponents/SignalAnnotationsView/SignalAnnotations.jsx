@@ -35,9 +35,9 @@ class SignalAnnotations extends Component {
             <li>Starts: {timestampToDate(event.start_time * 1000)}</li>
             <li>Ends: {timestampToDate(event.stop_time * 1000)}</li>
           </ul>
-          <button type="button">
+          {/* <button type="button">
             <ArrowDown />
-          </button>
+          </button> */}
         </div>
       </div>
     );

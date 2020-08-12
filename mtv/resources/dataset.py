@@ -2,7 +2,7 @@ import logging
 
 from flask_restful import Resource
 
-from mtv import model
+from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
 
 LOGGER = logging.getLogger(__name__)
@@ -13,7 +13,8 @@ def get_dataset(dataset_doc):
         'id': str(dataset_doc.id),
         'insert_time': dataset_doc.insert_time.isoformat(),
         'name': dataset_doc.name,
-        'entity_id': dataset_doc.entity_id
+        'entity': dataset_doc.entity,
+        'created_by': dataset_doc.created_by
     }
 
 
@@ -36,7 +37,7 @@ class Dataset(Resource):
         res, status = verify_auth()
         if status == 401:
             return res, status
-        document = model.Dataset.find_one(name=dataset_name)
+        document = schema.Dataset.find_one(name=dataset_name)
 
         if document is None:
             LOGGER.exception('Error getting dataset. '
@@ -72,7 +73,7 @@ class Datasets(Resource):
         res, status = verify_auth()
         if status == 401:
             return res, status
-        documents = model.Dataset.find()
+        documents = schema.Dataset.find()
 
         try:
             datasets = [get_dataset(document) for document in documents]
