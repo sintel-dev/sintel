@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { tagSeq, fromTagToClassName } from '../../../Landing/utils';
-import { fromMonthToIndex } from '../../../../model/utils/Utils';
+import { tagSeq, fromTagToClassName } from '../../../../Landing/utils';
+import { fromMonthToIndex } from '../../../../../model/utils/Utils';
 
 import './EventSummary.scss';
 
@@ -130,7 +130,7 @@ class EventSummary extends Component {
         <div className={`summary-details ${activeSummary}`}>
           <table>
             <tbody>
-              <tr className="row-light">
+              <tr>
                 <th>event tag</th>
                 {renderTagIcon()}
               </tr>
@@ -138,7 +138,7 @@ class EventSummary extends Component {
                 <th>Year</th>
                 {renderTagEvents(eventsPerRange.perYear)}
               </tr>
-              <tr className="row-light">
+              <tr>
                 <th>Month</th>
                 {renderTagEvents(eventsPerRange.perMonth)}
               </tr>

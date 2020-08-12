@@ -1,5 +1,6 @@
 @import '../../../assets/sass/colors.scss';
 @import '../../../assets/sass/main.scss';
+@import './Collapsible.scss';
 
 .right-sidebar {
     background: $main-color;
@@ -99,17 +100,14 @@
     .period-wrapper {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
+        padding: 0 15px;
         align-items: center;
     }
 
     .zoom {
         fill: transparent;
         cursor: move;
-    }
-
-    .event-summary {
-        margin: 16px 0 25px 0;
     }
 
     .period-info {
