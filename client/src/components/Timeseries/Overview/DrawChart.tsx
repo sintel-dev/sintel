@@ -107,7 +107,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     return { xCoord, yCoord };
   }
 
-  drawLine(eventData) {
+  drawLine(data) {
     const { drawableWidth, drawableHeight } = this.state;
     const { xCoord, yCoord } = this.getScale(drawableWidth, drawableHeight);
 
@@ -115,7 +115,10 @@ export class DrawChart extends Component<ChartProps, ChartState> {
       .line()
       .x((d) => xCoord(d[0]))
       .y((d) => yCoord(d[1]));
-    return line(eventData);
+
+    // TODO: depends on the current chart style
+    line.curve(d3.curveStepBefore);
+    return line(data);
   }
 
   initBrush() {
