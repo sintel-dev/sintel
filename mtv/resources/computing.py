@@ -5,8 +5,8 @@ from bson import ObjectId
 from flask import request
 from flask_restful import Resource
 
-from mtv import model
-from mtv.computings import similar_windows
+from mtv.db import schema
+from mtv.computings import search_similars
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,15 +46,15 @@ class SimilarWindows(Resource):
         except BaseException:
             LOGGER.exception('Error searching similar windows: wrong arg types.')
 
-        doc = model.Prediction.find_one(datarun=ObjectId(datarun_id))
+        doc = schema.Prediction.find_one(signalrun=ObjectId(datarun_id))
         # extract 'y_raw'
         timeseries = {
             'timestamp': [d[0] for d in doc.data],
             'value': [d[1] for d in doc.data]
         }
         df = pd.DataFrame(data=timeseries)
-        # windows = similar_windows.dtw(df, start, end)
-        windows = similar_windows.euclidean(df, start, end)
+        # windows = search_similars.dtw(df, start, end)
+        windows = search_similars.euclidean(df, start, end)
         windows = windows[:int(window_number)]
         return {
             'windows': windows
