@@ -3,9 +3,14 @@ import { connect } from 'react-redux';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
 import { fade } from '@material-ui/core';
-import { TriangleDown, TriangleUp, MicrophoneIcon, CloseIcon } from 'src/components/Common/icons';
+import { TriangleDown, TriangleUp, MicrophoneIcon, CloseIcon, RecordingIcon } from 'src/components/Common/icons';
 import { Collapse } from 'react-collapse';
-import { getSelectedDatarun, getCurrentEventDetails, getUpdatedEventsDetails } from 'src/model/selectors/datarun';
+import {
+  getSelectedDatarun,
+  getCurrentEventDetails,
+  getUpdatedEventsDetails,
+  getIsSpeechInProgress,
+} from 'src/model/selectors/datarun';
 
 import { filterOptions } from 'src/components/Common/Dropdown';
 import {
@@ -13,6 +18,7 @@ import {
   updateEventDetailsAction,
   saveEventDetailsAction,
   closeEventModal,
+  recordCommentAction,
 } from 'src/model/actions/datarun';
 import { getSelectedExperimentData } from 'src/model/selectors/experiment';
 import Loader from 'src/components/Common/Loader';
@@ -78,7 +84,15 @@ class SignalAnnotations extends Component {
 
   renderEventControls(event) {
     const { isFilterOpen } = this.state;
-    const { saveEventDetails, closeEventDetails, updatedEventDetails, updateEventDetails, eventDetails } = this.props;
+    const {
+      saveEventDetails,
+      closeEventDetails,
+      updatedEventDetails,
+      updateEventDetails,
+      eventDetails,
+      recordComment,
+      isSpeechInProgress,
+    } = this.props;
     const isEventTagChanged = updatedEventDetails.id === event.id && updatedEventDetails.tag !== event.tag;
     const isEventCommentChanged = updatedEventDetails.id === event.id && updatedEventDetails.commentsDraft;
     const isEventChanged = isEventCommentChanged || isEventTagChanged;
@@ -114,8 +128,8 @@ class SignalAnnotations extends Component {
                 </ul>
               </li>
               <li>
-                <button className="clean" type="button">
-                  <MicrophoneIcon />
+                <button className="clean" type="button" onClick={() => recordComment()}>
+                  {isSpeechInProgress ? <RecordingIcon /> : <MicrophoneIcon />}
                 </button>
               </li>
             </ul>
@@ -207,11 +221,13 @@ export default connect(
     dataRun: getSelectedDatarun(state),
     experimentData: getSelectedExperimentData(state),
     updatedEventDetails: getUpdatedEventsDetails(state),
+    isSpeechInProgress: getIsSpeechInProgress(state),
   }),
   (dispatch) => ({
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
     updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     closeEventDetails: () => dispatch(closeEventModal()),
+    recordComment: () => dispatch(recordCommentAction()),
   }),
 )(SignalAnnotations);
