@@ -74,12 +74,13 @@ class SimilarShapes extends Component<Props, {}> {
 
   renderShapeDetails(shape) {
     const { timeSeries } = this.props.dataRun;
-    const { start, end } = shape;
+    const { start, end, similarity } = shape;
     const startTime = start * 1000;
     const stopTime = end * 1000;
     const startIndex = timeSeries.findIndex((element) => startTime - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex((element) => stopTime - element[0] < 0);
     const event = timeSeries.slice(startIndex, stopIndex);
+    const fmt = d3.format('.2f');
 
     return (
       <div className="shape-details" key={startTime}>
@@ -90,12 +91,12 @@ class SimilarShapes extends Component<Props, {}> {
               <span>{timestampToDate(startTime)}</span>
             </li>
             <li>
-              <span>Ends:</span>
+              <span>End:</span>
               <span>{timestampToDate(stopTime)}</span>
             </li>
             <li>
               <span>Similarity:</span>
-              <span>88%</span>
+              <span>{`${fmt(similarity * 100)}%`}</span>
             </li>
             <li>
               <Dropdown onChange={(tag) => this.onTagSelect(tag)} />
