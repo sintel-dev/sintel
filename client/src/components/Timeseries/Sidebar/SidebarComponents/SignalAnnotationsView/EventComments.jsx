@@ -19,7 +19,7 @@ class EventComments extends Component {
     const { eventDetails } = this.props;
     return (
       eventDetails && (
-        <div className="event-comments">
+        <div className="event-comments scroll-style">
           <Loader isLoading={eventDetails.isCommentsLoading}>{this.renderComment(eventDetails)}</Loader>
         </div>
       )

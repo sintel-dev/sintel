@@ -78,8 +78,12 @@ class SignalAnnotations extends Component {
 
   renderEventControls(event) {
     const { isFilterOpen } = this.state;
-    const { saveEventDetails, closeEventDetails, updatedEventDetails, eventDetails } = this.props;
-    const isEventChanged = updatedEventDetails.id === event.id && updatedEventDetails.tag !== event.tag;
+    const { saveEventDetails, closeEventDetails, updatedEventDetails, updateEventDetails, eventDetails } = this.props;
+    const isEventTagChanged = updatedEventDetails.id === event.id && updatedEventDetails.tag !== event.tag;
+    const isEventCommentChanged = updatedEventDetails.id === event.id && updatedEventDetails.commentsDraft;
+    const isEventChanged = isEventCommentChanged || isEventTagChanged;
+
+    const commentText = updatedEventDetails.id === event.id ? updatedEventDetails.commentsDraft : '';
     const sortedFilters = eventDetails
       ? filterOptions.filter((currentFilter) => currentFilter.value !== eventDetails.tag)
       : filterOptions;
@@ -117,10 +121,18 @@ class SignalAnnotations extends Component {
             </ul>
           </div>
           <div className="comment-content">
-            {isEventChanged ? this.renderTagBadge() : <textarea placeholder="enter the comment" />}
+            {isEventTagChanged ? (
+              this.renderTagBadge()
+            ) : (
+              <textarea
+                value={commentText}
+                onChange={(event) => updateEventDetails({ commentsDraft: event.target.value })}
+                placeholder="Enter your comment..."
+              />
+            )}
             <div className="event-actions">
               <ul>
-                {isEventChanged && (
+                {isEventTagChanged && (
                   <li>
                     <button className="clean close" type="button" onClick={closeEventDetails}>
                       <CloseIcon />
@@ -128,7 +140,7 @@ class SignalAnnotations extends Component {
                   </li>
                 )}
                 <li>
-                  <button type="button" onClick={saveEventDetails}>
+                  <button type="button" onClick={saveEventDetails} disabled={!isEventChanged}>
                     Enter
                   </button>
                 </li>
@@ -185,7 +197,7 @@ class SignalAnnotations extends Component {
   }
 
   render() {
-    return <div className="signals-wrapper">{this.renderEventDetails()}</div>;
+    return <div className="signals-wrapper scroll-style">{this.renderEventDetails()}</div>;
   }
 }
 
