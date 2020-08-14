@@ -87,11 +87,11 @@ class SimilarShapes extends Component<Props, {}> {
           <ul>
             <li>
               <span>Start:</span>
-              <span>{timestampToDate(startTime)}</span>
+              {timestampToDate(startTime)}
             </li>
             <li>
               <span>Ends:</span>
-              <span>{timestampToDate(stopTime)}</span>
+              {timestampToDate(stopTime)}
             </li>
             <li>
               <span>Similarity:</span>

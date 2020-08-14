@@ -3,61 +3,203 @@ import { connect } from 'react-redux';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
 import { fade } from '@material-ui/core';
-import { ArrowDown } from 'src/components/Common/icons';
-import { getSelectedDatarun } from '../../../../../model/selectors/datarun';
+import { TriangleDown, TriangleUp, MicrophoneIcon, CloseIcon } from 'src/components/Common/icons';
+import { Collapse } from 'react-collapse';
+import { getSelectedDatarun, getCurrentEventDetails, getUpdatedEventsDetails } from 'src/model/selectors/datarun';
 
+import { filterOptions } from 'src/components/Common/Dropdown';
+import {
+  setActiveEventAction,
+  updateEventDetailsAction,
+  saveEventDetailsAction,
+  closeEventModal,
+} from 'src/model/actions/datarun';
+import { getSelectedExperimentData } from 'src/model/selectors/experiment';
+import Loader from 'src/components/Common/Loader';
+import EventComments from './EventComments';
 import './SignalAnnotations.scss';
 
+window.addEventListener('click', function (evt) {
+  const dropdown = document.querySelector('.assign-tag');
+
+  dropdown && !dropdown.contains(evt.target) && document.querySelector('.filters').classList.remove('active');
+  return null;
+});
+
 class SignalAnnotations extends Component {
-  getBackgroundColor(tag) {
-    // console.log(colorSchemes[tag], colorSchemes, tag);
-    // debugger;
-    // const backgroundColor = tag ? fade(colorSchemes[tag], 0.5) : fade('#C7C7C7', 0.5);
-    const backgroundColor = tag ? colorSchemes[tag] : '#C7C7C7';
-
-    // console.log(backgroundColor);
-
-    return backgroundColor;
+  constructor(props) {
+    super(props);
+    this.state = {
+      isFilterOpen: false,
+      changedEventProps: {
+        eventID: null,
+        eventTag: null,
+      },
+    };
   }
 
-  renderEventDetails(event) {
-    const color = this.getBackgroundColor(event.tag);
+  updateEventTag(eventID, newTag) {
+    const { updateEventDetails, eventDetails } = this.props;
+    this.setState({
+      isFilterOpen: false,
+      changedEventProps: {
+        eventID,
+        eventTag: newTag,
+      },
+    });
+    updateEventDetails({ tag: newTag });
+  }
+
+  toggleFilterState() {
+    const { isFilterOpen } = this.state;
+    this.setState({
+      isFilterOpen: !isFilterOpen,
+    });
+  }
+
+  renderTagBadge() {
+    const { tag } = this.props.updatedEventDetails;
+
+    const bgColor = fade(colorSchemes[tag], 0.15);
     return (
-      <div className="annotation-wrapper">
-        <div className="annotation-wrapper-left">
-          <span className="tag-wrapper" style={{ backgroundColor: fade(color, 0.15) }}>
-            <i style={{ backgroundColor: color }} />
-            <span>{event.tag || 'Untagged'}</span>
-          </span>
-        </div>
-        <div className="annotation-wrapper-right">
-          <ul>
-            <li>Starts: {timestampToDate(event.start_time * 1000)}</li>
-            <li>Ends: {timestampToDate(event.stop_time * 1000)}</li>
-          </ul>
-          {/* <button type="button">
-            <ArrowDown />
-          </button> */}
+      <div className="badge-wrapper">
+        <ul>
+          <li>Assign tag</li>
+          <li>
+            <div style={{ background: bgColor }} className="tag-wrapper">
+              <i className="badge" style={{ background: colorSchemes[tag] }} />
+              <span>{tag}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    );
+  }
+
+  renderEventControls(event) {
+    const { isFilterOpen } = this.state;
+    const { saveEventDetails, closeEventDetails, updatedEventDetails, eventDetails } = this.props;
+    const isEventChanged = updatedEventDetails.id === event.id && updatedEventDetails.tag !== event.tag;
+    const sortedFilters = eventDetails
+      ? filterOptions.filter((currentFilter) => currentFilter.value !== eventDetails.tag)
+      : filterOptions;
+
+    return (
+      <div>
+        <EventComments eventDetails={eventDetails} />
+        <div className="comment-wrapper">
+          <div className="comment-heading">
+            <div className="speech-controls"></div>
+            <ul className="comment-holder">
+              <li className="dropdown">
+                <button type="button" className="clean assign-tag" onClick={() => this.toggleFilterState()}>
+                  Assign a tag
+                </button>
+                <ul className={`filters ${isFilterOpen ? 'active' : ''}`}>
+                  {sortedFilters.map((currentFilter) => {
+                    return (
+                      <li
+                        key={currentFilter.value}
+                        onClick={() => this.updateEventTag(eventDetails.id, currentFilter.value)}
+                      >
+                        <i className="badge" style={{ background: colorSchemes[currentFilter.value] }} />{' '}
+                        <span>{currentFilter.value}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+              <li>
+                <button className="clean" type="button">
+                  <MicrophoneIcon />
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div className="comment-content">
+            {isEventChanged ? this.renderTagBadge() : <textarea placeholder="enter the comment" />}
+            <div className="event-actions">
+              <ul>
+                {isEventChanged && (
+                  <li>
+                    <button className="clean close" type="button" onClick={closeEventDetails}>
+                      <CloseIcon />
+                    </button>
+                  </li>
+                )}
+                <li>
+                  <button type="button" onClick={saveEventDetails}>
+                    Enter
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
+    );
+  }
+
+  renderEventDetails() {
+    const { dataRun } = this.props;
+    const { events } = dataRun;
+
+    const { eventDetails, setActiveEvent } = this.props;
+
+    return (
+      events.length &&
+      events.map((currentEvent) => {
+        const color = currentEvent.tag ? colorSchemes[currentEvent.tag] : '#C7C7C7';
+        return (
+          <div key={currentEvent.id} className="annotation-wrapper">
+            <div className="annotation-heading" onClick={() => setActiveEvent(currentEvent.id)}>
+              <div className="annotation-wrapper-left">
+                <span className="tag-wrapper" style={{ backgroundColor: fade(color, 0.15) }}>
+                  <i className="badge" style={{ backgroundColor: color }} />
+                  <span>{currentEvent.tag || 'Untagged'}</span>
+                </span>
+              </div>
+              <div className="annotation-wrapper-right">
+                <ul className="event-time-range">
+                  <li>
+                    <span>Starts:</span> {timestampToDate(currentEvent.start_time * 1000)}
+                  </li>
+                  <li>Ends: {timestampToDate(currentEvent.stop_time * 1000)}</li>
+                </ul>
+              </div>
+              <div>
+                <button type="button">
+                  {eventDetails && eventDetails.id === currentEvent.id ? <TriangleUp /> : <TriangleDown />}
+                </button>
+              </div>
+            </div>
+            <div className="collapsible-wrapper">
+              <Collapse isOpened={eventDetails && eventDetails.id === currentEvent.id}>
+                {this.renderEventControls(currentEvent)}
+              </Collapse>
+            </div>
+          </div>
+        );
+      })
     );
   }
 
   render() {
-    const { dataRun } = this.props;
-    const { events } = dataRun;
-
-    return (
-      <div className="signals-wrapper">
-        {events.length && events.map((currentEvent) => this.renderEventDetails(currentEvent))}
-      </div>
-    );
+    return <div className="signals-wrapper">{this.renderEventDetails()}</div>;
   }
 }
 
 export default connect(
   (state) => ({
+    eventDetails: getCurrentEventDetails(state),
     dataRun: getSelectedDatarun(state),
+    experimentData: getSelectedExperimentData(state),
+    updatedEventDetails: getUpdatedEventsDetails(state),
   }),
-  (dispatch) => ({}),
+  (dispatch) => ({
+    setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
+    updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
+    saveEventDetails: () => dispatch(saveEventDetailsAction()),
+    closeEventDetails: () => dispatch(closeEventModal()),
+  }),
 )(SignalAnnotations);

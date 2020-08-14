@@ -1,0 +1,9 @@
+.event-comments {
+    border-left: 1px dashed rgba(#55586a, 0.6);
+    padding-left: 20px;
+    margin-bottom: 30px;
+    position: relative;
+    min-height: 50px;
+    max-height: 350px;
+    overflow-y: auto;
+}

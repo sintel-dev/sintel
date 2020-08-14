@@ -1,34 +1,243 @@
 .signals-wrapper {
-    .annotation-wrapper {
+    .tag-wrapper {
+        padding: 8px 6px;
+        border-radius: 6px;
+        width: 152px;
+        height: 32px;
+    }
+    i {
+        &.badge {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    }
+
+    button {
+        background: #2f80ed;
+        border-radius: 4px;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        &.clean {
+            padding: 0;
+            background: transparent;
+        }
+
+        &.assign-tag {
+            color: #2f80ed;
+            font-size: 14px;
+        }
+        &.close {
+            border-radius: 100%;
+            background: #3c404a;
+            width: 24px;
+            height: 24px;
+
+            svg {
+                vertical-align: middle;
+            }
+        }
+    }
+
+    .annotation-heading {
+        align-items: center;
         padding: 15px 12px;
         display: flex;
         justify-content: space-between;
-        border-bottom: 1px solid rgba(#f2f2f2, 0.04);
+        background: #2c3034;
+        border-bottom: 1px solid rgba(#f2f2f2, 0.08);
+        cursor: pointer;
 
         .annotation-wrapper-left {
             justify-content: start;
-
-            span,
-            i {
-                display: inline-block;
-                width: 90%;
-                text-align: center;
-            }
+            width: 36%;
             span {
                 &.tag-wrapper {
-                    padding: 8px 15px;
-                    border-radius: 6px;
+                    float: left;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    span {
+                        width: 90%;
+                        text-align: center;
+                    }
                 }
             }
-            i {
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
+        }
+
+        .annotation-wrapper-right {
+            width: 40%;
+
+            li {
+                font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+                span {
+                    margin-right: 5px;
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
+            }
+
+            .date-wrapper {
+                display: flex;
+                justify-content: space-between;
             }
         }
-        .annotation-wrapper-left,
-        .annotation-wrapper-right {
-            width: 45%;
+
+        button {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+    }
+
+    .comment-wrapper {
+        border: 1px solid rgba(238, 241, 246, 0.38);
+        border-radius: 10px;
+
+        .comment-heading {
+            padding: 10px;
+            border-bottom: 1px solid rgba(238, 241, 246, 0.38);
+            display: flex;
+            justify-content: space-between;
+
+            ul.comment-holder,
+            .speech-controls {
+                width: 48%;
+            }
+
+            .speech-controls {
+                border-right: 1px solid rgba(238, 241, 246, 0.38);
+            }
+
+            ul.event-time-range {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                li {
+                    padding: 0 5px;
+                    &:last-child {
+                        line-height: 3px;
+                    }
+                }
+            }
+
+            ul.comment-holder {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .dropdown {
+                position: relative;
+
+                .filters {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background: #23242b;
+                    font-size: 14px;
+                    padding: 10px;
+                    border-radius: 4px;
+                    border: 1px solid rgba(151, 151, 151, 0.5);
+                    display: none;
+                    &.active {
+                        display: block;
+                    }
+                    i {
+                        margin-right: 3px;
+                    }
+                    span,
+                    i {
+                        vertical-align: middle;
+                    }
+                    li {
+                        cursor: pointer;
+                        vertical-align: middle;
+                        white-space: nowrap;
+                        line-height: 25px;
+                        padding: 0 10px 0 0;
+                    }
+                }
+            }
+        }
+
+        .comment-content {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            textarea {
+                width: 350px;
+                height: 32px;
+
+                font-family: 'Helvetica Neue';
+                &,
+                &:focus {
+                    background: none;
+                    border: none;
+                    color: #fff;
+                    outline: none;
+                }
+            }
+        }
+    }
+}
+
+.annotation-wrapper {
+    .collapsible-wrapper {
+        border: none;
+        .ReactCollapse--content {
+            padding: 20px 20px 20px 13px;
+            background: rgba(#5a627c, 0.15);
+        }
+    }
+}
+
+.badge-wrapper {
+    ul {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    li {
+        display: inline-block;
+        margin: 0 5px;
+    }
+    .tag-wrapper {
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        i {
+            margin-right: 5px;
+        }
+        span {
+            width: 90%;
+            text-align: center;
+        }
+    }
+}
+
+.event-actions {
+    ul {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    li {
+        margin-right: 5px;
+        &:last-child {
+            margin-right: 0;
         }
     }
 }
