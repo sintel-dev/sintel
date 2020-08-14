@@ -1,122 +1,145 @@
 
-# from scipy.spatial.distance import euclidean
-# import pandas as pd
-# from pyts.metrics import dtw
+""" Shape Matching.
+
+This functionality serves as a shape matching search algorithm.
+Given a signal and a particular shape, it returns a list of
+(start timestamp, end timestamp, distance) of each
+candidate shape within the signal.
+"""
+
 import numpy as np
-from dtw import dtw as dtwc
-from sklearn.metrics.pairwise import euclidean_distances
+import pandas as pd
+from pyts.metrics import dtw as pdtw
+from scipy.spatial.distance import euclidean
 from sklearn.preprocessing import MinMaxScaler
-from tqdm import tqdm
-
-# note: this algorithm is O(n ^ 4)! (since dtw is O(n ^ 3))
 
 
-def minmax(a):
-    max_a = a.max()
-    min_a = a.min()
-    for i in range(a.shape[0]):
-        a[i] = (a[i] - min_a) * (max_a - min_a)
-    return a
+def _pdtw(x, shape):
+    return pdtw(x, shape, method="itakura", options={"max_slope": 1.5})
 
 
-def euclidean(df, start_ts, end_ts):
-    """ This function returns all the possible shape matches that do not overlap
+def return_candidate_shapes(X, start_time, end_time, func='euclidean', step_size=1,
+                            time_column='timestamp', target_column='value'):
+    """ This function returns all the possible shape matches that do not overlap.
+
     Args:
-        * df (pd.DataFrame): original time series data.
-        * start_ts: start timestamp of shape.
-        * end_ts: end timestamp of shape.
+        X (ndarray or `pandas.DataFrame`):
+            Time series array to search in.
+        shape (ndarray or `pandas.DataFrame`):
+            Vector of desired shape.
+        func (method):
+            Function that returns the distance. If no function is given, use euclidean distance.
+        step_size (int):
+            Indicating the number of steps to move forward each round.
+        time_column (str or int):
+            Column of X that contains time values.
+        target_column (str or int):
+            Column of X that contains target values.
+
+    Returns:
+        list:
+            A list of tuples with (start timestamp, end timestamp, distance) of matched shapes.
     """
-    time_column = 'timestamp'
-    df = df.sort_values(time_column).set_index(time_column)
+    if func == "euclidean":
+        func = euclidean
+    else:
+        func = _pdtw
 
-    segment = df.loc[start_ts:end_ts]
-    window = segment.shape[0]
-    found = list()
+    if isinstance(X, np.ndarray):
+        X = pd.DataFrame(X)
 
-    def euclidean_dist(v1, v2):
-        return sum((p - q)**2 for p, q in zip(v1, v2)) ** .5
+    X = X.sort_values(time_column).set_index(time_column)
+    shape = X.loc[start_time:end_time].values
 
-    MinMaxScaler()
-    x = np.array(segment['value'].values)
-    x_ = minmax(x)
-    for i in tqdm(range(0, len(df) - window)):
-        # for i in range(0, len(df) - window):
-        y = np.array(df.iloc[i:i + window]['value'].values)
-        y_ = minmax(y)
-        dist = euclidean_dist(x_, y_)
-        # dist = euclidean_dist(x, y)
+    worst_dist = -1
+    # scale data between [0, 1]
+    scaler = MinMaxScaler(feature_range=[0, 1])
+    scaler.fit(X)
+    shape = scaler.transform(shape).flatten()
+    # shape = shape.flatten()
 
-        found.append({"id": i, "cost": dist})
+    window_size = shape.shape[0]
+    matched = list()
 
-    # remove overlap
-    found.sort(key=lambda x: x["cost"])
-    no_overlap = list()
+    start = 0
+    max_start = len(X) - window_size + 1
 
-    for first_shape in found:
-        first_range = range(first_shape["id"], first_shape["id"] + window)
+    previous, current, after = (np.inf, []), (np.inf, []), (np.inf, [])
+    checkpoint = window_size
 
-        flag = True
-        for second_shape in no_overlap:
-            second_range = range(second_shape["id"], second_shape["id"] + window)
+    while start < max_start:
+        end = start + window_size
 
-            xs = set(first_range)
-            if len(xs.intersection(second_range)) > 0:
-                flag = False
+        x = np.array(X.iloc[start:end])
+        x = scaler.transform(x).flatten()
+        # x = x.flatten()
+        dist = func(x, shape) / window_size  # normalized by number of data points
+        # dist = func(x, shape)  # normalized by number of data points
+        if (dist > worst_dist):
+            worst_dist = dist
+        if dist < after[0]:
+            after = (dist, range(start, end))
 
-        if flag:
-            no_overlap.append(first_shape)
+        if start > checkpoint or start + step_size >= max_start:
+            # time range
+            prevset = set(previous[1])
+            aftset = set(after[1])
+            # overlap
+            if prevset.intersection(current[1]):
+                if current[0] > previous[0]:
+                    # add previous
+                    idx_start = X.index[previous[1][0]]
+                    idx_end = X.index[previous[1][-1]]
+                    matched.append((idx_start, idx_end, previous[0]))
 
-    windows = [{'start': df.index[d['id']], 'end': df.index[d['id'] + window - 1],
-                'cost': d['cost']} for d in no_overlap]
+                    current = (np.inf, [])
 
-    return windows
+                elif aftset.intersection(current[1]) and after[0] < current[0]:
+                    # add previous
+                    idx_start = X.index[previous[1][0]]
+                    idx_end = X.index[previous[1][-1]]
+                    matched.append((idx_start, idx_end, previous[0]))
+
+                    current = (np.inf, [])
+
+                elif start + step_size >= max_start:  # edge case
+                    # add current
+                    idx_start = X.index[current[1][0]]
+                    idx_end = X.index[current[1][-1]]
+                    matched.append((idx_start, idx_end, current[0]))
+
+            # no overlap
+            elif previous[1]:
+                # add previous
+                idx_start = X.index[previous[1][0]]
+                idx_end = X.index[previous[1][-1]]
+                matched.append((idx_start, idx_end, previous[0]))
+
+            previous = current
+            current = after
+            after = (np.inf, [])
+
+            checkpoint = checkpoint + window_size
+
+        start = start + step_size
+
+    return matched, worst_dist
 
 
-def dtw(df, start_ts, end_ts):
-    """ This function returns all the possible shape matches that do not overlap
-    Args:
-        * df (pd.DataFrame): original time series data.
-        * start_ts: start timestamp of shape.
-        * end_ts: end timestamp of shape.
-    """
-    time_column = 'timestamp'
-    df = df.sort_values(time_column).set_index(time_column)
+if __name__ == '__main__':
+    samples = 200
+    f = 4
 
-    segment = df.loc[start_ts:end_ts]
-    window = segment.shape[0]
-    found = list()
+    t = np.arange(samples)
+    x = np.sin(3 * np.pi * f * t / 100).reshape((-1, 1))
 
-    x = np.array(segment['value'].values).reshape(-1, 1, 1)
-    for i in tqdm(range(0, len(df) - window)):
-        # for i in range(0, len(df) - window):
-        y = np.array(df.iloc[i:i + window]['value'].values).reshape(-1, 1, 1)
+    noise = np.random.normal(0, 0.2, size=x.shape)
+    x = x + noise
 
-        w = 5
-        dist_fun = euclidean_distances
-        dist, cost, acc, path = dtwc(x, y, dist_fun, w=w)
+    window_size = 10
+    i = np.random.choice(range(0, len(x) - window_size))
 
-        found.append({"id": i, "path": path, "cost": dist})
+    X = pd.DataFrame({'timestamp': t, 'value': x.flatten()})
 
-    # remove overlap
-    found.sort(key=lambda x: x["cost"])
-    no_overlap = list()
-
-    for first_shape in found:
-        first_range = range(first_shape["id"], first_shape["id"] + window)
-
-        flag = True
-        for second_shape in no_overlap:
-            second_range = range(second_shape["id"], second_shape["id"] + window)
-
-            xs = set(first_range)
-            if len(xs.intersection(second_range)) > 0:
-                flag = False
-
-        if flag:
-            no_overlap.append(first_shape)
-    # for d in no_overlap:
-    #     print(d)
-        # print(d['id'], d['id'] + window, df[d['id']]['timestamp'])
-    # windows = [{'start': df[d['id']]['timestamp'], 'end': df[d['id']+window]['timestamp']}
-    # for d in no_overlap]
-    return []
+    candidate_shapes = return_candidate_shapes(X, i, i + window_size, 'dtw')
+    print(candidate_shapes)
