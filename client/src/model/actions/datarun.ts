@@ -39,6 +39,8 @@ import {
   SET_SCROLL_HISTORY,
 } from '../types';
 import { toggleSimilarShapesModalAction } from './similarShapes';
+import Cookies from 'js-cookie';
+import { AUTHENTICATED_USER_ID } from '../utils/constants';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -232,6 +234,12 @@ export function isEditingEventRangeAction(eventState) {
 export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const userID = Cookies.get(AUTHENTICATED_USER_ID);
+
+    if (!userID) {
+      return null;
+    }
+
     const { commentsDraft } = updatedEventDetails;
     const { start_time, stop_time, score, tag } = updatedEventDetails;
 
@@ -250,7 +258,7 @@ export function saveEventDetailsAction() {
       const commentData = {
         event_id: updatedEventDetails.id,
         text: commentsDraft,
-        created_by: null, // no particular details about the logged in user
+        created_by: userID,
       };
 
       // posting comments
