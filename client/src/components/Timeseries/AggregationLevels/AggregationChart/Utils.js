@@ -1,3 +1,4 @@
+import React from 'react';
 export const timeIntervals = [
   '30 hours',
   '24 hours',
@@ -20,7 +21,16 @@ export const getAggregationChartCoords = () => {
 
 export const timestampToDate = (timeStamp) => {
   const date = new Date(timeStamp).toUTCString().split(' ');
-  return `${date[1]}/${date[2]}/${date[3]} ${date[4]}`;
+  return (
+    <div className="date-wrapper">
+      <span className="date">
+        {date[1]}/{date[2]}/{date[3]}
+      </span>
+      <span className="time">{date[4]}</span>
+    </div>
+  );
+  // @TODO - investigate if the clean string is needed anymore
+  // return `<span>${date[1]}/${date[2]}/${date[3]}</span> <span>${date[4]}</span>`;
 };
 
 export const timeToMiliseconds = (interval) => {

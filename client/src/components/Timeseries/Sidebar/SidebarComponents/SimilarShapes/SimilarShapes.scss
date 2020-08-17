@@ -28,6 +28,7 @@
             line-height: 10px;
             top: 12px;
             right: 15px;
+            position: absolute;
         }
     }
 
@@ -43,13 +44,13 @@
 
     .shape-details {
         background: #23242b;
-        padding: 16px;
+        padding: 16px 10px;
         border-radius: 12px;
         display: flex;
         margin-bottom: 15px;
+        justify-content: space-between;
 
         .info {
-            width: 54%;
             li {
                 margin-bottom: 10px;
 
@@ -63,6 +64,9 @@
                     }
                 }
             }
+            .date-wrapper {
+                display: inline-block;
+            }
 
             .tag-select {
                 .tag-options__control {
@@ -70,11 +74,6 @@
                     box-shadow: none;
                 }
             }
-        }
-
-        .drawings {
-            width: 120px;
-            width: 45%;
         }
     }
     .results {
