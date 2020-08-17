@@ -492,11 +492,11 @@ export function setScrollHistoryAction(period) {
   };
 }
 
-export function recordCommentAction() {
+export function recordCommentAction(recordState) {
   return function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventsDetails(getState());
     const { commentsDraft } = updatedEventDetails;
-    dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
+    dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: recordState });
 
     const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 

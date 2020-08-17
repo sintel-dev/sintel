@@ -128,7 +128,7 @@ class SignalAnnotations extends Component {
                 </ul>
               </li>
               <li>
-                <button className="clean" type="button" onClick={() => recordComment()}>
+                <button className="clean" type="button" onClick={() => recordComment(!isSpeechInProgress)}>
                   {isSpeechInProgress ? <RecordingIcon /> : <MicrophoneIcon />}
                 </button>
               </li>
@@ -228,6 +228,6 @@ export default connect(
     updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     closeEventDetails: () => dispatch(closeEventModal()),
-    recordComment: () => dispatch(recordCommentAction()),
+    recordComment: (recordState) => dispatch(recordCommentAction(recordState)),
   }),
 )(SignalAnnotations);
