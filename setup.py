@@ -29,6 +29,8 @@ requirements = [
     'pandas>=0.23.4,<0.25',
     'dtw >= 1.4.0',
     'scikit-learn>=0.22.2',
+    'pyts==0.10.0',
+    'numba==0.50.1',    # dependency of pyts
 
     # Flask
     'Flask==1.0.2',
