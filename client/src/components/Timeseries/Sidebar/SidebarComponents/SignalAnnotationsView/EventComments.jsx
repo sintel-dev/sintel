@@ -10,7 +10,6 @@ import './EventComments.scss';
 class EventComments extends Component {
   findUser(userID) {
     const { usersData } = this.props;
-    debugger;
     return usersData.filter((user) => user.user_id === userID)[0];
   }
 
