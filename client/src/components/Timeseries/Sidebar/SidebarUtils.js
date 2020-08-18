@@ -2,6 +2,8 @@ import * as d3 from 'd3';
 import { colorSchemes } from '../FocusChart/Constants';
 import { fromMonthToIndex } from '../../../model/utils/Utils';
 
+export const MAX_EVENTS_ACTIVITY = 5;
+
 export const getWrapperSize = () => {
   const sidebarHeight = document.querySelector('.right-sidebar').clientHeight - 75; // padding-top and bottom
   const sidebarHeaderHeight = document.querySelector('.period-control').clientHeight + 25; // margin-bottom;

@@ -21,7 +21,7 @@ import {
   recordCommentAction,
 } from 'src/model/actions/datarun';
 import { getSelectedExperimentData } from 'src/model/selectors/experiment';
-import Loader from 'src/components/Common/Loader';
+import { getActiveEventID } from 'src/model/selectors/datarun';
 import EventComments from './EventComments';
 import './SignalAnnotations.scss';
 
@@ -167,10 +167,12 @@ class SignalAnnotations extends Component {
   }
 
   renderEventDetails() {
-    const { dataRun } = this.props;
+    const { dataRun, eventDetails, setActiveEvent, activeEvent } = this.props;
     const { events } = dataRun;
 
-    const { eventDetails, setActiveEvent } = this.props;
+    const toggleEventState = (eventID) => {
+      return activeEvent === eventID ? setActiveEvent(null) : setActiveEvent(eventID);
+    };
 
     return (
       events.length &&
@@ -178,7 +180,7 @@ class SignalAnnotations extends Component {
         const color = currentEvent.tag ? colorSchemes[currentEvent.tag] : '#C7C7C7';
         return (
           <div key={currentEvent.id} className="annotation-wrapper">
-            <div className="annotation-heading" onClick={() => setActiveEvent(currentEvent.id)}>
+            <div className="annotation-heading" onClick={() => toggleEventState(currentEvent.id)}>
               <div className="annotation-wrapper-left">
                 <span className="tag-wrapper" style={{ backgroundColor: fade(color, 0.15) }}>
                   <i className="badge" style={{ backgroundColor: color }} />
@@ -222,6 +224,7 @@ export default connect(
     experimentData: getSelectedExperimentData(state),
     updatedEventDetails: getUpdatedEventsDetails(state),
     isSpeechInProgress: getIsSpeechInProgress(state),
+    activeEvent: getActiveEventID(state),
   }),
   (dispatch) => ({
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),

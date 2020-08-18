@@ -21,6 +21,7 @@ import {
   FETCH_EXPERIMENT_DATA,
   SET_TIMESERIES_PERIOD,
 } from '../types';
+import { getUsersDataAction } from './users';
 
 export function fetchExperiments() {
   return function (dispatch) {
@@ -131,6 +132,7 @@ export function selectExperiment(history: any, experimentID: string) {
         zoomValue: 1,
       },
     });
+    dispatch(getUsersDataAction());
     return dispatch(fetchDatarunsByExperimentID());
   };
 }

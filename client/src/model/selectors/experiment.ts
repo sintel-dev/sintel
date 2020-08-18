@@ -177,12 +177,14 @@ export const getProcessedDataRuns = createSelector(
       const timeseriesErr = groupDataBy(datarun.prediction, 'es_raw');
       const period = groupDataByPeriod(datarun.raw);
       const { events } = datarun;
+
       normalizePeriodData(period);
 
       const filteredEvents =
         filterTags && filterTags.length
           ? events.filter((currentEvent) => filterTags.includes(currentEvent.tag))
           : events;
+
       const eventWindows = groupByEventWindows(
         filteredEvents,
         timeSeries.map((series) => series[0]),
@@ -192,13 +194,17 @@ export const getProcessedDataRuns = createSelector(
         ? eventWindows.filter((currentWindow) => filterTags.includes(currentWindow[4]))
         : eventWindows;
 
+      const sortedEvents = filteredEvents
+        .map((currentEvent) => currentEvent)
+        .sort((current, next) => current.start_time - next.start_time);
+
       return {
         ...datarun,
         timeSeries,
         timeseriesPred,
         timeseriesErr,
         eventWindows: filteredEventWindows,
-        events: filteredEvents,
+        events: sortedEvents,
         period,
         maxTimeSeries,
       };
