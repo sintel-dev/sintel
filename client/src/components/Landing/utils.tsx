@@ -1,12 +1,12 @@
 export const colorSchemes = {
   tag: [
-    '#FFCD00', // investigate
-    '#7CA8FF', // do not investigate
-    '#A042FF', // postpone
-    '#F64242', // problem
-    '#F5FF00', // previously seen
-    '#45F642', // normal
-    '#C7C7C7', // untagged
+    '#FF9100', // investigate
+    '#4684FF', // do not investigate
+    '#8446C2', // postpone
+    '#C24D4D', // problem
+    '#F2FF00', // previously seen
+    '#6BC969', // normal
+    '#D5D5D5', // untagged
   ],
 };
 

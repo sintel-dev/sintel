@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
-import { fade } from '@material-ui/core';
 import { TriangleDown, TriangleUp, MicrophoneIcon, CloseIcon, RecordingIcon } from 'src/components/Common/icons';
 import { Collapse } from 'react-collapse';
 import {
@@ -66,14 +65,14 @@ class SignalAnnotations extends Component {
   renderTagBadge() {
     const { tag } = this.props.updatedEventDetails;
 
-    const bgColor = fade(colorSchemes[tag], 0.15);
+    const bgColor = colorSchemes[tag];
+    const eventClassName = tag.replace(/\s/g, '_').toLowerCase() || 'untagged';
     return (
       <div className="badge-wrapper">
         <ul>
           <li>Assign tag</li>
           <li>
-            <div style={{ background: bgColor }} className="tag-wrapper">
-              <i className="badge" style={{ background: colorSchemes[tag] }} />
+            <div style={{ background: bgColor }} className={`tag-wrapper ${eventClassName}`}>
               <span>{tag}</span>
             </div>
           </li>
@@ -177,14 +176,16 @@ class SignalAnnotations extends Component {
     return (
       events.length &&
       events.map((currentEvent) => {
-        const color = currentEvent.tag ? colorSchemes[currentEvent.tag] : '#C7C7C7';
+        const color = currentEvent.tag ? colorSchemes[currentEvent.tag] : '#D5D5D5';
+        const eventClassName =
+          (currentEvent && currentEvent.tag && currentEvent.tag.replace(/\s/g, '_').toLowerCase()) || 'untagged';
+
         return (
           <div key={currentEvent.id} className="annotation-wrapper">
             <div className="annotation-heading" onClick={() => toggleEventState(currentEvent.id)}>
               <div className="annotation-wrapper-left">
-                <span className="tag-wrapper" style={{ backgroundColor: fade(color, 0.15) }}>
-                  <i className="badge" style={{ backgroundColor: color }} />
-                  <span>{currentEvent.tag || 'Untagged'}</span>
+                <span className={`tag-wrapper ${eventClassName}`} style={{ backgroundColor: color }}>
+                  {currentEvent.tag || 'Untagged'}
                 </span>
               </div>
               <div className="annotation-wrapper-right">
