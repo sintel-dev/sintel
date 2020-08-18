@@ -45,6 +45,34 @@ class Signup(Resource):
             return {'message': str(e)}, 400
 
 
+# @TODO - get and return proper user data
+class UsersDetails(Resource):
+    def get(self):
+        res, status = auth_utils.verify_auth()
+
+        if status == 401:
+            return res, status
+
+        return {
+            'users': [{
+                'user_id': '5f3a0d51c6aa90ce1da09738',
+                'name': 'Sergiu Ojoc',
+                'email': 'sergiu.ojoc@bytex.ro',
+                'picture': 'https://lh5.googleusercontent.com/-PA6gL-OsxPw/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucm9XVLy35wcdqrYzT__Ayqvv24NGw/s96-c/photo.jpg'
+            }, {
+                'user_id': '5f33656d0ad32c9d2d4333d1',
+                'name': 'Dongyu Liu',
+                'email': 'windliyu@gmail.com',
+                'picture': 'https://lh5.googleusercontent.com/-PA6gL-OsxPw/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucm9XVLy35wcdqrYzT__Ayqvv24NGw/s96-c/photo.jpg'
+            }, {
+                'user_id': '5f3b7f62f0253705a67e2dd1',
+                'name': 'Sergiu',
+                'email': 'sergiu.ojoc@gmail.com',
+                'picture': 'https://lh3.googleusercontent.com/a-/AOh14Gj146iy1nDa6YwqabDUvUug1Pr0N8aCPYqxl6Vghw=s96-c'
+            }]
+        }
+
+
 class Signin(Resource):
     def post(self):
         """

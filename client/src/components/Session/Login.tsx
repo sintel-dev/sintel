@@ -12,7 +12,7 @@ import Wrapper from './Wrapper';
 import { getLoginStatus } from '../../model/selectors/users';
 import { isEmail } from '../../model/utils/Utils';
 
-import { onUserLoginAction, googleLoginAction, fetchCurrentUserAction } from '../../model/actions/users';
+import { onUserLoginAction, googleLoginAction, getUserAuthStatusAction } from '../../model/actions/users';
 
 export interface LoginProps {
   loginStatus: 'loading' | 'success' | 'fail' | 'authenticated';
@@ -22,7 +22,7 @@ export interface LoginProps {
     push: (url: string) => void;
   };
   googleLogin: (userData) => void;
-  fetchCurrentUser: () => void;
+  isUserAuthenthicated: () => void;
 }
 
 export interface LoginState {
@@ -55,7 +55,7 @@ class Login extends Component<LoginProps, LoginState> {
   componentDidUpdate(prevProps) {
     if (this.props.loginStatus === 'authenticated' && prevProps.loginStatus !== this.props.loginStatus) {
       this.props.history.push('/');
-      this.props.fetchCurrentUser();
+      this.props.isUserAuthenthicated();
     }
   }
 
@@ -195,6 +195,6 @@ export default connect(
   (dispatch: Function) => ({
     onUserLogin: (userData) => dispatch(onUserLoginAction(userData)),
     googleLogin: (userData) => dispatch(googleLoginAction(userData)),
-    fetchCurrentUser: () => dispatch(fetchCurrentUserAction()),
+    isUserAuthenthicated: () => dispatch(getUserAuthStatusAction()),
   }),
 )(Login);

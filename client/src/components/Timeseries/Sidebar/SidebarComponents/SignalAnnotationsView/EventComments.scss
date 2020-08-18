@@ -1,9 +1,59 @@
-.event-comments {
-    border-left: 1px dashed rgba(#55586a, 0.6);
-    padding-left: 20px;
-    margin-bottom: 30px;
-    position: relative;
-    min-height: 50px;
-    max-height: 180px;
-    overflow-y: auto;
+.event-data {
+    .event-comments {
+        font-family: 'Roboto';
+        border-left: 1px dashed rgba(#55586a, 0.6);
+        padding-left: 20px;
+        margin-bottom: 30px;
+        position: relative;
+        min-height: 50px;
+        max-height: 180px;
+        overflow-y: auto;
+
+        .user-activity {
+            img {
+                width: 32px;
+                border-radius: 50%;
+            }
+            table {
+                border-collapse: collapse;
+                margin-bottom: 10px;
+                td {
+                    padding-bottom: 8px;
+                }
+            }
+            strong {
+                color: #fff;
+                font-size: 14px;
+            }
+            p {
+                margin: 0;
+                padding: 0;
+                font-size: 14px;
+                line-height: 16px;
+                color: #e0e0e0;
+            }
+            .date-wrapper {
+                span {
+                    display: inline-block;
+                    padding-right: 10px;
+                    color: rgba(#fff, 0.6);
+                }
+            }
+        }
+    }
+    .event-jump {
+        margin-bottom: 20px;
+        ul {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(#fff, 0.6);
+        }
+        li {
+            display: inline-block;
+        }
+        button {
+            padding: 8px 12px;
+        }
+    }
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Session from './components/Session';
 import { getLoginStatus } from './model/selectors/users';
 import Dashboard from './components/Landing';
-import { getIsUserLoggedInAction } from './model/actions/users';
+import { getUserAuthStatusAction } from './model/actions/users';
 
 export interface AppProps {
   loginStatus: 'fail' | 'loading' | 'unauthenticated' | 'authenticated';
@@ -32,6 +32,6 @@ export default connect(
     loginStatus: getLoginStatus(state),
   }),
   (dispatch: Function) => ({
-    checkUserStatus: () => dispatch(getIsUserLoggedInAction()),
+    checkUserStatus: () => dispatch(getUserAuthStatusAction()),
   }),
 )(App);

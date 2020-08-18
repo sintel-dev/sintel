@@ -5,10 +5,10 @@ import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 import { groupEventsByTimestamp, fromMonthToIndex } from '../utils/Utils';
 
 // @TODO - set state: RootState
-const getActiveEventID = (state) => state.datarun.activeEventID;
 const getEventComments = (state) => state.datarun.eventComments;
 const isEventCommentsLoading = (state) => state.datarun.isEventCommentsLoading;
 
+export const getActiveEventID = (state) => state.datarun.activeEventID;
 export const getUpdatedEventsDetails = (state) => state.datarun.eventDetails;
 export const getNewEventDetails = (state) => state.datarun.newEventDetails;
 export const isPredictionEnabled = (state) => state.datarun.isPredictionEnabled;
