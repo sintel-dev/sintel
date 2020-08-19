@@ -22,10 +22,12 @@ def add_routes(app):
     api.add_resource(ctrl.user.Reset, current_api_version + 'users/reset/')
 
     # google login
-    # api.add_resource(ctrl.user.GoogleLogin, current_api_version + 'auth/google_login/')
-    api.add_resource(ctrl.user.GoogleAuthentication, current_api_version + 'auth/google_login/')
-    # api.add_resource(ctrl.user.GoogleLoginCallback,
-    #   current_api_version + 'auth/google_login/callback/')
+    api.add_resource(ctrl.google_auth.GoogleAuthentication,
+                     current_api_version + 'auth/google_login/')
+
+    #  user info
+    api.add_resource(ctrl.user.User, current_api_version + 'users/<string:user_id>/')
+    api.add_resource(ctrl.user.Users, current_api_version + 'users/')
 
     # data
     api.add_resource(ctrl.data.Data, current_api_version + current_api_version + 'data/')
