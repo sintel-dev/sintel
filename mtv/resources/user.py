@@ -1,6 +1,6 @@
 import logging
-from bson import ObjectId
 
+from bson import ObjectId
 from flask import request
 from flask_restful import Resource
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -56,7 +56,6 @@ class User(Resource):
 
         if status == 401:
             return res, status
-        print(user_id)
         user_doc, status = validate_user_id(user_id)
         if (status == 400):
             return {'message': 'Wrong user_id is given'}, 400

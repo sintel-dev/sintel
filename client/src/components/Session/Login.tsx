@@ -11,7 +11,6 @@ import { GoogleButton } from '../Common/GoogleButton';
 import Wrapper from './Wrapper';
 import { getLoginStatus } from '../../model/selectors/users';
 import { isEmail } from '../../model/utils/Utils';
-import { RootState } from '../../model/types';
 
 import { onUserLoginAction, googleLoginAction, fetchCurrentUserAction } from '../../model/actions/users';
 

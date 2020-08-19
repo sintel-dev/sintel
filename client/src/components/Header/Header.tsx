@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie';
-import { USERNAME } from '../../model/utils/constants';
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
@@ -9,8 +8,8 @@ import { faChevronRight, faChevronLeft, faCaretDown } from '@fortawesome/free-so
 import { getCurrentExperimentDetails, getSelectedExperimentData } from 'src/model/selectors/experiment';
 import { filterEventsByTagAction, toggleTimeSyncModeAction } from 'src/model/actions/datarun';
 import { getIsTimeSyncModeEnabled, getDatarunDetails } from 'src/model/selectors/datarun';
+import { USERNAME } from '../../model/utils/constants';
 import { getSelectedExperiment } from '../../model/selectors/projects';
-import { authUserData } from '../../model/selectors/users';
 import { onUserLogoutAction } from '../../model/actions/users';
 import { RootState } from '../../model/types';
 import { VerticalDots, DownloadIcon, UploadIcon, LineIcon, StepIcon } from '../Common/icons';
@@ -30,15 +29,7 @@ const downloadAsJSON = (dataRun) => {
 
 export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
-  const {
-    experimentDetails,
-    isTimeSyncEnabled,
-    filterByTags,
-    toggleTimeSync,
-    datarunDetails,
-    experimentData,
-    authUserData,
-  } = props;
+  const { experimentDetails, isTimeSyncEnabled, filterByTags, toggleTimeSync, datarunDetails, experimentData } = props;
   const { isExperimentDataLoading } = experimentData;
 
   let location = useLocation();
@@ -198,7 +189,6 @@ const mapState = (state: RootState) => ({
   isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
   datarunDetails: getDatarunDetails(state),
   experimentData: getSelectedExperimentData(state),
-  authUserData: authUserData(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

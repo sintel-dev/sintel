@@ -5,7 +5,6 @@ import Session from './components/Session';
 import { getLoginStatus } from './model/selectors/users';
 import Dashboard from './components/Landing';
 import { getIsUserLoggedInAction } from './model/actions/users';
-import { RootState } from './model/types';
 
 export interface AppProps {
   loginStatus: 'fail' | 'loading' | 'unauthenticated' | 'authenticated';
