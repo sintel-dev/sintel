@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { API_URL, SESSION_TOKEN } from '../utils/constants';
+import { API_URL, SESSION_TOKEN, USERNAME } from '../utils/constants';
 
 export function registerUserAction(userData) {
   return async function (dispatch) {
@@ -48,6 +48,8 @@ export function onUserLoginAction(userData) {
         Cookies.set(SESSION_TOKEN, token, {
           expires: Date.now() + (userData.rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 24),
         });
+        Cookies.set(USERNAME, response.data.data.name);
+
         dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
         return response;
       })
@@ -75,6 +77,7 @@ export function onUserLogoutAction() {
 
     axios.get(`${API_URL}users/signout/`, { headers: { [SESSION_TOKEN]: authHeader } });
     Cookies.remove(SESSION_TOKEN);
+    Cookies.remove(USERNAME);
     return dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'unauthenticated' });
   };
 }
@@ -82,7 +85,12 @@ export function onUserLogoutAction() {
 export function googleLoginAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
-      Cookies.set(SESSION_TOKEN, response.data.data.token);
+      const { data } = response.data;
+      const { token } = data;
+
+      Cookies.set(SESSION_TOKEN, token);
+      Cookies.set(USERNAME, response.data.data.name);
+      dispatch({ type: 'AUTHORIZED_USER_DATA', authUserData: data });
       dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
     });
   };

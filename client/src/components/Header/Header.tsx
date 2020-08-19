@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+import { USERNAME } from '../../model/utils/constants';
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
@@ -8,6 +10,7 @@ import { getCurrentExperimentDetails, getSelectedExperimentData } from 'src/mode
 import { filterEventsByTagAction, toggleTimeSyncModeAction } from 'src/model/actions/datarun';
 import { getIsTimeSyncModeEnabled, getDatarunDetails } from 'src/model/selectors/datarun';
 import { getSelectedExperiment } from '../../model/selectors/projects';
+import { authUserData } from '../../model/selectors/users';
 import { onUserLogoutAction } from '../../model/actions/users';
 import { RootState } from '../../model/types';
 import { VerticalDots, DownloadIcon, UploadIcon, LineIcon, StepIcon } from '../Common/icons';
@@ -27,7 +30,15 @@ const downloadAsJSON = (dataRun) => {
 
 export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
-  const { experimentDetails, isTimeSyncEnabled, filterByTags, toggleTimeSync, datarunDetails, experimentData } = props;
+  const {
+    experimentDetails,
+    isTimeSyncEnabled,
+    filterByTags,
+    toggleTimeSync,
+    datarunDetails,
+    experimentData,
+    authUserData,
+  } = props;
   const { isExperimentDataLoading } = experimentData;
 
   let location = useLocation();
@@ -161,7 +172,9 @@ export const Header: React.FC<Props> = (props) => {
               </div>
             </div>
           )}
+          {/* <span className="user-info">test</span> */}
           <ul className="user-opts">
+            <li>{Cookies.get(USERNAME)}</li>
             <li>
               <button type="button" onClick={logoutUser} className="logout-button">
                 Logout
@@ -185,6 +198,7 @@ const mapState = (state: RootState) => ({
   isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
   datarunDetails: getDatarunDetails(state),
   experimentData: getSelectedExperimentData(state),
+  authUserData: authUserData(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
