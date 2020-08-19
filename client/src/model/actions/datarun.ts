@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import {
   getCurrentEventDetails,
   getUpdatedEventsDetails,
@@ -11,6 +12,7 @@ import {
   getIsTimeSyncModeEnabled,
   getScrollHistory,
 } from '../selectors/datarun';
+import { USERNAME } from '../../model/utils/constants';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
 import {
@@ -250,7 +252,7 @@ export function saveEventDetailsAction() {
       const commentData = {
         event_id: updatedEventDetails.id,
         text: commentsDraft,
-        created_by: null, // no particular details about the logged in user
+        created_by: Cookies.get(USERNAME), // no particular details about the logged in user
       };
 
       // posting comments

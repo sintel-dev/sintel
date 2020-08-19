@@ -96,23 +96,13 @@ export class EventDetails extends Component {
       <div className={`events-wrapper scroll-style ${isActive}`}>
         {currentEventDetails && (
           <div>
-            <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
-              <AggregationIcon />
-            </button>{' '}
-            <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
-              <SearchIcon />
-            </button>
             <button type="button" className="close" onClick={closeEventDetails}>
               <CloseIcon />
             </button>
-            <div className="event-row">
+            {/* <div className="event-row">
               <label>Signal: </label>
               <span>{currentEventDetails.signal}</span>
-            </div>
-            <div className="event-row">
-              <label>Severity Score:</label>
-              <span>{currentEventDetails.score}</span>
-            </div>
+            </div> */}
             <div className="event-row">
               <label>From:</label>
               <span>{new Date(currentEventDetails.start_time).toUTCString()}</span>
@@ -123,6 +113,10 @@ export class EventDetails extends Component {
               <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
                 Modify
               </button>
+            </div>
+            <div className="event-row">
+              <label>Source:</label>
+              <span>{currentEventDetails.source}</span>
             </div>
             <div className="event-row">
               {this.state.isTooltipVisible && renderInfoTooltip()}
@@ -145,13 +139,24 @@ export class EventDetails extends Component {
                 i
               </i>
             </div>
-            <div className="event-row select-holder">
-              <Dropdown
-                onChange={(tag) => changeEventTag(tag)}
-                value={selectedOption(currentEventDetails.tag)}
-                isGrouppedOptions
-              />
+            <div className="event-row ">
+              <div className="select-holder">
+                <Dropdown
+                  onChange={(tag) => changeEventTag(tag)}
+                  value={selectedOption(currentEventDetails.tag)}
+                  isGrouppedOptions
+                />
+              </div>
+              <div className="search-similar">
+                {/* <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
+                  <AggregationIcon />
+                </button>{' '}
+                <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
+                  <SearchIcon />
+                </button> */}
+              </div>
             </div>
+
             <div className="event-row form-group">
               <ul className="form-intro">
                 <li>
