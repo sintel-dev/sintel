@@ -102,8 +102,6 @@ export const getDataScale = (innerRadius, outerRadius, periodRange, relativaScal
     scaleRadius.domain([0, 1]);
   }
 
-  console.log('currentPeriodExtent', currentPeriodExtent);
-
   const area = d3
     .areaRadial()
     .angle((d, i) => scaleAngle(i))
