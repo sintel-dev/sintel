@@ -118,7 +118,9 @@ class Signup(Resource):
             user['name'] = body['name']
             user['password'] = password_encrypted
             if schema.User.find_one(email=user['email']):
-                raise Exception('email already exist')
+                raise Exception('Email already exist')
+            # if schema.User.find_one(name=user['name']):
+            #     raise Exception('Name already exist! Please use another one.')
             origin_name = user['name']
             # keep finding until we find the one unique
             while schema.User.find_one(name=user['name']):
