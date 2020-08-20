@@ -221,3 +221,12 @@ i {
         background: #d5d5d5;
     }
 }
+
+button {
+    cursor: pointer;
+    &.clean {
+        margin: 0;
+        background: transparent;
+        border: none;
+    }
+}

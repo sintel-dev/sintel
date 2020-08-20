@@ -185,18 +185,18 @@ export const getProcessedDataRuns = createSelector(
           ? events.filter((currentEvent) => filterTags.includes(currentEvent.tag))
           : events;
 
+      const sortedEvents = filteredEvents
+        .map((currentEvent) => currentEvent)
+        .sort((current, next) => current.start_time - next.start_time);
+
       const eventWindows = groupByEventWindows(
-        filteredEvents,
+        sortedEvents,
         timeSeries.map((series) => series[0]),
       );
 
       const filteredEventWindows = filterTags.length
         ? eventWindows.filter((currentWindow) => filterTags.includes(currentWindow[4]))
         : eventWindows;
-
-      const sortedEvents = filteredEvents
-        .map((currentEvent) => currentEvent)
-        .sort((current, next) => current.start_time - next.start_time);
 
       return {
         ...datarun,

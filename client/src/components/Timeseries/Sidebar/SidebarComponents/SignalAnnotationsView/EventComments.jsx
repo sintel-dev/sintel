@@ -4,6 +4,7 @@ import { getCurrentEventDetails } from 'src/model/selectors/datarun';
 import Loader from 'src/components/Common/Loader';
 import { getUsersData, getIsUsersDataloading } from 'src/model/selectors/users';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
+import { setActivePanelAction } from 'src/model/actions/sidebar';
 import { MAX_EVENTS_ACTIVITY } from '../../SidebarUtils';
 import './EventComments.scss';
 
@@ -31,7 +32,7 @@ class EventComments extends Component {
             <tbody>
               <tr>
                 <td rowSpan="2" width="40">
-                  <img src={userData.picture} referrerPolicy="no-referrer" />
+                  <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
                 </td>
                 <td>
                   <strong>{userData.name}</strong>
@@ -51,9 +52,9 @@ class EventComments extends Component {
       );
     });
   }
-  render() {
-    const { eventDetails, isUsersDataLoading } = this.props;
 
+  render() {
+    const { eventDetails, isUsersDataLoading, isEventJumpVisible, setActivePanel } = this.props;
     const eventActivity =
       (eventDetails &&
         eventDetails.eventComments &&
@@ -71,24 +72,37 @@ class EventComments extends Component {
               {this.renderComment(eventDetails)}
             </Loader>
           </div>
-          <div className="event-jump">
-            <ul>
-              <li>
-                Showing <strong>{maxActivity} most recent</strong> - to see more details
-              </li>
-              <li>
-                <button type="button">Go to Event Details</button>
-              </li>
-            </ul>
-          </div>
+          {isEventJumpVisible && (
+            <div className="event-jump">
+              <ul>
+                <li>
+                  Showing <strong>{maxActivity} most recent</strong> - to see more details
+                </li>
+                <li>
+                  <button type="button" onClick={() => setActivePanel('eventView')}>
+                    Go to Event Details
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       )
     );
   }
 }
 
-export default connect((state) => ({
-  eventDetails: getCurrentEventDetails(state),
-  usersData: getUsersData(state),
-  isUsersDataLoading: getIsUsersDataloading(state),
-}))(EventComments);
+EventComments.defaultProps = {
+  isEventJumpVisible: true,
+};
+
+export default connect(
+  (state) => ({
+    eventDetails: getCurrentEventDetails(state),
+    usersData: getUsersData(state),
+    isUsersDataLoading: getIsUsersDataloading(state),
+  }),
+  (dispatch) => ({
+    setActivePanel: (activePanel) => dispatch(setActivePanelAction(activePanel)),
+  }),
+)(EventComments);

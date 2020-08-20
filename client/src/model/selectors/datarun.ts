@@ -9,7 +9,7 @@ const getEventComments = (state) => state.datarun.eventComments;
 const isEventCommentsLoading = (state) => state.datarun.isEventCommentsLoading;
 
 export const getActiveEventID = (state) => state.datarun.activeEventID;
-export const getUpdatedEventsDetails = (state) => state.datarun.eventDetails;
+export const getUpdatedEventDetails = (state) => state.datarun.eventDetails;
 export const getNewEventDetails = (state) => state.datarun.newEventDetails;
 export const isPredictionEnabled = (state) => state.datarun.isPredictionEnabled;
 export const isDatarunIDSelected = (state: RootState) => state.datarun.selectedDatarunID;
@@ -56,13 +56,13 @@ export const getSelectedDatarun = createSelector(
 );
 
 const updateEventDetails = (updatedEventDetails, timeSeries, eventIndex, eventWindows) => {
-  let { start_time, stop_time, tag } = updatedEventDetails;
+  let { start_time, stop_time, tag, score } = updatedEventDetails;
 
   const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1;
   const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0) - 1;
   eventWindows[eventIndex][0] = startIndex;
   eventWindows[eventIndex][1] = stopIndex;
-  eventWindows[eventIndex][2] = updatedEventDetails.score;
+  eventWindows[eventIndex][2] = score;
   eventWindows[eventIndex][4] = tag;
 };
 
@@ -140,7 +140,7 @@ export const getFilteredPeriodRange = createSelector(
 export const getDatarunDetails = createSelector(
   [
     getSelectedDatarun,
-    getUpdatedEventsDetails,
+    getUpdatedEventDetails,
     getFilteredPeriodRange,
     getIsTimeSyncModeEnabled,
     getFilterDatarunPeriod,
@@ -157,13 +157,13 @@ export const getDatarunDetails = createSelector(
     }
     const selectedPeriod = isTimeSyncEnabled ? filteredRange : filteredDatarunPeriod;
 
-    const completeDataRun = { ...dataRun, period: selectedPeriod };
-    return completeDataRun;
+    const datarunDetails = { ...dataRun, period: selectedPeriod };
+    return datarunDetails;
   },
 );
 
 export const getGrouppedDatarunEvents = createSelector(
-  [getSelectedDatarun, getUpdatedEventsDetails],
+  [getSelectedDatarun, getUpdatedEventDetails],
   (dataRun, updatedEventDetails) => {
     const currentEventIndex = dataRun.events.findIndex((datarunEvent) => datarunEvent.id === updatedEventDetails.id);
     let { events } = dataRun;

@@ -10,40 +10,13 @@
             display: inline-block;
         }
     }
-
     button {
         background: #2f80ed;
         border-radius: 4px;
         color: #fff;
         border: none;
         padding: 8px 12px;
-        cursor: pointer;
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        &.clean {
-            padding: 0;
-            background: transparent;
-        }
-
-        &.assign-tag {
-            color: #2f80ed;
-            font-size: 14px;
-        }
-        &.close {
-            border-radius: 100%;
-            background: #3c404a;
-            width: 24px;
-            height: 24px;
-
-            svg {
-                vertical-align: middle;
-            }
-        }
     }
-
     .annotation-heading {
         align-items: center;
         padding: 15px 12px;
@@ -75,98 +48,6 @@
             cursor: pointer;
         }
     }
-
-    .comment-wrapper {
-        border: 1px solid rgba(238, 241, 246, 0.38);
-        border-radius: 10px;
-
-        .comment-heading {
-            padding: 10px;
-            border-bottom: 1px solid rgba(238, 241, 246, 0.38);
-            display: flex;
-            justify-content: space-between;
-
-            ul.comment-holder,
-            .speech-controls {
-                width: 48%;
-            }
-
-            .speech-controls {
-                border-right: 1px solid rgba(238, 241, 246, 0.38);
-            }
-
-            ul.event-time-range {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                li {
-                    padding: 0 5px;
-                    &:last-child {
-                        line-height: 3px;
-                    }
-                }
-            }
-
-            ul.comment-holder {
-                display: flex;
-                justify-content: space-between;
-            }
-
-            .dropdown {
-                position: relative;
-
-                .filters {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    background: #23242b;
-                    font-size: 14px;
-                    padding: 10px;
-                    border-radius: 4px;
-                    border: 1px solid rgba(151, 151, 151, 0.5);
-                    display: none;
-                    z-index: 9;
-                    &.active {
-                        display: block;
-                    }
-                    i {
-                        margin-right: 3px;
-                    }
-                    span,
-                    i {
-                        vertical-align: middle;
-                    }
-                    li {
-                        cursor: pointer;
-                        vertical-align: middle;
-                        white-space: nowrap;
-                        line-height: 25px;
-                        padding: 0 10px 0 0;
-                    }
-                }
-            }
-        }
-
-        .comment-content {
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            textarea {
-                width: 350px;
-                height: 32px;
-
-                font-family: 'Helvetica Neue';
-                &,
-                &:focus {
-                    background: none;
-                    border: none;
-                    color: #fff;
-                    outline: none;
-                }
-            }
-        }
-    }
 }
 
 .annotation-wrapper {
@@ -179,7 +60,7 @@
     }
 }
 
-.tag-wrapper {
+.evt-tag {
     padding: 6px;
     border-radius: 16px;
     width: 152px;
@@ -193,30 +74,5 @@
     &.postpone,
     &.problem {
         color: #fff;
-    }
-}
-.badge-wrapper {
-    ul {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    li {
-        display: inline-block;
-        margin: 0 5px;
-    }
-}
-
-.event-actions {
-    ul {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    li {
-        margin-right: 5px;
-        &:last-child {
-            margin-right: 0;
-        }
     }
 }
