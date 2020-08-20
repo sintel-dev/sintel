@@ -42,6 +42,8 @@ type DispatchProps = ReturnType<typeof mapDispatch>;
 type ChartProps = StateProps & DispatchProps & Props;
 
 export class DrawChart extends Component<ChartProps, ChartState> {
+  private myCanvas = React.createRef<HTMLCanvasElement>();
+
   constructor(props) {
     super(props);
     this.state = {
@@ -59,7 +61,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
   componentDidMount() {
     const width: number = document.querySelector('.time-row').clientWidth;
-    const height = 40;
+    const height = 50;
     const { offset } = this.state;
 
     const chartWidth = width - offset.infoWidth - 2 * offset.left;
@@ -78,12 +80,15 @@ export class DrawChart extends Component<ChartProps, ChartState> {
         this.initBrush();
       },
     );
+
+    this.drawCanvas();
   }
 
   componentDidUpdate(prevProps) {
     if (JSON.stringify(prevProps.selectedPeriod.eventRange) !== JSON.stringify(this.props.selectedPeriod.eventRange)) {
       this.updateBrushes();
     }
+    // this.drawCanvas();
   }
 
   private brush: any;
@@ -230,7 +235,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
   drawEvent(event) {
     const { timeSeries } = this.props.dataRun;
-    const eventData: Array<number> = timeSeries.slice(event[0], event[1] + 2);
+    const eventData: Array<[number, number]> = timeSeries.slice(event[0], event[1] + 2);
     return <path key={event[3]} className="wave-event" d={this.drawLine(eventData)} />;
   }
 
@@ -262,6 +267,27 @@ export class DrawChart extends Component<ChartProps, ChartState> {
         </g>
       )
     );
+  }
+
+  drawCanvas() {
+    // const { offset } = this.state;
+    // const { dataRun } = this.props;
+    // const { timeSeries } = dataRun;
+    // const ctx: CanvasRenderingContext2D = this.myCanvas.current.getContext('2d');
+    // const { drawableWidth, drawableHeight } = this.state;
+    // const { xCoord, yCoord } = this.getScale(drawableWidth, drawableHeight);
+    // ctx.clearRect(0, 0, drawableWidth, drawableHeight);
+    // const line = d3
+    //   .line<[number, number]>()
+    //   .x((d) => xCoord(d[0]) + 0.5 + offset.left)
+    //   .y((d) => yCoord(d[1]) + offset.top)
+    //   .curve(d3.curveStepAfter)
+    //   .context(ctx);
+    // ctx.beginPath();
+    // line(timeSeries);
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = 'rgb(36, 116, 241, 0.6)';
+    // ctx.stroke();
   }
 
   initTooltip() {
@@ -315,7 +341,8 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     const { width, height } = this.state;
 
     return (
-      <div>
+      <div style={{ position: 'relative' }}>
+        {/* <canvas width={width} height={height} className="wave-chart-canvas" ref={this.myCanvas}></canvas> */}
         <svg width={width} height={height} className="wave-chart">
           {this.drawData()}
           <g
