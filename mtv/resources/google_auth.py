@@ -26,27 +26,31 @@ class GoogleAuthentication(Resource):
             user['picture'] = body.get('picture', None)
 
             if (user['email'] is None or user['gid'] is None or user['name'] is None):
-                raise('user information is missing')
+                raise Exception('user information is missing')
 
-            # if not exist -> write into db
-            if (not schema.User.find_one(email=user['email'])
-                    and not schema.User.find_one(gid=user['gid'])):
+            if schema.User.find_one(gid=user['gid']):
+                db_user = schema.User.find_one(gid=user['gid'])
+            else:
+                # write into db
+                origin_name = user['name']
+                # keep finding until we find the one unique
+                while schema.User.find_one(name=user['name']):
+                    user['name'] = origin_name + auth_utils.generate_digits()
                 schema.User.insert(**user)
+                db_user = schema.User.find_one(gid=user['gid'])
 
-            # TODO: currently gid is not fully used
-            db_user = schema.User.find_one(email=user['email'])
-            if db_user:
-                token = auth_utils.generate_auth_token(str(db_user.id)).decode()
-                return {
-                    'data': {
-                        'uid': str(db_user.id),
-                        'name': db_user.name,
-                        'email': db_user.email,
-                        # 'picture': db_user.picture,
-                        'token': token
-                    }
-                }, 200
+            token = auth_utils.generate_auth_token(str(db_user.id)).decode()
+            return {
+                'data': {
+                    'uid': str(db_user.id),
+                    'name': db_user.name,
+                    'email': db_user.email,
+                    # 'picture': db_user.picture,
+                    'token': token
+                }
+            }, 200
         except Exception as e:
+            LOGGER.exception(e)
             return {'message': str(e)}, 401
 
 
