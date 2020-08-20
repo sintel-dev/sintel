@@ -88,8 +88,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
     if (JSON.stringify(prevProps.selectedPeriod.eventRange) !== JSON.stringify(this.props.selectedPeriod.eventRange)) {
       this.updateBrushes();
     }
-    console.log('draw');
-    this.drawCanvas();
+    // this.drawCanvas();
   }
 
   private brush: any;
