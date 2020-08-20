@@ -35,17 +35,17 @@
             transition: all 0.2s ease-in-out;
             width: 100%;
             &:first-child {
-                width: 90px;
+                width: 95px;
                 text-align: center;
                 line-height: 55px;
             }
 
             &:last-child {
-                width: calc(100% - 90px);
+                width: calc(100% - 95px);
             }
 
             .fa-grip {
-                margin: 0 4px 0 10px;
+                margin: 0 4px 0 5px;
                 display: inline-block;
                 font-size: 14px;
                 opacity: 0;

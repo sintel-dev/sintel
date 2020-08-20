@@ -12,6 +12,7 @@ export type EventDataType = {
   insert_time?: string;
   datarun?: string;
   comments?: CommentDataType[];
+  source?: string;
 };
 
 export type EventsResponse = {

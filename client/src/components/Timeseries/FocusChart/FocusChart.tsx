@@ -139,7 +139,7 @@ export class FocusChart extends Component<Props, State> {
       .y((d) => yCoord(d[1]));
 
     // TODO: depends on the current chart style
-    line.curve(d3.curveStepBefore);
+    line.curve(d3.curveStepAfter);
     return line(data);
   }
 

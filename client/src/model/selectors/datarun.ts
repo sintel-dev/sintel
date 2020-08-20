@@ -189,12 +189,18 @@ export const getCurrentEventDetails = createSelector(
       return null;
     }
     const { timeSeries } = datarun;
+    const eventInfo = datarun.events.find((event) => event.id === activeEventID);
     const eventIndex = datarun.eventWindows.find((windowEvent) => windowEvent[3] === activeEventID);
+
+    if (eventInfo === undefined) {
+      return null;
+    }
 
     const start_time = datarun.timeSeries[eventIndex[0]][0];
     const stop_time = datarun.timeSeries[eventIndex[1]][0];
     const score = eventIndex[2];
     const eventTag = eventIndex[4];
+    const { source } = eventInfo;
 
     const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0);
@@ -214,6 +220,7 @@ export const getCurrentEventDetails = createSelector(
       eventComments,
       isCommentsLoading,
       score,
+      source,
     };
     return eventDetails;
   },
