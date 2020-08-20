@@ -117,8 +117,12 @@ class Signup(Resource):
             user['email'] = body['email']
             user['name'] = body['name']
             user['password'] = password_encrypted
-            if (schema.User.find_one(email=user['email'])):
-                raise('email already exist')
+            if schema.User.find_one(email=user['email']):
+                raise Exception('email already exist')
+            origin_name = user['name']
+            # keep finding until we find the one unique
+            while schema.User.find_one(name=user['name']):
+                user['name'] = origin_name + auth_utils.generate_digits()
 
             schema.User.insert(**user)
             auth_utils.send_mail('MTV: your password', password, user['email'])
