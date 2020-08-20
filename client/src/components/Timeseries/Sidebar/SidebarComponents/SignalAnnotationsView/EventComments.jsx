@@ -31,7 +31,7 @@ class EventComments extends Component {
             <tbody>
               <tr>
                 <td rowSpan="2" width="40">
-                  <img src={userData.picture} referrerPolicy="no-referrer" />
+                  <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
                 </td>
                 <td>
                   <strong>{userData.name}</strong>
@@ -51,9 +51,9 @@ class EventComments extends Component {
       );
     });
   }
-  render() {
-    const { eventDetails, isUsersDataLoading } = this.props;
 
+  render() {
+    const { eventDetails, isUsersDataLoading, isEventJumpVisible } = this.props;
     const eventActivity =
       (eventDetails &&
         eventDetails.eventComments &&
@@ -71,21 +71,27 @@ class EventComments extends Component {
               {this.renderComment(eventDetails)}
             </Loader>
           </div>
-          <div className="event-jump">
-            <ul>
-              <li>
-                Showing <strong>{maxActivity} most recent</strong> - to see more details
-              </li>
-              <li>
-                <button type="button">Go to Event Details</button>
-              </li>
-            </ul>
-          </div>
+          {isEventJumpVisible && (
+            <div className="event-jump">
+              <ul>
+                <li>
+                  Showing <strong>{maxActivity} most recent</strong> - to see more details
+                </li>
+                <li>
+                  <button type="button">Go to Event Details</button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       )
     );
   }
 }
+
+EventComments.defaultProps = {
+  isEventJumpVisible: true,
+};
 
 export default connect((state) => ({
   eventDetails: getCurrentEventDetails(state),

@@ -17,7 +17,7 @@ import {
 
 import {
   getCurrentEventDetails,
-  getUpdatedEventsDetails,
+  getUpdatedEventDetails,
   getIsEditingEventRange,
   getIsPopupOpen,
   getNewEventDetails,
@@ -126,11 +126,11 @@ export class EventDetails extends Component {
             </div>
             <div className="event-row">
               {this.state.isTooltipVisible && renderInfoTooltip()}
-              <label htmlFor="sevScore">Severity Score: </label>
+              {/* <label htmlFor="sevScore">Severity Score: </label> */}
               <input
                 type="text"
                 name="severity-score"
-                id="sevScore"
+                // id="sevScore"
                 maxLength="2"
                 value={currentEventDetails.score}
                 onChange={(event) => updateEventScore(event)}
@@ -232,7 +232,7 @@ EventDetails.propTypes = {
 export default connect(
   (state) => ({
     eventDetails: getCurrentEventDetails(state),
-    updatedEventDetails: getUpdatedEventsDetails(state),
+    updatedEventDetails: getUpdatedEventDetails(state),
     isEditingEventRange: getIsEditingEventRange(state),
     isPopupOpen: getIsPopupOpen(state),
     newEventDetails: getNewEventDetails(state),

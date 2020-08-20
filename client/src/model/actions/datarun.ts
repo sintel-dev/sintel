@@ -1,6 +1,7 @@
+import Cookies from 'js-cookie';
 import {
   getCurrentEventDetails,
-  getUpdatedEventsDetails,
+  getUpdatedEventDetails,
   getDatarunDetails,
   getZoomCounter,
   getNewEventDetails,
@@ -39,7 +40,6 @@ import {
   SET_SCROLL_HISTORY,
 } from '../types';
 import { toggleSimilarShapesModalAction } from './similarShapes';
-import Cookies from 'js-cookie';
 import { AUTHENTICATED_USER_ID } from '../utils/constants';
 
 export function selectDatarun(datarunID: string) {
@@ -233,11 +233,11 @@ export function isEditingEventRangeAction(eventState) {
 
 export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
-    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const updatedEventDetails = getUpdatedEventDetails(getState());
     const userID = Cookies.get(AUTHENTICATED_USER_ID);
 
     if (!userID) {
-      return null;
+      return;
     }
 
     const { commentsDraft } = updatedEventDetails;
@@ -298,6 +298,7 @@ export function saveEventDetailsAction() {
                 eventUpdateStatus: null,
               });
             }, 3000);
+            dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
           });
         })
         .catch(() => dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: 'error' }));
@@ -502,7 +503,7 @@ export function setScrollHistoryAction(period) {
 
 export function recordCommentAction(recordState) {
   return function (dispatch, getState) {
-    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const updatedEventDetails = getUpdatedEventDetails(getState());
     const { commentsDraft } = updatedEventDetails;
     dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: recordState });
 

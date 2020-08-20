@@ -1,3 +1,120 @@
 .event-details {
-    padding: 16px;
+    padding-top: 20px;
+    .evt-row {
+        padding: 0 16px;
+    }
+    p {
+        margin: 0;
+    }
+
+    .no-event {
+        min-height: 64.5vh;
+        vertical-align: middle;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgba(#fff, 0.4);
+    }
+
+    .evt-ops {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .evt-detail {
+        flex: 1;
+        padding: 0 5px 0 0;
+        .date-wrapper {
+            display: inline-block;
+
+            span {
+                display: inline-block;
+                color: #fff;
+                &.date {
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+
+    .detail {
+        margin-bottom: 30px;
+        p {
+            // display: block;
+            color: #b5b5b5;
+            margin-bottom: 8px;
+        }
+        input {
+            &[type='text'] {
+                width: 53px;
+                height: 32px;
+                border: 1px solid #979797;
+                border-radius: 4px;
+                background: transparent;
+                color: #fff;
+                padding: 0 3px;
+                text-align: center;
+            }
+        }
+
+        button {
+            &.evt-edit {
+                color: #2f80ed;
+                text-align: right;
+                font-size: 14px;
+                float: right;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    .evt-actions {
+        background: #292c31;
+        border: 1px solid rgba(238, 241, 246, 0.2);
+        border-radius: 8px;
+        margin: 0 15px 15px 15px;
+        padding: 5px 10px 0 10px;
+        .evt-row {
+            padding: 0 3px 0 16px;
+        }
+        .event-data {
+            .event-comments {
+                border: none;
+                padding-left: 15px;
+            }
+        }
+    }
+
+    .evt-footer {
+        display: flex;
+        justify-content: space-between;
+        background: #23242b;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        padding: 15px 20px;
+        align-items: center;
+        button {
+            color: #fff;
+            text-transform: uppercase;
+            border: none;
+            &.delete {
+                color: #f64242;
+            }
+
+            &.save {
+                background: #2f80ed;
+                padding: 10px 16px;
+                border-radius: 4px;
+            }
+        }
+        li {
+            display: inline-block;
+            margin-right: 15px;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
 }
