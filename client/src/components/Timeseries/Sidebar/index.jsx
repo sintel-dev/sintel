@@ -4,6 +4,7 @@ import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import Header from './Header';
+import * as _ from 'lodash';
 import {
   getDatarunDetails,
   getIsEditingEventRange,
@@ -26,6 +27,7 @@ class Sidebar extends Component {
       radius: 0,
       colSpacing: 0,
       rowSpacing: 30,
+      relativeScale: false,
     };
   }
 
@@ -102,9 +104,9 @@ class Sidebar extends Component {
     return { horizontalShift, verticalShift };
   }
 
-  getPathData(periodRange) {
+  getPathData(periodRange, currentPeriodExtent) {
     const { radius } = this.state;
-    const { area } = getDataScale(radius * 0.1, radius, periodRange);
+    const { area } = getDataScale(radius * 0.1, radius, periodRange, this.state.relativeScale, currentPeriodExtent);
     return area(periodRange);
   }
 
@@ -127,6 +129,12 @@ class Sidebar extends Component {
     const { width, radius } = this.state;
     const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled } = this.props;
 
+    let currentPeriodExtent = [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
+    _.each(dataRun.period, (currentPeriod) => {
+      currentPeriodExtent[0] = Math.min(_.min(currentPeriod.bins), currentPeriodExtent[0]);
+      currentPeriodExtent[1] = Math.max(_.max(currentPeriod.bins), currentPeriodExtent[1]);
+    });
+
     return (
       width > 0 &&
       radius > 0 &&
@@ -141,7 +149,11 @@ class Sidebar extends Component {
               transform={`translate(${horizontalShift}, ${verticalShift})`}
               onClick={() => currentPeriod.level !== 'day' && setPeriodRange(currentPeriod)}
             >
-              <path id={`path_${name}`} d={this.getPathData(bins)} className="feature-area radial-cursor" />
+              <path
+                id={`path_${name}`}
+                d={this.getPathData(bins, currentPeriodExtent)}
+                className="feature-area radial-cursor"
+              />
               <clipPath id={`clip_${name}`}>
                 <use href={`#path_${name}`} />
               </clipPath>
@@ -162,7 +174,8 @@ class Sidebar extends Component {
                     <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
                   ))}
               </g>
-              <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} />
+              {/* <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} /> */}
+              <circle r={radius * 0.95} className="wrapper" fill="url(#blueGradient)" />
             </g>
           </g>
         );
@@ -202,6 +215,12 @@ class Sidebar extends Component {
     return wrapperHeight;
   };
 
+  changeScale = (relativeScale) => {
+    this.setState({
+      relativeScale,
+    });
+  };
+
   render() {
     const { experimentData, isSimilarShapesOpen } = this.props;
     const { width, height } = this.state;
@@ -209,7 +228,7 @@ class Sidebar extends Component {
       <div className="right-sidebar">
         {isSimilarShapesOpen && <SimilarShapes />}
         <Loader isLoading={experimentData.isExperimentDataLoading}>
-          <Header />
+          <Header relativeScale={false} changeScale={this.changeScale} />
           <div id="dataWrapper" className="data-wrapper">
             {this.renderWeekDays()}
             <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}>
@@ -217,8 +236,9 @@ class Sidebar extends Component {
                 {this.drawData()}
                 <defs>
                   <radialGradient id="blueGradient">
-                    <stop offset="0" stopColor="#B2C1FF" />
-                    <stop offset="100" stopColor="rgba(216,216,216,0)" />
+                    {/* <stop offset="0" stopColor="rgba(178, 193, 255, 0.4)" /> */}
+                    <stop offset="0" stopColor="rgba(216,216,216, 0)" />
+                    <stop offset="100" stopColor="rgba(216,216,216, 0)" />
                   </radialGradient>
                 </defs>
               </svg>

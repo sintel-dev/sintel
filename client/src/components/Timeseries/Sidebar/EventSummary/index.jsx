@@ -84,38 +84,42 @@ class EventSummary extends Component {
     return eventsPerRange;
   }
 
-  showPeriod() {
+  showPeriod(ym) {
     const { filteredPeriodRange, selectedPeriodLevel, isTimeSyncEnabled } = this.props;
-    let periodString = 'YY/MM';
+    let yy = '';
+    let mm = '';
 
     if (isTimeSyncEnabled) {
       const { level } = filteredPeriodRange[0];
       if (level === 'month') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
+        yy = filteredPeriodRange[0].parent.name;
       }
 
       if (level === 'day') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
-        periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
+        yy = filteredPeriodRange[0].parent.parent.name;
+        mm = filteredPeriodRange[0].parent.name;
       }
     } else {
       if (selectedPeriodLevel.year) {
-        periodString = periodString.replace('YY', selectedPeriodLevel.year);
+        yy = selectedPeriodLevel.year;
       }
       if (selectedPeriodLevel.month) {
-        periodString = periodString.replace('MM', selectedPeriodLevel.month);
+        mm = selectedPeriodLevel.month;
       }
     }
+    if (yy !== '') {
+      yy = `(${yy})`;
+    }
+    if (mm !== '') {
+      mm = `(${mm})`;
+    }
 
-    return (
-      <div className="period-info">
-        <p>{periodString}</p>
-      </div>
-    );
+    const res = ym === 'y' ? yy : mm;
+    return res;
   }
 
   render() {
-    const { isOpen } = this.props;
+    const { isOpen, signalName } = this.props;
     const eventsPerRange = this.getTimeRangeEvents();
     const activeSummary = isOpen ? 'active' : '';
 
@@ -123,23 +127,22 @@ class EventSummary extends Component {
       <div className="event-summary">
         <div className="event-header">
           <div className="left-wrapper wrapper">
-            <span>{this.props.signalName}</span>
+            <span>{signalName}</span>
           </div>
-          <div className="right-wrapper wrapper">{this.showPeriod()}</div>
         </div>
         <div className={`summary-details ${activeSummary}`}>
           <table>
             <tbody>
               <tr className="row-light">
-                <th>event tag</th>
+                <th>Tag Type</th>
                 {renderTagIcon()}
               </tr>
               <tr>
-                <th>Year</th>
+                <th>Year {this.showPeriod('y')}</th>
                 {renderTagEvents(eventsPerRange.perYear)}
               </tr>
               <tr className="row-light">
-                <th>Month</th>
+                <th>Month {this.showPeriod('m')}</th>
                 {renderTagEvents(eventsPerRange.perMonth)}
               </tr>
             </tbody>

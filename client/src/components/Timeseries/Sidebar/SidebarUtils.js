@@ -27,8 +27,8 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
 
   const arc = d3
     .arc()
-    .innerRadius(radius - 2)
-    .outerRadius(radius + 2);
+    .innerRadius(radius - 0)
+    .outerRadius(radius + 4);
 
   if (level === 'year') {
     const yearHasEvents = periodEvents && periodEvents[currentPeriod.name];
@@ -47,6 +47,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
   }
 
   if (level === 'month') {
+    arc.outerRadius(radius + 3);
     const year = currentPeriod.parent.name;
     const monthEvents = periodEvents[year] && periodEvents[year].months[fromMonthToIndex(currentPeriod.name)];
     if (monthEvents !== undefined) {
@@ -66,6 +67,7 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
   }
 
   if (level === 'day') {
+    arc.outerRadius(radius + 2);
     const year = currentPeriod.parent.parent.name;
     const month = currentPeriod.parent.name;
     const monthNumber = fromMonthToIndex(month);
@@ -87,13 +89,20 @@ export const drawArc = (currentPeriod, periodEvents, radius, periodIndex) => {
   return arcData;
 };
 
-export const getDataScale = (innerRadius, outerRadius, periodRange) => {
+export const getDataScale = (innerRadius, outerRadius, periodRange, relativaScale, currentPeriodExtent) => {
   const scaleAngle = d3
     .scaleLinear()
     .range([0, 2 * Math.PI])
     .domain([0, periodRange.length - 0.08]);
 
-  const scaleRadius = d3.scaleLinear().range([innerRadius, outerRadius]).clamp(true).domain([0, 1.2]);
+  const scaleRadius = d3.scaleLinear().range([innerRadius, outerRadius]);
+  if (relativaScale) {
+    scaleRadius.domain([0, currentPeriodExtent[1]]);
+  } else {
+    scaleRadius.domain([0, 1]);
+  }
+
+  console.log('currentPeriodExtent', currentPeriodExtent);
 
   const area = d3
     .areaRadial()

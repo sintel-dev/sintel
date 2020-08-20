@@ -31,18 +31,19 @@ import Loader from '../../../Common/Loader';
 import { RenderComments, selectedOption } from './eventUtils';
 import AggregationLevels from '../../AggregationLevels';
 import Dropdown from '../../../Common/Dropdown';
-import { CloseIcon, SearchIcon, AggregationIcon } from '../../../Common/icons';
+import { CloseIcon } from '../../../Common/icons';
+// import { CloseIcon, SearchIcon, AggregationIcon } from '../../../Common/icons';
 import './EventDetails.scss';
 
-const renderInfoTooltip = () => (
-  <div className="tooltip-info">
-    <p>Insert a score between 0 to 10</p>
-    <ul>
-      <li>0 - not severe</li>
-      <li>10 - most severe</li>
-    </ul>
-  </div>
-);
+// const renderInfoTooltip = () => (
+//   <div className="tooltip-info">
+//     <p>Insert a score between 0 to 10</p>
+//     <ul>
+//       <li>0 - not severe</li>
+//       <li>10 - most severe</li>
+//     </ul>
+//   </div>
+// );
 export class EventDetails extends Component {
   constructor(props) {
     super(props);
@@ -116,9 +117,9 @@ export class EventDetails extends Component {
       recordComment,
       isTranscriptSupported,
       isSpeechInProgress,
-      toggleAggregationLevels,
-      toggleSimilarShapesModal,
-      isSimilarShapesOpen,
+      // toggleAggregationLevels,
+      // toggleSimilarShapesModal,
+      // isSimilarShapesOpen,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -132,12 +133,12 @@ export class EventDetails extends Component {
       }
     };
 
-    const updateEventScore = ({ target }) => {
-      const eventScore = target.value;
-      if (!isNaN(eventScore) && eventScore <= 10) {
-        updateEventDetails({ score: eventScore });
-      }
-    };
+    // const updateEventScore = ({ target }) => {
+    //   const eventScore = target.value;
+    //   if (!isNaN(eventScore) && eventScore <= 10) {
+    //     updateEventDetails({ score: eventScore });
+    //   }
+    // };
 
     return (
       <div className="events-wrapper-overflow">

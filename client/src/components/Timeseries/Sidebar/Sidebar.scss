@@ -5,7 +5,7 @@
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding: 20px 10px 10px 10px;
+    padding: 0 10px 10px 10px;
     box-sizing: border-box;
     height: 89vh;
     position: relative;
@@ -25,20 +25,26 @@
         }
         .feature-area {
             stroke: #687ba3;
+            stroke-width: 1px;
         }
         .radial-text {
             fill: #8a9097;
-            font-size: 13px;
+            font-size: 15px;
             text-anchor: middle;
         }
 
         .radial-cursor {
-            fill: transparent;
+            fill: rgba(104, 123, 163, 0.7);
+            // fill: transparent;
         }
 
         &.level-day {
             cursor: default;
         }
+    }
+
+    .sidechart-controls {
+        padding: 10px 0 0 10px;
     }
 
     .period-control {
@@ -113,6 +119,8 @@
     }
 
     .period-info {
+        float: right;
+        margin-right: 15px;
         p {
             margin: 0;
             padding: 0;

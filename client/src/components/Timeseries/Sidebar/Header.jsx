@@ -80,11 +80,11 @@ class Header extends Component {
   }
 
   renderHeadingControls() {
-    const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
+    const buttonText = this.state.isSummaryVisible ? 'HIDE Tag Summary Table' : 'SHOW Tag Summary Table';
     return (
       <div className="sidebar-heading">
         <ul>
-          <li className="signal-title">Periodical View</li>
+          <li className="signal-title"></li>
           <li>
             <button type="button" onClick={this.toggleSummaryDetails} id="toggleSummary">
               <span>{buttonText}</span>
@@ -137,10 +137,11 @@ class Header extends Component {
       currentPeriod,
       scrollHistory,
       isTimeSyncEnabled,
-      isEventModeEnabled,
-      toggleEventsMode,
       dataRun,
+      changeScale,
     } = this.props;
+
+    let { relativeScale } = this.props;
 
     const getBtnProps = (button) => {
       const getParentLevel = () => (button === 'day' ? 'month' : 'year');
@@ -180,6 +181,22 @@ class Header extends Component {
           isTimeSyncEnabled={isTimeSyncEnabled}
         />
         <div className="period-wrapper">
+          <div className="sidechart-controls switch-control">
+            <div className="row">
+              <label htmlFor="glyphScale">
+                <input
+                  type="checkbox"
+                  id="glyphScale"
+                  onChange={() => {
+                    relativeScale = !relativeScale;
+                    changeScale(relativeScale);
+                  }}
+                />
+                <span className="switch" />
+                Relative scale
+              </label>
+            </div>
+          </div>
           <ul className="period-filter">
             <li>
               <button type="button" {...getBtnProps('year')}>
@@ -197,7 +214,7 @@ class Header extends Component {
               </button>
             </li>
           </ul>
-          <ul>
+          {/* <ul>
             <li>
               <div className="switch-control reversed">
                 <div className="row">
@@ -214,7 +231,8 @@ class Header extends Component {
                 </div>
               </div>
             </li>
-          </ul>
+          </ul> */}
+          {this.showPeriod(selectedPeriodLevel)}
         </div>
         <div className="clear" />
       </div>
