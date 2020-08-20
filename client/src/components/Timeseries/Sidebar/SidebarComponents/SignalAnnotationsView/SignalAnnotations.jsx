@@ -20,20 +20,6 @@ window.addEventListener('click', function (evt) {
 });
 
 class SignalAnnotations extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFilterOpen: false,
-    };
-  }
-
-  toggleFilterState() {
-    const { isFilterOpen } = this.state;
-    this.setState({
-      isFilterOpen: !isFilterOpen,
-    });
-  }
-
   renderEventDetails() {
     const { dataRun, eventDetails, setActiveEvent, activeEvent } = this.props;
     const { events } = dataRun;

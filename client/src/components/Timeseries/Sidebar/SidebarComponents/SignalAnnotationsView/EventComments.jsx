@@ -4,6 +4,7 @@ import { getCurrentEventDetails } from 'src/model/selectors/datarun';
 import Loader from 'src/components/Common/Loader';
 import { getUsersData, getIsUsersDataloading } from 'src/model/selectors/users';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
+import { setActivePanelAction } from 'src/model/actions/sidebar';
 import { MAX_EVENTS_ACTIVITY } from '../../SidebarUtils';
 import './EventComments.scss';
 
@@ -53,7 +54,7 @@ class EventComments extends Component {
   }
 
   render() {
-    const { eventDetails, isUsersDataLoading, isEventJumpVisible } = this.props;
+    const { eventDetails, isUsersDataLoading, isEventJumpVisible, setActivePanel } = this.props;
     const eventActivity =
       (eventDetails &&
         eventDetails.eventComments &&
@@ -78,7 +79,9 @@ class EventComments extends Component {
                   Showing <strong>{maxActivity} most recent</strong> - to see more details
                 </li>
                 <li>
-                  <button type="button">Go to Event Details</button>
+                  <button type="button" onClick={() => setActivePanel('eventView')}>
+                    Go to Event Details
+                  </button>
                 </li>
               </ul>
             </div>
@@ -93,8 +96,13 @@ EventComments.defaultProps = {
   isEventJumpVisible: true,
 };
 
-export default connect((state) => ({
-  eventDetails: getCurrentEventDetails(state),
-  usersData: getUsersData(state),
-  isUsersDataLoading: getIsUsersDataloading(state),
-}))(EventComments);
+export default connect(
+  (state) => ({
+    eventDetails: getCurrentEventDetails(state),
+    usersData: getUsersData(state),
+    isUsersDataLoading: getIsUsersDataloading(state),
+  }),
+  (dispatch) => ({
+    setActivePanel: (activePanel) => dispatch(setActivePanelAction(activePanel)),
+  }),
+)(EventComments);

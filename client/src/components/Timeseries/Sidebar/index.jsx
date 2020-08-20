@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
 import { ArrowDown, ArrowUp } from 'src/components/Common/icons';
 import { Collapse } from 'react-collapse';
+import { setActivePanelAction } from 'src/model/actions/sidebar';
+import { getCurrentActivePanel } from 'src/model/selectors/sidebar';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
 import { getIsEditingEventRange } from '../../../model/selectors/datarun';
@@ -12,69 +14,54 @@ import SignalAnnotations from './SidebarComponents/SignalAnnotationsView/SignalA
 import SimilarShapes from './SidebarComponents/SimilarShapes';
 import './Sidebar.scss';
 
+const sidebarPanels = [
+  {
+    key: 'periodicalView',
+    title: 'Periodical View',
+    component: <PeriodicalView />,
+  },
+  {
+    key: 'signalView',
+    title: 'Signal Annotations',
+    component: <SignalAnnotations />,
+  },
+  {
+    key: 'eventView',
+    title: 'Event Details',
+    component: <EventDetailsView />,
+  },
+];
+
 class Sidebar extends Component {
-  constructor(...props) {
-    super(...props);
-    this.state = {
-      sections: [
-        {
-          key: 'periodicalView',
-          isOpen: false,
-          title: 'Periodical View',
-          component: <PeriodicalView />,
-        },
-        {
-          key: 'signalView',
-          isOpen: true,
-          title: 'Signal Annotations',
-          component: <SignalAnnotations />,
-        },
-        {
-          key: 'eventView',
-          isOpen: false,
-          title: 'Event Details',
-          component: <EventDetailsView />,
-        },
-      ],
-    };
-  }
+  toggleActivePanel(newPanel) {
+    const { activePanel, setActivePanel } = this.props;
+    if (newPanel !== activePanel) {
+      return setActivePanel(newPanel);
+    }
 
-  togglePanel(sectionName, state) {
-    const { sections } = this.state;
-    const sectionIndex = this.state.sections.findIndex((section) => section.key === sectionName);
-    const changedSection = { ...sections[sectionIndex], isOpen: state };
-    let changedSections = sections;
-
-    changedSections.map((currentSection) => {
-      currentSection.isOpen = false;
-    });
-
-    changedSections[sectionIndex] = changedSection;
-
-    this.setState({
-      sections: changedSections,
-    });
+    return setActivePanel(null);
   }
 
   render() {
-    const { experimentData, isSimilarShapesOpen } = this.props;
-    const { sections } = this.state;
+    const { experimentData, isSimilarShapesOpen, activePanel } = this.props;
+
     return (
       <div className="right-sidebar">
         {isSimilarShapesOpen && <SimilarShapes />}
         <Loader isLoading={experimentData.isExperimentDataLoading}>
-          {sections.map((currentSection) => {
-            const { isOpen, title } = currentSection;
+          {sidebarPanels.map((currentPanel) => {
+            const { title } = currentPanel;
+            const isPanelOpen = activePanel === currentPanel.key;
             return (
-              <div key={currentSection.key} className={`collapsible-wrapper ${isOpen ? 'active' : ''}`}>
-                <div className="collapsible-trigger" onClick={() => this.togglePanel(currentSection.key, !isOpen)}>
+              <div key={currentPanel.key} className={`collapsible-wrapper ${isPanelOpen ? 'active' : ''}`}>
+                <div className="collapsible-trigger" onClick={() => this.toggleActivePanel(currentPanel.key)}>
                   <ul>
                     <li>{title}</li>
-                    <li>{isOpen ? <ArrowUp /> : <ArrowDown />}</li>
+                    <li>{isPanelOpen ? <ArrowUp /> : <ArrowDown />}</li>
                   </ul>
                 </div>
                 <div className="collapsible-content">
-                  <Collapse isOpened={isOpen}>{currentSection.component}</Collapse>
+                  <Collapse isOpened={isPanelOpen}>{currentPanel.component}</Collapse>
                 </div>
               </div>
             );
@@ -85,8 +72,14 @@ class Sidebar extends Component {
   }
 }
 
-export default connect((state) => ({
-  experimentData: getSelectedExperimentData(state),
-  isEditingEventRange: getIsEditingEventRange(state),
-  isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
-}))(Sidebar);
+export default connect(
+  (state) => ({
+    experimentData: getSelectedExperimentData(state),
+    isEditingEventRange: getIsEditingEventRange(state),
+    isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+    activePanel: getCurrentActivePanel(state),
+  }),
+  (dispatch) => ({
+    setActivePanel: (activePanel) => dispatch(setActivePanelAction(activePanel)),
+  }),
+)(Sidebar);

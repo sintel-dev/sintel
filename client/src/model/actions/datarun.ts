@@ -41,6 +41,7 @@ import {
 } from '../types';
 import { toggleSimilarShapesModalAction } from './similarShapes';
 import { AUTHENTICATED_USER_ID } from '../utils/constants';
+import { setActivePanelAction } from './sidebar';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -92,6 +93,7 @@ export function setActiveEventAction(eventID) {
     }
 
     dispatch(getEventComments());
+    dispatch(setActivePanelAction('signalView'));
   };
 }
 
