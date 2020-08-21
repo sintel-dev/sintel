@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { API_URL, SESSION_TOKEN, AUTHENTICATED_USER_ID } from '../utils/constants';
+import { API_URL, SESSION_TOKEN, AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
 import { GET_USERS_DATA } from '../types/users';
 import API from '../utils/api';
 
@@ -21,6 +21,7 @@ export function googleRegisterAction(userData) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       dispatch({ type: 'GOOGLE_USER_REGISTER', googleRegisterStatus: 'success' });
       Cookies.set(SESSION_TOKEN, response.data.data.token);
+      Cookies.set(AUTH_USER_DATA, response.config.data);
     });
   };
 }
@@ -78,6 +79,8 @@ export function onUserLogoutAction() {
     axios.get(`${API_URL}users/signout/`, { headers: { [SESSION_TOKEN]: authHeader } });
     Cookies.remove(SESSION_TOKEN);
     Cookies.remove(AUTHENTICATED_USER_ID);
+    Cookies.remove(AUTH_USER_DATA);
+
     return dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'unauthenticated' });
   };
 }
@@ -86,6 +89,7 @@ export function googleLoginAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       const { data } = response.data;
+      Cookies.set(AUTH_USER_DATA, response.config.data);
       Cookies.set(SESSION_TOKEN, data.token);
       dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
 

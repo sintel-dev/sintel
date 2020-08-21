@@ -341,3 +341,5 @@ class User(MTVDocument):
     password = fields.StringField()
     gid = fields.StringField()
     picture = fields.StringField()  # can be base64 format or image url
+
+    unique_key_fields = ['name']

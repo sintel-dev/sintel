@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as fileDownload from 'react-file-download';
 import { faChevronRight, faChevronLeft, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentExperimentDetails, getSelectedExperimentData } from 'src/model/selectors/experiment';
 import { filterEventsByTagAction, toggleTimeSyncModeAction } from 'src/model/actions/datarun';
 import { getIsTimeSyncModeEnabled, getDatarunDetails } from 'src/model/selectors/datarun';
+import { AUTH_USER_DATA } from 'src/model/utils/constants';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { onUserLogoutAction } from '../../model/actions/users';
 import { RootState } from '../../model/types';
-import { VerticalDots, DownloadIcon, UploadIcon, LineIcon, StepIcon } from '../Common/icons';
+import { VerticalDots, DownloadIcon, UploadIcon, LineIcon, StepIcon, LogoutIcon } from '../Common/icons';
 import Dropdown from '../Common/Dropdown';
 import UploadEvents from '../Timeseries/UploadEvents';
 import './header.scss';
@@ -64,6 +66,10 @@ export const Header: React.FC<Props> = (props) => {
     return null;
   });
 
+  // @TODO - check the case of normal/non google login
+  const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
+
+  const { name, picture } = userData;
   return (
     <header id="header" className="main-header">
       <div className="header-container">
@@ -163,8 +169,12 @@ export const Header: React.FC<Props> = (props) => {
           )}
           <ul className="user-opts">
             <li>
+              <img src={picture} referrerPolicy="no-referrer" alt={name} />
+            </li>
+            <li>{name}</li>
+            <li>
               <button type="button" onClick={logoutUser} className="logout-button">
-                Logout
+                <LogoutIcon />
               </button>
             </li>
           </ul>

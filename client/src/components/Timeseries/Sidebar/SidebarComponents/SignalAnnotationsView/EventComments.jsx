@@ -9,9 +9,9 @@ import { MAX_EVENTS_ACTIVITY } from '../../SidebarUtils';
 import './EventComments.scss';
 
 class EventComments extends Component {
-  findUser(userID) {
+  findUser(userName) {
     const { usersData } = this.props;
-    return usersData.filter((user) => user.user_id === userID)[0];
+    return usersData.filter((user) => user.name === userName)[0];
   }
 
   renderComment(eventDetails) {

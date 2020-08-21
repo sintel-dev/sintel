@@ -63,6 +63,20 @@
                 text-decoration: underline;
             }
         }
+
+        li {
+            display: inline-block;
+            margin-right: 8px;
+            img {
+                width: 30px;
+                border-radius: 50%;
+            }
+            &,
+            img,
+            svg {
+                vertical-align: middle;
+            }
+        }
     }
 
     .logout-button {

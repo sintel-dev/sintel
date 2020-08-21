@@ -29,7 +29,7 @@ class SignalAnnotations extends Component {
     return (
       events.length &&
       events.map((currentEvent) => {
-        const color = currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
+        const color = currentEvent && currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
         const eventClassName =
           (currentEvent && currentEvent.tag && currentEvent.tag.replace(/\s/g, '_').toLowerCase()) || 'untagged';
 
