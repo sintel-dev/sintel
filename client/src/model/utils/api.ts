@@ -1,8 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
 import { API_URL, SESSION_TOKEN } from './constants';
-// import { SESSION_TOKEN } from '@nx-react/session';
-
 import Resource from './restResource';
 import {
   DatasetDataType,

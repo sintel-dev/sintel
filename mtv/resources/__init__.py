@@ -1,5 +1,6 @@
 from . import (
-    comment, computing, data, datarun, dataset, event, experiment, pipeline, signal, test, user)
+    comment, computing, data, datarun, dataset, event, experiment, google_auth, pipeline, signal,
+    test, user)
 
 __all__ = [
     'user',
@@ -12,5 +13,6 @@ __all__ = [
     'experiment',
     'pipeline',
     'signal',
-    'test'
+    'test',
+    'google_auth'
 ]

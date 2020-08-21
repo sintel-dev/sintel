@@ -40,7 +40,7 @@ import {
   SET_SCROLL_HISTORY,
 } from '../types';
 import { toggleSimilarShapesModalAction } from './similarShapes';
-import { AUTHENTICATED_USER_ID } from '../utils/constants';
+import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
 import { setActivePanelAction } from './sidebar';
 
 export function selectDatarun(datarunID: string) {
@@ -238,6 +238,8 @@ export function saveEventDetailsAction() {
     const updatedEventDetails = getUpdatedEventDetails(getState());
     const userID = Cookies.get(AUTHENTICATED_USER_ID);
 
+    // @TODO - getting the user data without Google authentication is yet to be handled
+    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
     if (!userID) {
       return;
     }
@@ -260,7 +262,7 @@ export function saveEventDetailsAction() {
       const commentData = {
         event_id: updatedEventDetails.id,
         text: commentsDraft,
-        created_by: userID,
+        created_by: userData.name,
       };
 
       // posting comments
