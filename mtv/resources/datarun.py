@@ -35,7 +35,8 @@ def get_signalrun(signalrun_doc):
                 'start_time': event_doc.start_time,
                 'stop_time': event_doc.stop_time,
                 'score': event_doc.severity,
-                'tag': event_doc.tag
+                'tag': event_doc.tag,
+                'source': event_doc.source
             })
             # signalrun['events'][-1]['tag'] = \
             #     None if annotation_doc is None else annotation_doc.tag

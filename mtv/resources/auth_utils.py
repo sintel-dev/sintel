@@ -31,6 +31,20 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+def generate_digits(size=3, chars=string.digits):
+    """Randomly generate a number with length `size`.
+
+    Args:
+        size (int): Length of the number.
+        chars (str): The char appeared in this string will be considered as
+        one of the choice.
+
+    Returns:
+        A number (str).
+    """
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
 def generate_auth_token(id, expiration=3600):
     if g['config']['USE_SYS_ENV_KEYS']:
         AUTH_KEY = os.environ['AUTH_KEY']

@@ -33,6 +33,7 @@ def get_event(event_doc):
         'score': event_doc.severity,
         'tag': event_doc.tag,
         'datarun': str(event_doc.signalrun.id),
+        'source': event_doc.source,
         'comments': comments
     }
 
@@ -319,6 +320,9 @@ class Events(Resource):
             del d['datarun_id']
             if d['tag'] == 'untagged':
                 del d['tag']
+            d['severity'] = d['score']
+            del d['score']
+            d['source'] = 'MANUALLY_CREATED'
             event_doc = schema.Event.insert(**d)
             res = get_event(event_doc)
         except Exception as e:

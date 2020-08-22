@@ -1,6 +1,5 @@
 import logging
-import datetime
-import time
+
 from bson import ObjectId
 from flask import request
 from flask_restful import Resource
@@ -156,20 +155,12 @@ class Comments(Resource):
         documents = schema.Annotation.find(event=eid)
 
         comments = []
-
-        # @TODO - client needs insert_time timestamp, investigate if this is proper approach
-        epoch = datetime.datetime.utcfromtimestamp(0)
-
-        def time_to_milliseconds(date):
-            return (date - epoch).total_seconds() * 1000.0
-
         for document in documents:
             comments.append({
                 "id": str(document.id),
                 "event": event_id,
                 "text": document.comment,
-                "created_by": document.created_by,
-                "insert_time": time_to_milliseconds(document.insert_time),
+                "created_by": document.created_by
             })
 
         return {'comments': comments}
