@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { API_URL, SESSION_TOKEN, USERNAME } from '../utils/constants';
+import { API_URL, SESSION_TOKEN, AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
+import { GET_USERS_DATA } from '../types/users';
+import API from '../utils/api';
 
 export function registerUserAction(userData) {
   return async function (dispatch) {
@@ -19,6 +21,7 @@ export function googleRegisterAction(userData) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       dispatch({ type: 'GOOGLE_USER_REGISTER', googleRegisterStatus: 'success' });
       Cookies.set(SESSION_TOKEN, response.data.data.token);
+      Cookies.set(AUTH_USER_DATA, response.config.data);
     });
   };
 }
@@ -48,8 +51,6 @@ export function onUserLoginAction(userData) {
         Cookies.set(SESSION_TOKEN, token, {
           expires: Date.now() + (userData.rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 24),
         });
-        Cookies.set(USERNAME, response.data.data.name);
-
         dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
         return response;
       })
@@ -59,7 +60,7 @@ export function onUserLoginAction(userData) {
   };
 }
 
-export function getIsUserLoggedInAction() {
+export function getUserAuthStatusAction() {
   return function (dispatch) {
     const authHeader = Cookies.get(SESSION_TOKEN);
     const loginStatus = authHeader ? 'authenticated' : 'unauthenticated';
@@ -77,7 +78,9 @@ export function onUserLogoutAction() {
 
     axios.get(`${API_URL}users/signout/`, { headers: { [SESSION_TOKEN]: authHeader } });
     Cookies.remove(SESSION_TOKEN);
-    Cookies.remove(USERNAME);
+    Cookies.remove(AUTHENTICATED_USER_ID);
+    Cookies.remove(AUTH_USER_DATA);
+
     return dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'unauthenticated' });
   };
 }
@@ -86,22 +89,21 @@ export function googleLoginAction(userData) {
   return async function (dispatch) {
     await axios.post(`${API_URL}auth/google_login/`, userData).then((response) => {
       const { data } = response.data;
-      const { token } = data;
-
-      Cookies.set(SESSION_TOKEN, token);
-      Cookies.set(USERNAME, response.data.data.name);
-      dispatch({ type: 'AUTHORIZED_USER_DATA', authUserData: data });
+      Cookies.set(AUTH_USER_DATA, response.config.data);
+      Cookies.set(SESSION_TOKEN, data.token);
       dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
+
+      Cookies.set(AUTHENTICATED_USER_ID, data.uid);
     });
   };
 }
 
-export function fetchCurrentUserAction() {
+export function getUsersDataAction() {
   return function (dispatch) {
-    const authHeader = Cookies.get(SESSION_TOKEN);
-    if (!authHeader) {
-      dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'unauthenticated' });
-    }
-    dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
+    const action = {
+      type: GET_USERS_DATA,
+      promise: API.users.all(),
+    };
+    dispatch(action);
   };
 }

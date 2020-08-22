@@ -4,17 +4,17 @@ export const FocusChartConstants = {
   CHART_WIDTH: 0,
   CHART_HEIGHT: 0,
   TRANSLATE_TOP: 90,
-  TRANSLATE_LEFT: 50,
+  TRANSLATE_LEFT: 38,
   DRAW_EVENTS_TIMEOUT: 400,
   CHART_MARGIN: 10,
 };
 
 export const colorSchemes = {
-  Investigate: '#FFCD00',
-  'Do not Investigate': '#7CA8FF',
-  Postpone: '#A042FF',
-  Problem: '#F64242',
-  'Previously seen': '#F5FF00',
-  Normal: '#45F642',
-  Untagged: '#C7C7C7',
+  Investigate: '#FF9100',
+  'Do not Investigate': '#4684FF',
+  Postpone: '#8446C2',
+  Problem: '#C24D4D',
+  'Previously seen': '#F2FF00',
+  Normal: '#6BC969',
+  Untagged: '#D5D5D5',
 };

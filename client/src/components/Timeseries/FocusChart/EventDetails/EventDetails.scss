@@ -1,22 +1,16 @@
 @import '../../../../assets/sass/colors.scss';
-
-.events-wrapper-overflow {
-    overflow: hidden;
-}
-
 .events-wrapper {
     font-size: 14px;
     width: 400px;
     height: calc(100%);
     position: absolute;
-    left: 0;
-    top: 0;
+    right: 0px;
+    top: 0px;
     color: #fff;
-    padding: 0;
+    padding: 12px 12px 12px 15px;
     box-sizing: border-box;
-    // transform: translateX(100%);
-    // transition: all 0.2s ease-in-out;
-    visibility: hidden;
+    transform: translateX(100%);
+    transition: all 0.2s ease-in-out;
     background: rgba(35, 36, 43, 0.9);
     overflow-y: auto;
     z-index: 9;
@@ -27,254 +21,220 @@
         margin: 0 5px;
     }
 
-    .events-header {
-        padding: 0;
-        height: 15px;
-        cursor: move;
-        z-index: 20;
-        background-color: #787575;
-        color: #fff;
-
-        .back-position {
-            background: none;
-            font-size: 18px;
-            position: absolute;
-            left: 5px;
-            top: -5px;
-            border: none;
-            padding: 0;
-            color: #fff;
-            outline: none;
-            cursor: pointer;
-            z-index: 30;
-        }
-    }
-
     &.active {
         transform: translateX(0);
-        visibility: visible;
     }
 
-    .events-body {
-        padding: 8px 12px 12px 15px;
-
-        .event-row {
-            margin-bottom: 10px;
-            position: relative;
-            li {
-                display: inline-block;
-                margin: 0 16px 0 0;
-            }
-
-            .select-holder {
-                display: inline-block;
-                .tag-select {
-                    width: 175px;
-                }
-            }
-            .search-similar {
-                display: inline-block;
-                margin: 0 0 0 16px;
-            }
-
-            i {
-                &.score-info {
-                    background-color: #fff;
-                    font-size: 8px;
-                    color: #000;
-                    border-radius: 52%;
-                    display: inline-block;
-                    margin-left: 6px;
-                    width: 12px;
-                    height: 12px;
-                    text-align: center;
-                    vertical-align: top;
-                    line-height: 13px;
-                    font-style: normal;
-                    cursor: pointer;
-                }
-            }
-
-            .tooltip-info {
-                font-size: 12px;
-                background: rgba(103, 106, 130, 1);
-                padding: 8px 14px;
-                border-radius: 4px;
-                border-bottom-left-radius: 0;
-                position: absolute;
-                z-index: 999;
-                color: #fff;
-                text-transform: capitalize;
-                top: -75px;
-                right: -3px;
-                white-space: nowrap;
-                width: 195px;
-                li {
-                    display: block;
-                }
-                p {
-                    font-size: 12px;
-                    margin: 0 0 5px 0;
-                }
-            }
-
-            .btn-wrapper {
-                p {
-                    margin: 0;
-                    padding: 0;
-                    &.success,
-                    &.error {
-                        svg {
-                            margin-right: 6px;
-                        }
-                    }
-                    &.success {
-                        path {
-                            fill: $green-color;
-                        }
-                    }
-                    &.error {
-                        path {
-                            fill: $red-color;
-                        }
-                    }
-                }
-            }
-        }
-
-        button {
+    .event-row {
+        margin-bottom: 10px;
+        position: relative;
+        li {
             display: inline-block;
-            margin-bottom: 0;
-            font-weight: normal;
-            text-align: center;
-            vertical-align: middle;
-            touch-action: manipulation;
-            cursor: pointer;
-            background-image: none;
-            border: 1px solid transparent;
-            white-space: nowrap;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
+            margin: 0 16px 0 0;
+        }
+
+        &.select-holder {
+            .tag-select {
+                width: 175px;
+            }
+        }
+
+        i {
+            &.score-info {
+                background-color: #fff;
+                font-size: 8px;
+                color: #000;
+                border-radius: 52%;
+                display: inline-block;
+                margin-left: 6px;
+                width: 12px;
+                height: 12px;
+                text-align: center;
+                vertical-align: top;
+                line-height: 13px;
+                font-style: normal;
+                cursor: pointer;
+            }
+        }
+
+        .tooltip-info {
+            font-size: 12px;
+            background: rgba(103, 106, 130, 1);
+            padding: 8px 14px;
             border-radius: 4px;
-            background: $blue-color;
+            border-bottom-left-radius: 0;
+            position: absolute;
+            z-index: 999;
             color: #fff;
-            outline: none;
-
-            &.danger {
-                background: $red-color;
-            }
-
-            &.close {
-                background: none;
-                margin-top: 10px;
-            }
-
-            &.edit {
-                padding: 1px 5px;
-                font-size: 12px;
-                border-radius: 3px;
-            }
-        }
-
-        .form-group {
-            label {
-                display: block;
-                margin-bottom: 4px;
-            }
-
-            .comment-area {
-                border: 1px solid #979797;
-                padding: 7px;
-                box-sizing: border-box;
-                border-radius: 4px;
-                font-size: 12px;
-                margin-bottom: 20px;
-                width: 100%;
-                height: 190px;
-
-                .comment-wrapper {
-                    border-bottom: 1px solid #979797;
-                    overflow-y: auto;
-                    padding: 5px;
-                    height: 135px;
-                }
-
-                .comment {
-                    padding: 5px;
-                    margin-bottom: 10px;
-                    padding-bottom: 10px;
-                    border-radius: 3px;
-                    transition: all 0.2s ease-in-out;
-                    &:hover {
-                        background: rgba(216, 216, 216, 0.1);
-                    }
-                }
-                p {
-                    margin: 0;
-                    padding: 0;
-                }
-
-                textarea {
-                    width: 100%;
-                    height: 37px;
-                    border: none;
-                    color: #fff;
-                    background: transparent;
-                    font-size: 12px;
-                    padding: 5px;
-                    overflow: hidden;
-                    margin-top: 6px;
-                    &:focus {
-                        outline: none;
-                    }
-                }
-            }
-        }
-
-        input[type='text'] {
-            background: #2c3034;
-            border: 1px solid #979797;
-            width: 82px;
-            height: 33px;
-            border-radius: 2px;
-            margin-left: 3px;
-            color: #fff;
-            font-size: 14px;
-            box-sizing: border-box;
-            padding: 3px;
-            text-align: center;
-            &:focus {
-                outline: none;
-            }
-        }
-
-        .form-intro {
-            margin-bottom: 10px;
-            display: flex;
+            text-transform: capitalize;
+            top: -75px;
+            right: -3px;
+            white-space: nowrap;
+            width: 195px;
             li {
-                width: 50%;
-                margin-right: 5px;
-                &:last-child {
-                    text-align: right;
-                }
+                display: block;
             }
-
-            button {
-                padding: 2px 7px;
+            p {
                 font-size: 12px;
-                &:disabled {
-                    background: #4f5661;
-                    cursor: not-allowed;
-                    opacity: 0.8;
-                }
+                margin: 0 0 5px 0;
             }
         }
 
         .btn-wrapper {
-            &.speech {
-                float: right;
+            p {
+                margin: 0;
+                padding: 0;
+                &.success,
+                &.error {
+                    svg {
+                        margin-right: 6px;
+                    }
+                }
+                &.success {
+                    path {
+                        fill: $green-color;
+                    }
+                }
+                &.error {
+                    path {
+                        fill: $red-color;
+                    }
+                }
             }
+        }
+    }
+
+    button {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: normal;
+        text-align: center;
+        vertical-align: middle;
+        touch-action: manipulation;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        border-radius: 4px;
+        background: $blue-color;
+        color: #fff;
+        outline: none;
+
+        &.danger {
+            background: $red-color;
+        }
+
+        &.close {
+            background: none;
+        }
+
+        &.edit {
+            padding: 1px 5px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+    }
+
+    .form-group {
+        label {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .comment-area {
+            border: 1px solid #979797;
+            padding: 7px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 20px;
+            width: 100%;
+            height: 190px;
+
+            .comment-wrapper {
+                border-bottom: 1px solid #979797;
+                overflow-y: auto;
+                padding: 5px;
+                height: 135px;
+            }
+
+            .comment {
+                padding: 5px;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-radius: 3px;
+                transition: all 0.2s ease-in-out;
+                &:hover {
+                    background: rgba(216, 216, 216, 0.1);
+                }
+            }
+            p {
+                margin: 0;
+                padding: 0;
+            }
+
+            textarea {
+                width: 100%;
+                height: 37px;
+                border: none;
+                color: #fff;
+                background: transparent;
+                font-size: 12px;
+                padding: 5px;
+                overflow: hidden;
+                margin-top: 6px;
+                &:focus {
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    input[type='text'] {
+        background: #2c3034;
+        border: 1px solid #979797;
+        width: 82px;
+        height: 33px;
+        border-radius: 2px;
+        margin-left: 3px;
+        color: #fff;
+        font-size: 14px;
+        box-sizing: border-box;
+        padding: 3px;
+        text-align: center;
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .form-intro {
+        margin-bottom: 10px;
+        display: flex;
+        li {
+            width: 50%;
+            margin-right: 5px;
+            &:last-child {
+                text-align: right;
+            }
+        }
+
+        button {
+            padding: 2px 7px;
+            font-size: 12px;
+            &:disabled {
+                background: #4f5661;
+                cursor: not-allowed;
+                opacity: 0.8;
+            }
+        }
+    }
+
+    .btn-wrapper {
+        &.speech {
+            float: right;
         }
     }
 }

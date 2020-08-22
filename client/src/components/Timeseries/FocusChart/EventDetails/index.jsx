@@ -17,7 +17,7 @@ import {
 
 import {
   getCurrentEventDetails,
-  getUpdatedEventsDetails,
+  getUpdatedEventDetails,
   getIsEditingEventRange,
   getIsPopupOpen,
   getNewEventDetails,
@@ -31,73 +31,25 @@ import Loader from '../../../Common/Loader';
 import { RenderComments, selectedOption } from './eventUtils';
 import AggregationLevels from '../../AggregationLevels';
 import Dropdown from '../../../Common/Dropdown';
-import { CloseIcon } from '../../../Common/icons';
-// import { CloseIcon, SearchIcon, AggregationIcon } from '../../../Common/icons';
+import { CloseIcon, SearchIcon, AggregationIcon } from '../../../Common/icons';
 import './EventDetails.scss';
 
-// const renderInfoTooltip = () => (
-//   <div className="tooltip-info">
-//     <p>Insert a score between 0 to 10</p>
-//     <ul>
-//       <li>0 - not severe</li>
-//       <li>10 - most severe</li>
-//     </ul>
-//   </div>
-// );
+const renderInfoTooltip = () => (
+  <div className="tooltip-info">
+    <p>Insert a score between 0 to 10</p>
+    <ul>
+      <li>0 - not severe</li>
+      <li>10 - most severe</li>
+    </ul>
+  </div>
+);
 export class EventDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isTooltipVisible: false,
-      pos: { x: 0, y: 0 },
-      dragging: false,
-      rel: null, // position relative to the cursor
     };
   }
-
-  componentDidMount() {}
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.dragging && !prevState.dragging) {
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-    } else if (!this.state.dragging && prevState.dragging) {
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-    }
-  }
-
-  onMouseDown = (e) => {
-    // only left mouse button
-    if (e.button !== 0) return;
-    this.setState({
-      dragging: true,
-      rel: {
-        x: e.pageX - this.wrapper.offsetLeft,
-        y: e.pageY - this.wrapper.offsetTop,
-      },
-    });
-    e.stopPropagation();
-    e.preventDefault();
-  };
-
-  onMouseUp = (e) => {
-    this.setState({ dragging: false });
-    e.stopPropagation();
-    e.preventDefault();
-  };
-
-  onMouseMove = (e) => {
-    if (!this.state.dragging) return;
-    this.setState({
-      pos: {
-        x: e.pageX - this.state.rel.x,
-        y: e.pageY - this.state.rel.y,
-      },
-    });
-    e.stopPropagation();
-    e.preventDefault();
-  };
 
   render() {
     const {
@@ -117,9 +69,9 @@ export class EventDetails extends Component {
       recordComment,
       isTranscriptSupported,
       isSpeechInProgress,
-      // toggleAggregationLevels,
-      // toggleSimilarShapesModal,
-      // isSimilarShapesOpen,
+      toggleAggregationLevels,
+      toggleSimilarShapesModal,
+      isSimilarShapesOpen,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -133,162 +85,138 @@ export class EventDetails extends Component {
       }
     };
 
-    // const updateEventScore = ({ target }) => {
-    //   const eventScore = target.value;
-    //   if (!isNaN(eventScore) && eventScore <= 10) {
-    //     updateEventDetails({ score: eventScore });
-    //   }
-    // };
+    const updateEventScore = ({ target }) => {
+      const eventScore = target.value;
+      if (!isNaN(eventScore) && eventScore <= 10) {
+        updateEventDetails({ score: eventScore });
+      }
+    };
 
     return (
-      <div className="events-wrapper-overflow">
-        <div
-          className={`events-wrapper ${isActive} scroll-style`}
-          ref={(c) => (this.wrapper = c)}
-          style={{ left: `${this.state.pos.x}px`, top: `${this.state.pos.y}px` }}
-        >
-          {currentEventDetails && (
-            <div className="events-header" onMouseDown={this.onMouseDown}>
-              <button
-                type="button"
-                className="back-position"
-                title="Move back to the original position"
-                onClick={() => {
-                  this.setState({ pos: { x: 0, y: 0 } });
-                }}
-              >
-                o
-              </button>
-            </div>
-          )}
-          {currentEventDetails && (
-            <div className="events-body" ref={(c) => (this.ebody = c)}>
-              <button type="button" className="close" onClick={closeEventDetails}>
-                <CloseIcon />
-              </button>
-              {/* <div className="event-row">
+      <div className={`events-wrapper scroll-style ${isActive}`}>
+        {currentEventDetails && (
+          <div>
+            <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
+              <AggregationIcon />
+            </button>{' '}
+            <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
+              <SearchIcon />
+            </button>
+            <button type="button" className="close" onClick={closeEventDetails}>
+              <CloseIcon />
+            </button>
+            <div className="event-row">
               <label>Signal: </label>
               <span>{currentEventDetails.signal}</span>
-            </div> */}
-              <div className="event-row">
-                <label>From:</label>
-                <span>{new Date(currentEventDetails.start_time).toUTCString()}</span>
-              </div>
-              <div className="event-row">
-                <label>To:</label>
-                <span>{new Date(currentEventDetails.stop_time).toUTCString()}</span>
-                <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
-                  Modify
-                </button>
-              </div>
-              <div className="event-row">
-                <label>Source:</label>
-                <span>{currentEventDetails.source}</span>
-              </div>
-              {/* <div className="event-row">
-                {this.state.isTooltipVisible && renderInfoTooltip()}
-                <label htmlFor="sevScore">Severity Score: </label>
-                <input
-                  type="text"
-                  name="severity-score"
-                  id="sevScore"
-                  maxLength="2"
-                  value={currentEventDetails.score}
-                  onChange={(event) => updateEventScore(event)}
-                  placeholder="-"
-                />
-                <i
-                  className="score-info"
-                  onMouseOver={() => this.setState({ isTooltipVisible: true })}
-                  onMouseLeave={() => this.setState({ isTooltipVisible: false })}
-                >
-                  i
-                </i>
-              </div> */}
-              <div className="event-row ">
-                <div className="select-holder">
-                  <Dropdown
-                    onChange={(tag) => changeEventTag(tag)}
-                    value={selectedOption(currentEventDetails.tag)}
-                    isGrouppedOptions
-                  />
-                </div>
-                <div className="search-similar">
-                  {/* <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
-                  <AggregationIcon />
-                </button>{' '}
-                <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
-                  <SearchIcon />
-                </button> */}
-                </div>
-              </div>
-
-              <div className="event-row form-group">
-                <ul className="form-intro">
-                  <li>
-                    <label htmlFor="comment">Comment</label>
-                  </li>
-                  <li>
-                    {isTranscriptSupported && (
-                      <button type="button" onClick={() => recordComment()} disabled={isSpeechInProgress}>
-                        <FontAwesomeIcon icon={faMicrophone} />
-                      </button>
-                    )}
-                  </li>
-                </ul>
-
-                <div className="comment-area">
-                  <div className="comment-wrapper scroll-style">
-                    {(!isAddingNewEvent && (
-                      <Loader isLoading={currentEventDetails.isCommentsLoading}>
-                        <RenderComments comments={currentEventDetails.eventComments.comments} />
-                      </Loader>
-                    )) || <p>Comments can be added after saving event</p>}
-                  </div>
-                  <textarea
-                    id="comment"
-                    placeholder="Enter your comment..."
-                    value={updatedEventDetails.commentsDraft}
-                    onChange={(event) => updateEventDetails({ commentsDraft: event.target.value })}
-                    readOnly={isAddingNewEvent}
-                  />
-                </div>
-              </div>
-              <div className="event-row">
-                <ul className="btn-wrapper">
-                  {!isAddingNewEvent && (
-                    <li>
-                      <button type="button" className="danger" onClick={deleteEvent}>
-                        Delete
-                      </button>
-                    </li>
-                  )}
-                  <li>
-                    <button type="button" onClick={saveEventDetails}>
-                      Save
+            </div>
+            <div className="event-row">
+              <label>Severity Score:</label>
+              <span>{currentEventDetails.score}</span>
+            </div>
+            <div className="event-row">
+              <label>From:</label>
+              <span>{new Date(currentEventDetails.start_time).toUTCString()}</span>
+            </div>
+            <div className="event-row">
+              <label>To:</label>
+              <span>{new Date(currentEventDetails.stop_time).toUTCString()}</span>
+              <button type="button" className="edit danger" onClick={() => editEventRange(true)}>
+                Modify
+              </button>
+            </div>
+            <div className="event-row">
+              {this.state.isTooltipVisible && renderInfoTooltip()}
+              {/* <label htmlFor="sevScore">Severity Score: </label> */}
+              <input
+                type="text"
+                name="severity-score"
+                // id="sevScore"
+                maxLength="2"
+                value={currentEventDetails.score}
+                onChange={(event) => updateEventScore(event)}
+                placeholder="-"
+              />
+              {/* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */}
+              <i
+                className="score-info"
+                onMouseOver={() => this.setState({ isTooltipVisible: true })}
+                onMouseLeave={() => this.setState({ isTooltipVisible: false })}
+              >
+                i
+              </i>
+            </div>
+            <div className="event-row select-holder">
+              <Dropdown
+                onChange={(tag) => changeEventTag(tag)}
+                value={selectedOption(currentEventDetails.tag)}
+                isGrouppedOptions
+              />
+            </div>
+            <div className="event-row form-group">
+              <ul className="form-intro">
+                <li>
+                  <label htmlFor="comment">Comment</label>
+                </li>
+                <li>
+                  {isTranscriptSupported && (
+                    <button type="button" onClick={() => recordComment()} disabled={isSpeechInProgress}>
+                      <FontAwesomeIcon icon={faMicrophone} />
                     </button>
-                  </li>
-                  {eventUpdateStatus !== null && (
-                    <li>
-                      {eventUpdateStatus === 'success' ? (
-                        <p className="success">
-                          <FontAwesomeIcon icon={faCheck} />
-                          Event successfuly saved
-                        </p>
-                      ) : (
-                        <p className="error">
-                          <FontAwesomeIcon icon={faExclamation} />
-                          Event update error
-                        </p>
-                      )}
-                    </li>
                   )}
-                </ul>
+                </li>
+              </ul>
+
+              <div className="comment-area">
+                <div className="comment-wrapper scroll-style">
+                  {(!isAddingNewEvent && (
+                    <Loader isLoading={currentEventDetails.isCommentsLoading}>
+                      <RenderComments comments={currentEventDetails.eventComments.comments} />
+                    </Loader>
+                  )) || <p>Comments can be added after saving event</p>}
+                </div>
+                <textarea
+                  id="comment"
+                  placeholder="Enter your comment..."
+                  value={updatedEventDetails.commentsDraft}
+                  onChange={(event) => updateEventDetails({ commentsDraft: event.target.value })}
+                  readOnly={isAddingNewEvent}
+                />
               </div>
             </div>
-          )}
-          <AggregationLevels />
-        </div>
+            <div className="event-row">
+              <ul className="btn-wrapper">
+                {!isAddingNewEvent && (
+                  <li>
+                    <button type="button" className="danger" onClick={deleteEvent}>
+                      Delete
+                    </button>
+                  </li>
+                )}
+                <li>
+                  <button type="button" onClick={saveEventDetails}>
+                    Save
+                  </button>
+                </li>
+                {eventUpdateStatus !== null && (
+                  <li>
+                    {eventUpdateStatus === 'success' ? (
+                      <p className="success">
+                        <FontAwesomeIcon icon={faCheck} />
+                        Event successfuly saved
+                      </p>
+                    ) : (
+                      <p className="error">
+                        <FontAwesomeIcon icon={faExclamation} />
+                        Event update error
+                      </p>
+                    )}
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        )}
+        <AggregationLevels />
       </div>
     );
   }
@@ -304,7 +232,7 @@ EventDetails.propTypes = {
 export default connect(
   (state) => ({
     eventDetails: getCurrentEventDetails(state),
-    updatedEventDetails: getUpdatedEventsDetails(state),
+    updatedEventDetails: getUpdatedEventDetails(state),
     isEditingEventRange: getIsEditingEventRange(state),
     isPopupOpen: getIsPopupOpen(state),
     newEventDetails: getNewEventDetails(state),

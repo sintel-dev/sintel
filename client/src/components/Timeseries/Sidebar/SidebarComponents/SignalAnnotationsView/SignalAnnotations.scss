@@ -1,0 +1,78 @@
+.signals-wrapper {
+    max-height: 610px;
+    overflow-y: auto;
+
+    i {
+        &.badge {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    }
+    button {
+        background: #2f80ed;
+        border-radius: 4px;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+    }
+    .annotation-heading {
+        align-items: center;
+        padding: 15px 12px;
+        display: flex;
+        justify-content: space-between;
+        background: #2c3034;
+        border-bottom: 1px solid rgba(#f2f2f2, 0.08);
+        cursor: pointer;
+
+        .annotation-wrapper-right {
+            width: 40%;
+
+            li {
+                font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+                span {
+                    margin-right: 5px;
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
+            }
+        }
+
+        button {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+    }
+}
+
+.annotation-wrapper {
+    .collapsible-wrapper {
+        border: none;
+        .ReactCollapse--content {
+            padding: 20px 20px 20px 13px;
+            background: rgba(#5a627c, 0.15);
+        }
+    }
+}
+
+.evt-tag {
+    padding: 6px;
+    border-radius: 16px;
+    width: 152px;
+    display: block;
+    text-align: center;
+    color: #2c3034;
+    font-weight: bold;
+
+    &.do_not_investigate,
+    &.investigate,
+    &.postpone,
+    &.problem {
+        color: #fff;
+    }
+}

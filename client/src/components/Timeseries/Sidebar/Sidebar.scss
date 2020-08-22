@@ -1,11 +1,12 @@
 @import '../../../assets/sass/colors.scss';
 @import '../../../assets/sass/main.scss';
+@import './Collapsible.scss';
 
 .right-sidebar {
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding: 0 10px 10px 10px;
+    padding-bottom: 10px;
     box-sizing: border-box;
     height: 89vh;
     position: relative;
@@ -25,26 +26,20 @@
         }
         .feature-area {
             stroke: #687ba3;
-            stroke-width: 1px;
         }
         .radial-text {
             fill: #8a9097;
-            font-size: 15px;
+            font-size: 13px;
             text-anchor: middle;
         }
 
         .radial-cursor {
             fill: rgba(104, 123, 163, 0.7);
-            // fill: transparent;
         }
 
         &.level-day {
             cursor: default;
         }
-    }
-
-    .sidechart-controls {
-        padding: 10px 0 0 10px;
     }
 
     .period-control {
@@ -105,7 +100,8 @@
     .period-wrapper {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
+        padding: 0 15px;
         align-items: center;
     }
 
@@ -114,13 +110,7 @@
         cursor: move;
     }
 
-    .event-summary {
-        margin: 16px 0 25px 0;
-    }
-
     .period-info {
-        float: right;
-        margin-right: 15px;
         p {
             margin: 0;
             padding: 0;
@@ -133,6 +123,7 @@
         .wrapper-container {
             overflow-y: auto;
             overflow-x: hidden;
+            padding: 0 10px;
         }
 
         .week-days {

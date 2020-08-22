@@ -13,6 +13,9 @@
         width: 96%;
         margin: 0 auto;
     }
+    .tag-wrapper {
+        float: right;
+    }
 
     a {
         transition: all 0.2s ease-in-out;
@@ -51,22 +54,27 @@
         }
     }
 
-    .user-info {
-        float: right;
-    }
-
     .user-opts {
         float: right;
-
-        li {
-            display: inline-block;
-            margin-left: 10px;
-        }
 
         a {
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
+            }
+        }
+
+        li {
+            display: inline-block;
+            margin-right: 8px;
+            img {
+                width: 30px;
+                border-radius: 50%;
+            }
+            &,
+            img,
+            svg {
+                vertical-align: middle;
             }
         }
     }

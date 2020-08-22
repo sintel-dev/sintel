@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import {
   getCurrentEventDetails,
-  getUpdatedEventsDetails,
+  getUpdatedEventDetails,
   getDatarunDetails,
   getZoomCounter,
   getNewEventDetails,
@@ -12,7 +12,6 @@ import {
   getIsTimeSyncModeEnabled,
   getScrollHistory,
 } from '../selectors/datarun';
-import { USERNAME } from '../../model/utils/constants';
 import { getSelectedExperimentData } from '../../model/selectors/experiment';
 import API from '../utils/api';
 import {
@@ -41,6 +40,8 @@ import {
   SET_SCROLL_HISTORY,
 } from '../types';
 import { toggleSimilarShapesModalAction } from './similarShapes';
+import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
+import { setActivePanelAction } from './sidebar';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -92,6 +93,7 @@ export function setActiveEventAction(eventID) {
     }
 
     dispatch(getEventComments());
+    dispatch(setActivePanelAction('signalView'));
   };
 }
 
@@ -233,7 +235,15 @@ export function isEditingEventRangeAction(eventState) {
 
 export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
-    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const updatedEventDetails = getUpdatedEventDetails(getState());
+    const userID = Cookies.get(AUTHENTICATED_USER_ID);
+
+    // @TODO - getting the user data without Google authentication is yet to be handled
+    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
+    if (!userID) {
+      return;
+    }
+
     const { commentsDraft } = updatedEventDetails;
     const { start_time, stop_time, score, tag } = updatedEventDetails;
 
@@ -252,7 +262,7 @@ export function saveEventDetailsAction() {
       const commentData = {
         event_id: updatedEventDetails.id,
         text: commentsDraft,
-        created_by: Cookies.get(USERNAME), // no particular details about the logged in user
+        created_by: userData.name,
       };
 
       // posting comments
@@ -292,6 +302,7 @@ export function saveEventDetailsAction() {
                 eventUpdateStatus: null,
               });
             }, 3000);
+            dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
           });
         })
         .catch(() => dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: 'error' }));
@@ -494,11 +505,11 @@ export function setScrollHistoryAction(period) {
   };
 }
 
-export function recordCommentAction() {
+export function recordCommentAction(recordState) {
   return function (dispatch, getState) {
-    const updatedEventDetails = getUpdatedEventsDetails(getState());
+    const updatedEventDetails = getUpdatedEventDetails(getState());
     const { commentsDraft } = updatedEventDetails;
-    dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: true });
+    dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: recordState });
 
     const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 

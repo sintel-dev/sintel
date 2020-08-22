@@ -196,28 +196,37 @@ i {
     }
 
     &.investigate {
-        background: #ffcd00;
+        background: #ff9100;
     }
 
     &.not_investigate {
-        background: #7ca8ff;
+        background: #4684ff;
     }
 
     &.postpone {
-        background: #a042ff;
+        background: #8446c2;
     }
     &.problem {
-        background: #f64242;
+        background: #c24d4d;
     }
     &.seen {
-        background: #f5ff00;
+        background: #f2ff00;
     }
 
     &.normal {
-        background: #45f642;
+        background: #6bc969;
     }
 
     &.untagged {
-        background: #c7c7c7;
+        background: #d5d5d5;
+    }
+}
+
+button {
+    cursor: pointer;
+    &.clean {
+        margin: 0;
+        background: transparent;
+        border: none;
     }
 }

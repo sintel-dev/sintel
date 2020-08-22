@@ -4,16 +4,16 @@ import { toggleSimilarShapesModalAction, getSimilarShapesAction } from 'src/mode
 import { getDatarunDetails, getCurrentEventDetails } from 'src/model/selectors/datarun';
 import * as d3 from 'd3';
 import Loader from 'src/components/Common/Loader';
-import { RootState } from '../../../../model/types';
-import Dropdown from '../../../Common/Dropdown';
+import { RootState } from '../../../../../model/types';
+import Dropdown from '../../../../Common/Dropdown';
 import {
   getIsSimilarShapesModalOpen,
   getIsSimilarShapesLoading,
   getSimilarShapesFound,
-} from '../../../../model/selectors/similarShapes';
-import { CloseIcon } from '../../../Common/icons';
+} from '../../../../../model/selectors/similarShapes';
+import { CloseIcon } from '../../../../Common/icons';
 import './SimilarShapes.scss';
-import { timestampToDate } from '../../AggregationLevels/AggregationChart/Utils';
+import { timestampToDate } from '../../../AggregationLevels/AggregationChart/Utils';
 
 type StateProps = ReturnType<typeof mapState>;
 type DispatchProps = ReturnType<typeof mapDispatch>;
@@ -88,11 +88,11 @@ class SimilarShapes extends Component<Props, {}> {
           <ul>
             <li>
               <span>Start:</span>
-              <span>{timestampToDate(startTime)}</span>
+              {timestampToDate(startTime)}
             </li>
             <li>
               <span>End:</span>
-              <span>{timestampToDate(stopTime)}</span>
+              {timestampToDate(stopTime)}
             </li>
             <li>
               <span>Similarity:</span>
@@ -121,7 +121,7 @@ class SimilarShapes extends Component<Props, {}> {
           <button type="button" onClick={() => toggleSimilarShapesModal(false)} className="close">
             <CloseIcon />
           </button>
-          <h3>Similar Segments Lis</h3>
+          <h3>Similar Segments List</h3>
           <ul className="select-controls">
             <li>Override segments tags:</li>
             <li>

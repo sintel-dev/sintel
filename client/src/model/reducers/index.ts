@@ -8,6 +8,7 @@ import datarun from './datarun';
 import users from './users';
 import aggregationLevels from './aggregationLevels';
 import similarShapes from './similarShapes';
+import sidebar from './sidebar';
 
 const dashBoardReducers = combineReducers({
   users,
@@ -19,6 +20,7 @@ const dashBoardReducers = combineReducers({
   datarun,
   aggregationLevels,
   similarShapes,
+  sidebar,
 });
 
 export default dashBoardReducers;

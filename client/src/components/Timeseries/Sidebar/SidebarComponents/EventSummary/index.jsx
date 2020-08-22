@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { tagSeq, fromTagToClassName } from '../../../Landing/utils';
-import { fromMonthToIndex } from '../../../../model/utils/Utils';
+import { tagSeq, fromTagToClassName } from '../../../../Landing/utils';
+import { fromMonthToIndex } from '../../../../../model/utils/Utils';
 
 import './EventSummary.scss';
 
@@ -84,42 +84,38 @@ class EventSummary extends Component {
     return eventsPerRange;
   }
 
-  showPeriod(ym) {
+  showPeriod() {
     const { filteredPeriodRange, selectedPeriodLevel, isTimeSyncEnabled } = this.props;
-    let yy = '';
-    let mm = '';
+    let periodString = 'YY/MM';
 
     if (isTimeSyncEnabled) {
       const { level } = filteredPeriodRange[0];
       if (level === 'month') {
-        yy = filteredPeriodRange[0].parent.name;
+        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
       }
 
       if (level === 'day') {
-        yy = filteredPeriodRange[0].parent.parent.name;
-        mm = filteredPeriodRange[0].parent.name;
+        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
+        periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
       }
     } else {
       if (selectedPeriodLevel.year) {
-        yy = selectedPeriodLevel.year;
+        periodString = periodString.replace('YY', selectedPeriodLevel.year);
       }
       if (selectedPeriodLevel.month) {
-        mm = selectedPeriodLevel.month;
+        periodString = periodString.replace('MM', selectedPeriodLevel.month);
       }
     }
-    if (yy !== '') {
-      yy = `(${yy})`;
-    }
-    if (mm !== '') {
-      mm = `(${mm})`;
-    }
 
-    const res = ym === 'y' ? yy : mm;
-    return res;
+    return (
+      <div className="period-info">
+        <p>{periodString}</p>
+      </div>
+    );
   }
 
   render() {
-    const { isOpen, signalName } = this.props;
+    const { isOpen } = this.props;
     const eventsPerRange = this.getTimeRangeEvents();
     const activeSummary = isOpen ? 'active' : '';
 
@@ -127,22 +123,23 @@ class EventSummary extends Component {
       <div className="event-summary">
         <div className="event-header">
           <div className="left-wrapper wrapper">
-            <span>{signalName}</span>
+            <span>{this.props.signalName}</span>
           </div>
+          <div className="right-wrapper wrapper">{this.showPeriod()}</div>
         </div>
         <div className={`summary-details ${activeSummary}`}>
           <table>
             <tbody>
-              <tr className="row-light">
-                <th>Tag Type</th>
+              <tr>
+                <th>event tag</th>
                 {renderTagIcon()}
               </tr>
               <tr>
-                <th>Year {this.showPeriod('y')}</th>
+                <th>Year</th>
                 {renderTagEvents(eventsPerRange.perYear)}
               </tr>
-              <tr className="row-light">
-                <th>Month {this.showPeriod('m')}</th>
+              <tr>
+                <th>Month</th>
                 {renderTagEvents(eventsPerRange.perMonth)}
               </tr>
             </tbody>

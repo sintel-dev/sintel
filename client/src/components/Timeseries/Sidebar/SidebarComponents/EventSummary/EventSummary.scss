@@ -1,16 +1,17 @@
-@import '../../../../assets/sass/form.scss';
+@import '../../../../../assets/sass/form.scss';
 .event-summary {
     text-transform: uppercase;
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid rgba(96, 102, 108, 0.5);
-    padding: 10px 0 0 0;
+    padding: 5px 0 0 0;
+    margin: 0 0 15px 0;
     border-radius: 4px;
     font-size: 12px;
-    background: #26282e;
+    border-bottom: 1px solid #23242b;
 
     .event-header {
-        padding: 0 16px;
+        margin: 0 16px;
+        border-bottom: 1px solid #23242b;
     }
     .tooltip-data {
         font-size: 12px;
@@ -57,9 +58,6 @@
                 }
             }
         }
-        .row-light {
-            background: #2c3034;
-        }
 
         tr:last-child {
             th {
@@ -80,12 +78,9 @@
         align-items: center;
         justify-content: space-between;
 
-        .wrapper {
-            padding-bottom: 8px;
-        }
         .left-wrapper {
-            font-size: 18px;
-            // font-weight: bold;
+            font-size: 20px;
+            font-weight: bold;
         }
     }
 

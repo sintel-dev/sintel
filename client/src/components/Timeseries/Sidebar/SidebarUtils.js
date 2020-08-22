@@ -2,13 +2,15 @@ import * as d3 from 'd3';
 import { colorSchemes } from '../FocusChart/Constants';
 import { fromMonthToIndex } from '../../../model/utils/Utils';
 
+export const MAX_EVENTS_ACTIVITY = 5;
+
 export const getWrapperSize = () => {
-  const sidebarHeight = document.querySelector('.right-sidebar').clientHeight - 40; // padding-top and bottom
-  const sidebarHeaderHeight = document.querySelector('.period-control').clientHeight + 10; // margin-bottom;
+  const sidebarHeight = document.querySelector('.right-sidebar').clientHeight - 75; // padding-top and bottom
+  const sidebarHeaderHeight = document.querySelector('.period-control').clientHeight + 25; // margin-bottom;
   const wrapper = document.querySelector('#dataWrapper');
 
   const height = sidebarHeight - sidebarHeaderHeight;
-  const width = wrapper.clientWidth - 7; // scrollbar offset
+  const width = wrapper.clientWidth - 22; // scrollbar offset
 
   return { width, height };
 };
