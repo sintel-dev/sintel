@@ -19,12 +19,15 @@ import {
   setScrollHistoryAction,
   setReviewPeriodAction,
 } from '../../../../model/actions/datarun';
+import { toggleRelativeScale } from 'src/model/actions/sidebar';
+import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
 
 class Header extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isSummaryVisible: true,
+      // isRelativeScaleEnabled: false,
     };
     this.toggleSummaryDetails = this.toggleSummaryDetails.bind(this);
   }
@@ -126,6 +129,13 @@ class Header extends Component {
     );
   }
 
+  // changeScale() {
+  //   const { isRelativeScaleEnabled } = this.state;
+  //   this.setState({
+  //     isRelativeScaleEnabled: !isRelativeScaleEnabled,
+  //   });
+  // }
+
   render() {
     const { isSummaryVisible } = this.state;
     const {
@@ -139,6 +149,8 @@ class Header extends Component {
       isTimeSyncEnabled,
       isEventModeEnabled,
       toggleEventsMode,
+      isRelativeScaleEnabled,
+      toggleRelativeScale,
       dataRun,
     } = this.props;
 
@@ -170,6 +182,7 @@ class Header extends Component {
 
     return (
       <div className="period-control">
+        {/* @TODO - under discussion if this should be removed or not */}
         {/* {this.renderHeadingControls()} */}
         <EventSummary
           selectedPeriodLevel={selectedPeriodLevel}
@@ -180,6 +193,20 @@ class Header extends Component {
           isTimeSyncEnabled={isTimeSyncEnabled}
         />
         <div className="period-wrapper">
+          <div className="sidechart-controls switch-control">
+            <div className="row">
+              <label htmlFor="glyphScale">
+                <input
+                  type="checkbox"
+                  id="glyphScale"
+                  onChange={() => toggleRelativeScale()}
+                  checked={isRelativeScaleEnabled}
+                />
+                <span className="switch" />
+                Relative scale
+              </label>
+            </div>
+          </div>
           <ul className="period-filter">
             <li>
               <button type="button" {...getBtnProps('year')}>
@@ -197,7 +224,8 @@ class Header extends Component {
               </button>
             </li>
           </ul>
-          <ul>
+          {/* @TODO - new toggle switch appear(changeScale), check to see where to place this one */}
+          {/* <ul>
             <li>
               <div className="switch-control reversed">
                 <div className="row">
@@ -214,7 +242,8 @@ class Header extends Component {
                 </div>
               </div>
             </li>
-          </ul>
+          </ul> */}
+          {/* {this.showPeriod(selectedPeriodLevel)} */}
         </div>
         <div className="clear" />
       </div>
@@ -233,11 +262,13 @@ export default connect(
     filteredPeriodRange: getFilteredPeriodRange(state),
     currentPeriod: getSelectedPeriodLevel(state),
     scrollHistory: getScrollHistory(state),
+    isRelativeScaleEnabled: getIsRelativeScaleEnabled(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodRange) => dispatch(setPeriodRangeAction(periodRange)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
     setScrollHistory: (period) => dispatch(setScrollHistoryAction(period)),
     setReviewPeriod: (period) => dispatch(setReviewPeriodAction(period)),
+    toggleRelativeScale: () => dispatch(toggleRelativeScale()),
   }),
 )(Header);

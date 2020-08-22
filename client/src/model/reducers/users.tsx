@@ -1,4 +1,5 @@
 import createReducer from '../store/createReducer';
+import { UsersState } from '../types';
 
 const initialState = {
   loginStatus: 'unauthenticated',
@@ -9,20 +10,20 @@ const initialState = {
   usersData: [],
 };
 
-function AUTHORIZED_USER_DATA(nextState, { authUserData }) {
+function AUTHORIZED_USER_DATA(nextState: UsersState, { authUserData }) {
   nextState.authUserData = authUserData;
 }
 
-function SET_LOGIN_STATUS(nextState, { loginStatus }) {
+function SET_LOGIN_STATUS(nextState: UsersState, { loginStatus }) {
   nextState.loginStatus = loginStatus;
 }
 
-function USER_REGISTER(nextState, { registerStatus, failureReason }) {
+function USER_REGISTER(nextState: UsersState, { registerStatus, failureReason }) {
   nextState.registerStatus = registerStatus;
   nextState.registerFailure = failureReason;
 }
 
-function GOOGLE_USER_REGISTER(nextState, { googleRegisterStatus }) {
+function GOOGLE_USER_REGISTER(nextState: UsersState, { googleRegisterStatus }) {
   nextState.googleRegisterStatus = googleRegisterStatus;
 }
 
@@ -30,7 +31,7 @@ function RESET_PASSWORD_STATUS(nextState, { passwordResetStatus }) {
   nextState.passwordResetStatus = passwordResetStatus;
 }
 
-function GET_USERS_DATA_REQUEST(nextState) {
+function GET_USERS_DATA_REQUEST(nextState: UsersState) {
   nextState.isUsersDataLoading = false;
 }
 
@@ -39,7 +40,7 @@ function GET_USERS_DATA_SUCCESS(nextState, action) {
   nextState.usersData = action.result.users;
 }
 
-function GET_USERS_DATA_FAILURE(nextState) {
+function GET_USERS_DATA_FAILURE(nextState: UsersState) {
   nextState.isUsersDataLoading = false;
   nextState.userData = [];
 }

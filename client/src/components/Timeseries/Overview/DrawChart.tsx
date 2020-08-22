@@ -117,7 +117,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
       .y((d) => yCoord(d[1]));
 
     // TODO: depends on the current chart style
-    line.curve(d3.curveStepBefore);
+    line.curve(d3.curveStepAfter);
     return line(data);
   }
 
@@ -230,7 +230,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
   drawEvent(event) {
     const { timeSeries } = this.props.dataRun;
-    const eventData: Array<number> = timeSeries.slice(event[0], event[1] + 2);
+    const eventData: Array<[number, number]> = timeSeries.slice(event[0], event[1] + 2);
     return <path key={event[3]} className="wave-event" d={this.drawLine(eventData)} />;
   }
 

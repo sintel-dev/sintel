@@ -83,9 +83,12 @@ const groupDataByPeriod = (data) => {
         month.children.push(day);
 
         let dayData = data[yearIterator].data[monthIterator][dayIterator];
-        const count = dayData.counts.reduce((currentCount, nextCount) => currentCount + nextCount, 0);
-        const mean = dayData.means.reduce((currentMean, nextMean) => currentMean + nextMean, 0) / dayData.means.length;
+        const count = _.sum(dayData.counts);
+        const mean = _.sum(dayData.means) / dayData.means.length;
+        // const count = dayData.counts.reduce((currentCount, nextCount) => currentCount + nextCount, 0);
+        // const mean = dayData.means.reduce((currentMean, nextMean) => currentMean + nextMean, 0) / dayData.means.length;
 
+        // one day one bin
         year.bins.push(mean);
         year.counts.push(count);
 
@@ -94,7 +97,7 @@ const groupDataByPeriod = (data) => {
       }
     }
 
-    // 7 days as one bin
+    // aggregate 7 days (bins) into one
     let i = 0;
     let nbins = [];
     let ncounts = [];
@@ -102,8 +105,7 @@ const groupDataByPeriod = (data) => {
       let s = 0;
       let c = 0;
       let v = 0;
-      // eslint-disable-next-line no-plusplus
-      for (let j = 0; j < 7; j++) {
+      for (let j = 0; j < 7; j += 1) {
         s += year.bins[i + j];
         c += year.counts[i + j];
       }
@@ -127,8 +129,8 @@ const groupDataByPeriod = (data) => {
       }
       ncounts.push(c);
     }
-    year.bins = nbins;
-    year.counts = ncounts;
+    // year.bins = nbins;
+    // year.counts = ncounts;
   }
 
   return result;
@@ -137,12 +139,18 @@ const groupDataByPeriod = (data) => {
 const normalizePeriodRange = (periodData) => {
   let minRange = Number.MAX_SAFE_INTEGER;
   let maxRange = Number.MIN_SAFE_INTEGER;
-  periodData.forEach((currentPeriod) => {
-    const { bins } = currentPeriod;
-    bins.forEach((bin) => {
-      minRange = Math.min(minRange, bin);
-      maxRange = Math.max(maxRange, bin);
-    });
+  periodData.forEach((year) => {
+    for (let monthIterator = 0; monthIterator < year.children.length; monthIterator += 1) {
+      for (let dayIterator = 0; dayIterator < year.children[monthIterator].children.length; dayIterator += 1) {
+        const { counts, bins } = year.children[monthIterator].children[dayIterator];
+        for (let i = 0; i < bins.length; i += 1) {
+          if (counts[i] !== 0) {
+            minRange = Math.min(minRange, bins[i]);
+            maxRange = Math.max(maxRange, bins[i]);
+          }
+        }
+      }
+    }
   });
   return { minRange, maxRange };
 };
@@ -151,8 +159,35 @@ const normalizePeriodData = (periodData) => {
   const { minRange, maxRange } = normalizePeriodRange(periodData);
   const normalizeScale = d3.scaleLinear().domain([minRange, maxRange]).range([0, 1]);
 
-  periodData.forEach((currentPeriod) => {
-    currentPeriod.bins = currentPeriod.bins.map((bin) => (bin !== 0 ? normalizeScale(bin) : 0));
+  periodData.forEach((year) => {
+    let countsY = year.counts;
+    year.bins = _.map(year.bins, (bin, i) => {
+      if (countsY[i] === 0) {
+        return bin;
+      }
+      return normalizeScale(bin);
+    });
+    for (let monthIterator = 0; monthIterator < year.children.length; monthIterator += 1) {
+      let countsM = year.children[monthIterator].counts;
+      year.children[monthIterator].bins = _.map(year.children[monthIterator].bins, (bin, i) => {
+        if (countsM[i] === 0) {
+          return bin;
+        }
+        return normalizeScale(bin);
+      });
+      for (let dayIterator = 0; dayIterator < year.children[monthIterator].children.length; dayIterator += 1) {
+        let countsD = year.children[monthIterator].children[dayIterator].counts;
+        year.children[monthIterator].children[dayIterator].bins = _.map(
+          year.children[monthIterator].children[dayIterator].bins,
+          (bin, i) => {
+            if (countsD[i] === 0) {
+              return bin;
+            }
+            return normalizeScale(bin);
+          },
+        );
+      }
+    }
   });
 };
 

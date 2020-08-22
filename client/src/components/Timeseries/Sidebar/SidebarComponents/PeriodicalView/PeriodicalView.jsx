@@ -7,10 +7,12 @@ import {
   getIsEventModeEnabled,
   getIsEditingEventRange,
 } from 'src/model/selectors/datarun';
+import * as _ from 'lodash';
 import { setPeriodRangeAction } from 'src/model/actions/datarun';
 import { getWrapperSize, drawArc, getDataScale } from '../../SidebarUtils';
 
 import Header from '../Header';
+import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
 
 class PeriodicalView extends Component {
   constructor(props) {
@@ -64,9 +66,10 @@ class PeriodicalView extends Component {
     return { horizontalShift, verticalShift };
   }
 
-  getPathData(periodRange) {
+  getPathData(periodRange, currentPeriodExtent) {
     const { radius } = this.state;
-    const { area } = getDataScale(radius * 0.1, radius, periodRange);
+    const { isRelativeScaleEnabled } = this.props;
+    const { area } = getDataScale(radius * 0.1, radius, periodRange, isRelativeScaleEnabled, currentPeriodExtent);
     return area(periodRange);
   }
 
@@ -131,7 +134,8 @@ class PeriodicalView extends Component {
 
   drawData() {
     const { width, radius } = this.state;
-    const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled } = this.props;
+    const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled, isRelativeScaleEnabled } = this.props;
+    const currentPeriodExtent = [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
 
     return (
       width > 0 &&
@@ -139,15 +143,22 @@ class PeriodicalView extends Component {
       dataRun.period.map((currentPeriod, periodIndex) => {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
-        const { name, bins } = currentPeriod;
+        const { name, bins, level } = currentPeriod;
+        currentPeriodExtent[0] = Math.min(_.min(currentPeriod.bins), currentPeriodExtent[0]);
+        currentPeriodExtent[1] = Math.max(_.max(currentPeriod.bins), currentPeriodExtent[1]);
+
         return (
           <g key={name}>
             <g
-              className={`feature-cell level-${currentPeriod.level}`}
+              className={`feature-cell level-${level}`}
               transform={`translate(${horizontalShift}, ${verticalShift})`}
-              onClick={() => currentPeriod.level !== 'day' && setPeriodRange(currentPeriod)}
+              onClick={() => level !== 'day' && setPeriodRange(currentPeriod)}
             >
-              <path id={`path_${name}`} d={this.getPathData(bins)} className="feature-area radial-cursor" />
+              <path
+                id={`path_${name}`}
+                d={this.getPathData(bins, currentPeriodExtent)}
+                className="feature-area radial-cursor"
+              />
               <clipPath id={`clip_${name}`}>
                 <use href={`#path_${name}`} />
               </clipPath>
@@ -168,7 +179,8 @@ class PeriodicalView extends Component {
                     <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
                   ))}
               </g>
-              <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} />
+              {/* <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} /> */}
+              {/* <circle r={radius * 0.95} className="wrapper" fill="url(#blueGradient)" /> */}
             </g>
           </g>
         );
@@ -207,12 +219,12 @@ class PeriodicalView extends Component {
           <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}>
             <svg id="multiPeriodChart" width={width} height={height}>
               {this.drawData()}
-              <defs>
+              {/* <defs>
                 <radialGradient id="blueGradient">
                   <stop offset="0" stopColor="#B2C1FF" />
                   <stop offset="100" stopColor="rgba(216,216,216,0)" />
                 </radialGradient>
-              </defs>
+              </defs> */}
             </svg>
           </div>
         </div>
@@ -228,6 +240,7 @@ export default connect(
     grouppedEvents: getGrouppedDatarunEvents(state),
     isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
+    isRelativeScaleEnabled: getIsRelativeScaleEnabled(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodLevel) => dispatch(setPeriodRangeAction(periodLevel)),
