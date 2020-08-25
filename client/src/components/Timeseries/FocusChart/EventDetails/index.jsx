@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faExclamation, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
-import { toggleSimilarShapesModalAction } from 'src/model/actions/similarShapes';
-import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
+import { toggleSimilarShapesAction } from 'src/model/actions/similarShapes';
+import { getIsSimilarShapesActive } from 'src/model/selectors/similarShapes';
 import {
   updateEventDetailsAction,
   saveEventDetailsAction,
@@ -70,8 +70,8 @@ export class EventDetails extends Component {
       isTranscriptSupported,
       isSpeechInProgress,
       toggleAggregationLevels,
-      toggleSimilarShapesModal,
-      isSimilarShapesOpen,
+      toggleSimilarShapes,
+      isSimilarShapesActive,
     } = this.props;
 
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
@@ -99,7 +99,7 @@ export class EventDetails extends Component {
             <button type="button" onClick={() => toggleAggregationLevels(true)} title="Signal Aggregation Levels">
               <AggregationIcon />
             </button>{' '}
-            <button type="button" onClick={() => toggleSimilarShapesModal(true)} disabled={isSimilarShapesOpen}>
+            <button type="button" onClick={() => toggleSimilarShapes(true)} disabled={isSimilarShapesActive}>
               <SearchIcon />
             </button>
             <button type="button" className="close" onClick={closeEventDetails}>
@@ -240,7 +240,7 @@ export default connect(
     eventUpdateStatus: getUpdateEventStatus(state),
     isTranscriptSupported: getIsTranscriptSupported(state),
     isSpeechInProgress: getIsSpeechInProgress(state),
-    isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+    isSimilarShapesActive: getIsSimilarShapesActive(state),
   }),
   (dispatch) => ({
     closeEventDetails: () => dispatch(closeEventModal()),
@@ -251,6 +251,6 @@ export default connect(
     updateNewEventDetails: (details) => dispatch(updateNewEventDetailsAction(details)),
     recordComment: () => dispatch(recordCommentAction()),
     toggleAggregationLevels: (state) => dispatch(toggleAggregationModal(state)),
-    toggleSimilarShapesModal: (modalState) => dispatch(toggleSimilarShapesModalAction(modalState)),
+    toggleSimilarShapes: (modalState) => dispatch(toggleSimilarShapesAction(modalState)),
   }),
 )(EventDetails);

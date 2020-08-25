@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import {
-  getIsSimilarShapesLoading,
-  getIsSimilarShapesModalOpen,
-  getSimilarShapesCoords,
-} from 'src/model/selectors/similarShapes';
+import { getIsSimilarShapesActive, getSimilarShapesCoords } from 'src/model/selectors/similarShapes';
 import { RootState } from '../../../model/types';
 import { FocusChartConstants, colorSchemes } from './Constants';
-import EventDetails from './EventDetails';
+// import EventDetails from './EventDetails';
 import AddEvent from './FocusChartEvents/AddEvent';
 import ShowErrors from './ShowErrors';
 import { setTimeseriesPeriod, setActiveEventAction } from '../../../model/actions/datarun';
@@ -373,14 +369,7 @@ export class FocusChart extends Component<Props, State> {
 
   drawChartData() {
     const { width, height } = this.state;
-    const {
-      dataRun,
-      isPredictionVisible,
-      isZoomEnabled,
-      isSimilarShapesLoading,
-      isSimilarShapesOpen,
-      similarShapesCoords,
-    } = this.props;
+    const { dataRun, isPredictionVisible, isZoomEnabled, isSimilarShapesActive, similarShapesCoords } = this.props;
     const { eventWindows, timeSeries, timeseriesPred } = dataRun;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
 
@@ -405,8 +394,8 @@ export class FocusChart extends Component<Props, State> {
             </g>
             <rect className="zoom" {...zoomProps} />
             {eventWindows.map((currentEvent) => this.renderEvents(currentEvent))}
-            {isSimilarShapesOpen &&
-              !isSimilarShapesLoading &&
+            {isSimilarShapesActive &&
+              similarShapesCoords !== null &&
               similarShapesCoords.map((currentShapeCoords) => this.renderSimilarShapes(currentShapeCoords))}
           </g>
           <g className="chart-axis">
@@ -425,7 +414,7 @@ export class FocusChart extends Component<Props, State> {
       <div className="focus-chart" id="focusChartWrapper">
         {isTooltipVisible && this.renderEventTooltip()}
         <ShowErrors isOpen={this.props.isPredictionVisible} />
-        <EventDetails />
+        {/* <EventDetails /> */}
         <svg width={width} height={height} id="focusChart">
           {this.drawChartData()}
         </svg>
@@ -449,8 +438,7 @@ const mapState = (state: RootState) => ({
   isZoomEnabled: getZoomMode(state),
   isTimeSyncEnbled: getIsTimeSyncModeEnabled(state),
   scrollHistory: getScrollHistory(state),
-  isSimilarShapesLoading: getIsSimilarShapesLoading(state),
-  isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+  isSimilarShapesActive: getIsSimilarShapesActive(state),
   similarShapesCoords: getSimilarShapesCoords(state),
 });
 
