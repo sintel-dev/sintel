@@ -141,5 +141,5 @@ if __name__ == '__main__':
 
     X = pd.DataFrame({'timestamp': t, 'value': x.flatten()})
 
-    candidate_shapes = return_candidate_shapes(X, i, i + window_size, 'dtw')
+    candidate_shapes, worst_dist = return_candidate_shapes(X, i, i + window_size, 'dtw')
     print(candidate_shapes)
