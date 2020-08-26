@@ -174,7 +174,7 @@ class Comments(Resource):
 
         @apiParam {String} event_id Event ID.
         @apiParam {String} text Content of comment.
-        @apiParam {String} [created_by='default'] User ID.
+        @apiParam {String} created_by User name.
         """
 
         res, status = verify_auth()
@@ -221,7 +221,15 @@ class Comments(Resource):
         }
 
         try:
-            schema.Annotation.insert(**comment)
+            annotation_doc = schema.Annotation.insert(**comment)
+
+            doc = {
+                'event': target_event.id,
+                'action': 'COMMENT',
+                'annotation': annotation_doc.id,
+                'created_by': created_by
+            }
+            schema.EventInteraction.insert(**doc)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

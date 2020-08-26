@@ -258,6 +258,7 @@ export function saveEventDetailsAction() {
       score,
       tag,
       event_id: updatedEventDetails.id,
+      created_by: userData.name,
     };
 
     if (commentsDraft && commentsDraft.length) {
@@ -356,12 +357,14 @@ export function saveNewEventAction() {
     let { start_time, stop_time } = newEventDetails;
     start_time /= 1000;
     stop_time /= 1000;
+    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
     const eventDetails = {
       start_time,
       stop_time,
       score: '0.00',
       tag: newEventDetails.tag || 'Untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
+      create_by: userData.name,
     };
     await API.events
       .create(eventDetails)
@@ -411,7 +414,9 @@ export function deleteEventAction() {
     // Investigate why server response is 405 when deleting comment
     // dispatch(deleteEventComments());
 
-    await API.events.delete(currentEventDetails.id).then(() => {
+    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
+
+    await API.events.delete(currentEventDetails.id, { created_by: userData.name }).then(() => {
       dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
       dispatch({
         type: UPDATE_DATARUN_EVENTS,

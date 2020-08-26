@@ -278,20 +278,6 @@ class Event(MTVDocument):
         return self.event_interactions.last()
 
 
-class EventInteraction(MTVDocument):
-    """EventInteraction object.
-
-    The EventInteraction object represents an interaction of a user with an
-    Event and includes information about the assocaiated Event, the action
-    performed and, if changed, the specified start and stop times.
-    """
-    event = fields.ReferenceField(Event, reverse_delete_rule=CASCADE)
-    action = fields.StringField()
-    start_time = fields.IntField(required=True)
-    stop_time = fields.IntField(required=True)
-    created_by = fields.StringField()
-
-
 class Annotation(MTVDocument):
     """Annotation object.
 
@@ -307,6 +293,24 @@ class Annotation(MTVDocument):
         super().save()
         self.event.num_annotations = self.event.annotations.count()
         self.event.save()
+
+
+class EventInteraction(MTVDocument):
+    """EventInteraction object.
+
+    The EventInteraction object represents an interaction of a user with an
+    Event and includes information about the assocaiated Event, the action
+    performed and, if changed, the specified start and stop times.
+    """
+    ACTION_CHOICES = ('DELETE', 'CREATE', 'MODIFY', 'TAG', 'COMMENT')
+
+    event = fields.ReferenceField(Event, required=True)
+    action = fields.StringField(choices=ACTION_CHOICES, requred=True)
+    annotation = fields.ReferenceField(Annotation)
+    tag = fields.StringField()
+    start_time = fields.IntField()
+    stop_time = fields.IntField()
+    created_by = fields.StringField()
 
 # the following Class is specific to MTV
 

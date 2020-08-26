@@ -136,7 +136,7 @@ class Experiments(Resource):
 
         @apiParam {String} [project] Project name.
 
-        @apiSuccess {Object[]} experiments Experiment ID.
+        @apiSuccess {Object[]} experiments Experiment.
         @apiSuccess {String} experiments.id Experiment ID.
         @apiSuccess {String} experiments.project Project name.
         @apiSuccess {String} experiments.dataset Dataset name.
