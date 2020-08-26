@@ -7,6 +7,7 @@ import {
   getSimilarShapesAction,
   saveSimilarShapesAction,
   resetSimilarShapesAction,
+  shapesTagsOverrideAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -16,6 +17,7 @@ import {
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
+import Dropdown from 'src/components/Common/Dropdown';
 
 const shapesLanding = () => (
   <div className="shapes-landing">
@@ -140,41 +142,44 @@ class SimilarShapes extends Component {
     }
 
     if (currentEvent === null) {
-      return shapesLanding();
+      return null;
     }
 
-    return (
-      <div>
-        <div className="shape-options" />
-        {similarShapes.map((currentShape) => {
-          const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
-          return (
-            <div className="shape-details" key={currentShape.start}>
-              <ul className="info">
-                <li>
-                  <span>Start:</span>
-                  {startTime}
-                </li>
-                <li>
-                  <span>End:</span>
-                  {stopTime}
-                </li>
-                <li>
-                  <span>Similarity:</span>
-                  <span>{similarity}%</span>
-                </li>
-              </ul>
-              <div className="drawing">
-                <svg width="210" height="122" className="shape-chart">
-                  <path d={this.drawLine(eventInterval)} />
-                  <path d={this.getCurrentEventShape()} className="current-event-shape" />
-                </svg>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
+    return similarShapes.map((currentShape) => {
+      const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
+      return (
+        <div className="shape-details" key={currentShape.start}>
+          <table className="info">
+            <tbody>
+              <tr>
+                <th>Start:</th>
+                <td>{startTime}</td>
+              </tr>
+              <tr>
+                <th>End:</th>
+                <td>{stopTime}</td>
+              </tr>
+              <tr>
+                <th>Similarity:</th>
+                <td>{similarity}%</td>
+              </tr>
+              <tr>
+                <th>Tag</th>
+                <td>
+                  <Dropdown />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div className="drawing">
+            <svg width="134" height="127" className="shape-chart">
+              <path d={this.drawLine(eventInterval)} />
+              <path d={this.getCurrentEventShape()} className="current-event-shape" />
+            </svg>
+          </div>
+        </div>
+      );
+    });
   }
 
   renderEventData() {
@@ -234,6 +239,25 @@ class SimilarShapes extends Component {
     setActiveEvent(null);
   }
 
+  shapeTagOverride() {
+    const { overrideAllTags } = this.props;
+    return (
+      <div className="shape-form overwrite">
+        <div className="form-row">
+          <div className="form-wrapper ">
+            <p>Override all segments tags</p>
+            <p className="recent">5 most similar segments</p>
+          </div>
+          <div className="form-wrapper">
+            <div className="shape-options">
+              <Dropdown onChange={(tag) => overrideAllTags(tag.value)} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   renderSearchControls() {
     const { currentEvent, getSimilarShapes, similarShapes, isSimilarShapesLoading, isEditingEventRange } = this.props;
     const isSearchDisabled =
@@ -243,7 +267,7 @@ class SimilarShapes extends Component {
     }
 
     if (similarShapes.length) {
-      return null;
+      return this.shapeTagOverride();
     }
 
     return (
@@ -311,5 +335,6 @@ export default connect(
     saveShapes: () => dispatch(saveSimilarShapesAction()),
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
     resetSimilarShapes: () => dispatch(resetSimilarShapesAction()),
+    overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
   }),
 )(SimilarShapes);

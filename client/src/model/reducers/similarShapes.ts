@@ -23,9 +23,14 @@ function RESET_SIMILAR_SHAPES(nextState) {
   nextState.similarShapes = [];
 }
 
+function UPDATE_SIMILAR_SHAPES(nextState, { shapes }) {
+  nextState.similarShapes = shapes;
+}
+
 export default createReducer(initialState, {
   TOGGLE_SIMILAR_SHAPES_MODAL,
   FETCH_SIMILAR_SHAPES_SUCCESS,
   FETCH_SIMILAR_SHAPES_REQUEST,
   RESET_SIMILAR_SHAPES,
+  UPDATE_SIMILAR_SHAPES,
 });
