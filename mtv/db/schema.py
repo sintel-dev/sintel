@@ -342,6 +342,23 @@ class Prediction(MTVDocument):
     }
 
 
+class Raw(MTVDocument):
+    """ Raw signal data.
+
+    Compared with the Prediction, Raw only save the raw data aggregated
+    in 6-minute level.
+    """
+    signal = fields.ReferenceField(Signal, reverse_delete_rule=CASCADE)
+    data = fields.ListField(fields.ListField())
+    index = fields.IntField()
+    meta = {
+        'indexes': [
+            'signal',
+            ('signal', '+index')
+        ]
+    }
+
+
 class User(MTVDocument):
     name = fields.StringField(required=True)
     email = fields.StringField(required=True)

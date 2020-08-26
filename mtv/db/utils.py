@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from pymongo import MongoClient
 
+from mtv.data import load_signal
 from mtv.db import schema
 
 LOGGER = logging.getLogger(__name__)
@@ -140,10 +141,10 @@ def _split_large_prediction_data(doc, signal):
 
     for d in doc['data']:
         dt = datetime.utcfromtimestamp(d[0])
+        y_idx = dt.year - signal_start_dt.year
+        m_idx = dt.month
+        index = y_idx * 12 + (m_idx - 1)
         if (dt.year != current_year or current_month != dt.month):
-            y_idx = dt.year - signal_start_dt.year
-            m_idx = dt.month
-            index = y_idx * 12 + (m_idx - 1)
             if len(year_month_data) > 0:
                 pred_doc = {
                     'signalrun': doc['signalrun'],
@@ -157,6 +158,16 @@ def _split_large_prediction_data(doc, signal):
             current_month = dt.month
 
         year_month_data.append(d)
+
+    # handle the last one
+    if len(year_month_data) > 0:
+        pred_doc = {
+            'signalrun': doc['signalrun'],
+            'attrs': doc['attrs'],
+            'index': index,
+            'data': year_month_data
+        }
+        schema.Prediction.insert(**pred_doc)
 
 
 def _update_prediction(signalrun, v):
@@ -322,18 +333,82 @@ def _update_period(signalrun, v, utc):
     schema.Period.insert_many(docs)
 
 
+def _update_raw(signal, interval=360, method='mean'):
+    X = load_signal(signal.location)
+    X = X.sort_values('timestamp').set_index('timestamp')
+
+    start_ts = X.index.values[0]
+    max_ts = X.index.values[-1]
+
+    signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
+
+    values = list()
+    index = list()
+    while start_ts <= max_ts:
+        end_ts = start_ts + interval
+        subset = X.loc[start_ts:end_ts - 1]
+        aggregated = [
+            getattr(subset, agg)(skipna=True).values
+            for agg in method
+        ]
+        values.append(np.concatenate(aggregated))
+        index.append(start_ts)
+        start_ts = end_ts
+
+    current_year = -1
+    current_month = -1
+    year_month_data = list()
+    for i, v in zip(index, values):
+
+        dt = datetime.utcfromtimestamp(i)
+        y_idx = dt.year - signal_start_dt.year
+        m_idx = dt.month
+        idx = y_idx * 12 + (m_idx - 1)
+        if (dt.year != current_year or current_month != dt.month):
+
+            if len(year_month_data) > 0:
+                raw_doc = {
+                    'signal': signal.id,
+                    'index': idx,
+                    'data': year_month_data
+                }
+                schema.Raw.insert(**raw_doc)
+            year_month_data = list()
+            current_year = dt.year
+            current_month = dt.month
+
+        year_month_data.append(v)
+
+    # handle the last one
+    if len(year_month_data) > 0:
+        raw_doc = {
+            'signal': signal.id,
+            'index': idx,
+            'data': year_month_data
+        }
+        schema.Raw.insert(**raw_doc)
+
+
 def update_db(fs, exp_filter=None):
 
     # get signalrun list
-    signalruns = schema.Signalrun.find({}).timeout(False)
-    total = signalruns.count()
-    cc = 0
 
     # TODO: remove utc setting, it should be always True
     utc = True
 
-    LOGGER.info('UTC: {}. Total: {}'.format(utc, total))
+    signals = schema.Signal.find().timeout(False)
+    cc = 0
+    total = signals.count()
+    for signal in signals:
+        try:
+            LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
+            _update_raw(signal)
+        except Exception as e:
+            LOGGER.error(str(e))
 
+    signalruns = schema.Signalrun.find({}).timeout(False)
+    cc = 0
+    total = signalruns.count()
     for signalrun in signalruns:
         try:
             cc += 1
