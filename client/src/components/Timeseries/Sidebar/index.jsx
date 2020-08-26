@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { getIsSimilarShapesActive } from 'src/model/selectors/similarShapes';
 import { ArrowDown, ArrowUp } from 'src/components/Common/icons';
 import { Collapse } from 'react-collapse';
 import { setActivePanelAction } from 'src/model/actions/sidebar';
@@ -52,13 +51,12 @@ class Sidebar extends Component {
 
     return (
       <div className="right-sidebar">
-        {/* {isSimilarShapesActive && <SimilarShapes />} */}
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           {sidebarPanels.map((currentPanel) => {
             const { title } = currentPanel;
             const isPanelOpen = activePanel === currentPanel.key;
             return (
-              <div key={currentPanel.key} className={`collapsible-wrapper ${isPanelOpen ? 'active' : ''}`}>
+              <div key={currentPanel.key} className={`collapsible-wrapper scroll-style ${isPanelOpen ? 'active' : ''}`}>
                 <div className="collapsible-trigger" onClick={() => this.toggleActivePanel(currentPanel.key)}>
                   <ul>
                     <li>{title}</li>
@@ -81,7 +79,6 @@ export default connect(
   (state) => ({
     experimentData: getSelectedExperimentData(state),
     isEditingEventRange: getIsEditingEventRange(state),
-    // isSimilarShapesActive: getIsSimilarShapesActive(state),
     activePanel: getCurrentActivePanel(state),
   }),
   (dispatch) => ({

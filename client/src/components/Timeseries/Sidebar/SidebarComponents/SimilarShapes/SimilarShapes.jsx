@@ -8,12 +8,14 @@ import {
   saveSimilarShapesAction,
   resetSimilarShapesAction,
   shapesTagsOverrideAction,
+  setActiveShapeAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
   getIsSimilarShapesLoading,
   getSimilarShapesCoords,
   getIsSimilarShapesActive,
+  getActiveShape,
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
@@ -78,12 +80,11 @@ class SimilarShapes extends Component {
   getShapeDetails(shape) {
     const { timeSeries } = this.props.dataRun;
     const { start, end, similarity } = shape;
-    const startTime = start * 1000;
-    const stopTime = end * 1000;
+    const startTime = timeSeries[start][0];
+    const stopTime = timeSeries[end][0];
 
     const eventInterval = timeSeries.slice(start, end);
     const format = d3.format('.2f');
-
     return {
       startTime: timestampToDate(startTime),
       stopTime: timestampToDate(stopTime),
@@ -135,20 +136,24 @@ class SimilarShapes extends Component {
   }
 
   renderShapes() {
-    const { similarShapes, isSimilarShapesLoading, currentEvent } = this.props;
-
-    if (isSimilarShapesLoading) {
-      return shapesLoader();
-    }
+    const { similarShapes, currentEvent } = this.props;
 
     if (currentEvent === null) {
       return null;
     }
 
     return similarShapes.map((currentShape) => {
+      const { activeShape, setActiveShape } = this.props;
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
+      const shapeClassName =
+        activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
+
       return (
-        <div className="shape-details" key={currentShape.start}>
+        <div
+          className={`shape-details ${shapeClassName}`}
+          key={currentShape.start}
+          onClick={() => setActiveShape(currentShape)}
+        >
           <table className="info">
             <tbody>
               <tr>
@@ -297,7 +302,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeFormular() {
-    const { currentEvent, isEditingEventRange } = this.props;
+    const { currentEvent, isEditingEventRange, isSimilarShapesLoading } = this.props;
     const shapesDisabled = currentEvent === null || isEditingEventRange ? 'disabled' : '';
 
     return (
@@ -308,7 +313,13 @@ class SimilarShapes extends Component {
             {this.renderShapeOptions()}
           </div>
           {this.renderSearchControls()}
-          <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+          <div className="scroll-style">
+            {isSimilarShapesLoading ? (
+              shapesLoader()
+            ) : (
+              <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+            )}
+          </div>
           {this.renderShapeFooter()}
         </div>
       </div>
@@ -328,6 +339,7 @@ export default connect(
     isSimilarShapesLoading: getIsSimilarShapesLoading(state),
     isSimilarShapesActive: getIsSimilarShapesActive(state),
     isEditingEventRange: getIsEditingEventRange(state),
+    activeShape: getActiveShape(state),
   }),
   (dispatch) => ({
     toggleSimilarShapes: (state) => dispatch(toggleSimilarShapesAction(state)),
@@ -336,5 +348,6 @@ export default connect(
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
     resetSimilarShapes: () => dispatch(resetSimilarShapesAction()),
     overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
+    setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
   }),
 )(SimilarShapes);

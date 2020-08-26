@@ -5,6 +5,7 @@ import { getDatarunDetails, getCurrentEventDetails } from './datarun';
 export const getIsSimilarShapesActive = (state) => state.similarShapes.isShapesModalOpen;
 export const getIsSimilarShapesLoading = (state) => state.similarShapes.isSimilarShapesLoading;
 export const similarShapesResults = (state) => state.similarShapes.similarShapes;
+export const getActiveShape = (state) => state.similarShapes.activeShape;
 
 export const getSimilarShapesFound = createSelector(
   [getIsSimilarShapesLoading, similarShapesResults, getCurrentEventDetails],
