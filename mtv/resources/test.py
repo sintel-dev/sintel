@@ -8,6 +8,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Test(Resource):
+
     def get(self):
         """
         @api {get} /test/ Test get

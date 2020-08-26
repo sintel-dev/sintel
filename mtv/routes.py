@@ -47,6 +47,7 @@ def add_routes(app):
     # event
     api.add_resource(ctrl.event.Event, current_api_version + 'events/<string:event_id>/')
     api.add_resource(ctrl.event.Events, current_api_version + 'events/')
+    api.add_resource(ctrl.event.EventInteraction, current_api_version + 'event_interaction/')
 
     # experiment
     api.add_resource(ctrl.experiment.Experiment, current_api_version
