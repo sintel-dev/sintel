@@ -304,6 +304,7 @@ class Events(Resource):
         @apiParam {String} tag Event tag.
         @apiParam {String} datarun_id Datarun ID.
         @apiParam {String} created_by User name.
+        @apiParam {String="SHAPE_MATCHING","MANUALLY_CREATED"} source Source.
 
         @apiSuccess {String} id Event ID.
         @apiSuccess {String} insert_time Event insert time.
@@ -323,10 +324,11 @@ class Events(Resource):
         if status == 401:
             return res, status
         # modifiable attributes
-        attrs = ['start_time', 'stop_time', 'score', 'tag', 'datarun_id']
-        attrs_type = [float, float, float, str, str]
+        attrs = ['start_time', 'stop_time', 'score', 'tag', 'datarun_id', 'source']
+        attrs_type = [float, float, float, str, str, str]
         d = dict()
         body = request.json
+        print(body)
         for attr in attrs:
             d[attr] = None
             if body is not None:
@@ -358,7 +360,8 @@ class Events(Resource):
                 del d['tag']
             d['severity'] = d['score']
             del d['score']
-            d['source'] = 'MANUALLY_CREATED'
+            if (d['source'] is None):
+                d['source'] = 'MANUALLY_CREATED'
             event_doc = schema.Event.insert(**d)
 
             user = request.json.get('created_by', None)
