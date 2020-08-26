@@ -81,6 +81,12 @@
             stroke-width: 1px;
             stroke: #fff;
             stroke-dasharray: 4;
+            transition: all 0.2s ease-in-out;
+        }
+        &.active {
+            .evt-area {
+                stroke-dasharray: 0;
+            }
         }
     }
 

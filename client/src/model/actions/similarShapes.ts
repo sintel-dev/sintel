@@ -4,6 +4,7 @@ import {
   UPDATE_DATARUN_EVENTS,
   UPDATE_SIMILAR_SHAPES,
   UPDATE_EVENT_DETAILS,
+  SET_ACTIVE_SHAPE,
 } from '../types';
 import { getCurrentEventDetails, getDatarunDetails } from '../selectors/datarun';
 import API from '../utils/api';
@@ -103,6 +104,15 @@ export function shapesTagsOverrideAction(tag) {
     dispatch({
       type: UPDATE_SIMILAR_SHAPES,
       shapes: updatedShapes,
+    });
+  };
+}
+
+export function setActiveShapeAction(activeShape) {
+  return function (dispatch) {
+    dispatch({
+      type: SET_ACTIVE_SHAPE,
+      activeShape,
     });
   };
 }

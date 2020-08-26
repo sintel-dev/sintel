@@ -8,12 +8,14 @@ import {
   saveSimilarShapesAction,
   resetSimilarShapesAction,
   shapesTagsOverrideAction,
+  setActiveShapeAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
   getIsSimilarShapesLoading,
   getSimilarShapesCoords,
   getIsSimilarShapesActive,
+  getActiveShape,
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
@@ -78,12 +80,11 @@ class SimilarShapes extends Component {
   getShapeDetails(shape) {
     const { timeSeries } = this.props.dataRun;
     const { start, end, similarity } = shape;
-    const startTime = start * 1000;
-    const stopTime = end * 1000;
+    const startTime = timeSeries[start][0];
+    const stopTime = timeSeries[end][0];
 
     const eventInterval = timeSeries.slice(start, end);
     const format = d3.format('.2f');
-
     return {
       startTime: timestampToDate(startTime),
       stopTime: timestampToDate(stopTime),
@@ -142,9 +143,17 @@ class SimilarShapes extends Component {
     }
 
     return similarShapes.map((currentShape) => {
+      const { activeShape, setActiveShape } = this.props;
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
+      const shapeClassName =
+        activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
+
       return (
-        <div className="shape-details" key={currentShape.start}>
+        <div
+          className={`shape-details ${shapeClassName}`}
+          key={currentShape.start}
+          onClick={() => setActiveShape(currentShape)}
+        >
           <table className="info">
             <tbody>
               <tr>
@@ -330,6 +339,7 @@ export default connect(
     isSimilarShapesLoading: getIsSimilarShapesLoading(state),
     isSimilarShapesActive: getIsSimilarShapesActive(state),
     isEditingEventRange: getIsEditingEventRange(state),
+    activeShape: getActiveShape(state),
   }),
   (dispatch) => ({
     toggleSimilarShapes: (state) => dispatch(toggleSimilarShapesAction(state)),
@@ -338,5 +348,6 @@ export default connect(
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
     resetSimilarShapes: () => dispatch(resetSimilarShapesAction()),
     overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
+    setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
   }),
 )(SimilarShapes);

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import { getIsSimilarShapesActive, getSimilarShapesCoords } from 'src/model/selectors/similarShapes';
+import { getIsSimilarShapesActive, getSimilarShapesCoords, getActiveShape } from 'src/model/selectors/similarShapes';
+import { setActiveShapeAction } from 'src/model/actions/similarShapes';
 import { RootState } from '../../../model/types';
 import { FocusChartConstants, colorSchemes } from './Constants';
 import EventDetails from './EventDetails';
@@ -172,7 +173,7 @@ export class FocusChart extends Component<Props, State> {
   }
 
   renderSimilarShapes(shape) {
-    const { dataRun, periodRange } = this.props;
+    const { dataRun, periodRange, activeShape, setActiveShape } = this.props;
     const { timeSeries } = dataRun;
     const { height } = this.state;
     const { xCoord } = this.getScale();
@@ -187,8 +188,11 @@ export class FocusChart extends Component<Props, State> {
     const shapeHeight = height - 3.5 * CHART_MARGIN;
     const translateShape = xCoord(timeSeries[start][0]);
     const tagColor = colorSchemes[shape.tag] || colorSchemes.Untagged;
+    const isShapeActive =
+      activeShape && activeShape.start === shape.start && activeShape.end === shape.end ? 'active' : '';
+
     return (
-      <g className="similar-shape" key={start}>
+      <g className={`similar-shape ${isShapeActive}`} key={start} onClick={() => setActiveShape(shape)}>
         <rect className="evt-area" width={shapeWidth} height={shapeHeight} y={0} x={translateShape} />
         <rect className="evt-comment" width={shapeWidth} height="10" y={1} x={translateShape} fill={tagColor} />
       </g>
@@ -457,11 +461,13 @@ const mapState = (state: RootState) => ({
   isSimilarShapesActive: getIsSimilarShapesActive(state),
   similarShapesCoords: getSimilarShapesCoords(state),
   selectedEventDetails: getCurrentEventDetails(state),
+  activeShape: getActiveShape(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   setPeriodRange: (period) => dispatch(setTimeseriesPeriod(period)),
   setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
+  setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(FocusChart);
