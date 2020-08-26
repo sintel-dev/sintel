@@ -5,6 +5,7 @@ a simple programatic access to creating and reading objects in the MTV Database.
 """
 import json
 import logging
+from datetime import datetime, timezone
 
 from gridfs import GridFS
 from mongoengine import connect
@@ -948,3 +949,87 @@ class DBExplorer:
             tag=tag,
             created_by=created_by,
         )
+
+    # ########## #
+    # Prediction #
+    # ########## #
+
+    @classmethod
+    def get_prediction(cls, signalrun, start_time=None, stop_time=None):
+        """Get prediction data from the database
+
+        Only argument "signalrun" is required.
+
+        Args:
+            signalrun (Signalrun, ObjectID or str)
+                Signalrun object (or the corresponding ObjectID, or its string
+                representation) that we want to retrieve.
+            start_time (int):
+                Timestamp indicating the start time of the data you want search.
+                If not given, the corresponding signal start time will be used.
+            stop_time (int)
+                Timestamp indicating the stop time of the data you want search.
+                If not given, the corresponding signal stop time will be used.
+
+        Returns:
+            PredictionData
+        """
+
+        signalrun_doc = schema.Signalrun.find_one(signalrun=signalrun)
+        signal_doc = signalrun_doc.signal
+
+        signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
+
+        if start_time is None:
+            start_time = signal_doc.start_time
+        if stop_time is None:
+            stop_time = signal_doc.stop_time
+
+        start_dt = datetime.utcfromtimestamp(start_time)
+        stop_dt = datetime.utcfromtimestamp(stop_time)
+        start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
+        stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
+
+        pred_docs = schema.Prediction.find(signalrun=signalrun,
+                                           index__gte=start_idx, index__lte=stop_idx)
+
+        prediction_results = dict()
+        data = list()
+        for idx, doc in enumerate(pred_docs):
+
+            if idx == 0:
+                # first month
+                prediction_results['attrs'] = doc.attrs
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            elif idx != 0 and idx == len(pred_docs) - 1:
+                # last month but not the first
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            else:
+                data.extend(doc.data)
+        prediction_results['data'] = data
+        return prediction_results
+
+
+def main():
+    """
+    Use the following command to run the main function.
+    Command:
+        mtv run -v -m mtv.db.explorer --args arg1 arg2
+    """
+
+    dbconfig = {
+        'host': 'localhost',  # mongodb server address
+        'port': 27017  # mongodb server port
+    }
+
+    explorer = DBExplorer('Liu Dongyu', 'mtv-demo', dbconfig)
+
+    signalrun = "5f33521c1219eb21ae2cdc5a"
+    start_time = datetime(2010, 1, 1 + 1, tzinfo=timezone.utc).timestamp()
+    stop_time = datetime(2010, 7, 2 + 1, tzinfo=timezone.utc).timestamp()
+
+    explorer.get_prediction(signalrun, start_time, stop_time)

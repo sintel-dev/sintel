@@ -42,8 +42,6 @@ export class RestClient {
 
   public comments: Resource<CommentDataType, CommentsResponse>;
 
-  public data: Resource<any, DataResponse>;
-
   public similar_windows: Resource<any, DataResponse>;
 
   public users: Resource<any, UsersResponse>;
@@ -64,7 +62,6 @@ export class RestClient {
     this.pipelines = new Resource(this.server, 'pipelines/');
     this.events = new Resource(this.server, 'events/');
     this.comments = new Resource(this.server, 'comments/');
-    this.data = new Resource(this.server, 'data/');
     this.similar_windows = new Resource(this.server, 'computings/similar_windows/');
     this.users = new Resource(this.server, 'users/');
     this.server.interceptors.request.use(this.requestInterceptor);

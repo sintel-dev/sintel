@@ -329,12 +329,15 @@ class Period(MTVDocument):
 
 
 class Prediction(MTVDocument):
-    signalrun = fields.ReferenceField(Datarun)
+    signalrun = fields.ReferenceField(Datarun,
+                                      reverse_delete_rule=CASCADE)
     attrs = fields.ListField(fields.StringField())
     data = fields.ListField(fields.ListField())
+    index = fields.IntField()
     meta = {
         'indexes': [
-            'signalrun'
+            'signalrun',
+            ('signalrun', '+index')
         ]
     }
 

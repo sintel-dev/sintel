@@ -58,7 +58,7 @@ class MTV:
         g['client'] = WebApplicationClient(self._cf['GOOGLE_CLIENT_ID'])
         return app
 
-    def update_db(self, utc):
+    def update_db(self):
 
         # copy from orion
         DBUtils.copy_from_partial(
@@ -76,7 +76,7 @@ class MTV:
         # update collection "prediction" and "raw"
         orion_db_client = MongoClient(self._cf['or_host'], port=self._cf['or_port'])
         DBUtils.update_db(GridFS(orion_db_client[self._cf['or_db']]),
-                          utc, exp_filter=self._cf['experiment_list'])
+                          exp_filter=self._cf['experiment_list'])
 
     def run_server(self, env, port):
 

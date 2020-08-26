@@ -2,11 +2,10 @@ import logging
 
 import numpy as np
 import pandas as pd
-from bson import ObjectId
 from flask_restful import Resource, reqparse
 from sklearn.preprocessing import MinMaxScaler
 
-from mtv.db import schema
+from mtv.db import DBExplorer
 from mtv.resources.auth_utils import verify_auth
 from mtv.resources.computing.utils.search_similars import return_candidate_shapes
 
@@ -27,10 +26,11 @@ parser.add_argument(
 
 
 def get_windows(start, end, datarun_id, metric, number):
-    doc = schema.Prediction.find_one(signalrun=ObjectId(datarun_id))
+    # doc = schema.Prediction.find_one(signalrun=ObjectId(datarun_id))
+    prediction_data = DBExplorer.get_prediction(datarun_id)
     timeseries = {
-        'timestamp': [d[0] for d in doc.data],
-        'value': [d[1] for d in doc.data]
+        'timestamp': [d[0] for d in prediction_data['data']],
+        'value': [d[1] for d in prediction_data['data']]
     }
     df = pd.DataFrame(data=timeseries)
     windows, worst_dist = return_candidate_shapes(df, start, end, func=metric)

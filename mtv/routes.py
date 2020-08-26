@@ -29,9 +29,6 @@ def add_routes(app):
     api.add_resource(ctrl.user.User, current_api_version + 'users/<string:user_id>/')
     api.add_resource(ctrl.user.Users, current_api_version + 'users/')
 
-    # data
-    api.add_resource(ctrl.data.Data, current_api_version + current_api_version + 'data/')
-
     # comment
     api.add_resource(ctrl.comment.Comment, current_api_version + 'comments/<string:comment_id>/')
     api.add_resource(ctrl.comment.Comments, current_api_version + 'comments/')
