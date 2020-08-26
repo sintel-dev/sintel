@@ -2,7 +2,7 @@ import logging
 
 from bson import ObjectId
 from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
@@ -112,6 +112,7 @@ class Event(Resource):
         @apiParam {Int} stop_time Event stop time.
         @apiParam {Float} score Event anomaly score.
         @apiParam {String} tag Event tag.
+        @apiParam {String} created_by User name.
 
         @apiSuccess {String} id Event ID.
         @apiSuccess {String} insert_time Event insert time.
@@ -139,7 +140,7 @@ class Event(Resource):
 
         # modifiable attributes
         attrs = ['start_time', 'stop_time', 'score', 'tag']
-        attrs_type = [float, float, float, str]
+        attrs_type = [int, int, float, str]
         d = dict()
         body = request.json
         for attr in attrs:
@@ -158,15 +159,41 @@ class Event(Resource):
             return {'message': str(e)}, 400
 
         # update event
+        action_modify = False
+        if (d['start_time'] != event_doc.start_time
+                or d['stop_time'] != event_doc.stop_time):
+            action_modify = True
         event_doc.start_time = d['start_time']
         event_doc.stop_time = d['stop_time']
         event_doc.score = d['score']
-        if d['tag'] != 'untagged':
+
+        action_tag = False
+        if d['tag'] != 'Untagged':
+            if (d['tag'] != event_doc.tag):
+                action_tag = True
             event_doc.tag = d['tag']
 
         # return result
         try:
             event_doc.save()
+            user = request.json.get('created_by', None)
+            if action_modify:
+                doc = {
+                    'event': event_doc.id,
+                    'action': 'MODIFY',
+                    'start_time': event_doc.start_time,
+                    'stop_time': event_doc.stop_time,
+                    'created_by': user
+                }
+                schema.EventInteraction.insert(**doc)
+            if action_tag:
+                doc = {
+                    'event': event_doc.id,
+                    'action': 'TAG',
+                    'tag': event_doc.tag,
+                    'created_by': user
+                }
+                schema.EventInteraction.insert(**doc)
             res = get_event(event_doc)
         except Exception as e:
             LOGGER.exception('Error saving event. ' + str(e))
@@ -195,8 +222,16 @@ class Event(Resource):
 
         event_doc = validate_result[0]
 
+        user = request.args.get('created_by', None)
+
         try:
             event_doc.delete()
+            doc = {
+                'event': event_doc.id,
+                'action': 'DELETE',
+                'created_by': user
+            }
+            schema.EventInteraction.insert(**doc)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500
@@ -268,6 +303,7 @@ class Events(Resource):
         @apiParam {Float} score Event anomaly score.
         @apiParam {String} tag Event tag.
         @apiParam {String} datarun_id Datarun ID.
+        @apiParam {String} created_by User name.
 
         @apiSuccess {String} id Event ID.
         @apiSuccess {String} insert_time Event insert time.
@@ -318,15 +354,113 @@ class Events(Resource):
         try:
             d['signalrun'] = d['datarun_id']
             del d['datarun_id']
-            if d['tag'] == 'untagged':
+            if d['tag'] == 'Untagged':
                 del d['tag']
             d['severity'] = d['score']
             del d['score']
             d['source'] = 'MANUALLY_CREATED'
             event_doc = schema.Event.insert(**d)
+
+            user = request.json.get('created_by', None)
+            doc = {
+                'event': event_doc.id,
+                'action': 'CREATE',
+                'start_time': event_doc.start_time,
+                'stop_time': event_doc.stop_time,
+                'created_by': user
+            }
+            schema.EventInteraction.insert(**doc)
+
+            if event_doc.tag is not None:
+                doc = {
+                    'event': event_doc.id,
+                    'action': 'CREATE',
+                    'tag': event_doc.tag,
+                    'created_by': user
+                }
+            schema.EventInteraction.insert(**doc)
+
             res = get_event(event_doc)
         except Exception as e:
             LOGGER.exception('Error creating event. ' + str(e))
             return {'message': str(e)}, 400
         else:
             return res
+
+
+class EventInteraction(Resource):
+
+    def __init__(self):
+        parser_get = reqparse.RequestParser(bundle_errors=True)
+        parser_get.add_argument('event_id', type=str, required=True, location='args')
+        parser_get.add_argument('action',
+                                choices=['DELETE', 'CREATE', 'MODIFY', 'TAG', 'COMMENT'],
+                                location='args')
+        self.parser_get = parser_get
+
+    def _get_event_interaction(self, doc):
+        annotation_id = None
+        if doc.annotation is not None:
+            annotation_id = str(doc.annotation.id)
+        record = {
+            'id': str(doc.id),
+            'event': str(doc.event.id),
+            'action': doc.action,
+            'tag': doc.tag,
+            'annotation': annotation_id,
+            'start_time': doc.start_time,
+            'stop_time': doc.stop_time,
+            'insert_time': doc.insert_time.isoformat(),
+            'created_by': doc.created_by
+        }
+        return record
+
+    def get(self):
+        """
+        @api {get} /event_interaction/ Get event interaction history by EID
+        @apiName GetEventInteractionByEID
+        @apiGroup EventInteraction
+        @apiVersion 1.0.0
+
+        @apiParam {String} event_id Event ID.
+        @apiParam {String="CREATE","DELETE","MODIFY","TAG","COMMENT"} [action]
+            Action used to filter interaction records.
+        @apiSuccess {Object[]} records Record.
+        @apiSuccess {String} records.event ID of Event.
+        @apiSuccess {String} records.action Action type.
+        @apiSuccess {String} records.tag Updated tag if action='TAG'.
+        @apiSuccess {Int} records.start_time Updated event start time if
+            action='MODIFY' or 'CREATE'.
+        @apiSuccess {Int} records.stop_time Updated event stop time if
+            action='MODIFY' or 'CREATE'.
+        @apiSuccess {Float} records.created_by User name.
+        @apiSuccess {Float} records.insert_time Record insert time.
+        """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
+
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        validate_result = validate_event_id(args['event_id'])
+        if validate_result[1] == 400:
+            return validate_result
+
+        query = {
+            'event': ObjectId(args['event_id'])
+        }
+        if args.action is not None:
+            query['action'] = args.action
+        docs = schema.EventInteraction.find(**query)
+        try:
+            records = [self._get_event_interaction(doc) for doc in docs]
+        except Exception as e:
+            LOGGER.exception(e)
+            return {'message': str(e)}, 500
+        else:
+            return {'records': records}

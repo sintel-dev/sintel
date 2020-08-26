@@ -73,11 +73,14 @@ export default class Resource<T, R> {
   /**
    * Delete an item.
    * @param id the item ID (name) to delete
+   * @param params URL parameters
+   *
+   *
    * @returns Promise of the response's status
    */
-  public delete(id): Promise<number> {
+  public delete(id, params = {}): Promise<number> {
     const newUrl = `${this.url}${id}/`;
-    const promise = this.server.delete<number>(newUrl);
+    const promise = this.server.delete<number>(newUrl, { params });
     return promise
       .then((res) => res.status)
       .catch((err) => {
