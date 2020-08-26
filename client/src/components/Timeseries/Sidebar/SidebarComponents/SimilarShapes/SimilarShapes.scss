@@ -130,6 +130,18 @@
         }
     }
 
+    .shape-form {
+        &.overwrite {
+            .form-row {
+                padding-bottom: 0;
+                p.recent {
+                    padding-top: 20px;
+                    color: rgba(#fff, 0.4);
+                }
+            }
+        }
+    }
+
     .submit {
         width: 65%;
         float: right;
@@ -159,7 +171,7 @@
     }
 
     .shapes-results {
-        max-height: 45vh;
+        max-height: 35vh;
         overflow-y: auto;
         margin-bottom: 10px;
     }
@@ -198,7 +210,31 @@
                 }
             }
         }
+
+        table {
+            td,
+            th {
+                padding-bottom: 7px;
+            }
+
+            tr {
+                &:last-child {
+                    td,
+                    th {
+                        padding-bottom: 0px;
+                    }
+                }
+            }
+
+            th {
+                text-align: left;
+                font-weight: normal;
+                color: #b5b5b5;
+                padding-right: 20px;
+            }
+        }
     }
+
     .shape-chart {
         path {
             fill: transparent;
@@ -222,7 +258,7 @@
         left: 1px;
         right: 1px;
         margin: 0 auto;
-        bottom: 2px;
+        bottom: 1px;
         button {
             color: #fff;
             text-transform: uppercase;

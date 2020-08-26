@@ -1,8 +1,15 @@
-import { TOGGLE_SIMILAR_SHAPES_MODAL, FETCH_SIMILAR_SHAPES, UPDATE_DATARUN_EVENTS } from '../types';
+import {
+  TOGGLE_SIMILAR_SHAPES_MODAL,
+  FETCH_SIMILAR_SHAPES,
+  UPDATE_DATARUN_EVENTS,
+  UPDATE_SIMILAR_SHAPES,
+  UPDATE_EVENT_DETAILS,
+} from '../types';
 import { getCurrentEventDetails, getDatarunDetails } from '../selectors/datarun';
 import API from '../utils/api';
-import { getSimilarShapesCoords } from '../selectors/similarShapes';
+import { getSimilarShapesCoords, getSimilarShapesFound } from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
+import { saveEventDetailsAction } from './datarun';
 
 export function toggleSimilarShapesAction(modalState) {
   return async function (dispatch) {
@@ -49,8 +56,8 @@ function saveNewShape(currentShape) {
     const shapePayload = {
       start_time: timeSeries[start][0] / 1000,
       stop_time: timeSeries[end][0] / 1000,
-      score: '0.00', // @TODO - add this data and the one below
-      tag: 'Untagged',
+      score: '0.00', // @TODO - add this data
+      tag: currentShape.tag || 'Untagged',
       datarun_id: dataRun.id,
     };
 
@@ -72,5 +79,24 @@ export function saveSimilarShapesAction() {
     // @TODO - backend should provide a single endpoint, single API call instead of 5
     const currentShapes = getSimilarShapesCoords(getState());
     currentShapes.map((current) => dispatch(saveNewShape(current)));
+    dispatch(saveEventDetailsAction());
+  };
+}
+
+export function shapesTagsOverrideAction(tag) {
+  return function (dispatch, getState) {
+    const currentShapes = getSimilarShapesFound(getState());
+    const updatedShapes = currentShapes.map((current) => ({ ...current, tag }));
+    const currentEvent = getCurrentEventDetails(getState());
+
+    dispatch({
+      type: UPDATE_EVENT_DETAILS,
+      eventDetails: { ...currentEvent, tag },
+    });
+
+    dispatch({
+      type: UPDATE_SIMILAR_SHAPES,
+      shapes: updatedShapes,
+    });
   };
 }

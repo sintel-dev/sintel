@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { getIsSimilarShapesActive, getSimilarShapesCoords } from 'src/model/selectors/similarShapes';
 import { RootState } from '../../../model/types';
 import { FocusChartConstants, colorSchemes } from './Constants';
-// import EventDetails from './EventDetails';
+import EventDetails from './EventDetails';
 import AddEvent from './FocusChartEvents/AddEvent';
 import ShowErrors from './ShowErrors';
 import { setTimeseriesPeriod, setActiveEventAction } from '../../../model/actions/datarun';
@@ -185,10 +185,11 @@ export class FocusChart extends Component<Props, State> {
     const shapeWidth = Math.max(xCoord(timeSeries[end][0]) - xCoord(timeSeries[start][0]));
     const shapeHeight = height - 3.5 * CHART_MARGIN;
     const translateShape = xCoord(timeSeries[start][0]);
-
+    const tagColor = colorSchemes[shape.tag] || colorSchemes.Untagged;
     return (
       <g className="similar-shape" key={start}>
         <rect className="evt-area" width={shapeWidth} height={shapeHeight} y={0} x={translateShape} />
+        <rect className="evt-comment" width={shapeWidth} height="10" y={0} x={translateShape} fill={tagColor} />
       </g>
     );
   }
