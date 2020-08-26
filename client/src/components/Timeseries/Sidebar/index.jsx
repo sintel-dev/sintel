@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getIsSimilarShapesModalOpen } from 'src/model/selectors/similarShapes';
+// import { getIsSimilarShapesActive } from 'src/model/selectors/similarShapes';
 import { ArrowDown, ArrowUp } from 'src/components/Common/icons';
 import { Collapse } from 'react-collapse';
 import { setActivePanelAction } from 'src/model/actions/sidebar';
@@ -11,7 +11,7 @@ import { getIsEditingEventRange } from '../../../model/selectors/datarun';
 import PeriodicalView from './SidebarComponents/PeriodicalView/PeriodicalView';
 import EventDetailsView from './SidebarComponents/EventDetailsView/EventDetailsView';
 import SignalAnnotations from './SidebarComponents/SignalAnnotationsView/SignalAnnotations';
-import SimilarShapes from './SidebarComponents/SimilarShapes';
+import SimilarShapes from './SidebarComponents/SimilarShapes/SimilarShapes';
 import './Sidebar.scss';
 
 const sidebarPanels = [
@@ -30,6 +30,11 @@ const sidebarPanels = [
     title: 'Event Details',
     component: <EventDetailsView />,
   },
+  {
+    key: 'similarShapes',
+    title: 'Similar Segments',
+    component: <SimilarShapes />,
+  },
 ];
 
 class Sidebar extends Component {
@@ -43,11 +48,11 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, isSimilarShapesOpen, activePanel } = this.props;
+    const { experimentData, activePanel } = this.props;
 
     return (
       <div className="right-sidebar">
-        {isSimilarShapesOpen && <SimilarShapes />}
+        {/* {isSimilarShapesActive && <SimilarShapes />} */}
         <Loader isLoading={experimentData.isExperimentDataLoading}>
           {sidebarPanels.map((currentPanel) => {
             const { title } = currentPanel;
@@ -76,7 +81,7 @@ export default connect(
   (state) => ({
     experimentData: getSelectedExperimentData(state),
     isEditingEventRange: getIsEditingEventRange(state),
-    isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+    // isSimilarShapesActive: getIsSimilarShapesActive(state),
     activePanel: getCurrentActivePanel(state),
   }),
   (dispatch) => ({

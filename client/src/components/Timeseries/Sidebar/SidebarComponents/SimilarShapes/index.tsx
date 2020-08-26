@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { toggleSimilarShapesModalAction, getSimilarShapesAction } from 'src/model/actions/similarShapes';
+import { toggleSimilarShapesAction, getSimilarShapesAction } from 'src/model/actions/similarShapes';
 import { getDatarunDetails, getCurrentEventDetails } from 'src/model/selectors/datarun';
 import * as d3 from 'd3';
 import Loader from 'src/components/Common/Loader';
 import { RootState } from '../../../../../model/types';
 import Dropdown from '../../../../Common/Dropdown';
 import {
-  getIsSimilarShapesModalOpen,
+  getIsSimilarShapesActive,
   getIsSimilarShapesLoading,
   getSimilarShapesFound,
 } from '../../../../../model/selectors/similarShapes';
@@ -20,9 +20,10 @@ type DispatchProps = ReturnType<typeof mapDispatch>;
 
 type Props = StateProps & DispatchProps;
 
+// @TODO - remove this component entirely
 class SimilarShapes extends Component<Props, {}> {
   componentDidMount() {
-    if (!this.props.isModalOpen) {
+    if (!this.props.isSimilarShapesActive) {
       return;
     }
 
@@ -30,7 +31,7 @@ class SimilarShapes extends Component<Props, {}> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.currentEvent.id !== this.props.currentEvent.id) {
+    if (prevProps.currentEvent && prevProps.currentEvent.id !== this.props.currentEvent.id) {
       this.props.getSimilarShapes();
     }
   }
@@ -113,12 +114,12 @@ class SimilarShapes extends Component<Props, {}> {
   }
 
   render() {
-    const { isModalOpen, toggleSimilarShapesModal, isSimilarShapesLoading, similarShapes } = this.props;
-    const isActive = isModalOpen ? 'active' : '';
+    const { isSimilarShapesActive, toggleSimilarShapes, isSimilarShapesLoading, similarShapes } = this.props;
+    const isActive = isSimilarShapesActive ? 'active' : '';
     return (
-      isModalOpen && (
+      isSimilarShapesActive && (
         <div className={`similar-shapes ${isActive}`}>
-          <button type="button" onClick={() => toggleSimilarShapesModal(false)} className="close">
+          <button type="button" onClick={() => toggleSimilarShapes(false)} className="close">
             <CloseIcon />
           </button>
           <h3>Similar Segments List</h3>
@@ -140,7 +141,7 @@ class SimilarShapes extends Component<Props, {}> {
 }
 
 const mapState = (state: RootState) => ({
-  isModalOpen: getIsSimilarShapesModalOpen(state),
+  isSimilarShapesActive: getIsSimilarShapesActive(state),
   isSimilarShapesLoading: getIsSimilarShapesLoading(state),
   similarShapes: getSimilarShapesFound(state),
   dataRun: getDatarunDetails(state),
@@ -148,7 +149,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = (dispatch: Function) => ({
-  toggleSimilarShapesModal: (modalState) => dispatch(toggleSimilarShapesModalAction(modalState)),
+  toggleSimilarShapes: (modalState) => dispatch(toggleSimilarShapesAction(modalState)),
   getSimilarShapes: () => dispatch(getSimilarShapesAction()),
 });
 

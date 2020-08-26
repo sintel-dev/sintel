@@ -1,3 +1,253 @@
+.similar-shapes-wrapper {
+    .shape-container {
+        padding: 15px;
+        height: 64.7vh;
+    }
+
+    .shapes-landing {
+        height: 43vh;
+        text-align: center;
+        color: rgba(#fff, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+    }
+
+    .shapes-option {
+        position: relative;
+        &.disabled {
+            p,
+            label,
+            span,
+            span:before,
+            label span:after,
+            .form-row .algorithms label {
+                color: rgba(#b5b5b5, 0.4);
+            }
+            label {
+                cursor: text;
+            }
+            .form-row input[type='radio'] + label span {
+                border: 2px solid rgba(#fff, 0.4);
+            }
+        }
+    }
+
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+
+        label {
+            margin-bottom: 8px;
+            color: #b5b5b5;
+            display: inline-block;
+            cursor: pointer;
+        }
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .algorithms {
+            label {
+                color: #fff;
+            }
+        }
+
+        .form-wrapper {
+            flex: 1;
+
+            input {
+                &[type='radio'] {
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+
+                    + label {
+                        span {
+                            margin-right: 5px;
+                            vertical-align: middle;
+                            position: relative;
+                            border: 2px solid #fff;
+                            border-radius: 100%;
+                            display: inline-block;
+                            width: 16px;
+                            height: 16px;
+
+                            &::before {
+                                position: absolute;
+                                width: 8px;
+                                height: 8px;
+                                content: '';
+                                border-radius: 100%;
+                                background: #fff;
+                                left: 0;
+                                right: 0;
+                                margin: 0 auto;
+                                top: 2px;
+                                opacity: 0;
+                                transition: all 0.2s ease-in-out;
+                            }
+                        }
+                    }
+                    &:checked {
+                        + label {
+                            span:before {
+                                opacity: 1;
+                            }
+                        }
+                    }
+
+                    &:disabled {
+                        + label {
+                            cursor: not-allowed;
+                            span {
+                                border: 2px solid rgba(#fff, 0.4);
+                                &:before {
+                                    background: rgba(#fff, 0.4);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ul {
+            display: flex;
+            justify-content: space-between;
+
+            li {
+                flex: 1;
+            }
+        }
+
+        &.active {
+            border-bottom: 1px solid rgba(#f2f2f2, 0.04);
+        }
+    }
+
+    .submit {
+        width: 65%;
+        float: right;
+        text-align: right;
+
+        li {
+            display: inline-block;
+            margin-right: 10px;
+            &:last-child {
+                margin-right: 0;
+            }
+
+            button {
+                color: #fff;
+
+                &.trigger {
+                    padding: 10px 16px;
+                    background: #2f80ed;
+                    border-radius: 4px;
+                }
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+
+    .shapes-results {
+        max-height: 45vh;
+        overflow-y: auto;
+        margin-bottom: 10px;
+    }
+
+    .shape-details {
+        background: #23242b;
+        padding: 16px 10px;
+        border-radius: 12px;
+        display: flex;
+        margin-bottom: 15px;
+        justify-content: space-between;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-right: 5px;
+        .info {
+            li {
+                margin-bottom: 10px;
+
+                span {
+                    font-size: 14px;
+                    margin-right: 8px;
+                    display: inline-block;
+                    &:last-child {
+                        font-weight: bold;
+                        color: #b5b5b5;
+                    }
+                }
+            }
+            .date-wrapper {
+                display: inline-block;
+            }
+
+            .tag-select {
+                .tag-options__control {
+                    background: #23242b !important;
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+    .shape-chart {
+        path {
+            fill: transparent;
+            stroke: #7d87ae;
+            stroke-width: 2px;
+            &.current-event-shape {
+                stroke: #f2ff00;
+            }
+        }
+    }
+
+    .shape-footer {
+        display: flex;
+        justify-content: space-between;
+        background: #23242b;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        padding: 15px 20px;
+        align-items: center;
+        position: absolute;
+        left: 1px;
+        right: 1px;
+        margin: 0 auto;
+        bottom: 2px;
+        button {
+            color: #fff;
+            text-transform: uppercase;
+            border: none;
+            &.delete {
+                color: #f64242;
+            }
+
+            &.save {
+                background: #2f80ed;
+                padding: 10px 16px;
+                border-radius: 4px;
+            }
+        }
+        li {
+            display: inline-block;
+            margin-right: 15px;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}
+
+// @TODO - delete this part
 .similar-shapes {
     width: 100%;
     height: 100%;
