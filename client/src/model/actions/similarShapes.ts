@@ -48,8 +48,6 @@ export function resetSimilarShapesAction() {
 function saveNewShape(currentShape) {
   return async function (dispatch, getState) {
     const dataRun = getDatarunDetails(getState());
-    const selectedExperimentData = getSelectedExperimentData(getState());
-    const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === dataRun.id);
     const { timeSeries } = dataRun;
     const { start, end } = currentShape;
 
@@ -61,16 +59,7 @@ function saveNewShape(currentShape) {
       datarun_id: dataRun.id,
     };
 
-    await API.events.create(shapePayload).then(async () => {
-      await API.events.all(dataRun.id).then((newEvents) => {
-        const newDatarunEvents = newEvents.events.filter((currentEvent) => currentEvent.datarun === dataRun.id);
-        dispatch({
-          type: UPDATE_DATARUN_EVENTS,
-          newDatarunEvents,
-          datarunIndex,
-        });
-      });
-    });
+    return API.events.create(shapePayload);
   };
 }
 
@@ -79,7 +68,24 @@ export function saveSimilarShapesAction() {
     // @TODO - backend should provide a single endpoint, single API call instead of 5
     const currentShapes = getSimilarShapesCoords(getState());
     currentShapes.map((current) => dispatch(saveNewShape(current)));
-    dispatch(saveEventDetailsAction());
+    const dataRun = getDatarunDetails(getState());
+    const selectedExperimentData = getSelectedExperimentData(getState());
+    const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === dataRun.id);
+    dispatch(saveEventDetailsAction())
+      .then(async () => {
+        await API.events.all(dataRun.id).then((newEvents) => {
+          const newDatarunEvents = newEvents.events.filter((currentEvent) => currentEvent.datarun === dataRun.id);
+          dispatch({
+            type: UPDATE_DATARUN_EVENTS,
+            newDatarunEvents,
+            datarunIndex,
+          });
+        });
+      })
+      .then(() => {
+        dispatch(resetSimilarShapesAction());
+        dispatch(toggleSimilarShapesAction(false));
+      });
   };
 }
 

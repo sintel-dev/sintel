@@ -26,13 +26,39 @@
     .chart-data {
         path {
             stroke-width: 1;
-            stroke: $blue-color;
+            stroke: $path-color;
             &.evt-highlight {
                 stroke: $yellow-color;
             }
             &.predictions {
                 stroke: #b9782d;
                 fill: none;
+            }
+
+            &.investigate {
+                stroke: #ff9100;
+            }
+
+            &.do_not_investigate {
+                stroke: #4684ff;
+            }
+
+            &.postpone {
+                stroke: #8446c2;
+            }
+            &.problem {
+                stroke: #c24d4d;
+            }
+            &.previously_seen {
+                stroke: #f2ff00;
+            }
+
+            &.normal {
+                stroke: #6bc969;
+            }
+
+            &.untagged {
+                stroke: #d5d5d5;
             }
         }
     }
@@ -45,9 +71,16 @@
     .event-comment {
         cursor: pointer;
         .evt-area {
-            fill: #777;
+            fill: rgba(#5a627c, 0.3);
             stroke-width: 0;
-            fill-opacity: 0.5;
+        }
+    }
+
+    .similar-shape {
+        .evt-area {
+            stroke-width: 1px;
+            stroke: #fff;
+            stroke-dasharray: 4;
         }
     }
 

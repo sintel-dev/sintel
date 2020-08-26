@@ -135,11 +135,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapes() {
-    const { similarShapes, isSimilarShapesLoading, currentEvent } = this.props;
-
-    if (isSimilarShapesLoading) {
-      return shapesLoader();
-    }
+    const { similarShapes, currentEvent } = this.props;
 
     if (currentEvent === null) {
       return null;
@@ -297,7 +293,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeFormular() {
-    const { currentEvent, isEditingEventRange } = this.props;
+    const { currentEvent, isEditingEventRange, isSimilarShapesLoading } = this.props;
     const shapesDisabled = currentEvent === null || isEditingEventRange ? 'disabled' : '';
 
     return (
@@ -308,7 +304,13 @@ class SimilarShapes extends Component {
             {this.renderShapeOptions()}
           </div>
           {this.renderSearchControls()}
-          <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+          <div className="scroll-style">
+            {isSimilarShapesLoading ? (
+              shapesLoader()
+            ) : (
+              <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+            )}
+          </div>
           {this.renderShapeFooter()}
         </div>
       </div>

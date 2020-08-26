@@ -23,6 +23,7 @@ import {
   getZoomMode,
   getIsTimeSyncModeEnabled,
   getScrollHistory,
+  getCurrentEventDetails,
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -189,12 +190,12 @@ export class FocusChart extends Component<Props, State> {
     return (
       <g className="similar-shape" key={start}>
         <rect className="evt-area" width={shapeWidth} height={shapeHeight} y={0} x={translateShape} />
-        <rect className="evt-comment" width={shapeWidth} height="10" y={0} x={translateShape} fill={tagColor} />
+        <rect className="evt-comment" width={shapeWidth} height="10" y={1} x={translateShape} fill={tagColor} />
       </g>
     );
   }
 
-  renderEvents(currentEvent) {
+  renderEventArea(currentEvent) {
     const { dataRun, periodRange, setActiveEvent } = this.props;
     const { timeSeries } = dataRun;
     const { height } = this.state;
@@ -219,6 +220,7 @@ export class FocusChart extends Component<Props, State> {
 
     const startDate = new Date(timeSeries[startIndex][0]);
     const stopDate = new Date(timeSeries[stopIndex][0]);
+    const pathClassName = currentEvent[4].replace(/\s/g, '_').toLowerCase() || 'untagged';
 
     return (
       <g
@@ -239,13 +241,26 @@ export class FocusChart extends Component<Props, State> {
         }}
         onMouseLeave={() => this.setState({ isTooltipVisible: false })}
       >
-        <path className="evt-highlight" d={this.drawLine(event)} />
+        <path className={`evt-highlight ${pathClassName}`} d={this.drawLine(event)} />
         <g className="event-comment">
           <rect className="evt-area" width={commentWidth} height={commentHeight} y={0} x={translateComment} />
           <rect className="evt-comment" height="10" width={commentWidth} y="0" x={translateComment} fill={tagColor} />
         </g>
       </g>
     );
+  }
+
+  renderEvents() {
+    const { dataRun, selectedEventDetails, isSimilarShapesActive } = this.props;
+
+    const { eventWindows } = dataRun;
+
+    if (isSimilarShapesActive) {
+      const eventIndex = eventWindows.findIndex((currentWindow) => currentWindow[3] === selectedEventDetails.id);
+      return this.renderEventArea(eventWindows[eventIndex]);
+    }
+
+    return eventWindows.map((currentWindow) => this.renderEventArea(currentWindow));
   }
 
   renderChartAxis() {
@@ -371,7 +386,7 @@ export class FocusChart extends Component<Props, State> {
   drawChartData() {
     const { width, height } = this.state;
     const { dataRun, isPredictionVisible, isZoomEnabled, isSimilarShapesActive, similarShapesCoords } = this.props;
-    const { eventWindows, timeSeries, timeseriesPred } = dataRun;
+    const { timeSeries, timeseriesPred } = dataRun;
     const focusChartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
 
     const zoomProps = {
@@ -394,7 +409,7 @@ export class FocusChart extends Component<Props, State> {
               {isPredictionVisible && <path className="predictions" d={this.drawLine(timeseriesPred)} />}
             </g>
             <rect className="zoom" {...zoomProps} />
-            {eventWindows.map((currentEvent) => this.renderEvents(currentEvent))}
+            {this.renderEvents()}
             {isSimilarShapesActive &&
               similarShapesCoords !== null &&
               similarShapesCoords.map((currentShapeCoords) => this.renderSimilarShapes(currentShapeCoords))}
@@ -441,6 +456,7 @@ const mapState = (state: RootState) => ({
   scrollHistory: getScrollHistory(state),
   isSimilarShapesActive: getIsSimilarShapesActive(state),
   similarShapesCoords: getSimilarShapesCoords(state),
+  selectedEventDetails: getCurrentEventDetails(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
