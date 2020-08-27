@@ -136,9 +136,9 @@ class SignalRaw(Resource):
         @apiParam {Int} [start_time] Timestamp
         @apiParam {Int} [stop_time] Timestamp
 
-        @apiSuccess {2-Tuple[]} data.
-        @apiSuccess {Int} list.timestamp Timestamp
-        @apiSuccess {Float} list.value Value
+        @apiSuccess {2-Tuple[]} data Data.
+        @apiSuccess {Int} data.timestamp Timestamp
+        @apiSuccess {Float} data.value Value
         """
 
         res, status = verify_auth()
