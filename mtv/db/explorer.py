@@ -7,9 +7,13 @@ import json
 import logging
 from datetime import datetime, timezone
 
+import numpy as np
+import pandas as pd
+from bson import ObjectId
 from gridfs import GridFS
 from mongoengine import connect
 from pymongo.database import Database
+from sklearn.impute import SimpleImputer
 
 from mtv.db import schema
 
@@ -1013,6 +1017,93 @@ class DBExplorer:
         prediction_results['data'] = data
         return prediction_results
 
+    # ########## #
+    # Raw #
+    # ########## #
+
+    @classmethod
+    def get_raw(cls, signal, interval=21600, start_time=None, stop_time=None):
+        """Get raw signal data at the given interval
+
+        Only argument "signal" is required.
+
+        Args:
+            signal (Signal, ObjectID or str)
+                Signal object (or the corresponding ObjectID, or its string
+                representation) that we want to retrieve.
+            interval (int):
+                In seconds. The interval will be used to aggregate the raw data.
+            start_time (int):
+                Timestamp indicating the start time of the data you want search.
+                If not given, the corresponding signal start time will be used.
+            stop_time (int)
+                Timestamp indicating the stop time of the data you want search.
+                If not given, the corresponding signal stop time will be used.
+
+        Returns:
+            Timeseries
+        """
+
+        signal_doc = schema.Signal.find_one(signal=signal)
+
+        signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
+
+        if start_time is None:
+            start_time = signal_doc.start_time
+        if stop_time is None:
+            stop_time = signal_doc.stop_time
+
+        start_dt = datetime.utcfromtimestamp(start_time)
+        stop_dt = datetime.utcfromtimestamp(stop_time)
+        start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
+        stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
+
+        raw_docs = schema.SignalRaw.find(
+            signal=signal, index__gte=start_idx, index__lte=stop_idx)
+
+        data = list()
+        for idx, doc in enumerate(raw_docs):
+
+            if idx == 0:
+                # first month
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            elif idx != 0 and idx == len(raw_docs) - 1:
+                # last month but not the first
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            else:
+                data.extend(doc.data)
+
+        X = pd.DataFrame(data=np.asarray(data), columns=["timestamp", "value"])
+
+        X = X.sort_values('timestamp').set_index('timestamp')
+
+        start_ts = X.index.values[0]
+        max_ts = X.index.values[-1]
+
+        values = list()
+        index = list()
+        while start_ts <= max_ts:
+            end_ts = start_ts + interval
+            subset = X.loc[start_ts:end_ts - 1]
+            aggregated = [
+                getattr(subset, agg)(skipna=True).values
+                for agg in ['mean']
+            ]
+            values.append(np.concatenate(aggregated))
+            index.append(start_ts)
+            start_ts = end_ts
+
+        imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+        V = np.asarray(values).reshape((-1, 1))
+        V = imp_mean.fit_transform(V)
+        values = V.flatten().tolist()
+
+        return np.stack((np.array(index), np.array(values)), axis=-1).tolist()
+
 
 def main():
     """
@@ -1028,8 +1119,13 @@ def main():
 
     explorer = DBExplorer('Liu Dongyu', 'mtv-demo', dbconfig)
 
-    signalrun = "5f33521c1219eb21ae2cdc5a"
-    start_time = datetime(2010, 1, 1 + 1, tzinfo=timezone.utc).timestamp()
-    stop_time = datetime(2010, 7, 2 + 1, tzinfo=timezone.utc).timestamp()
+    start_time = datetime(2010, 2, 1 + 1, tzinfo=timezone.utc).timestamp()
+    stop_time = datetime(2010, 2, 2 + 1, tzinfo=timezone.utc).timestamp()
 
-    explorer.get_prediction(signalrun, start_time, stop_time)
+    # signalrun = "5f33521c1219eb21ae2cdc5a"
+    # explorer.get_prediction(signalrun, start_time, stop_time)
+
+    signal = ObjectId("5f46ebfe4e33925bbf954c6c")
+    print(start_time, stop_time)
+    results = explorer.get_raw(signal, 21600, start_time, stop_time)
+    print(results)

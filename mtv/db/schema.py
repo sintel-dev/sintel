@@ -342,7 +342,7 @@ class Prediction(MTVDocument):
     }
 
 
-class Raw(MTVDocument):
+class SignalRaw(MTVDocument):
     """ Raw signal data.
 
     Compared with the Prediction, Raw only save the raw data aggregated
@@ -350,6 +350,7 @@ class Raw(MTVDocument):
     """
     signal = fields.ReferenceField(Signal, reverse_delete_rule=CASCADE)
     data = fields.ListField(fields.ListField())
+    interval = fields.IntField()
     index = fields.IntField()
     meta = {
         'indexes': [

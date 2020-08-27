@@ -328,7 +328,6 @@ class Events(Resource):
         attrs_type = [float, float, float, str, str, str]
         d = dict()
         body = request.json
-        print(body)
         for attr in attrs:
             d[attr] = None
             if body is not None:

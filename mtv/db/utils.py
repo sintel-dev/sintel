@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 from pymongo import MongoClient
+from sklearn.impute import SimpleImputer
 
 from mtv.data import load_signal
 from mtv.db import schema
@@ -333,8 +334,8 @@ def _update_period(signalrun, v, utc):
     schema.Period.insert_many(docs)
 
 
-def _update_raw(signal, interval=360, method='mean'):
-    X = load_signal(signal.location)
+def _update_raw(signal, interval=360, method=['mean']):
+    X = load_signal(signal.data_location)
     X = X.sort_values('timestamp').set_index('timestamp')
 
     start_ts = X.index.values[0]
@@ -355,6 +356,11 @@ def _update_raw(signal, interval=360, method='mean'):
         index.append(start_ts)
         start_ts = end_ts
 
+    imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+    V = np.asarray(values).reshape((-1, 1))
+    V = imp_mean.fit_transform(V)
+    values = V.flatten().tolist()
+
     current_year = -1
     current_month = -1
     year_month_data = list()
@@ -370,14 +376,15 @@ def _update_raw(signal, interval=360, method='mean'):
                 raw_doc = {
                     'signal': signal.id,
                     'index': idx,
-                    'data': year_month_data
+                    'data': year_month_data,
+                    'interval': interval
                 }
-                schema.Raw.insert(**raw_doc)
+                schema.SignalRaw.insert(**raw_doc)
             year_month_data = list()
             current_year = dt.year
             current_month = dt.month
 
-        year_month_data.append(v)
+        year_month_data.append([float(i), float(v)])
 
     # handle the last one
     if len(year_month_data) > 0:
@@ -386,7 +393,7 @@ def _update_raw(signal, interval=360, method='mean'):
             'index': idx,
             'data': year_month_data
         }
-        schema.Raw.insert(**raw_doc)
+        schema.SignalRaw.insert(**raw_doc)
 
 
 def update_db(fs, exp_filter=None):
@@ -401,6 +408,7 @@ def update_db(fs, exp_filter=None):
     total = signals.count()
     for signal in signals:
         try:
+            cc += 1
             LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
             _update_raw(signal)
         except Exception as e:
