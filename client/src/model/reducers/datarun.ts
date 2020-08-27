@@ -17,7 +17,7 @@ const initialState: DatarunState = {
   isEditingEventRangeDone: false,
   isPopupOpen: false,
   isAddingEvent: false,
-  newEventDetails: {},
+  newEventDetails: null,
   filterTags: [],
   zoomDirection: '',
   zoomCounter: 0,
