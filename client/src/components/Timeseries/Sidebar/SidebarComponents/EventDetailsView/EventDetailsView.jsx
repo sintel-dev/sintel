@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getCurrentEventDetails, getUpdatedEventDetails } from 'src/model/selectors/datarun';
+import {
+  getCurrentEventDetails,
+  getUpdatedEventDetails,
+  getIsAddingNewEvents,
+  getNewEventDetails,
+} from 'src/model/selectors/datarun';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import Dropdown from 'src/components/Common/Dropdown';
 import {
@@ -9,7 +14,7 @@ import {
   isEditingEventRangeAction,
   saveEventDetailsAction,
   deleteEventAction,
-  closeEventModal,
+  setActiveEventAction,
 } from 'src/model/actions/datarun';
 
 import { selectedOption } from './eventUtils';
@@ -27,8 +32,9 @@ class EventDetailsView extends Component {
   }
 
   renderEventHeader() {
-    const { eventDetails, updateEventDetails, editEventRange } = this.props;
-    const { start_time, stop_time, score, tag } = eventDetails;
+    const { eventDetails, updateEventDetails, editEventRange, newEventDetails, isAddingNewEvent } = this.props;
+    const currentEvent = isAddingNewEvent ? newEventDetails : eventDetails;
+    const { start_time, stop_time, score, tag } = currentEvent;
 
     return (
       <div className="evt-ops">
@@ -74,7 +80,7 @@ class EventDetailsView extends Component {
   }
 
   renderEventFooter() {
-    const { saveEventDetails, deleteEvent, closeEventDetails } = this.props;
+    const { saveEventDetails, deleteEvent, setActiveEvent } = this.props;
     return (
       <div className="evt-footer">
         <ul>
@@ -86,7 +92,7 @@ class EventDetailsView extends Component {
         </ul>
         <ul>
           <li>
-            <button type="button" className="clean" onClick={closeEventDetails}>
+            <button type="button" className="clean" onClick={() => setActiveEvent(null)}>
               Cancel
             </button>
           </li>
@@ -101,24 +107,27 @@ class EventDetailsView extends Component {
   }
 
   renderEventDetails(eventDetails) {
+    const { isAddingNewEvent } = this.props;
     return (
       <div>
         <div className="evt-row">{this.renderEventHeader()}</div>
-        <div className="evt-row evt-actions">
-          <EventComments isEventJumpVisible={false} />
-          <CommentControl isChangeTagEnabled={false} eventDetails={eventDetails} />
-        </div>
+        {!isAddingNewEvent && (
+          <div className="evt-row evt-actions">
+            <EventComments isEventJumpVisible={false} />
+            <CommentControl isChangeTagEnabled={false} eventDetails={eventDetails} />
+          </div>
+        )}
         {this.renderEventFooter()}
       </div>
     );
   }
 
   render() {
-    const { eventDetails } = this.props;
-
+    const { eventDetails, isAddingNewEvent, newEventDetails } = this.props;
+    const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
     return (
       <div className="event-details">
-        {eventDetails ? this.renderEventDetails(eventDetails) : this.noEventToRender()}
+        {currentEventDetails ? this.renderEventDetails(currentEventDetails) : this.noEventToRender()}
       </div>
     );
   }
@@ -128,12 +137,14 @@ export default connect(
   (state) => ({
     eventDetails: getCurrentEventDetails(state),
     updatedEventDetails: getUpdatedEventDetails(state),
+    isAddingNewEvent: getIsAddingNewEvents(state),
+    newEventDetails: getNewEventDetails(state),
   }),
   (dispatch) => ({
     updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
     editEventRange: (eventState) => dispatch(isEditingEventRangeAction(eventState)),
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     deleteEvent: () => dispatch(deleteEventAction()),
-    closeEventDetails: () => dispatch(closeEventModal()),
+    setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
   }),
 )(EventDetailsView);

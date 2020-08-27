@@ -223,9 +223,10 @@ export function updateEventDetailsAction(updatedEventDetails) {
     let currentEventDetails = getCurrentEventDetails(getState());
     if (isAddingNewEvent) {
       currentEventDetails = getNewEventDetails(getState());
+      return dispatch(updateNewEventDetailsAction(updatedEventDetails));
     }
 
-    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
+    return dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
   };
 }
 
@@ -333,7 +334,7 @@ export function updateNewEventDetailsAction(eventDetails) {
       ...eventDetails,
       datarun_id: datarun.id,
       score: 0,
-      tag: (eventDetails.tag && eventDetails.tag) || null,
+      tag: (eventDetails.tag && eventDetails.tag) || 'Untagged',
     };
 
     dispatch({ type: NEW_EVENT_DETAILS, newEventDetails: eventTemplate });
