@@ -6,7 +6,9 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 from pymongo import MongoClient
+from sklearn.impute import SimpleImputer
 
+from mtv.data import load_signal
 from mtv.db import schema
 
 LOGGER = logging.getLogger(__name__)
@@ -131,6 +133,44 @@ def _inverse_scale_transform(v, a0, b0, a1, b1):
     return k * (b1 - a1) + a1
 
 
+def _split_large_prediction_data(doc, signal):
+    current_year = -1
+    current_month = -1
+    year_month_data = list()
+
+    signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
+
+    for d in doc['data']:
+        dt = datetime.utcfromtimestamp(d[0])
+        y_idx = dt.year - signal_start_dt.year
+        m_idx = dt.month
+        index = y_idx * 12 + (m_idx - 1)
+        if (dt.year != current_year or current_month != dt.month):
+            if len(year_month_data) > 0:
+                pred_doc = {
+                    'signalrun': doc['signalrun'],
+                    'attrs': doc['attrs'],
+                    'index': index,
+                    'data': year_month_data
+                }
+                schema.Prediction.insert(**pred_doc)
+            year_month_data = list()
+            current_year = dt.year
+            current_month = dt.month
+
+        year_month_data.append(d)
+
+    # handle the last one
+    if len(year_month_data) > 0:
+        pred_doc = {
+            'signalrun': doc['signalrun'],
+            'attrs': doc['attrs'],
+            'index': index,
+            'data': year_month_data
+        }
+        schema.Prediction.insert(**pred_doc)
+
+
 def _update_prediction(signalrun, v):
 
     try:
@@ -221,7 +261,7 @@ def _update_prediction(signalrun, v):
             'data': data
         }
 
-        schema.Prediction(**doc).save()
+        _split_large_prediction_data(doc, signalrun.signal)
     except Exception as e:
         print(e)
 
@@ -294,15 +334,89 @@ def _update_period(signalrun, v, utc):
     schema.Period.insert_many(docs)
 
 
-def update_db(fs, utc=True, exp_filter=None):
+def _update_raw(signal, interval=360, method=['mean']):
+    X = load_signal(signal.data_location)
+    X = X.sort_values('timestamp').set_index('timestamp')
+
+    start_ts = X.index.values[0]
+    max_ts = X.index.values[-1]
+
+    signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
+
+    values = list()
+    index = list()
+    while start_ts <= max_ts:
+        end_ts = start_ts + interval
+        subset = X.loc[start_ts:end_ts - 1]
+        aggregated = [
+            getattr(subset, agg)(skipna=True).values
+            for agg in method
+        ]
+        values.append(np.concatenate(aggregated))
+        index.append(start_ts)
+        start_ts = end_ts
+
+    imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+    V = np.asarray(values).reshape((-1, 1))
+    V = imp_mean.fit_transform(V)
+    values = V.flatten().tolist()
+
+    current_year = -1
+    current_month = -1
+    year_month_data = list()
+    for i, v in zip(index, values):
+
+        dt = datetime.utcfromtimestamp(i)
+        y_idx = dt.year - signal_start_dt.year
+        m_idx = dt.month
+        idx = y_idx * 12 + (m_idx - 1)
+        if (dt.year != current_year or current_month != dt.month):
+
+            if len(year_month_data) > 0:
+                raw_doc = {
+                    'signal': signal.id,
+                    'index': idx,
+                    'data': year_month_data,
+                    'interval': interval
+                }
+                schema.SignalRaw.insert(**raw_doc)
+            year_month_data = list()
+            current_year = dt.year
+            current_month = dt.month
+
+        year_month_data.append([float(i), float(v)])
+
+    # handle the last one
+    if len(year_month_data) > 0:
+        raw_doc = {
+            'signal': signal.id,
+            'index': idx,
+            'data': year_month_data
+        }
+        schema.SignalRaw.insert(**raw_doc)
+
+
+def update_db(fs, exp_filter=None):
 
     # get signalrun list
-    signalruns = schema.Signalrun.find({}).timeout(False)
-    total = signalruns.count()
+
+    # TODO: remove utc setting, it should be always True
+    utc = True
+
+    signals = schema.Signal.find().timeout(False)
     cc = 0
+    total = signals.count()
+    for signal in signals:
+        try:
+            cc += 1
+            LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
+            _update_raw(signal)
+        except Exception as e:
+            LOGGER.error(str(e))
 
-    LOGGER.info('UTC: {}. Total: {}'.format(utc, total))
-
+    signalruns = schema.Signalrun.find({}).timeout(False)
+    cc = 0
+    total = signalruns.count()
     for signalrun in signalruns:
         try:
             cc += 1

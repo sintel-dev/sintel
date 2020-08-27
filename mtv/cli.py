@@ -12,7 +12,7 @@ def _run(explorer, args):
 
 
 def _update_db(explorer, args):
-    explorer.update_db(args.utc)
+    explorer.update_db()
 
 
 def get_parser():
@@ -56,8 +56,6 @@ def get_parser():
     # mtv update db
     update_db = update_model.add_parser('db', parents=[common],
                                         help='Add raw data')
-    update_db.add_argument('--utc', action='store_true',
-                           help='whether to use UTC time')
     update_db.set_defaults(function=_update_db)
 
     # mtv add

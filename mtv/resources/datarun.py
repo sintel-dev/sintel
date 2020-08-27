@@ -4,7 +4,7 @@ from bson import ObjectId
 from flask import request
 from flask_restful import Resource
 
-from mtv.db import schema
+from mtv.db import DBExplorer, schema
 from mtv.resources.auth_utils import verify_auth
 from mtv.resources.experiment import validate_experiment_id
 
@@ -42,10 +42,11 @@ def get_signalrun(signalrun_doc):
             #     None if annotation_doc is None else annotation_doc.tag
 
     # get prediction
-    prediction_doc = schema.Prediction.find_one(signalrun=signalrun_doc.id)
+    prediction_data = DBExplorer.get_prediction(signalrun_doc)
+    # prediction_doc = schema.Prediction.find_one(signalrun=signalrun_doc.id)
     signalrun['prediction'] = {
-        'names': prediction_doc.attrs,
-        'data': prediction_doc.data
+        'names': prediction_data['attrs'],
+        'data': prediction_data['data']
     }
 
     # get raw

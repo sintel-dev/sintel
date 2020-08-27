@@ -329,12 +329,33 @@ class Period(MTVDocument):
 
 
 class Prediction(MTVDocument):
-    signalrun = fields.ReferenceField(Datarun)
+    signalrun = fields.ReferenceField(Datarun,
+                                      reverse_delete_rule=CASCADE)
     attrs = fields.ListField(fields.StringField())
     data = fields.ListField(fields.ListField())
+    index = fields.IntField()
     meta = {
         'indexes': [
-            'signalrun'
+            'signalrun',
+            ('signalrun', '+index')
+        ]
+    }
+
+
+class SignalRaw(MTVDocument):
+    """ Raw signal data.
+
+    Compared with the Prediction, Raw only save the raw data aggregated
+    in 6-minute level.
+    """
+    signal = fields.ReferenceField(Signal, reverse_delete_rule=CASCADE)
+    data = fields.ListField(fields.ListField())
+    interval = fields.IntField()
+    index = fields.IntField()
+    meta = {
+        'indexes': [
+            'signal',
+            ('signal', '+index')
         ]
     }
 

@@ -29,9 +29,6 @@ def add_routes(app):
     api.add_resource(ctrl.user.User, current_api_version + 'users/<string:user_id>/')
     api.add_resource(ctrl.user.Users, current_api_version + 'users/')
 
-    # data
-    api.add_resource(ctrl.data.Data, current_api_version + current_api_version + 'data/')
-
     # comment
     api.add_resource(ctrl.comment.Comment, current_api_version + 'comments/<string:comment_id>/')
     api.add_resource(ctrl.comment.Comments, current_api_version + 'comments/')
@@ -63,6 +60,7 @@ def add_routes(app):
     # signal
     api.add_resource(ctrl.signal.Signal, current_api_version + 'signals/<string:signal_name>/')
     api.add_resource(ctrl.signal.Signals, current_api_version + 'signals/')
+    api.add_resource(ctrl.signal.SignalRaw, current_api_version + 'signalraw/')
 
     # computing resources
     api.add_resource(ctrl.computing.similar_windows.SimilarWindows,
