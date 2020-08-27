@@ -26,8 +26,7 @@ class SignalAnnotations extends Component {
 
     const toggleEventState = (eventID) => (activeEvent === eventID ? setActiveEvent(null) : setActiveEvent(eventID));
 
-    return (
-      events.length &&
+    return events.length ? (
       events.map((currentEvent) => {
         const color = currentEvent && currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
         const eventClassName =
@@ -64,6 +63,12 @@ class SignalAnnotations extends Component {
           </div>
         );
       })
+    ) : (
+      <div className="annotation-wrapper">
+        <div className="annotation-heading">
+          <p>No annotations found</p>
+        </div>
+      </div>
     );
   }
 

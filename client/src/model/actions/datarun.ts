@@ -39,9 +39,10 @@ import {
   TOGGLE_TIME_SYNC_RANGE,
   SET_SCROLL_HISTORY,
 } from '../types';
-import { toggleSimilarShapesModalAction } from './similarShapes';
+import { toggleSimilarShapesAction } from './similarShapes';
 import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
 import { setActivePanelAction } from './sidebar';
+import { getCurrentActivePanel } from '../selectors/sidebar';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -57,7 +58,7 @@ export function selectDatarun(datarunID: string) {
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
-    dispatch(toggleSimilarShapesModalAction(false));
+    dispatch(toggleSimilarShapesAction(false));
   };
 }
 
@@ -81,7 +82,8 @@ export function setTimeseriesPeriod(eventRange: {
 }
 
 export function setActiveEventAction(eventID) {
-  return function (dispatch) {
+  return function (dispatch, getState) {
+    const currentPanel = getCurrentActivePanel(getState());
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: eventID });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });
     dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: null });
@@ -93,7 +95,7 @@ export function setActiveEventAction(eventID) {
     }
 
     dispatch(getEventComments());
-    dispatch(setActivePanelAction('signalView'));
+    (currentPanel === 'periodicalView' || currentPanel === null) && dispatch(setActivePanelAction('signalView'));
   };
 }
 
@@ -113,7 +115,7 @@ export function closeEventModal() {
       dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
       dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
       dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
-      dispatch(toggleSimilarShapesModalAction(false));
+      dispatch(toggleSimilarShapesAction(false));
     });
   };
 }

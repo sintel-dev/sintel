@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { connect } from 'react-redux';
 import {
-  getIsSimilarShapesModalOpen,
+  getIsSimilarShapesActive,
   getIsSimilarShapesLoading,
   getSimilarShapesCoords,
 } from 'src/model/selectors/similarShapes';
@@ -246,7 +246,13 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
   drawData() {
     const { width, height, offset } = this.state;
-    const { dataRun, isSimilarShapesLoading, isSimilarShapesOpen, similarShapesCoords, selectedDatarunID } = this.props;
+    const {
+      dataRun,
+      isSimilarShapesLoading,
+      isSimilarShapesActive,
+      similarShapesCoords,
+      selectedDatarunID,
+    } = this.props;
     const { eventWindows, timeSeries } = dataRun;
 
     return (
@@ -255,7 +261,7 @@ export class DrawChart extends Component<ChartProps, ChartState> {
         <g className="event-wrapper" transform={`translate(${offset.left}, ${offset.top})`}>
           <path className="wave-data" d={this.drawLine(timeSeries)} />
           {eventWindows.length > 0 && eventWindows.map((windowEvent) => this.drawEvent(windowEvent))}
-          {isSimilarShapesOpen &&
+          {isSimilarShapesActive &&
             !isSimilarShapesLoading &&
             dataRun.id === selectedDatarunID &&
             similarShapesCoords.map((currentShape) => this.renderSimilarShapes(currentShape))}
@@ -342,7 +348,7 @@ const mapState = (state: RootState) => ({
   isAddingNewEvent: getIsAddingNewEvents(state),
   isPopupOpen: getIsPopupOpen(state),
   isSimilarShapesLoading: getIsSimilarShapesLoading(state),
-  isSimilarShapesOpen: getIsSimilarShapesModalOpen(state),
+  isSimilarShapesActive: getIsSimilarShapesActive(state),
   similarShapesCoords: getSimilarShapesCoords(state),
   selectedDatarunID: getSelectedDatarunID(state),
 });
