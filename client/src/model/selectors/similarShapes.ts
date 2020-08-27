@@ -48,7 +48,7 @@ export const getSimilarShapesCoords = createSelector(
       const { start, end } = currentShape;
       const startIndex = timeSeries.findIndex((element) => start * 1000 - element[0] < 0) - 1;
       const stopIndex = timeSeries.findIndex((element) => end * 1000 - element[0] < 0);
-      return { ...currentShape, start: startIndex, end: stopIndex };
+      return { ...currentShape, start: startIndex, end: stopIndex, source: 'SHAPE_MATCHING' };
     });
   },
 );

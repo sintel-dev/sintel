@@ -225,7 +225,7 @@ export class FocusChart extends Component<Props, State> {
     const startDate = new Date(timeSeries[startIndex][0]);
     const stopDate = new Date(timeSeries[stopIndex][0]);
 
-    const pathClassName = (currentEvent[4] && currentEvent[4].replace(/\s/g, '_').toLowerCase()) || 'untagged';
+    const pathClassName = currentEvent[4]?.replace(/\s/g, '_').toLowerCase() || 'untagged';
 
     return (
       <g

@@ -239,6 +239,7 @@ export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventDetails(getState());
     const userID = Cookies.get(AUTHENTICATED_USER_ID);
+    const dataRun = getDatarunDetails(getState());
 
     // @TODO - getting the user data without Google authentication is yet to be handled
     const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
@@ -257,6 +258,7 @@ export function saveEventDetailsAction() {
       stop_time: stop,
       score,
       tag,
+      datarun_id: dataRun.id,
       event_id: updatedEventDetails.id,
       created_by: userData.name,
     };
@@ -365,6 +367,7 @@ export function saveNewEventAction() {
       tag: newEventDetails.tag || 'Untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
       create_by: userData.name,
+      source: newEventDetails.source ? newEventDetails.source : 'MANUALLY_CREATED',
     };
     await API.events
       .create(eventDetails)
@@ -410,13 +413,7 @@ export function deleteEventAction() {
       (dataItem) => dataItem.id === currentDatarun.id,
     );
 
-    // @TODO - implement delete comments as wel.
-    // Investigate why server response is 405 when deleting comment
-    // dispatch(deleteEventComments());
-
-    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
-
-    await API.events.delete(currentEventDetails.id, { created_by: userData.name }).then(() => {
+    await API.events.delete(currentEventDetails.id).then(() => {
       dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
       dispatch({
         type: UPDATE_DATARUN_EVENTS,

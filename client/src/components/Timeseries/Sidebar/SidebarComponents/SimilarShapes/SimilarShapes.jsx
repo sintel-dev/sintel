@@ -9,6 +9,7 @@ import {
   resetSimilarShapesAction,
   shapesTagsOverrideAction,
   setActiveShapeAction,
+  changeActiveShapeTagAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -20,6 +21,7 @@ import {
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
 import Dropdown from 'src/components/Common/Dropdown';
+import { selectedOption } from 'src/components/Timeseries/FocusChart/EventDetails/eventUtils';
 
 const shapesLanding = () => (
   <div className="shapes-landing">
@@ -143,11 +145,10 @@ class SimilarShapes extends Component {
     }
 
     return similarShapes.map((currentShape) => {
-      const { activeShape, setActiveShape } = this.props;
+      const { activeShape, setActiveShape, changeShapeTag } = this.props;
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
       const shapeClassName =
         activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
-
       return (
         <div
           className={`shape-details ${shapeClassName}`}
@@ -171,7 +172,7 @@ class SimilarShapes extends Component {
               <tr>
                 <th>Tag</th>
                 <td>
-                  <Dropdown />
+                  <Dropdown onChange={(tag) => changeShapeTag(tag.value)} value={selectedOption(currentShape.tag)} />
                 </td>
               </tr>
             </tbody>
@@ -349,5 +350,6 @@ export default connect(
     resetSimilarShapes: () => dispatch(resetSimilarShapesAction()),
     overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
     setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
+    changeShapeTag: (tag) => dispatch(changeActiveShapeTagAction(tag)),
   }),
 )(SimilarShapes);

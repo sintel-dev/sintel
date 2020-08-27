@@ -8,9 +8,8 @@ import {
 } from '../types';
 import { getCurrentEventDetails, getDatarunDetails } from '../selectors/datarun';
 import API from '../utils/api';
-import { getSimilarShapesCoords, getSimilarShapesFound } from '../selectors/similarShapes';
+import { getSimilarShapesCoords, getSimilarShapesFound, getActiveShape } from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
-import { saveEventDetailsAction } from './datarun';
 
 export function toggleSimilarShapesAction(modalState) {
   return async function (dispatch) {
@@ -58,8 +57,8 @@ function saveNewShape(currentShape) {
       score: '0.00', // @TODO - add this data
       tag: currentShape.tag || 'Untagged',
       datarun_id: dataRun.id,
+      source: 'SHAPE_MATCHING',
     };
-
     return API.events.create(shapePayload);
   };
 }
@@ -68,25 +67,26 @@ export function saveSimilarShapesAction() {
   return async function (dispatch, getState) {
     // @TODO - backend should provide a single endpoint, single API call instead of 5
     const currentShapes = getSimilarShapesCoords(getState());
-    currentShapes.map((current) => dispatch(saveNewShape(current)));
+
     const dataRun = getDatarunDetails(getState());
     const selectedExperimentData = getSelectedExperimentData(getState());
     const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === dataRun.id);
-    dispatch(saveEventDetailsAction())
-      .then(async () => {
+
+    await currentShapes.map((current) =>
+      dispatch(saveNewShape(current)).then(async () => {
         await API.events.all(dataRun.id).then((newEvents) => {
           const newDatarunEvents = newEvents.events.filter((currentEvent) => currentEvent.datarun === dataRun.id);
           dispatch({
             type: UPDATE_DATARUN_EVENTS,
             newDatarunEvents,
             datarunIndex,
+          }).then(() => {
+            dispatch(resetSimilarShapesAction());
+            dispatch(toggleSimilarShapesAction(false));
           });
         });
-      })
-      .then(() => {
-        dispatch(resetSimilarShapesAction());
-        dispatch(toggleSimilarShapesAction(false));
-      });
+      }),
+    );
   };
 }
 
@@ -113,6 +113,25 @@ export function setActiveShapeAction(activeShape) {
     dispatch({
       type: SET_ACTIVE_SHAPE,
       activeShape,
+    });
+  };
+}
+
+export function changeActiveShapeTagAction(tag) {
+  return function (dispatch, getState) {
+    const currentShapes = getSimilarShapesFound(getState());
+    const activeShape = { ...getActiveShape(getState()), tag };
+    const { start, end } = activeShape;
+    const dataRun = getDatarunDetails(getState());
+    const { timeSeries } = dataRun;
+    const updatedShape = { ...activeShape, start: timeSeries[start][0] / 1000, end: timeSeries[end][0] / 1000, tag };
+    const shapeIndex = currentShapes.findIndex((current) => current.similarity === activeShape.similarity);
+
+    currentShapes[shapeIndex] = updatedShape;
+
+    dispatch({
+      type: UPDATE_SIMILAR_SHAPES,
+      shapes: currentShapes,
     });
   };
 }
