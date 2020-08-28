@@ -10,6 +10,7 @@
         overflow-y: auto;
 
         .user-activity {
+            margin-bottom: 20px;
             img {
                 width: 32px;
                 border-radius: 50%;
@@ -31,6 +32,8 @@
                 color: #e0e0e0;
             }
             .date-wrapper {
+                display: inline-block;
+                margin-left: 8px;
                 span {
                     display: inline-block;
                     padding-right: 10px;

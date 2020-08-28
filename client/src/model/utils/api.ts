@@ -16,7 +16,7 @@ import {
   UsersResponse,
 } from '../types/index';
 import { PipelineDataType } from '../types/pipeline';
-import { EventDataType } from '../types/event';
+import { EventDataType, EventInteractions } from '../types/event';
 import { CommentDataType } from '../types/comment';
 
 export class RestClient {
@@ -46,6 +46,8 @@ export class RestClient {
 
   public users: Resource<any, UsersResponse>;
 
+  public eventInteraction: Resource<any, EventInteractions>;
+
   /**
    *
    * @param config AxiosRequestConfig
@@ -64,6 +66,7 @@ export class RestClient {
     this.comments = new Resource(this.server, 'comments/');
     this.similar_windows = new Resource(this.server, 'computings/similar_windows/');
     this.users = new Resource(this.server, 'users/');
+    this.eventInteraction = new Resource(this.server, 'event_interaction/');
     this.server.interceptors.request.use(this.requestInterceptor);
     this.server.interceptors.response.use(this.responseSuccessInterceptor, this.responseFailInterceptor);
   }

@@ -43,6 +43,7 @@ import { toggleSimilarShapesAction } from './similarShapes';
 import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
 import { setActivePanelAction } from './sidebar';
 import { getCurrentActivePanel } from '../selectors/sidebar';
+import { getCurrentEventHistoryAction } from './events';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -95,6 +96,7 @@ export function setActiveEventAction(eventID) {
     }
 
     dispatch(getEventComments());
+    dispatch(getCurrentEventHistoryAction());
     (currentPanel === 'periodicalView' || currentPanel === null) && dispatch(setActivePanelAction('signalView'));
   };
 }
@@ -309,6 +311,7 @@ export function saveEventDetailsAction() {
               });
             }, 3000);
             dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+            dispatch(getCurrentEventHistoryAction());
           });
         })
         .catch(() => dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: 'error' }));
