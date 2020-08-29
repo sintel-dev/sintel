@@ -370,7 +370,7 @@ export function saveNewEventAction() {
       score: '0.00',
       tag: newEventDetails.tag || 'Untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
-      create_by: userData.name,
+      created_by: userData.name,
       source: newEventDetails.source ? newEventDetails.source : 'MANUALLY_CREATED',
     };
     await API.events
