@@ -3,6 +3,7 @@ import { RootState } from '../types';
 
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 import { groupEventsByTimestamp, fromMonthToIndex } from '../utils/Utils';
+import { getCurrentEventHistory } from './events';
 
 // @TODO - set state: RootState
 const getEventComments = (state) => state.datarun.eventComments;
@@ -188,6 +189,7 @@ export const getCurrentEventDetails = createSelector(
     if (activeEventID === null) {
       return null;
     }
+
     const { timeSeries } = datarun;
     const eventInfo = datarun.events.find((event) => event.id === activeEventID);
     const eventIndex = datarun.eventWindows.find((windowEvent) => windowEvent[3] === activeEventID);
@@ -223,5 +225,27 @@ export const getCurrentEventDetails = createSelector(
       source,
     };
     return eventDetails;
+  },
+);
+
+export const getEventSortedHistory = createSelector(
+  [getCurrentEventDetails, getCurrentEventHistory],
+  (eventDetails, eventHistory) => {
+    if (eventDetails === null || eventHistory === null) {
+      return null;
+    }
+
+    const eventData = [];
+    const { comments } = eventDetails.eventComments || null;
+    eventData?.push(...comments);
+    eventData?.push(...eventHistory);
+
+    const stringToTimestamp = (string) => new Date(string).getTime();
+
+    const sortedHistory = eventData.sort(
+      (prev, current) => stringToTimestamp(prev.insert_time) - stringToTimestamp(current.insert_time),
+    );
+
+    return sortedHistory;
   },
 );

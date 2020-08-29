@@ -238,6 +238,18 @@ class Event(Resource):
 
 
 class Events(Resource):
+
+    def __init__(self):
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('start_time', type=str, required=True, location='json')
+        parser_post.add_argument('stop_time', type=str, required=True, location='json')
+        parser_post.add_argument('datarun_id', type=str, required=True, location='json')
+        parser_post.add_argument('created_by', type=str, required=True, location='json')
+        parser_post.add_argument('source', type=str, default='MANUALLY_CREATED', location='json')
+        parser_post.add_argument('score', type=float, default=0, location='json')
+        parser_post.add_argument('tag', type=str, default=None, location='json')
+        self.parser_post = parser_post
+
     def get(self):
         """
         @api {get} /events/ Get events by datarun ID
@@ -300,11 +312,12 @@ class Events(Resource):
 
         @apiParam {Int} start_time Event start time.
         @apiParam {Int} stop_time Event stop time.
-        @apiParam {Float} score Event anomaly score.
-        @apiParam {String} tag Event tag.
-        @apiParam {String} datarun_id Datarun ID.
+        @apiParam {String} datarun_id Datarun ID (Use signalrun ID node;
+            TO be fixed in the future).
         @apiParam {String} created_by User name.
-        @apiParam {String="SHAPE_MATCHING","MANUALLY_CREATED"} source Source.
+        @apiParam {Float} [score] Event anomaly score.
+        @apiParam {String} [tag] Event tag.
+        @apiParam {String="SHAPE_MATCHING","MANUALLY_CREATED"} [source] Source.
 
         @apiSuccess {String} id Event ID.
         @apiSuccess {String} insert_time Event insert time.
@@ -323,64 +336,47 @@ class Events(Resource):
         res, status = verify_auth()
         if status == 401:
             return res, status
-        # modifiable attributes
-        attrs = ['start_time', 'stop_time', 'score', 'tag', 'datarun_id', 'source']
-        attrs_type = [float, float, float, str, str, str]
-        d = dict()
-        body = request.json
-        for attr in attrs:
-            d[attr] = None
-            if body is not None:
-                d[attr] = body.get(attr)
-            else:
-                if attr in request.form:
-                    d[attr] = request.form[attr]
 
-        # validate data type
         try:
-            for i, attr in enumerate(attrs):
-                d[attr] = attrs_type[i](d[attr])
+            args = self.parser_post.parse_args()
         except Exception as e:
-            LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
 
         # further validate datarun
-        validate_result = validate_datarun_id(d['datarun_id'])
+        validate_result = validate_datarun_id(args['datarun_id'])
         if validate_result[1] == 400:
             return validate_result
 
-        validate_result[0]
-
         # create and return event
         try:
-            d['signalrun'] = d['datarun_id']
-            del d['datarun_id']
-            if d['tag'] == 'Untagged':
-                del d['tag']
-            d['severity'] = d['score']
-            del d['score']
-            if (d['source'] is None):
-                d['source'] = 'MANUALLY_CREATED'
-            event_doc = schema.Event.insert(**d)
+            doc = {
+                key: args[key]
+                for key in ['start_time', 'stop_time', 'tag', 'source']
+                if args[key] is not None
+            }
+            doc['signalrun'] = args['datarun_id']
+            doc['severity'] = args['score']
 
-            user = request.json.get('created_by', None)
+            event_doc = schema.Event.insert(**doc)
+
             doc = {
                 'event': event_doc.id,
                 'action': 'CREATE',
                 'start_time': event_doc.start_time,
                 'stop_time': event_doc.stop_time,
-                'created_by': user
+                'created_by': args['created_by']
             }
             schema.EventInteraction.insert(**doc)
 
             if event_doc.tag is not None:
                 doc = {
                     'event': event_doc.id,
-                    'action': 'CREATE',
+                    'action': 'TAG',
                     'tag': event_doc.tag,
-                    'created_by': user
+                    'created_by': args['created_by']
                 }
-            schema.EventInteraction.insert(**doc)
+                schema.EventInteraction.insert(**doc)
 
             res = get_event(event_doc)
         except Exception as e:
