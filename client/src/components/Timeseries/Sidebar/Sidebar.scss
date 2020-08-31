@@ -3,11 +3,13 @@
 @import './Collapsible.scss';
 
 .right-sidebar {
+    display: flex;
+    flex-flow: column;
     background: $main-color;
     float: right;
     min-width: 480px;
-    padding-bottom: 10px;
     box-sizing: border-box;
+    height: 94vh;
     height: 89vh;
     position: relative;
     overflow: hidden;
@@ -124,6 +126,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             padding: 0 10px;
+            height: 38vh;
         }
 
         .week-days {
@@ -142,12 +145,5 @@
     .right-sidebar {
         margin-top: 20px;
         width: 100%;
-    }
-}
-
-@media screen and (min-width: 1201px) {
-    .right-sidebar {
-        float: right;
-        max-width: 480px;
     }
 }
