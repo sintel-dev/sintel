@@ -5,10 +5,16 @@ import {
   UPDATE_SIMILAR_SHAPES,
   UPDATE_EVENT_DETAILS,
   SET_ACTIVE_SHAPE,
+  CHANGE_SHAPES_METRICS,
 } from '../types';
 import { getCurrentEventDetails, getDatarunDetails } from '../selectors/datarun';
 import API from '../utils/api';
-import { getSimilarShapesCoords, getSimilarShapesFound, getActiveShape } from '../selectors/similarShapes';
+import {
+  getSimilarShapesCoords,
+  getSimilarShapesFound,
+  getActiveShape,
+  getCurrentShapeMetrics,
+} from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
 
 export function toggleSimilarShapesAction(modalState) {
@@ -23,12 +29,16 @@ export function toggleSimilarShapesAction(modalState) {
 export function getSimilarShapesAction() {
   return function (dispatch, getState) {
     const eventDetails = getCurrentEventDetails(getState());
+    const shapeMetric = getCurrentShapeMetrics(getState());
     let { datarun, start_time, stop_time } = eventDetails;
     start_time /= 1000;
     stop_time /= 1000;
     const action = {
       type: FETCH_SIMILAR_SHAPES,
-      promise: API.similar_windows.all({}, { start: start_time, end: stop_time, datarun_id: datarun, number: 4 }),
+      promise: API.similar_windows.all(
+        {},
+        { start: start_time, end: stop_time, datarun_id: datarun, number: 4, metric: shapeMetric },
+      ),
     };
 
     dispatch(action);
@@ -133,5 +143,11 @@ export function changeActiveShapeTagAction(tag) {
       type: UPDATE_SIMILAR_SHAPES,
       shapes: currentShapes,
     });
+  };
+}
+
+export function changeMetricsAction(metrics) {
+  return function (dispatch) {
+    dispatch({ type: CHANGE_SHAPES_METRICS, metrics });
   };
 }

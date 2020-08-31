@@ -10,6 +10,7 @@ import {
   shapesTagsOverrideAction,
   setActiveShapeAction,
   changeActiveShapeTagAction,
+  changeMetricsAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -17,6 +18,7 @@ import {
   getSimilarShapesCoords,
   getIsSimilarShapesActive,
   getActiveShape,
+  getCurrentShapeMetrics,
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
@@ -207,7 +209,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeOptions() {
-    const { currentEvent, similarShapes } = this.props;
+    const { currentEvent, similarShapes, activeMetric, changeShapeMetric } = this.props;
     if (similarShapes.length) {
       return null;
     }
@@ -219,14 +221,28 @@ class SimilarShapes extends Component {
         <div className="form-wrapper">
           <ul className="algorithms">
             <li>
-              <input type="radio" name="algotitm" id="euclidian" disabled={currentEvent === null} />
+              <input
+                type="radio"
+                name="algotitm"
+                id="euclidian"
+                checked={activeMetric === 'euclidean'}
+                disabled={currentEvent === null}
+                onChange={() => changeShapeMetric('euclidean')}
+              />
               <label htmlFor="euclidian">
                 <span />
                 Euclidean
               </label>
             </li>
             <li>
-              <input type="radio" name="algotitm" id="dtw" disabled={currentEvent === null} />
+              <input
+                type="radio"
+                name="algotitm"
+                id="dtw"
+                checked={activeMetric === 'dtw'}
+                disabled={currentEvent === null}
+                onChange={() => changeShapeMetric('dtw')}
+              />
               <label htmlFor="dtw">
                 <span />
                 DTW
@@ -339,6 +355,7 @@ export default connect(
     isSimilarShapesActive: getIsSimilarShapesActive(state),
     isEditingEventRange: getIsEditingEventRange(state),
     activeShape: getActiveShape(state),
+    activeMetric: getCurrentShapeMetrics(state),
   }),
   (dispatch) => ({
     toggleSimilarShapes: (state) => dispatch(toggleSimilarShapesAction(state)),
@@ -349,5 +366,6 @@ export default connect(
     overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
     setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
     changeShapeTag: (tag) => dispatch(changeActiveShapeTagAction(tag)),
+    changeShapeMetric: (metric) => dispatch(changeMetricsAction(metric)),
   }),
 )(SimilarShapes);
