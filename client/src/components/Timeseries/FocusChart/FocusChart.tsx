@@ -25,6 +25,7 @@ import {
   getIsTimeSyncModeEnabled,
   getScrollHistory,
   getCurrentEventDetails,
+  getActiveEventID,
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -200,7 +201,7 @@ export class FocusChart extends Component<Props, State> {
   }
 
   renderEventArea(currentEvent) {
-    const { dataRun, periodRange, setActiveEvent } = this.props;
+    const { dataRun, periodRange, setActiveEvent, activeEventID } = this.props;
     const { timeSeries } = dataRun;
     const { height } = this.state;
 
@@ -225,8 +226,8 @@ export class FocusChart extends Component<Props, State> {
     const startDate = new Date(timeSeries[startIndex][0]);
     const stopDate = new Date(timeSeries[stopIndex][0]);
 
-    const pathClassName = (currentEvent[4] && currentEvent[4].replace(/\s/g, '_').toLowerCase()) || 'untagged';
-
+    const pathClassName = currentEvent[4]?.replace(/\s/g, '_').toLowerCase() || 'untagged';
+    const activeClass = currentEvent[3] === activeEventID ? 'active' : '';
     return (
       <g
         className="line-highlight"
@@ -248,7 +249,13 @@ export class FocusChart extends Component<Props, State> {
       >
         <path className={`evt-highlight ${pathClassName}`} d={this.drawLine(event)} />
         <g className="event-comment">
-          <rect className="evt-area" width={commentWidth} height={commentHeight} y={0} x={translateComment} />
+          <rect
+            className={`evt-area ${activeClass}`}
+            width={commentWidth}
+            height={commentHeight}
+            y={0}
+            x={translateComment}
+          />
           <rect className="evt-comment" height="10" width={commentWidth} y="0" x={translateComment} fill={tagColor} />
         </g>
       </g>
@@ -463,6 +470,7 @@ const mapState = (state: RootState) => ({
   similarShapesCoords: getSimilarShapesCoords(state),
   selectedEventDetails: getCurrentEventDetails(state),
   activeShape: getActiveShape(state),
+  activeEventID: getActiveEventID(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

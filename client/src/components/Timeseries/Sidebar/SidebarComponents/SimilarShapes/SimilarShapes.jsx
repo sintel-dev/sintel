@@ -9,6 +9,9 @@ import {
   resetSimilarShapesAction,
   shapesTagsOverrideAction,
   setActiveShapeAction,
+  changeActiveShapeTagAction,
+  changeMetricsAction,
+  deleteShapeAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -16,10 +19,12 @@ import {
   getSimilarShapesCoords,
   getIsSimilarShapesActive,
   getActiveShape,
+  getCurrentShapeMetrics,
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
 import Dropdown from 'src/components/Common/Dropdown';
+import { selectedOption } from 'src/components/Timeseries/FocusChart/EventDetails/eventUtils';
 
 const shapesLanding = () => (
   <div className="shapes-landing">
@@ -105,7 +110,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeFooter() {
-    const { deleteEvent, saveShapes, similarShapes, currentEvent } = this.props;
+    const { deleteShape, saveShapes, similarShapes, currentEvent, activeShape } = this.props;
     if (!similarShapes.length || currentEvent === null) {
       return null;
     }
@@ -114,7 +119,7 @@ class SimilarShapes extends Component {
       <div className="shape-footer">
         <ul>
           <li>
-            <button type="button" className="clean delete" onClick={deleteEvent}>
+            <button type="button" className="clean delete" onClick={deleteShape} disabled={!activeShape}>
               Delete
             </button>
           </li>
@@ -143,11 +148,10 @@ class SimilarShapes extends Component {
     }
 
     return similarShapes.map((currentShape) => {
-      const { activeShape, setActiveShape } = this.props;
+      const { activeShape, setActiveShape, changeShapeTag } = this.props;
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
       const shapeClassName =
         activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
-
       return (
         <div
           className={`shape-details ${shapeClassName}`}
@@ -171,7 +175,7 @@ class SimilarShapes extends Component {
               <tr>
                 <th>Tag</th>
                 <td>
-                  <Dropdown />
+                  <Dropdown onChange={(tag) => changeShapeTag(tag.value)} value={selectedOption(currentShape.tag)} />
                 </td>
               </tr>
             </tbody>
@@ -206,7 +210,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeOptions() {
-    const { currentEvent, similarShapes } = this.props;
+    const { currentEvent, similarShapes, activeMetric, changeShapeMetric } = this.props;
     if (similarShapes.length) {
       return null;
     }
@@ -218,14 +222,28 @@ class SimilarShapes extends Component {
         <div className="form-wrapper">
           <ul className="algorithms">
             <li>
-              <input type="radio" name="algotitm" id="euclidian" disabled={currentEvent === null} />
+              <input
+                type="radio"
+                name="algotitm"
+                id="euclidian"
+                checked={activeMetric === 'euclidean'}
+                disabled={currentEvent === null}
+                onChange={() => changeShapeMetric('euclidean')}
+              />
               <label htmlFor="euclidian">
                 <span />
                 Euclidean
               </label>
             </li>
             <li>
-              <input type="radio" name="algotitm" id="dtw" disabled={currentEvent === null} />
+              <input
+                type="radio"
+                name="algotitm"
+                id="dtw"
+                checked={activeMetric === 'dtw'}
+                disabled={currentEvent === null}
+                onChange={() => changeShapeMetric('dtw')}
+              />
               <label htmlFor="dtw">
                 <span />
                 DTW
@@ -313,13 +331,11 @@ class SimilarShapes extends Component {
             {this.renderShapeOptions()}
           </div>
           {this.renderSearchControls()}
-          <div className="scroll-style">
-            {isSimilarShapesLoading ? (
-              shapesLoader()
-            ) : (
-              <div className="shapes-results scroll-style">{this.renderShapes()}</div>
-            )}
-          </div>
+          {isSimilarShapesLoading ? (
+            shapesLoader()
+          ) : (
+            <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+          )}
           {this.renderShapeFooter()}
         </div>
       </div>
@@ -340,6 +356,7 @@ export default connect(
     isSimilarShapesActive: getIsSimilarShapesActive(state),
     isEditingEventRange: getIsEditingEventRange(state),
     activeShape: getActiveShape(state),
+    activeMetric: getCurrentShapeMetrics(state),
   }),
   (dispatch) => ({
     toggleSimilarShapes: (state) => dispatch(toggleSimilarShapesAction(state)),
@@ -349,5 +366,8 @@ export default connect(
     resetSimilarShapes: () => dispatch(resetSimilarShapesAction()),
     overrideAllTags: (tag) => dispatch(shapesTagsOverrideAction(tag)),
     setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
+    changeShapeTag: (tag) => dispatch(changeActiveShapeTagAction(tag)),
+    changeShapeMetric: (metric) => dispatch(changeMetricsAction(metric)),
+    deleteShape: () => dispatch(deleteShapeAction()),
   }),
 )(SimilarShapes);

@@ -9,10 +9,10 @@ import {
 } from 'src/model/selectors/datarun';
 import * as _ from 'lodash';
 import { setPeriodRangeAction } from 'src/model/actions/datarun';
+import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
 import { getWrapperSize, drawArc, getDataScale } from '../../SidebarUtils';
 
 import Header from '../Header';
-import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
 
 class PeriodicalView extends Component {
   constructor(props) {
@@ -216,7 +216,8 @@ class PeriodicalView extends Component {
         <Header />
         <div id="dataWrapper" className="data-wrapper">
           {this.renderWeekDays()}
-          <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}>
+          {/* <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}> */}
+          <div className="wrapper-container scroll-style">
             <svg id="multiPeriodChart" width={width} height={height}>
               {this.drawData()}
               {/* <defs>

@@ -6,6 +6,7 @@ export const getIsSimilarShapesActive = (state) => state.similarShapes.isShapesM
 export const getIsSimilarShapesLoading = (state) => state.similarShapes.isSimilarShapesLoading;
 export const similarShapesResults = (state) => state.similarShapes.similarShapes;
 export const getActiveShape = (state) => state.similarShapes.activeShape;
+export const getCurrentShapeMetrics = (state) => state.similarShapes.shapeMetrics;
 
 export const getSimilarShapesFound = createSelector(
   [getIsSimilarShapesLoading, similarShapesResults, getCurrentEventDetails],
@@ -48,7 +49,7 @@ export const getSimilarShapesCoords = createSelector(
       const { start, end } = currentShape;
       const startIndex = timeSeries.findIndex((element) => start * 1000 - element[0] < 0) - 1;
       const stopIndex = timeSeries.findIndex((element) => end * 1000 - element[0] < 0);
-      return { ...currentShape, start: startIndex, end: stopIndex };
+      return { ...currentShape, start: startIndex, end: stopIndex, source: 'SHAPE_MATCHING' };
     });
   },
 );

@@ -38,8 +38,8 @@ class CommentControl extends Component {
   renderTagBadge() {
     const { tag } = this.props.updatedEventDetails;
 
-    const bgColor = colorSchemes[tag];
-    const eventClassName = tag.replace(/\s/g, '_').toLowerCase() || 'untagged';
+    const bgColor = (tag && colorSchemes[tag]) || colorSchemes.Untagged;
+    const eventClassName = tag?.replace(/\s/g, '_').toLowerCase() || 'untagged';
     return (
       <div className="badge-wrapper">
         <ul>

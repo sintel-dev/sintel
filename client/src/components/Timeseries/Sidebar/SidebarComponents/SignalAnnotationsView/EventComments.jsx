@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getCurrentEventDetails } from 'src/model/selectors/datarun';
+import { getCurrentEventDetails, getEventSortedHistory } from 'src/model/selectors/datarun';
 import Loader from 'src/components/Common/Loader';
+import { getCurrentEventHistoryAction } from 'src/model/actions/events';
 import { getUsersData, getIsUsersDataloading } from 'src/model/selectors/users';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActivePanelAction } from 'src/model/actions/sidebar';
+import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
 import { MAX_EVENTS_ACTIVITY } from '../../SidebarUtils';
 import './EventComments.scss';
 
@@ -14,42 +16,79 @@ class EventComments extends Component {
     return usersData.filter((user) => user.name === userName)[0];
   }
 
-  renderComment(eventDetails) {
-    const { eventComments } = eventDetails;
-    const { comments } = eventComments;
+  renderEventComment(eventComment, userData) {
+    const { id, insert_time, text } = eventComment;
+    return (
+      <div key={id} className="user-activity">
+        <table width="99%">
+          <tbody>
+            <tr>
+              <td rowSpan="2" width="40" valign="top">
+                <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
+              </td>
+              <td>
+                <strong>{userData.name}</strong> {timestampToDate(insert_time)}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan="2">
+                <p>{text}</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
-    if (comments === undefined || !comments.length) {
-      return <p>This event has no comments yet.</p>;
+  renderEventTag(currentEvent, userData) {
+    const { tag, insert_time } = currentEvent;
+    const color = tag ? colorSchemes[tag] : colorSchemes.Untagged;
+    const eventClassName = (tag && tag.replace(/\s/g, '_').toLowerCase()) || 'untagged';
+    return (
+      <div key={currentEvent.id} className="user-activity">
+        <table width="100%">
+          <tbody>
+            <tr>
+              <td colSpan="2">{timestampToDate(insert_time)}</td>
+            </tr>
+            <tr>
+              <td rowSpan="2" width="40">
+                <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
+              </td>
+              <td>
+                <strong>{userData.name}</strong> assigned a tag
+              </td>
+              <td>
+                <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>
+                  {tag || 'Untagged'}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  renderEventHistory() {
+    const { isEventJumpVisible, eventHistory } = this.props;
+
+    if (eventHistory === null || !eventHistory.length) {
+      return <p>This event has no activity yet.</p>;
     }
 
-    const maxActivity = comments.slice(Math.max(comments.length - MAX_EVENTS_ACTIVITY, 0));
+    const maxActivity = isEventJumpVisible
+      ? eventHistory.slice(Math.max(eventHistory.length - MAX_EVENTS_ACTIVITY, 0))
+      : eventHistory;
 
-    return maxActivity.map((currentComment) => {
-      const userData = this.findUser(currentComment.created_by);
-      return (
-        <div key={currentComment.id} className="user-activity">
-          <table width="100%">
-            <tbody>
-              <tr>
-                <td rowSpan="2" width="40">
-                  <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
-                </td>
-                <td>
-                  <strong>{userData.name}</strong>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>{currentComment.text}</p>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="2">{timestampToDate(currentComment.insert_time)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      );
+    return maxActivity.map((currentActivity) => {
+      const userData = this.findUser(currentActivity.created_by);
+      const action = currentActivity.action || null;
+
+      return action === null
+        ? this.renderEventComment(currentActivity, userData)
+        : this.renderEventTag(currentActivity, userData);
     });
   }
 
@@ -69,7 +108,7 @@ class EventComments extends Component {
         <div className="event-data">
           <div className="event-comments scroll-style">
             <Loader isLoading={eventDetails.isCommentsLoading || isUsersDataLoading}>
-              {this.renderComment(eventDetails)}
+              {this.renderEventHistory()}
             </Loader>
           </div>
           {isEventJumpVisible && (
@@ -101,8 +140,10 @@ export default connect(
     eventDetails: getCurrentEventDetails(state),
     usersData: getUsersData(state),
     isUsersDataLoading: getIsUsersDataloading(state),
+    eventHistory: getEventSortedHistory(state),
   }),
   (dispatch) => ({
     setActivePanel: (activePanel) => dispatch(setActivePanelAction(activePanel)),
+    getEventHistory: () => dispatch(getCurrentEventHistoryAction()),
   }),
 )(EventComments);

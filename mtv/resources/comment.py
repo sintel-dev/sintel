@@ -160,7 +160,8 @@ class Comments(Resource):
                 "id": str(document.id),
                 "event": event_id,
                 "text": document.comment,
-                "created_by": document.created_by
+                "created_by": document.created_by,
+                "insert_time": str(document.insert_time)
             })
 
         return {'comments': comments}

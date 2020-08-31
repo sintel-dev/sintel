@@ -43,6 +43,7 @@ import { toggleSimilarShapesAction } from './similarShapes';
 import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
 import { setActivePanelAction } from './sidebar';
 import { getCurrentActivePanel } from '../selectors/sidebar';
+import { getCurrentEventHistoryAction } from './events';
 
 export function selectDatarun(datarunID: string) {
   return function (dispatch, getState) {
@@ -95,6 +96,7 @@ export function setActiveEventAction(eventID) {
     }
 
     dispatch(getEventComments());
+    dispatch(getCurrentEventHistoryAction());
     (currentPanel === 'periodicalView' || currentPanel === null) && dispatch(setActivePanelAction('signalView'));
   };
 }
@@ -223,9 +225,10 @@ export function updateEventDetailsAction(updatedEventDetails) {
     let currentEventDetails = getCurrentEventDetails(getState());
     if (isAddingNewEvent) {
       currentEventDetails = getNewEventDetails(getState());
+      return dispatch(updateNewEventDetailsAction(updatedEventDetails));
     }
 
-    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
+    return dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: { ...currentEventDetails, ...updatedEventDetails } });
   };
 }
 
@@ -239,6 +242,7 @@ export function saveEventDetailsAction() {
   return async function (dispatch, getState) {
     const updatedEventDetails = getUpdatedEventDetails(getState());
     const userID = Cookies.get(AUTHENTICATED_USER_ID);
+    const dataRun = getDatarunDetails(getState());
 
     // @TODO - getting the user data without Google authentication is yet to be handled
     const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
@@ -257,6 +261,7 @@ export function saveEventDetailsAction() {
       stop_time: stop,
       score,
       tag,
+      datarun_id: dataRun.id,
       event_id: updatedEventDetails.id,
       created_by: userData.name,
     };
@@ -306,6 +311,7 @@ export function saveEventDetailsAction() {
               });
             }, 3000);
             dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+            dispatch(getCurrentEventHistoryAction());
           });
         })
         .catch(() => dispatch({ type: EVENT_UPDATE_STATUS, eventUpdateStatus: 'error' }));
@@ -331,7 +337,7 @@ export function updateNewEventDetailsAction(eventDetails) {
       ...eventDetails,
       datarun_id: datarun.id,
       score: 0,
-      tag: (eventDetails.tag && eventDetails.tag) || null,
+      tag: (eventDetails.tag && eventDetails.tag) || 'Untagged',
     };
 
     dispatch({ type: NEW_EVENT_DETAILS, newEventDetails: eventTemplate });
@@ -364,7 +370,8 @@ export function saveNewEventAction() {
       score: '0.00',
       tag: newEventDetails.tag || 'Untagged',
       datarun_id: newEventDetails.datarun_id || newEventDetails.datarun,
-      create_by: userData.name,
+      created_by: userData.name,
+      source: newEventDetails.source ? newEventDetails.source : 'MANUALLY_CREATED',
     };
     await API.events
       .create(eventDetails)
@@ -410,13 +417,7 @@ export function deleteEventAction() {
       (dataItem) => dataItem.id === currentDatarun.id,
     );
 
-    // @TODO - implement delete comments as wel.
-    // Investigate why server response is 405 when deleting comment
-    // dispatch(deleteEventComments());
-
-    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
-
-    await API.events.delete(currentEventDetails.id, { created_by: userData.name }).then(() => {
+    await API.events.delete(currentEventDetails.id).then(() => {
       dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: null });
       dispatch({
         type: UPDATE_DATARUN_EVENTS,

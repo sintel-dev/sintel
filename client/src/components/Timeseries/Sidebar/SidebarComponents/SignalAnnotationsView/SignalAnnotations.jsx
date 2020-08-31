@@ -28,34 +28,34 @@ class SignalAnnotations extends Component {
 
     return events.length ? (
       events.map((currentEvent) => {
+        const { id, tag, start_time, stop_time } = currentEvent;
         const color = currentEvent && currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
-        const eventClassName =
-          (currentEvent && currentEvent.tag && currentEvent.tag.replace(/\s/g, '_').toLowerCase()) || 'untagged';
+        const eventClassName = tag?.replace(/\s/g, '_').toLowerCase() || 'untagged';
 
         return (
-          <div key={currentEvent.id} className="annotation-wrapper">
-            <div className="annotation-heading" onClick={() => toggleEventState(currentEvent.id)}>
+          <div key={id} className="annotation-wrapper">
+            <div className="annotation-heading" onClick={() => toggleEventState(id)}>
               <div className="annotation-wrapper-left">
                 <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>
-                  {currentEvent.tag || 'Untagged'}
+                  {tag || 'Untagged'}
                 </span>
               </div>
               <div className="annotation-wrapper-right">
                 <ul className="event-time-range">
                   <li>
-                    <span>Starts:</span> {timestampToDate(currentEvent.start_time * 1000)}
+                    <span>Starts:</span> {timestampToDate(start_time * 1000)}
                   </li>
-                  <li>Ends: {timestampToDate(currentEvent.stop_time * 1000)}</li>
+                  <li>Ends: {timestampToDate(stop_time * 1000)}</li>
                 </ul>
               </div>
               <div>
                 <button type="button">
-                  {eventDetails && eventDetails.id === currentEvent.id ? <TriangleUp /> : <TriangleDown />}
+                  {eventDetails && eventDetails.id === id ? <TriangleUp /> : <TriangleDown />}
                 </button>
               </div>
             </div>
             <div className="collapsible-wrapper">
-              <Collapse isOpened={eventDetails && eventDetails.id === currentEvent.id}>
+              <Collapse isOpened={eventDetails && eventDetails.id === id}>
                 <EventComments />
                 <CommentControl eventDetails={currentEvent} />
               </Collapse>

@@ -9,6 +9,7 @@ import users from './users';
 import aggregationLevels from './aggregationLevels';
 import similarShapes from './similarShapes';
 import sidebar from './sidebar';
+import events from './events';
 
 const dashBoardReducers = combineReducers({
   users,
@@ -21,6 +22,7 @@ const dashBoardReducers = combineReducers({
   aggregationLevels,
   similarShapes,
   sidebar,
+  events,
 });
 
 export default dashBoardReducers;

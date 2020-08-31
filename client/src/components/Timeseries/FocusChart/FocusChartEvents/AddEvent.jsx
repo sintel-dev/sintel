@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
+import { setActivePanelAction } from 'src/model/actions/sidebar';
 import {
   updateNewEventDetailsAction,
   updateEventDetailsAction,
-  openEventDetailsPopupAction,
+  // openEventDetailsPopupAction,
 } from '../../../../model/actions/datarun';
 
 import {
@@ -148,6 +149,7 @@ export class AddEvents extends Component {
             stop_time: new Date(timeSeries[stopIndex][0]).getTime(),
           };
 
+          // @TODO - investigate if really needed, updateEventDetails should do the trick
           if (isAddingNewEvent) {
             updateNewEventDetails({ ...eventDetails });
           }
@@ -168,10 +170,8 @@ export class AddEvents extends Component {
   }
 
   render() {
-    const { openEventDetailsPopup, isAddingNewEvent, isEditingEventRange } = this.props;
-    return (
-      (isAddingNewEvent || isEditingEventRange) && <g className="brush-instance" onClick={openEventDetailsPopup} />
-    );
+    const { isAddingNewEvent, isEditingEventRange, toggleActivePanel } = this.props;
+    return (isAddingNewEvent || isEditingEventRange) && <g className="brush-instance" onClick={toggleActivePanel} />;
   }
 }
 
@@ -186,6 +186,7 @@ export default connect(
   (dispatch) => ({
     updateNewEventDetails: (eventDetails) => dispatch(updateNewEventDetailsAction(eventDetails)),
     updateEventDetails: (eventDetails) => dispatch(updateEventDetailsAction(eventDetails)),
-    openEventDetailsPopup: () => dispatch(openEventDetailsPopupAction()),
+    // openEventDetailsPopup: () => dispatch(openEventDetailsPopup()),
+    toggleActivePanel: () => dispatch(setActivePanelAction('eventView')),
   }),
 )(AddEvents);
