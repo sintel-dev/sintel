@@ -11,6 +11,7 @@ import {
   setActiveShapeAction,
   changeActiveShapeTagAction,
   changeMetricsAction,
+  deleteShapeAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -109,7 +110,7 @@ class SimilarShapes extends Component {
   }
 
   renderShapeFooter() {
-    const { deleteEvent, saveShapes, similarShapes, currentEvent } = this.props;
+    const { deleteShape, saveShapes, similarShapes, currentEvent, activeShape } = this.props;
     if (!similarShapes.length || currentEvent === null) {
       return null;
     }
@@ -118,7 +119,7 @@ class SimilarShapes extends Component {
       <div className="shape-footer">
         <ul>
           <li>
-            <button type="button" className="clean delete" onClick={deleteEvent}>
+            <button type="button" className="clean delete" onClick={deleteShape} disabled={!activeShape}>
               Delete
             </button>
           </li>
@@ -367,5 +368,6 @@ export default connect(
     setActiveShape: (shape) => dispatch(setActiveShapeAction(shape)),
     changeShapeTag: (tag) => dispatch(changeActiveShapeTagAction(tag)),
     changeShapeMetric: (metric) => dispatch(changeMetricsAction(metric)),
+    deleteShape: () => dispatch(deleteShapeAction()),
   }),
 )(SimilarShapes);
