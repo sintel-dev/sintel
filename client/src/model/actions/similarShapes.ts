@@ -14,6 +14,7 @@ import {
   getSimilarShapesFound,
   getActiveShape,
   getCurrentShapeMetrics,
+  similarShapesResults,
 } from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
 
@@ -149,5 +150,19 @@ export function changeActiveShapeTagAction(tag) {
 export function changeMetricsAction(metrics) {
   return function (dispatch) {
     dispatch({ type: CHANGE_SHAPES_METRICS, metrics });
+  };
+}
+
+export function deleteShapeAction() {
+  return function (dispatch, getState) {
+    let similarShapes = [...similarShapesResults(getState())];
+    const activeShape = getActiveShape(getState());
+    const shapeIndex = similarShapes.findIndex((current) => current.similarity === activeShape.similarity);
+    similarShapes.splice(shapeIndex, 1);
+
+    dispatch({
+      type: UPDATE_SIMILAR_SHAPES,
+      shapes: similarShapes,
+    });
   };
 }
