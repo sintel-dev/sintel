@@ -314,13 +314,11 @@ class SimilarShapes extends Component {
             {this.renderShapeOptions()}
           </div>
           {this.renderSearchControls()}
-          <div className="scroll-style">
-            {isSimilarShapesLoading ? (
-              shapesLoader()
-            ) : (
-              <div className="shapes-results scroll-style">{this.renderShapes()}</div>
-            )}
-          </div>
+          {isSimilarShapesLoading ? (
+            shapesLoader()
+          ) : (
+            <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+          )}
           {this.renderShapeFooter()}
         </div>
       </div>
