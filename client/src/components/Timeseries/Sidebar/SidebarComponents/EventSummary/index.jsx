@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Collapse } from 'react-collapse';
+import { FillTriangleUpIcon, FillTriangleDownIcon } from 'src/components/Common/icons';
 import { tagSeq, fromTagToClassName } from '../../../../Landing/utils';
 import { fromMonthToIndex } from '../../../../../model/utils/Utils';
 
@@ -84,67 +86,47 @@ class EventSummary extends Component {
     return eventsPerRange;
   }
 
-  showPeriod() {
-    const { filteredPeriodRange, selectedPeriodLevel, isTimeSyncEnabled } = this.props;
-    let periodString = 'YY/MM';
-
-    if (isTimeSyncEnabled) {
-      const { level } = filteredPeriodRange[0];
-      if (level === 'month') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
-      }
-
-      if (level === 'day') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
-        periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
-      }
-    } else {
-      if (selectedPeriodLevel.year) {
-        periodString = periodString.replace('YY', selectedPeriodLevel.year);
-      }
-      if (selectedPeriodLevel.month) {
-        periodString = periodString.replace('MM', selectedPeriodLevel.month);
-      }
-    }
-
-    return (
-      <div className="period-info">
-        <p>{periodString}</p>
-      </div>
-    );
-  }
-
   render() {
-    const { isOpen } = this.props;
+    const { showPeriod, toggleEventSummary, isSummaryViewActive } = this.props;
     const eventsPerRange = this.getTimeRangeEvents();
-    const activeSummary = isOpen ? 'active' : '';
-
+    const activeSummary = isSummaryViewActive ? 'active' : '';
     return (
       <div className="event-summary">
         <div className="event-header">
           <div className="left-wrapper wrapper">
             <span>{this.props.signalName}</span>
           </div>
-          <div className="right-wrapper wrapper">{this.showPeriod()}</div>
+          <div className="right-wrapper wrapper">
+            <ul>
+              <li>{showPeriod}</li>
+              <li>
+                <button type="button" onClick={toggleEventSummary} className="toggle clean">
+                  {isSummaryViewActive ? <FillTriangleUpIcon /> : <FillTriangleDownIcon />}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className={`summary-details ${activeSummary}`}>
-          <table>
-            <tbody>
-              <tr>
-                <th>event tag</th>
-                {renderTagIcon()}
-              </tr>
-              <tr>
-                <th>Year</th>
-                {renderTagEvents(eventsPerRange.perYear)}
-              </tr>
-              <tr>
-                <th>Month</th>
-                {renderTagEvents(eventsPerRange.perMonth)}
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Collapse isOpened={isSummaryViewActive}>
+          <div className={`summary-details ${activeSummary}`}>
+            <table>
+              <tbody>
+                <tr>
+                  <th>event tag</th>
+                  {renderTagIcon()}
+                </tr>
+                <tr>
+                  <th>Year</th>
+                  {renderTagEvents(eventsPerRange.perYear)}
+                </tr>
+                <tr>
+                  <th>Month</th>
+                  {renderTagEvents(eventsPerRange.perMonth)}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Collapse>
       </div>
     );
   }
