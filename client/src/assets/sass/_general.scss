@@ -14,9 +14,9 @@ body {
 }
 
 #content-wrapper {
-    margin: 63px 0 0 0;
-    height: 90vh;
+    height: 99.5vh;
     position: relative;
+    overflow: hidden;
 }
 
 .scroll-style::-webkit-scrollbar {
@@ -38,7 +38,6 @@ body {
     border-radius: 5px;
 }
 
-.main-wrapper{
-    width: 98%;
+.main-wrapper {
     margin: 0 auto;
 }
