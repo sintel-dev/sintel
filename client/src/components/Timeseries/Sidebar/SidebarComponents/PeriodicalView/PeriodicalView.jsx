@@ -9,7 +9,7 @@ import {
 } from 'src/model/selectors/datarun';
 import * as _ from 'lodash';
 import { setPeriodRangeAction } from 'src/model/actions/datarun';
-import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
+import { getIsRelativeScaleEnabled, getIsSummaryViewActive } from 'src/model/selectors/sidebar';
 import { getWrapperSize, drawArc, getDataScale } from '../../SidebarUtils';
 
 import Header from '../Header';
@@ -74,14 +74,17 @@ class PeriodicalView extends Component {
   }
 
   getWrapperHeight = () => {
-    const { dataRun } = this.props;
+    const { dataRun, isSummaryViewActive } = this.props;
     const { initialHeight } = this.state;
     let wrapperHeight = initialHeight;
 
     if (dataRun.period[0].level === 'day') {
-      wrapperHeight -= 20; // wrapper heading height (day names)
+      return isSummaryViewActive ? wrapperHeight - 198 : wrapperHeight - 81; // day names height calculus
     }
-    return wrapperHeight;
+    if (!isSummaryViewActive) {
+      return wrapperHeight - 58;
+    }
+    return wrapperHeight - 175;
   };
 
   getColSpacing(period) {
@@ -179,8 +182,7 @@ class PeriodicalView extends Component {
                     <path key={arc.eventID} d={arc.pathData} className={arc.tag} fill={arc.tagColor} />
                   ))}
               </g>
-              {/* <circle r={radius * 0.85} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} /> */}
-              {/* <circle r={radius * 0.95} className="wrapper" fill="url(#blueGradient)" /> */}
+              <circle r={radius} className="wrapper" fill="url(#blueGradient)" clipPath={`url(#clip_${name})`} />
             </g>
           </g>
         );
@@ -216,16 +218,15 @@ class PeriodicalView extends Component {
         <Header />
         <div id="dataWrapper" className="data-wrapper">
           {this.renderWeekDays()}
-          {/* <div className="wrapper-container scroll-style" style={{ height: `${this.getWrapperHeight()}px` }}> */}
-          <div className="wrapper-container scroll-style">
+          <div className="wrapper-container scroll-style" style={{ maxHeight: `${this.getWrapperHeight()}px` }}>
             <svg id="multiPeriodChart" width={width} height={height}>
               {this.drawData()}
-              {/* <defs>
+              <defs>
                 <radialGradient id="blueGradient">
-                  <stop offset="0" stopColor="#B2C1FF" />
-                  <stop offset="100" stopColor="rgba(216,216,216,0)" />
+                  <stop offset="0" stopColor="rgba(178, 193, 255, 0.7)" />
+                  <stop offset="100" stopColor="rgba(89, 93, 106, 0.1)" />
                 </radialGradient>
-              </defs> */}
+              </defs>
             </svg>
           </div>
         </div>
@@ -242,6 +243,7 @@ export default connect(
     isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
     isEventModeEnabled: getIsEventModeEnabled(state),
     isRelativeScaleEnabled: getIsRelativeScaleEnabled(state),
+    isSummaryViewActive: getIsSummaryViewActive(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodLevel) => dispatch(setPeriodRangeAction(periodLevel)),
