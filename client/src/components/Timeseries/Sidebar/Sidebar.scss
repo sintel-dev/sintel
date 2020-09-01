@@ -6,13 +6,13 @@
     display: flex;
     flex-flow: column;
     background: $main-color;
-    float: right;
-    min-width: 480px;
+    width: 480px;
     box-sizing: border-box;
-    height: 94vh;
-    height: 89vh;
-    position: relative;
-    overflow: hidden;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    padding-top: 50px;
+    right: 0px;
 
     .feature-cell {
         cursor: pointer;
@@ -126,7 +126,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             padding: 0 10px;
-            height: 38vh;
+            max-height: 43vh;
         }
 
         .week-days {
