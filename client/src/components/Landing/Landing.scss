@@ -2,11 +2,12 @@
 @import '../../assets/sass/animations.scss';
 
 .page-landing {
+    margin-top: 63px;
+
     .projects-wrapper {
         background: $second-color;
         z-index: 10;
     }
-
 }
 
 @keyframes homepage {
@@ -26,7 +27,7 @@
     overflow-x: auto;
     width: 100%;
 
-    h2{
+    h2 {
         margin-top: 0px;
         margin-bottom: 10px;
     }
@@ -52,15 +53,15 @@
         font-size: 17px;
         cursor: pointer;
         animation: slide-up 1s ease;
-        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.5);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
 
         &.active {
             border: 1px solid $active-border;
             background: $active-card-bg;
             color: #fff;
-            box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5);
-            background-color: #23242B;
-            box-shadow: inset 0 1px 17px 0 rgba(0,0,0,0.5), 0 2px 2px 0 rgba(0,0,0,0.5);
+            box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5);
+            background-color: #23242b;
+            box-shadow: inset 0 1px 17px 0 rgba(0, 0, 0, 0.5), 0 2px 2px 0 rgba(0, 0, 0, 0.5);
         }
 
         &:hover {
@@ -115,34 +116,37 @@
 
 .page-slider {
     width: 100%;
-    height: 90vh;
+    height: 100vh;
     animation-name: enterRight;
     animation-duration: 1s;
     overflow: hidden;
 
-    .animate-left, .animate-right {
+    .animate-left,
+    .animate-right {
         position: absolute;
-        top: 0;
-        width: 100%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
     }
 
+    .animate-left {
+        width: 98%;
+    }
 
-
-    .page-slider-enter{
-        background:#23242b;
+    .page-slider-enter {
+        background: #23242b;
         z-index: 9;
 
-        &.page-slider-enter-active{
+        &.page-slider-enter-active {
             overflow: hidden;
-            height: 89vh;
+            height: 100vh;
         }
     }
-    .page-slider-exit{
+    .page-slider-exit {
         background: #23242b;
         z-index: 1;
 
-        &.page-slider-exit-active{
-            height: 89vh;
+        &.page-slider-exit-active {
             overflow: hidden;
         }
     }
@@ -159,12 +163,12 @@
     }
 
     .animate-right {
-        &.page-slider-enter{
+        &.page-slider-enter {
             animation-name: enterRight;
             animation-duration: 1s;
         }
 
-        &.page-slider-exit{
+        &.page-slider-exit {
             animation-name: leaveRight;
             animation-duration: 1s;
         }
@@ -198,7 +202,7 @@
     }
 }
 
-@keyframes leaveRight{
+@keyframes leaveRight {
     0% {
         transform: translate3d(0%, 0, 0);
     }

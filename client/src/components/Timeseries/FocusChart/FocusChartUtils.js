@@ -6,10 +6,10 @@ const { TRANSLATE_TOP, CHART_MARGIN, TRANSLATE_LEFT, MAX_VALUE, MIN_VALUE } = Fo
 
 export const getWrapperSize = () => {
   const wrapperOffsetMargin = 40;
-  const wrapperHeight = document.querySelector('#content-wrapper').clientHeight;
   const overViewHeight = document.querySelector('#overview-wrapper').clientHeight;
-  const chartControlsHeight = document.querySelector('#chartControls').clientHeight + 20;
-  const height = wrapperHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin + chartControlsHeight);
+  const chartControlsHeight = document.querySelector('#chartControls').clientHeight + 10;
+  const leftSidebarHeight = document.querySelector('.left-sidebar').clientHeight;
+  const height = leftSidebarHeight - (overViewHeight + TRANSLATE_TOP + wrapperOffsetMargin + chartControlsHeight);
   const width = document.querySelector('.focus-chart').clientWidth;
   return { width, height };
 };

@@ -57,8 +57,8 @@ class Experiment extends Component<Props, LocalState> {
     const { dataRuns } = this.state;
     return (
       <div className="experiment">
-        <Loader isLoading={experimentData.isExperimentDataLoading}>
-          <div className="left-sidebar">
+        <div className="left-sidebar">
+          <Loader isLoading={experimentData.isExperimentDataLoading}>
             <div className="overview-wrapper scroll-style" id="overview-wrapper">
               {dataRuns.length ? (
                 <ul>
@@ -80,10 +80,9 @@ class Experiment extends Component<Props, LocalState> {
             </div>
             <FocusChartControls />
             <FocusChart />
-          </div>
-          <Sidebar />
-        </Loader>
-        <div className="clear" />
+          </Loader>
+        </div>
+        <Sidebar />
       </div>
     );
   }
