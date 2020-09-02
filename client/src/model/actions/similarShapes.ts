@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import {
   TOGGLE_SIMILAR_SHAPES_MODAL,
   FETCH_SIMILAR_SHAPES,
@@ -17,6 +18,7 @@ import {
   similarShapesResults,
 } from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
+import { AUTH_USER_DATA } from '../utils/constants';
 
 export function toggleSimilarShapesAction(modalState) {
   return async function (dispatch) {
@@ -61,6 +63,7 @@ function saveNewShape(currentShape) {
     const dataRun = getDatarunDetails(getState());
     const { timeSeries } = dataRun;
     const { start, end } = currentShape;
+    const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
 
     const shapePayload = {
       start_time: timeSeries[start][0] / 1000,
@@ -69,6 +72,7 @@ function saveNewShape(currentShape) {
       tag: currentShape.tag || 'Untagged',
       datarun_id: dataRun.id,
       source: 'SHAPE_MATCHING',
+      created_by: userData.name,
     };
     return API.events.create(shapePayload);
   };

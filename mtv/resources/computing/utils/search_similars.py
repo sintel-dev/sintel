@@ -18,8 +18,141 @@ def _pdtw(x, shape):
     return pdtw(x, shape, method="itakura", options={"max_slope": 1.5})
 
 
+def _overlap(expected, observed):
+    first = expected[0] - observed[1]
+    second = expected[1] - observed[0]
+    if first * second < 0:
+        return observed
+
+    return False
+
+
+def _any_overlap(part, intervals):
+    for interval in intervals:
+        flag = _overlap(part, interval)
+        if flag:
+            return flag
+
+    return False
+
+
+def _segment_timeseries(X, events):
+    edges = set()
+    for event in events:
+        edges.update(event)
+
+    start = X.index.min()
+    end = X.index.max()
+
+    edges.add(start)
+    edges.add(end)
+
+    segments = list()
+    edges = sorted(edges)
+
+    index = 0
+    while index < len(edges) - 1:
+        start = edges[index]
+        end = edges[index + 1]
+        segments.append(X.loc[start: end])
+        index += 2
+
+    return segments
+
+
+def _add_shape(X, matched, shape):
+    if (shape[1]):
+        idx_start = X.index[shape[1][0]]
+        idx_end = X.index[shape[1][-1]]
+        matched.append((idx_start, idx_end, shape[0]))
+
+
+def _check_edges(X, matched, state):
+    state = sorted(state, key=lambda x: x[0])
+
+    for i, s in enumerate(state):
+        if s == (np.inf, []):
+            state[i] = state[i - 1]
+
+    _add_shape(X, matched, state[0])
+
+    prevset = set(state[0][1])
+
+    # overlap
+    if len(state) and prevset.intersection(state[1][1]):
+        if not prevset.intersection(state[2][1]):
+            _add_shape(X, matched, state[2])
+
+    # no overlap
+    else:
+        _add_shape(X, matched, state[1])
+        prevset = set(state[1][1])
+        if not prevset.intersection(state[2][1]):
+            _add_shape(X, matched, state[2])
+
+
+def _return_candidate_shapes(X, shape, func, step_size):
+    worst_dist = -1
+
+    window_size = shape.shape[0]
+    matched = list()
+
+    start = 0
+    max_start = len(X) - window_size + 1
+
+    previous, current, after = (np.inf, []), (np.inf, []), (np.inf, [])
+    checkpoint = window_size
+
+    while start < max_start:
+        end = start + window_size
+
+        x = X.iloc[start:end]
+        x = np.array(x).flatten()
+
+        dist = func(x, shape) / window_size  # normalized by number of data points
+        if (dist > worst_dist):
+            worst_dist = dist
+
+        if dist < after[0]:
+            after = (dist, range(start, end))
+
+        if start > checkpoint:
+            # time range
+            prevset = set(previous[1])
+            aftset = set(after[1])
+
+            # overlap
+            if prevset.intersection(current[1]):
+                if current[0] > previous[0]:
+                    # add previous
+                    _add_shape(X, matched, previous)
+                    current = (np.inf, [])
+
+                elif aftset.intersection(current[1]) and after[0] < current[0]:
+                    # add previous
+                    _add_shape(X, matched, previous)
+                    current = (np.inf, [])
+
+            # no overlap
+            elif previous[1]:
+                # add previous
+                _add_shape(X, matched, previous)
+
+            previous = current
+            current = after
+            after = (np.inf, [])
+
+            checkpoint = checkpoint + window_size
+
+        start = start + step_size
+
+    _check_edges(X, matched, (previous, current, after))
+
+    return matched, worst_dist
+
+
 def return_candidate_shapes(X, start_time, end_time, func='euclidean', step_size=1,
-                            time_column='timestamp', target_column='value'):
+                            time_column='timestamp', target_column='value', events=[]):
     """ This function returns all the possible shape matches that do not overlap.
 
     Args:
@@ -35,6 +168,8 @@ def return_candidate_shapes(X, start_time, end_time, func='euclidean', step_size
             Column of X that contains time values.
         target_column (str or int):
             Column of X that contains target values.
+        events (list):
+            A list of tuples with (start timestamp, end timestamp,) of existing events.
 
     Returns:
         list:
@@ -49,97 +184,43 @@ def return_candidate_shapes(X, start_time, end_time, func='euclidean', step_size
         X = pd.DataFrame(X)
 
     X = X.sort_values(time_column).set_index(time_column)
-    shape = X.loc[start_time:end_time].values
-
-    worst_dist = -1
-    # scale data between [0, 1]
     scaler = MinMaxScaler(feature_range=[0, 1])
-    scaler.fit(X)
-    shape = scaler.transform(shape).flatten()
-    # shape = shape.flatten()
+    X.loc[:] = scaler.fit_transform(X.values.reshape(-1, 1))
 
-    window_size = shape.shape[0]
-    matched = list()
+    shape = X.loc[start_time:end_time].values
+    shape = shape.flatten()
 
-    start = 0
-    max_start = len(X) - window_size + 1
+    segments = _segment_timeseries(X, events)
 
-    previous, current, after = (np.inf, []), (np.inf, []), (np.inf, [])
-    checkpoint = window_size
+    worst = -1
+    candidates = list()
+    for seg in segments:
+        matched, worst_dist = _return_candidate_shapes(seg, shape, func, step_size)
+        candidates.extend(matched)
 
-    while start < max_start:
-        end = start + window_size
+        if worst < worst_dist:
+            worst = worst_dist
 
-        x = np.array(X.iloc[start:end])
-        x = scaler.transform(x).flatten()
-        # x = x.flatten()
-        dist = func(x, shape) / window_size  # normalized by number of data points
-        # dist = func(x, shape)  # normalized by number of data points
-        if (dist > worst_dist):
-            worst_dist = dist
-        if dist < after[0]:
-            after = (dist, range(start, end))
-
-        if start > checkpoint or start + step_size >= max_start:
-            # time range
-            prevset = set(previous[1])
-            aftset = set(after[1])
-            # overlap
-            if prevset.intersection(current[1]):
-                if current[0] > previous[0]:
-                    # add previous
-                    idx_start = X.index[previous[1][0]]
-                    idx_end = X.index[previous[1][-1]]
-                    matched.append((idx_start, idx_end, previous[0]))
-
-                    current = (np.inf, [])
-
-                elif aftset.intersection(current[1]) and after[0] < current[0]:
-                    # add previous
-                    idx_start = X.index[previous[1][0]]
-                    idx_end = X.index[previous[1][-1]]
-                    matched.append((idx_start, idx_end, previous[0]))
-
-                    current = (np.inf, [])
-
-                elif start + step_size >= max_start:  # edge case
-                    # add current
-                    idx_start = X.index[current[1][0]]
-                    idx_end = X.index[current[1][-1]]
-                    matched.append((idx_start, idx_end, current[0]))
-
-            # no overlap
-            elif previous[1]:
-                # add previous
-                idx_start = X.index[previous[1][0]]
-                idx_end = X.index[previous[1][-1]]
-                matched.append((idx_start, idx_end, previous[0]))
-
-            previous = current
-            current = after
-            after = (np.inf, [])
-
-            checkpoint = checkpoint + window_size
-
-        start = start + step_size
-
-    return matched, worst_dist
+    return candidates, worst
 
 
 if __name__ == '__main__':
     samples = 200
     f = 4
 
-    t = np.arange(samples)
+    s = 100
+    t = np.arange(s, s + samples)
     x = np.sin(3 * np.pi * f * t / 100).reshape((-1, 1))
 
     noise = np.random.normal(0, 0.2, size=x.shape)
     x = x + noise
 
     window_size = 10
-    i = np.random.choice(range(0, len(x) - window_size))
+    i = np.random.choice(range(s, s + len(x) - window_size))
 
     X = pd.DataFrame({'timestamp': t, 'value': x.flatten()})
+    events = [(120, 140)]
 
-    candidate_shapes, worst_dist = return_candidate_shapes(X, i, i + window_size, 'dtw')
+    candidate_shapes, worst_dist = return_candidate_shapes(
+        X, i, i + window_size, 'dtw', events=events)
     print(candidate_shapes)

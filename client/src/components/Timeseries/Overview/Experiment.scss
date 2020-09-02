@@ -1,24 +1,24 @@
 .experiment {
-    margin: 0 auto 10px auto;
+    margin: 0 auto;
     position: relative;
     width: 98%;
-    height: 88vh;
+    display: flex;
 }
 
 .left-sidebar {
-    float: left;
-    margin-right: 20px;
+    margin-top: 63px;
+    position: relative; // <Loader /> component purposes
+    height: 92vh;
 }
 
 @media screen and (max-width: 1200px) {
     .left-sidebar {
         width: 100%;
-        margin-right: 0;
     }
 }
 
 @media screen and (min-width: 1201px) {
     .left-sidebar {
-        width: calc(100% - 510px);
+        width: calc(100% - 480px);
     }
 }

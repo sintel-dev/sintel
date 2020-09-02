@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { toggleRelativeScaleAction, toggleEventSummaryAction } from 'src/model/actions/sidebar';
+import { getIsRelativeScaleEnabled, getIsSummaryViewActive } from 'src/model/selectors/sidebar';
 import EventSummary from './EventSummary';
 import {
   getDatarunDetails,
@@ -19,19 +19,37 @@ import {
   setScrollHistoryAction,
   setReviewPeriodAction,
 } from '../../../../model/actions/datarun';
-import { toggleRelativeScale } from 'src/model/actions/sidebar';
-import { getIsRelativeScaleEnabled } from 'src/model/selectors/sidebar';
 
-class Header extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSummaryVisible: true,
-      // isRelativeScaleEnabled: false,
-    };
-    this.toggleSummaryDetails = this.toggleSummaryDetails.bind(this);
+const showPeriod = (periodRange) => {
+  let periodString = (
+    <p>
+      <span>YY / MM</span>
+    </p>
+  );
+
+  const { level } = periodRange;
+  if (level === 'month') {
+    periodString = (
+      <p>
+        <span className="active">{periodRange.parent.name}</span>
+        <span> / MM</span>
+      </p>
+    );
   }
 
+  if (level === 'day') {
+    periodString = (
+      <p>
+        <span className="active">{periodRange.parent.parent.name}</span> /{' '}
+        <span className="active">{periodRange.parent.name}</span>
+      </p>
+    );
+  }
+
+  return <div className="period-info">{periodString}</div>;
+};
+
+class Header extends Component {
   componentDidUpdate(prevProps) {
     const { isTimeSyncEnabled, filteredPeriodRange, setScrollHistory, scrollHistory } = this.props;
 
@@ -75,69 +93,7 @@ class Header extends Component {
     }
   }
 
-  toggleSummaryDetails() {
-    const { isSummaryVisible } = this.state;
-    this.setState({
-      isSummaryVisible: !isSummaryVisible,
-    });
-  }
-
-  renderHeadingControls() {
-    const buttonText = this.state.isSummaryVisible ? 'HIDE' : 'SHOW';
-    return (
-      <div className="sidebar-heading">
-        <ul>
-          <li className="signal-title">Periodical View</li>
-          <li>
-            <button type="button" onClick={this.toggleSummaryDetails} id="toggleSummary">
-              <span>{buttonText}</span>
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </li>
-        </ul>
-      </div>
-    );
-  }
-
-  showPeriod() {
-    const { filteredPeriodRange, selectedPeriodLevel, isTimeSyncEnabled } = this.props;
-    let periodString = 'YY/MM';
-
-    if (isTimeSyncEnabled) {
-      const { level } = filteredPeriodRange[0];
-      if (level === 'month') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.name);
-      }
-
-      if (level === 'day') {
-        periodString = periodString.replace('YY', filteredPeriodRange[0].parent.parent.name);
-        periodString = periodString.replace('MM', filteredPeriodRange[0].parent.name);
-      }
-    } else {
-      if (selectedPeriodLevel.year) {
-        periodString = periodString.replace('YY', selectedPeriodLevel.year);
-      }
-      if (selectedPeriodLevel.month) {
-        periodString = periodString.replace('MM', selectedPeriodLevel.month);
-      }
-    }
-
-    return (
-      <div className="period-info">
-        <p>{periodString}</p>
-      </div>
-    );
-  }
-
-  // changeScale() {
-  //   const { isRelativeScaleEnabled } = this.state;
-  //   this.setState({
-  //     isRelativeScaleEnabled: !isRelativeScaleEnabled,
-  //   });
-  // }
-
   render() {
-    const { isSummaryVisible } = this.state;
     const {
       setReviewPeriod,
       selectedPeriodLevel,
@@ -147,11 +103,11 @@ class Header extends Component {
       currentPeriod,
       scrollHistory,
       isTimeSyncEnabled,
-      isEventModeEnabled,
-      toggleEventsMode,
       isRelativeScaleEnabled,
       toggleRelativeScale,
       dataRun,
+      toggleEventSummaryState,
+      isSummaryViewActive,
     } = this.props;
 
     const getBtnProps = (button) => {
@@ -182,15 +138,15 @@ class Header extends Component {
 
     return (
       <div className="period-control">
-        {/* @TODO - under discussion if this should be removed or not */}
-        {/* {this.renderHeadingControls()} */}
         <EventSummary
           selectedPeriodLevel={selectedPeriodLevel}
           grouppedEvents={grouppedEvents}
           filteredPeriodRange={filteredPeriodRange}
           signalName={dataRun.signal}
-          isOpen={isSummaryVisible}
           isTimeSyncEnabled={isTimeSyncEnabled}
+          showPeriod={showPeriod(filteredPeriodRange[0])}
+          toggleEventSummary={toggleEventSummaryState}
+          isSummaryViewActive={isSummaryViewActive}
         />
         <div className="period-wrapper">
           <div className="sidechart-controls switch-control">
@@ -199,7 +155,7 @@ class Header extends Component {
                 <input
                   type="checkbox"
                   id="glyphScale"
-                  onChange={() => toggleRelativeScale()}
+                  onChange={toggleRelativeScale}
                   checked={isRelativeScaleEnabled}
                 />
                 <span className="switch" />
@@ -207,6 +163,7 @@ class Header extends Component {
               </label>
             </div>
           </div>
+          {showPeriod(filteredPeriodRange[0])}
           <ul className="period-filter">
             <li>
               <button type="button" {...getBtnProps('year')}>
@@ -243,7 +200,6 @@ class Header extends Component {
               </div>
             </li>
           </ul> */}
-          {/* {this.showPeriod(selectedPeriodLevel)} */}
         </div>
         <div className="clear" />
       </div>
@@ -263,12 +219,14 @@ export default connect(
     currentPeriod: getSelectedPeriodLevel(state),
     scrollHistory: getScrollHistory(state),
     isRelativeScaleEnabled: getIsRelativeScaleEnabled(state),
+    isSummaryViewActive: getIsSummaryViewActive(state),
   }),
   (dispatch) => ({
     setPeriodRange: (periodRange) => dispatch(setPeriodRangeAction(periodRange)),
     toggleEventsMode: (mode) => dispatch(toggleEventModeAction(mode)),
     setScrollHistory: (period) => dispatch(setScrollHistoryAction(period)),
     setReviewPeriod: (period) => dispatch(setReviewPeriodAction(period)),
-    toggleRelativeScale: () => dispatch(toggleRelativeScale()),
+    toggleRelativeScale: () => dispatch(toggleRelativeScaleAction()),
+    toggleEventSummaryState: () => dispatch(toggleEventSummaryAction()),
   }),
 )(Header);

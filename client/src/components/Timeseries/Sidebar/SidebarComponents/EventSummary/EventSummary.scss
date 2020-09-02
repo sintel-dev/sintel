@@ -11,8 +11,8 @@
 
     .event-header {
         margin: 0 16px;
-        border-bottom: 1px solid #23242b;
     }
+
     .tooltip-data {
         font-size: 12px;
         background: rgba(103, 106, 130, 0.8);
@@ -82,14 +82,18 @@
             font-size: 20px;
             font-weight: bold;
         }
+        li {
+            margin-right: 20px;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
     }
 
     .summary-details {
-        display: none;
+        border-top: 1px solid #23242b;
+        border-width: 90%;
 
-        &.active {
-            display: block;
-        }
         .indicator {
             width: 7px;
             height: 7px;

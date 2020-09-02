@@ -211,3 +211,15 @@ export const LogoutIcon = () => (
     />
   </svg>
 );
+
+export const FillTriangleUpIcon = () => (
+  <svg width="10" height="5" viewBox="0 0 10 5" fill="none">
+    <path fillRule="evenodd" clipRule="evenodd" d="M0 5H10L5 0L0 5Z" fill="white" />
+  </svg>
+);
+
+export const FillTriangleDownIcon = () => (
+  <svg width="10" height="5" viewBox="0 0 10 5" fill="none">
+    <path fillRule="evenodd" clipRule="evenodd" d="M0 0H10L5 5L0 0Z" fill="white" />
+  </svg>
+);

@@ -130,9 +130,39 @@ def load_csv(path, timestamp_column=None, value_column=None):
     return pd.DataFrame(columns)[['timestamp', 'value']]
 
 
-def load_signal(signal, test_size=None, timestamp_column=None, value_column=None):
+def load_stock_csv(path, timestamp_column=0, value_column=4):
+    """ stock data csv
+
+    columns:
+        0. Date 2018-08-18
+        1. Open
+        2. High
+        3. Low
+        4. Close
+        5. Adj Close
+        6. Volume
+        7. Percentage
+    """
+    header = 'infer'
+    data = pd.read_csv(path, header=header)
+
+    timestamp_column_name = data.columns[timestamp_column]
+    value_column_name = data.columns[value_column]
+
+    columns = {
+        'timestamp': data[timestamp_column_name].values,
+        'value': data[value_column_name].values
+    }
+
+    return pd.DataFrame(columns)[['timestamp', 'value']]
+
+
+def load_signal(signal, test_size=None, timestamp_column=None, value_column=None, stock=False):
     if os.path.isfile(signal):
-        data = load_csv(signal, timestamp_column, value_column)
+        if (stock):
+            data = load_stock_csv(signal, timestamp_column, value_column)
+        else:
+            data = load_csv(signal, timestamp_column, value_column)
     else:
         data = download(signal)
 

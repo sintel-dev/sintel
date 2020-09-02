@@ -8,15 +8,15 @@ body {
     background: $second-color;
     color: #fff;
     font-size: 14px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
 }
 
 #content-wrapper {
-    margin: 63px 0 0 0;
-    height: 90vh;
+    height: 99.5vh;
     position: relative;
+    overflow: hidden;
 }
 
 .scroll-style::-webkit-scrollbar {
@@ -38,7 +38,6 @@ body {
     border-radius: 5px;
 }
 
-.main-wrapper{
-    width: 98%;
+.main-wrapper {
     margin: 0 auto;
 }
