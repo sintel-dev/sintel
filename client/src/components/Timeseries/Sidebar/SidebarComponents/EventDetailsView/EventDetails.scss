@@ -132,3 +132,16 @@
         }
     }
 }
+
+.collapsible-wrapper {
+    &.active {
+        .collapsible-content {
+            &.eventView {
+                .ReactCollapse--collapse,
+                .ReactCollapse--content {
+                    height: 100%;
+                }
+            }
+        }
+    }
+}

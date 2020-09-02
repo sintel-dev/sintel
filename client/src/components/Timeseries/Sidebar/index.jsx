@@ -69,7 +69,7 @@ class Sidebar extends Component {
                     <li>{isPanelOpen ? <ArrowUp /> : <ArrowDown />}</li>
                   </ul>
                 </div>
-                <div className="collapsible-content">
+                <div className={`collapsible-content ${currentPanel.key}`}>
                   <Collapse isOpened={isPanelOpen}>{currentPanel.component}</Collapse>
                 </div>
               </div>
