@@ -6,7 +6,7 @@ import { setActivePanelAction } from 'src/model/actions/sidebar';
 import { getCurrentActivePanel } from 'src/model/selectors/sidebar';
 import { getSelectedExperimentData } from '../../../model/selectors/experiment';
 import Loader from '../../Common/Loader';
-import { getIsEditingEventRange } from '../../../model/selectors/datarun';
+import { getIsEditingEventRange, getSelectedDatarun } from '../../../model/selectors/datarun';
 import PeriodicalView from './SidebarComponents/PeriodicalView/PeriodicalView';
 import EventDetailsView from './SidebarComponents/EventDetailsView/EventDetailsView';
 import SignalAnnotations from './SidebarComponents/SignalAnnotationsView/SignalAnnotations';
@@ -47,7 +47,9 @@ class Sidebar extends Component {
   }
 
   render() {
-    const { experimentData, activePanel } = this.props;
+    const { experimentData, activePanel, dataRun } = this.props;
+
+    const events = (dataRun && dataRun.events) || [];
 
     return (
       <div className="right-sidebar">
@@ -59,7 +61,11 @@ class Sidebar extends Component {
               <div key={currentPanel.key} className={`collapsible-wrapper scroll-style ${isPanelOpen ? 'active' : ''}`}>
                 <div className="collapsible-trigger" onClick={() => this.toggleActivePanel(currentPanel.key)}>
                   <ul>
-                    <li>{title}</li>
+                    <li className="title">
+                      <span>{title}</span>
+                      {currentPanel.key === 'signalView' &&
+                        (events.length ? <span>{events.length} events</span> : <span>No events</span>)}
+                    </li>
                     <li>{isPanelOpen ? <ArrowUp /> : <ArrowDown />}</li>
                   </ul>
                 </div>
@@ -80,6 +86,7 @@ export default connect(
     experimentData: getSelectedExperimentData(state),
     isEditingEventRange: getIsEditingEventRange(state),
     activePanel: getCurrentActivePanel(state),
+    dataRun: getSelectedDatarun(state),
   }),
   (dispatch) => ({
     setActivePanel: (activePanel) => dispatch(setActivePanelAction(activePanel)),
