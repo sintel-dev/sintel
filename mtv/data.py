@@ -18,7 +18,6 @@ import os
 
 import numpy as np
 import pandas as pd
-from datetime import datetime, timezone
 
 LOGGER = logging.getLogger(__name__)
 
@@ -132,7 +131,7 @@ def load_csv(path, timestamp_column=None, value_column=None):
 
 
 def load_stock_csv(path, timestamp_column=0, value_column=4):
-    """ stock data csv 
+    """ stock data csv
 
     columns:
         0. Date 2018-08-18
@@ -147,29 +146,7 @@ def load_stock_csv(path, timestamp_column=0, value_column=4):
     header = 'infer'
     data = pd.read_csv(path, header=header)
 
-    def datestr_timestamp(x):
-        x_ = x.split('-')
-        x_ = [int(xd) for xd in x_]
-        date_time_obj = datetime(x_[0], x_[1], x_[2], tzinfo=timezone.utc)
-        return date_time_obj.timestamp()
-
     timestamp_column_name = data.columns[timestamp_column]
-
-    data[timestamp_column_name] = data[timestamp_column_name].apply(datestr_timestamp)
-
-    if (value_column == 7):
-        prev_row = None
-        percentage = list()
-        for index, row in data.iterrows():
-            if (index == 0):
-                percentage.append(0)
-                prev_row = row
-            else:
-                percentage.append((row['Close'] - prev_row['Close']) / prev_row['Close'] * 100)
-                prev_row = row
-
-        data['percentage'] = percentage
-
     value_column_name = data.columns[value_column]
 
     columns = {

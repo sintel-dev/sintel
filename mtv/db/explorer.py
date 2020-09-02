@@ -996,6 +996,7 @@ class DBExplorer:
 
         pred_docs = schema.Prediction.find(signalrun=signalrun,
                                            index__gte=start_idx, index__lte=stop_idx)
+        pred_docs = pred_docs.order_by('+index')
 
         prediction_results = dict()
         data = list()
@@ -1014,6 +1015,7 @@ class DBExplorer:
                         data.append(d)
             else:
                 data.extend(doc.data)
+
         prediction_results['data'] = data
         return prediction_results
 
