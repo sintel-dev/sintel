@@ -142,7 +142,8 @@
 .collapsible-wrapper {
     &.active {
         .collapsible-content {
-            &.eventView {
+            &.eventView,
+            &.similarShapes {
                 .ReactCollapse--collapse,
                 .ReactCollapse--content {
                     height: 100% !important;

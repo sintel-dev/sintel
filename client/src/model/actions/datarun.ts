@@ -84,6 +84,7 @@ export function setTimeseriesPeriod(eventRange: {
 
 export function setActiveEventAction(eventID) {
   return function (dispatch, getState) {
+    dispatch(toggleSimilarShapesAction(false));
     const currentPanel = getCurrentActivePanel(getState());
     dispatch({ type: SET_ACTIVE_EVENT_ID, activeEventID: eventID });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: true });

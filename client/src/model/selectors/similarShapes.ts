@@ -7,6 +7,7 @@ export const getIsSimilarShapesLoading = (state) => state.similarShapes.isSimila
 export const similarShapesResults = (state) => state.similarShapes.similarShapes;
 export const getActiveShape = (state) => state.similarShapes.activeShape;
 export const getCurrentShapeMetrics = (state) => state.similarShapes.shapeMetrics;
+export const getCurrentShapesTag = (state) => state.similarShapes.shapesTag;
 
 export const getSimilarShapesFound = createSelector(
   [getIsSimilarShapesLoading, similarShapesResults, getCurrentEventDetails],
@@ -51,5 +52,17 @@ export const getSimilarShapesCoords = createSelector(
       const stopIndex = timeSeries.findIndex((element) => end * 1000 - element[0] < 0);
       return { ...currentShape, start: startIndex, end: stopIndex, source: 'SHAPE_MATCHING' };
     });
+  },
+);
+
+export const getIsResetSimilarDisabled = createSelector(
+  [getSimilarShapesCoords, getCurrentShapesTag],
+  (similarShapes, shapesTag) => {
+    const isShapeTagSelected =
+      similarShapes.length !== 0 &&
+      similarShapes.find((shape) => (shape.tag ? shape.tag !== null : false)) !== undefined;
+    const isMasterTagSelected = shapesTag !== null;
+
+    return !(isShapeTagSelected || isMasterTagSelected);
   },
 );
