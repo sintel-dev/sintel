@@ -25,6 +25,13 @@
         }
     }
 
+    .collapsible-content {
+        display: flex;
+        width: 100%;
+        height: 92%;
+        flex-flow: column;
+    }
+
     &.active {
         border: 1px solid rgba(#2d9cdb, 0.6);
         flex: 1 1 auto;
