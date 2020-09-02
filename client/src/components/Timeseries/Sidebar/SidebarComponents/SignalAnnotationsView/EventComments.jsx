@@ -11,15 +11,20 @@ import { MAX_EVENTS_ACTIVITY } from '../../SidebarUtils';
 import './EventComments.scss';
 
 class EventComments extends Component {
+  componentDidUpdate() {
+    const lastActivity = document.querySelectorAll('.last-activity');
+    lastActivity && lastActivity.forEach((activity) => activity.scrollIntoView());
+  }
+
   findUser(userName) {
     const { usersData } = this.props;
     return usersData.filter((user) => user.name === userName)[0];
   }
 
-  renderEventComment(eventComment, userData) {
+  renderEventComment(eventComment, userData, isLastItem) {
     const { id, insert_time, text } = eventComment;
     return (
-      <div key={id} className="user-activity">
+      <div key={id} className={`user-activity ${(isLastItem && 'last-activity') || ''}`}>
         <table width="99%">
           <tbody>
             <tr>
@@ -41,25 +46,27 @@ class EventComments extends Component {
     );
   }
 
-  renderEventTag(currentEvent, userData) {
+  renderEventTag(currentEvent, userData, isLastItem) {
     const { tag, insert_time } = currentEvent;
     const color = tag ? colorSchemes[tag] : colorSchemes.Untagged;
     const eventClassName = (tag && tag.replace(/\s/g, '_').toLowerCase()) || 'untagged';
+
     return (
-      <div key={currentEvent.id} className="user-activity">
+      <div key={currentEvent.id} className={`user-activity ${(isLastItem && 'last-activity') || ''}`}>
         <table width="100%">
           <tbody>
             <tr>
-              <td colSpan="2">{timestampToDate(insert_time)}</td>
-            </tr>
-            <tr>
-              <td rowSpan="2" width="40">
+              <td rowSpan="2" width="40" className="align-top">
                 <img src={userData.picture} referrerPolicy="no-referrer" alt={userData.name} />
               </td>
               <td>
-                <strong>{userData.name}</strong> assigned a tag
+                <strong>{userData.name}</strong>
               </td>
-              <td>
+              <td>{timestampToDate(insert_time)}</td>
+            </tr>
+            <tr>
+              <td>assigned a tag</td>
+              <td className="align-top">
                 <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>
                   {tag || 'Untagged'}
                 </span>
@@ -82,13 +89,14 @@ class EventComments extends Component {
       ? eventHistory.slice(Math.max(eventHistory.length - MAX_EVENTS_ACTIVITY, 0))
       : eventHistory;
 
-    return maxActivity.map((currentActivity) => {
+    return maxActivity.map((currentActivity, currentIndex) => {
       const userData = this.findUser(currentActivity.created_by);
       const action = currentActivity.action || null;
+      const isLastItem = currentIndex === maxActivity.length - 1;
 
       return action === null
-        ? this.renderEventComment(currentActivity, userData)
-        : this.renderEventTag(currentActivity, userData);
+        ? this.renderEventComment(currentActivity, userData, isLastItem)
+        : this.renderEventTag(currentActivity, userData, isLastItem);
     });
   }
 

@@ -153,8 +153,11 @@ class EventDetailsView extends Component {
   render() {
     const { eventDetails, isAddingNewEvent, newEventDetails } = this.props;
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
+
     return currentEventDetails ? (
-      <div className="event-details">{this.renderEventDetails(currentEventDetails)}</div>
+      <div className={`event-details ${(isAddingNewEvent && 'new-event') || ''}`}>
+        {this.renderEventDetails(currentEventDetails)}
+      </div>
     ) : (
       this.noEventToRender()
     );

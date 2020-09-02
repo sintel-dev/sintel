@@ -11,8 +11,14 @@
     display: flex;
     flex-flow: column;
     height: 100%;
+
     .evt-row {
         padding: 0 16px;
+    }
+    &.new-event {
+        .evt-row {
+            flex: 1;
+        }
     }
 
     p {
@@ -96,7 +102,7 @@
             flex: 1;
             .event-comments {
                 border: none;
-                padding-left: 15px;
+                padding-left: 5px;
             }
         }
     }
@@ -139,7 +145,7 @@
             &.eventView {
                 .ReactCollapse--collapse,
                 .ReactCollapse--content {
-                    height: 100%;
+                    height: 100% !important;
                 }
             }
         }
