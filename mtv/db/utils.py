@@ -334,32 +334,43 @@ def _update_period(signalrun, v, utc):
     schema.Period.insert_many(docs)
 
 
-def _update_raw(signal, interval=360, method=['mean']):
-    X = load_signal(signal.data_location)
-    X = X.sort_values('timestamp').set_index('timestamp')
+def _update_raw(signal, interval=360, method=['mean'], stock=True):
+    X = load_signal(signal.data_location, timestamp_column=signal.timestamp_column,
+                    value_column=signal.value_column, stock=stock)
 
-    start_ts = X.index.values[0]
-    max_ts = X.index.values[-1]
+    if signal.start_time:
+        X = X[X['timestamp'] >= signal.start_time].copy()
+    if signal.stop_time:
+        X = X[X['timestamp'] <= signal.stop_time].copy()
+    X = X.sort_values('timestamp').set_index('timestamp')
 
     signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
 
-    values = list()
-    index = list()
-    while start_ts <= max_ts:
-        end_ts = start_ts + interval
-        subset = X.loc[start_ts:end_ts - 1]
-        aggregated = [
-            getattr(subset, agg)(skipna=True).values
-            for agg in method
-        ]
-        values.append(np.concatenate(aggregated))
-        index.append(start_ts)
-        start_ts = end_ts
+    if stock:
+        values = X.values
+        index = X.index.values
+        interval = 24 * 60 * 60
+    else:
+        start_ts = X.index.values[0]
+        max_ts = X.index.values[-1]
 
-    imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-    V = np.asarray(values).reshape((-1, 1))
-    V = imp_mean.fit_transform(V)
-    values = V.flatten().tolist()
+        values = list()
+        index = list()
+        while start_ts <= max_ts:
+            end_ts = start_ts + interval
+            subset = X.loc[start_ts:end_ts - 1]
+            aggregated = [
+                getattr(subset, agg)(skipna=True).values
+                for agg in method
+            ]
+            values.append(np.concatenate(aggregated))
+            index.append(start_ts)
+            start_ts = end_ts
+
+        imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+        V = np.asarray(values).reshape((-1, 1))
+        V = imp_mean.fit_transform(V)
+        values = V.flatten().tolist()
 
     current_year = -1
     current_month = -1
@@ -410,7 +421,10 @@ def update_db(fs, exp_filter=None):
         try:
             cc += 1
             LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
-            _update_raw(signal)
+            if not schema.SignalRaw.find_one(signal=signal):
+                _update_raw(signal)
+            else:
+                LOGGER.info('Skip - this signal data has been processed previously')
         except Exception as e:
             LOGGER.error(str(e))
 
@@ -427,6 +441,7 @@ def update_db(fs, exp_filter=None):
 
             # ------ Prediction -------- #
             if (schema.Prediction.find_one(signalrun=signalrun.id) is not None):
+                LOGGER.info('Skip - this signalrun has been processed previously')
                 continue
             else:
                 v = dict()

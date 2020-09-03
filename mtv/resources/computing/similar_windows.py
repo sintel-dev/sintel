@@ -5,7 +5,7 @@ import pandas as pd
 from flask_restful import Resource, reqparse
 from sklearn.preprocessing import MinMaxScaler
 
-from mtv.db import DBExplorer
+from mtv.db import DBExplorer, schema
 from mtv.resources.auth_utils import verify_auth
 from mtv.resources.computing.utils.search_similars import return_candidate_shapes
 
@@ -22,7 +22,7 @@ parser.add_argument(
     'metric', choices=['euclidean', 'dtw'], help='Distance metric',
     default="euclidean", location='args')
 parser.add_argument(
-    'number', type=int, help='Number of returned windows', default=5, location='args')
+    'number', type=int, help='Number of returned windows', default=100, location='args')
 
 
 def get_windows(start, end, datarun_id, metric, number):
@@ -33,7 +33,14 @@ def get_windows(start, end, datarun_id, metric, number):
         'value': [d[1] for d in prediction_data['data']]
     }
     df = pd.DataFrame(data=timeseries)
-    windows, worst_dist = return_candidate_shapes(df, start, end, func=metric)
+
+    # find the existing events
+    event_docs = schema.Event.find(signalrun=datarun_id)
+    events = [(doc.start_time, doc.stop_time) for doc in event_docs]
+
+    # get candidate shapes
+    windows, worst_dist = return_candidate_shapes(df, start, end, func=metric,
+                                                  events=events)
 
     # represent it as similarities ranging from 0 to 100%
     scaler = MinMaxScaler(feature_range=[0, 1])
@@ -84,8 +91,6 @@ class SimilarWindows(Resource):
         except Exception as e:
             LOGGER.exception(str(e))
             return {'message', 'error computing the similar shapes'}, 500
-
-        print(windows)
 
         return {
             'windows': windows
