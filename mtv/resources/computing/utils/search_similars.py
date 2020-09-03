@@ -61,34 +61,18 @@ def _segment_timeseries(X, events):
 
 
 def _add_shape(X, matched, shape):
-    if (shape[1]):
-        idx_start = X.index[shape[1][0]]
-        idx_end = X.index[shape[1][-1]]
-        matched.append((idx_start, idx_end, shape[0]))
+    idx_start = X.index[shape[1][0]]
+    idx_end = X.index[shape[1][-1]]
+    matched.append((idx_start, idx_end, shape[0]))
 
 
 def _check_edges(X, matched, state):
     state = sorted(state, key=lambda x: x[0])
-
-    for i, s in enumerate(state):
-        if s == (np.inf, []):
-            state[i] = state[i - 1]
-
-    _add_shape(X, matched, state[0])
-
-    prevset = set(state[0][1])
-
-    # overlap
-    if len(state) and prevset.intersection(state[1][1]):
-        if not prevset.intersection(state[2][1]):
-            _add_shape(X, matched, state[2])
-
-    # no overlap
-    else:
-        _add_shape(X, matched, state[1])
-        prevset = set(state[1][1])
-        if not prevset.intersection(state[2][1]):
-            _add_shape(X, matched, state[2])
+    pre = set()
+    for sh in state:
+        if sh[1] and not pre.intersection(sh[1]):
+            _add_shape(X, matched, sh)
+        pre = set(sh[1])
 
 
 def _return_candidate_shapes(X, shape, func, step_size):
