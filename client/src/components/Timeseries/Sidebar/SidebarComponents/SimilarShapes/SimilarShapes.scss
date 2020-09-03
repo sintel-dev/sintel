@@ -1,6 +1,12 @@
 .similar-shapes-wrapper {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+
     .shape-container {
-        padding: 15px;
+        padding: 30px 15px 15px 15px;
+        height: 100%;
+        position: relative;
     }
 
     .shapes-landing {
@@ -10,10 +16,12 @@
         justify-content: center;
         align-items: center;
         font-size: 16px;
+        height: 71%;
     }
 
     .shapes-option {
-        position: relative;
+        height: 100%;
+
         &.disabled {
             p,
             label,
@@ -35,18 +43,20 @@
     .form-row {
         display: flex;
         justify-content: space-between;
-        padding-bottom: 15px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
 
         label {
-            margin-bottom: 8px;
             color: #b5b5b5;
             display: inline-block;
+            padding-right: 8px;
             cursor: pointer;
         }
         p {
             margin: 0;
             padding: 0;
+        }
+        .date-wrapper {
+            display: inline-block;
         }
 
         .algorithms {
@@ -117,6 +127,12 @@
                     margin-right: 10px;
                 }
             }
+            .shape-options {
+                text-align: right;
+                .tag-select {
+                    text-align: left;
+                }
+            }
         }
 
         ul {
@@ -126,10 +142,6 @@
             li {
                 flex: 1;
             }
-        }
-
-        &.active {
-            border-bottom: 1px solid rgba(#f2f2f2, 0.04);
         }
     }
 
@@ -174,9 +186,8 @@
     }
 
     .shapes-results {
-        max-height: 36.3vh;
+        max-height: 42.3vh;
         overflow-y: auto;
-        margin-bottom: 61px;
     }
 
     .shape-details {
@@ -201,6 +212,14 @@
                     background: #23242b !important;
                     box-shadow: none;
                 }
+            }
+        }
+        .tag-options__control {
+            border: 1px solid #979797;
+            &:hover,
+            &.tag-options__control--is-focused {
+                border: 1px solid #fff;
+                transition: all 0.2s ease-in-out;
             }
         }
 
@@ -263,6 +282,10 @@
             border: none;
             &.delete {
                 color: #f64242;
+                &:disabled {
+                    cursor: disabled;
+                    color: rgba(#f64242, 0.5);
+                }
             }
 
             &.save {

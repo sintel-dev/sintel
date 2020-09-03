@@ -100,7 +100,7 @@ export class FocusChart extends Component<Props, State> {
     const { maxTimeSeries, timeSeries } = dataRun;
     const [minDtTX, maxDtTX] = d3.extent(timeSeries, (time: Array<number>) => time[0]);
     const [minTX, maxTX] = d3.extent(maxTimeSeries, (time: Array<number>) => time[0]);
-    const [minTY, maxTY] = d3.extent(maxTimeSeries, (time: Array<number>) => time[1]);
+    const [minTY, maxTY] = d3.extent(timeSeries, (time: Array<number>) => time[1]);
     const drawableWidth = width - 2 * CHART_MARGIN - TRANSLATE_LEFT;
     const drawableHeight = height - 3.5 * CHART_MARGIN;
 
