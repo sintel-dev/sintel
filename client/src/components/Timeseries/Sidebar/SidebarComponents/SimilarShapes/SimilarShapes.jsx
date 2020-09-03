@@ -12,6 +12,7 @@ import {
   changeActiveShapeTagAction,
   changeMetricsAction,
   deleteShapeAction,
+  resetShapesTagsAction,
 } from 'src/model/actions/similarShapes';
 import { getCurrentEventDetails, getDatarunDetails, getIsEditingEventRange } from 'src/model/selectors/datarun';
 import {
@@ -20,6 +21,8 @@ import {
   getIsSimilarShapesActive,
   getActiveShape,
   getCurrentShapeMetrics,
+  getCurrentShapesTag,
+  getIsResetSimilarDisabled,
 } from 'src/model/selectors/similarShapes';
 import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { setActiveEventAction } from 'src/model/actions/datarun';
@@ -28,7 +31,9 @@ import { selectedOption } from 'src/components/Timeseries/FocusChart/EventDetail
 
 const shapesLanding = () => (
   <div className="shapes-landing">
-    <p>Select an Event in order to see Similar Segments</p>
+    <p>
+      Select an Event in <br /> order to see Similar Segments
+    </p>
   </div>
 );
 
@@ -39,6 +44,10 @@ const shapesLoader = () => (
 );
 
 class SimilarShapes extends Component {
+  componentDidMount() {
+    this.props.resetSimilarShapes();
+  }
+
   componentDidUpdate(prevProps) {
     const currentEventID =
       (this.props.currentEvent && this.props.currentEvent.id) ||
@@ -47,6 +56,8 @@ class SimilarShapes extends Component {
     if (prevProps.currentEvent && prevProps.currentEvent.id !== currentEventID) {
       this.props.resetSimilarShapes();
     }
+    const activeShape = document.querySelector('.shape-details.active');
+    activeShape && activeShape.scrollIntoView();
   }
 
   getScale(data) {
@@ -110,7 +121,15 @@ class SimilarShapes extends Component {
   }
 
   renderShapeFooter() {
-    const { deleteShape, saveShapes, similarShapes, currentEvent, activeShape } = this.props;
+    const {
+      deleteShape,
+      saveShapes,
+      similarShapes,
+      currentEvent,
+      activeShape,
+      resetShapesTags,
+      isRsetBtnDisabled,
+    } = this.props;
     if (!similarShapes.length || currentEvent === null) {
       return null;
     }
@@ -121,6 +140,16 @@ class SimilarShapes extends Component {
           <li>
             <button type="button" className="clean delete" onClick={deleteShape} disabled={!activeShape}>
               Delete
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="clean delete"
+              onClick={() => resetShapesTags()}
+              disabled={isRsetBtnDisabled}
+            >
+              Reset
             </button>
           </li>
         </ul>
@@ -192,11 +221,11 @@ class SimilarShapes extends Component {
   }
 
   renderEventData() {
-    const { currentEvent, similarShapes } = this.props;
+    const { currentEvent } = this.props;
     const { start_time, stop_time } = currentEvent || { start_time: null, stop_time: null };
-    const activeClass = similarShapes.length ? 'active' : '';
+
     return (
-      <div className={`form-row ${activeClass}`}>
+      <div className="form-row">
         <div className="form-wrapper">
           <label htmlFor="from">From</label>
           {(start_time !== null && timestampToDate(start_time)) || <p>-</p>}
@@ -263,7 +292,8 @@ class SimilarShapes extends Component {
   }
 
   shapeTagOverride() {
-    const { overrideAllTags } = this.props;
+    const { overrideAllTags, currentShapesTag } = this.props;
+
     return (
       <div className="shape-form overwrite">
         <div className="form-row">
@@ -273,7 +303,7 @@ class SimilarShapes extends Component {
           </div>
           <div className="form-wrapper">
             <div className="shape-options">
-              <Dropdown onChange={(tag) => overrideAllTags(tag.value)} />
+              <Dropdown value={selectedOption(currentShapesTag)} onChange={(tag) => overrideAllTags(tag.value)} />
             </div>
           </div>
         </div>
@@ -357,6 +387,8 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
     activeShape: getActiveShape(state),
     activeMetric: getCurrentShapeMetrics(state),
+    currentShapesTag: getCurrentShapesTag(state),
+    isRsetBtnDisabled: getIsResetSimilarDisabled(state),
   }),
   (dispatch) => ({
     toggleSimilarShapes: (state) => dispatch(toggleSimilarShapesAction(state)),
@@ -369,5 +401,6 @@ export default connect(
     changeShapeTag: (tag) => dispatch(changeActiveShapeTagAction(tag)),
     changeShapeMetric: (metric) => dispatch(changeMetricsAction(metric)),
     deleteShape: () => dispatch(deleteShapeAction()),
+    resetShapesTags: () => dispatch(resetShapesTagsAction()),
   }),
 )(SimilarShapes);

@@ -22,11 +22,25 @@ import EventComments from '../SignalAnnotationsView/EventComments';
 import CommentControl from '../SignalAnnotationsView/CommentControl';
 import './EventDetails.scss';
 
+const getEventSource = (type) => {
+  switch (type) {
+    case 'SHAPE_MATCHING':
+      return 'Shape Matching';
+    case 'MANUALLY_CREATED':
+      return 'Manually Created';
+    default:
+      return 'Orion';
+  }
+};
+
 class EventDetailsView extends Component {
   noEventToRender() {
     return (
       <div className="no-event">
-        <p>Please select an event in order to see details</p>
+        <p>
+          Add or Select an Event in <br />
+          order to see details.
+        </p>
       </div>
     );
   }
@@ -34,46 +48,60 @@ class EventDetailsView extends Component {
   renderEventHeader() {
     const { eventDetails, updateEventDetails, editEventRange, newEventDetails, isAddingNewEvent } = this.props;
     const currentEvent = isAddingNewEvent ? newEventDetails : eventDetails;
-    const { start_time, stop_time, score, tag } = currentEvent;
+    const { start_time, stop_time, score, tag, source } = currentEvent;
 
     return (
       <div className="evt-ops">
         <div className="evt-detail">
-          <div className="detail">
-            <p>From</p>
-            {timestampToDate(start_time)}
-          </div>
-          <div className="detail">
-            <p>
-              <label htmlFor="sevScore">Severity Score</label>
-            </p>
-            <input
-              type="text"
-              name="severity-score"
-              id="sevScore"
-              maxLength="2"
-              placeholder="-"
-              value={score}
-              onChange={(evt) => updateEventDetails({ score: evt.target.value })}
-            />
-          </div>
-        </div>
-        <div className="evt-detail">
-          <div className="detail">
-            <p>To</p>
-            {timestampToDate(stop_time)}
-            <button type="button" className="clean evt-edit" onClick={() => editEventRange(true)}>
-              Edit time
-            </button>
-          </div>
-          <div className="detail">
-            <p>Tag</p>
-            <Dropdown
-              value={selectedOption(tag)}
-              onChange={(evtTag) => updateEventDetails({ tag: evtTag.label })}
-              isGrouppedOptions
-            />
-          </div>
+          <table>
+            <tbody>
+              <tr className="date-time">
+                <td width="46%">
+                  <p>From</p>
+                  {timestampToDate(start_time)}
+                </td>
+                <td>
+                  <p>To</p>
+                  {timestampToDate(stop_time)}
+                </td>
+                <td>
+                  <button type="button" className="clean evt-edit" onClick={() => editEventRange(true)}>
+                    Edit time
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <tbody>
+              <tr>
+                <td width="46%">
+                  <p>Tag</p>
+                  <Dropdown
+                    value={selectedOption(tag)}
+                    onChange={(evtTag) => updateEventDetails({ tag: evtTag.label })}
+                    isGrouppedOptions
+                  />
+                </td>
+                <td width="29%">
+                  <p>Severity Score</p>
+                  <input
+                    type="text"
+                    name="severity-score"
+                    id="sevScore"
+                    maxLength="2"
+                    placeholder="-"
+                    value={score}
+                    onChange={(evt) => updateEventDetails({ score: evt.target.value })}
+                  />
+                </td>
+                <td>
+                  <p>Source</p>
+                  {getEventSource(source)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -109,7 +137,7 @@ class EventDetailsView extends Component {
   renderEventDetails(eventDetails) {
     const { isAddingNewEvent } = this.props;
     return (
-      <div>
+      <>
         <div className="evt-row">{this.renderEventHeader()}</div>
         {!isAddingNewEvent && (
           <div className="evt-row evt-actions">
@@ -118,17 +146,20 @@ class EventDetailsView extends Component {
           </div>
         )}
         {this.renderEventFooter()}
-      </div>
+      </>
     );
   }
 
   render() {
     const { eventDetails, isAddingNewEvent, newEventDetails } = this.props;
     const currentEventDetails = isAddingNewEvent ? newEventDetails : eventDetails;
-    return (
-      <div className="event-details">
-        {currentEventDetails ? this.renderEventDetails(currentEventDetails) : this.noEventToRender()}
+
+    return currentEventDetails ? (
+      <div className={`event-details ${(isAddingNewEvent && 'new-event') || ''}`}>
+        {this.renderEventDetails(currentEventDetails)}
       </div>
+    ) : (
+      this.noEventToRender()
     );
   }
 }
