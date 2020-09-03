@@ -27,53 +27,53 @@ class SignalAnnotations extends Component {
     const toggleEventState = (eventID) => (activeEvent === eventID ? setActiveEvent(null) : setActiveEvent(eventID));
 
     return events.length ? (
-      events.map((currentEvent) => {
-        const { id, tag, start_time, stop_time } = currentEvent;
-        const color = currentEvent && currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
-        const eventClassName = tag?.replace(/\s/g, '_').toLowerCase() || 'untagged';
+      <div className="signals-wrapper scroll-style">
+        {events.map((currentEvent) => {
+          const { id, tag, start_time, stop_time } = currentEvent;
+          const color = currentEvent && currentEvent.tag ? colorSchemes[currentEvent.tag] : colorSchemes.Untagged;
+          const eventClassName = tag?.replace(/\s/g, '_').toLowerCase() || 'untagged';
 
-        return (
-          <div key={id} className="annotation-wrapper">
-            <div className="annotation-heading" onClick={() => toggleEventState(id)}>
-              <div className="annotation-wrapper-left">
-                <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>
-                  {tag || 'Untagged'}
-                </span>
+          return (
+            <div key={id} className="annotation-wrapper">
+              <div className="annotation-heading" onClick={() => toggleEventState(id)}>
+                <div className="annotation-wrapper-left">
+                  <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>
+                    {tag || 'Untagged'}
+                  </span>
+                </div>
+                <div className="annotation-wrapper-right">
+                  <ul className="event-time-range">
+                    <li>
+                      <span>Starts:</span> {timestampToDate(start_time * 1000)}
+                    </li>
+                    <li>Ends: {timestampToDate(stop_time * 1000)}</li>
+                  </ul>
+                </div>
+                <div>
+                  <button type="button">
+                    {eventDetails && eventDetails.id === id ? <TriangleUp /> : <TriangleDown />}
+                  </button>
+                </div>
               </div>
-              <div className="annotation-wrapper-right">
-                <ul className="event-time-range">
-                  <li>
-                    <span>Starts:</span> {timestampToDate(start_time * 1000)}
-                  </li>
-                  <li>Ends: {timestampToDate(stop_time * 1000)}</li>
-                </ul>
-              </div>
-              <div>
-                <button type="button">
-                  {eventDetails && eventDetails.id === id ? <TriangleUp /> : <TriangleDown />}
-                </button>
+              <div className="collapsible-wrapper">
+                <Collapse isOpened={eventDetails && eventDetails.id === id}>
+                  <EventComments />
+                  <CommentControl eventDetails={currentEvent} />
+                </Collapse>
               </div>
             </div>
-            <div className="collapsible-wrapper">
-              <Collapse isOpened={eventDetails && eventDetails.id === id}>
-                <EventComments />
-                <CommentControl eventDetails={currentEvent} />
-              </Collapse>
-            </div>
-          </div>
-        );
-      })
+          );
+        })}
+      </div>
     ) : (
-      <div className="annotation-wrapper">
-        <div className="annotation-heading">
-          <p>No annotations found</p>
-        </div>
+      <div className="no-event">
+        <p>No annotations found</p>
       </div>
     );
   }
 
   render() {
-    return <div className="signals-wrapper scroll-style">{this.renderEventDetails()}</div>;
+    return this.renderEventDetails();
   }
 }
 

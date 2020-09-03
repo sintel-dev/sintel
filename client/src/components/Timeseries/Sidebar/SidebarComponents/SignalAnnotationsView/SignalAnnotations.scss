@@ -1,5 +1,5 @@
 .signals-wrapper {
-    max-height: 557px;
+    max-height: 69vh;
     overflow-y: auto;
 
     i {
@@ -24,7 +24,11 @@
         justify-content: space-between;
         background: #2c3034;
         border-bottom: 1px solid rgba(#f2f2f2, 0.08);
+        transition: background-color 0.2s ease-in-out;
         cursor: pointer;
+        &:hover {
+            background-color: rgba(#5a627c, 0.15);
+        }
 
         .annotation-wrapper-right {
             width: 40%;

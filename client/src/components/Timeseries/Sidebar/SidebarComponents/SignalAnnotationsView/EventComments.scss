@@ -4,20 +4,24 @@
         padding-left: 20px;
         margin-bottom: 10px;
         position: relative;
-        height: 19vh;
+        max-height: 24vh;
         overflow-y: auto;
 
         .user-activity {
             margin-bottom: 20px;
             img {
                 width: 32px;
+                height: 32px;
                 border-radius: 50%;
             }
             table {
                 border-collapse: collapse;
                 margin-bottom: 10px;
                 td {
-                    padding-bottom: 8px;
+                    padding-bottom: 5px;
+                    &.align-top {
+                        vertical-align: top;
+                    }
                 }
             }
             strong {

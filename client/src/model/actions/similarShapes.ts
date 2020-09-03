@@ -109,11 +109,10 @@ export function shapesTagsOverrideAction(tag) {
   return function (dispatch, getState) {
     const currentShapes = getSimilarShapesFound(getState());
     const updatedShapes = currentShapes.map((current) => ({ ...current, tag }));
-    const currentEvent = getCurrentEventDetails(getState());
 
     dispatch({
-      type: UPDATE_EVENT_DETAILS,
-      eventDetails: { ...currentEvent, tag },
+      type: 'UPDATE_SHAPES_TAG',
+      tag,
     });
 
     dispatch({
@@ -147,6 +146,21 @@ export function changeActiveShapeTagAction(tag) {
     dispatch({
       type: UPDATE_SIMILAR_SHAPES,
       shapes: currentShapes,
+    });
+  };
+}
+
+export function resetShapesTagsAction() {
+  return function (dispatch, getState) {
+    const currentShapes = getSimilarShapesFound(getState());
+    const updatedShapes = currentShapes.map((shape) => ({ ...shape, tag: null }));
+    dispatch({
+      type: 'UPDATE_SHAPES_TAG',
+      tag: null,
+    });
+    dispatch({
+      type: UPDATE_SIMILAR_SHAPES,
+      shapes: updatedShapes,
     });
   };
 }
