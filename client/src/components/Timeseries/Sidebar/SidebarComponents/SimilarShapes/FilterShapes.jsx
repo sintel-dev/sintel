@@ -44,14 +44,14 @@ class FilterShapes extends Component {
 
   grouppedIntervals() {
     const steps = percentageCount();
-    let intervals = [];
-    steps.map((currentStep) => {
-      if (currentStep === 100) {
-        return;
+    const intervals = steps.reduce((acc, elem) => {
+      if (elem !== 100) {
+        const nextStep = elem + 5;
+        const newEntry = [elem, nextStep];
+        acc.push(newEntry);
       }
-      const nextStep = currentStep + 5;
-      intervals.push([currentStep, nextStep]);
-    });
+      return acc;
+    }, []);
 
     return intervals;
   }

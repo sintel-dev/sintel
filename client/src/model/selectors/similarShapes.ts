@@ -46,9 +46,9 @@ export const getSimilarShapesCoords = createSelector(
       currentEvents.push(current.stop_time);
     });
 
-    const filteredShapes = similarShapes
-      .filter((shape) => currentEvents.indexOf(shape.start) === -1)
-      .filter((currentShape) => currentShape.similarity * 100 >= percentageInterval[0]);
+    const filteredShapes = similarShapes.filter(
+      (shape) => currentEvents.indexOf(shape.start) === -1 && shape.similarity * 100 >= percentageInterval[0],
+    );
     return filteredShapes.map((currentShape) => {
       const { start, end } = currentShape;
       const startIndex = timeSeries.findIndex((element) => start * 1000 - element[0] < 0) - 1;

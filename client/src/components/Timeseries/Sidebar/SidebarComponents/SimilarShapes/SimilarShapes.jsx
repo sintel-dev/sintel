@@ -301,14 +301,14 @@ class SimilarShapes extends Component {
   }
 
   shapeTagOverride() {
-    const { overrideAllTags, currentShapesTag } = this.props;
+    const { overrideAllTags, currentShapesTag, similarShapes } = this.props;
 
     return (
       <div className="shape-form overwrite">
         <div className="form-row">
           <div className="form-wrapper ">
             <p>Override all segments tags</p>
-            <p className="recent">5 most similar segments</p>
+            <p className="recent">{similarShapes.length} similar segments</p>
           </div>
           <div className="form-wrapper">
             <div className="shape-options">
