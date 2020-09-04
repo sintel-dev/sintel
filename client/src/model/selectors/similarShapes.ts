@@ -8,6 +8,7 @@ export const similarShapesResults = (state) => state.similarShapes.similarShapes
 export const getActiveShape = (state) => state.similarShapes.activeShape;
 export const getCurrentShapeMetrics = (state) => state.similarShapes.shapeMetrics;
 export const getCurrentShapesTag = (state) => state.similarShapes.shapesTag;
+export const getPercentageInterval = (state) => state.similarShapes.currentPercentage;
 
 export const getSimilarShapesFound = createSelector(
   [getIsSimilarShapesLoading, similarShapesResults, getCurrentEventDetails],
@@ -29,8 +30,8 @@ export const getSimilarShapesFound = createSelector(
 );
 
 export const getSimilarShapesCoords = createSelector(
-  [getIsSimilarShapesLoading, similarShapesResults, getDatarunDetails],
-  (isShapesLoading, similarShapes, dataRun) => {
+  [getIsSimilarShapesLoading, similarShapesResults, getDatarunDetails, getPercentageInterval],
+  (isShapesLoading, similarShapes, dataRun, percentageInterval) => {
     if (isShapesLoading) {
       return [];
     }
@@ -45,7 +46,9 @@ export const getSimilarShapesCoords = createSelector(
       currentEvents.push(current.stop_time);
     });
 
-    const filteredShapes = similarShapes.filter((shape) => currentEvents.indexOf(shape.start) === -1);
+    const filteredShapes = similarShapes
+      .filter((shape) => currentEvents.indexOf(shape.start) === -1)
+      .filter((currentShape) => currentShape.similarity * 100 >= percentageInterval[0]);
     return filteredShapes.map((currentShape) => {
       const { start, end } = currentShape;
       const startIndex = timeSeries.findIndex((element) => start * 1000 - element[0] < 0) - 1;

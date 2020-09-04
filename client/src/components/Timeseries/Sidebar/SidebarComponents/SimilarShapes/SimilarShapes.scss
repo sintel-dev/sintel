@@ -2,9 +2,10 @@
     display: flex;
     flex-flow: column;
     height: 100%;
+    position: relative;
 
     .shape-container {
-        padding: 30px 15px 15px 15px;
+        padding: 30px 15px 0px 15px;
         height: 100%;
         position: relative;
     }
@@ -20,7 +21,7 @@
     }
 
     .shapes-option {
-        height: 100%;
+        height: 88%;
 
         &.disabled {
             p,
@@ -186,7 +187,7 @@
     }
 
     .shapes-results {
-        max-height: 42.3vh;
+        max-height: 38.3vh;
         overflow-y: auto;
     }
 
@@ -275,7 +276,7 @@
         left: 1px;
         right: 1px;
         margin: 0 auto;
-        bottom: 1px;
+        bottom: 0px;
         button {
             color: #fff;
             text-transform: uppercase;

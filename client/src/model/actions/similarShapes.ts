@@ -40,7 +40,7 @@ export function getSimilarShapesAction() {
       type: FETCH_SIMILAR_SHAPES,
       promise: API.similar_windows.all(
         {},
-        { start: start_time, end: stop_time, datarun_id: datarun, number: 4, metric: shapeMetric },
+        { start: start_time, end: stop_time, datarun_id: datarun, metric: shapeMetric },
       ),
     };
 
@@ -181,6 +181,15 @@ export function deleteShapeAction() {
     dispatch({
       type: UPDATE_SIMILAR_SHAPES,
       shapes: similarShapes,
+    });
+  };
+}
+
+export function updateCurrentPercentage(newPercentage) {
+  return function (dispatch) {
+    dispatch({
+      type: 'UPDATE_CURRENT_PERCENTAGE',
+      percentageValue: newPercentage,
     });
   };
 }
