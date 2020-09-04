@@ -7,6 +7,7 @@ from flask_restful import Resource
 from mtv.db import DBExplorer, schema
 from mtv.resources.auth_utils import verify_auth
 from mtv.resources.experiment import validate_experiment_id
+from mtv.resources.computing.utils.layout import tsne
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,6 +69,8 @@ def get_datarun(datarun_doc):
         signalrun = get_signalrun(signalrun_doc)
         signalruns.append(signalrun)
 
+    # TODO: add option
+    signalruns = tsne(signalruns)
     return signalruns
 
 
@@ -192,7 +195,7 @@ class Dataruns(Resource):
                 dataruns.extend(get_datarun(datarun_doc))
             # dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
             # sort by signal name
-            dataruns.sort(key=lambda x: x['signal'], reverse=False)
+            # dataruns.sort(key=lambda x: x['signal'], reverse=False)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500
