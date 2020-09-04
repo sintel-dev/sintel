@@ -1,0 +1,108 @@
+.filter-wrapper {
+    border-bottom: 2px solid rgba(#f2f2f2, 0.04);
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    ul {
+        display: flex;
+        justify-content: space-between;
+        &.info {
+            cursor: pointer;
+            li {
+                vertical-align: middle;
+                span {
+                    margin-right: 20px;
+
+                    &:last-child {
+                        margin-right: 0;
+                        vertical-align: text-bottom;
+                    }
+                    svg {
+                        vertical-align: middle;
+                    }
+                }
+            }
+        }
+    }
+}
+.filtering {
+    ul {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    li {
+        width: 24px;
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+
+        &.step {
+            height: 40px;
+            display: flex;
+
+            span {
+                &.step-graph {
+                    height: 20px;
+                    border-top-left-radius: 6px;
+                    border-top-right-radius: 6px;
+                    width: 12px;
+                    background: rgba(#bdbdbd, 0.2);
+                    margin-bottom: 3px;
+                    align-self: flex-end;
+                }
+            }
+        }
+
+        span {
+            display: block;
+            margin: 0 auto;
+
+            &.glissor {
+                width: 12px;
+                height: 12px;
+                border-radius: 100%;
+                background: #fff;
+                margin-bottom: 5px;
+                visibility: hidden;
+
+                &.active {
+                    visibility: visible;
+                }
+            }
+
+            &.step-value {
+                color: rgba(#fff, 0.2);
+                font-size: 12px;
+            }
+        }
+
+        &.active {
+            span {
+                &.step-graph {
+                    background: #2f80ed;
+                }
+
+                &.step-value {
+                    color: #fff;
+                }
+            }
+        }
+    }
+
+    .progress-bar {
+        width: 98%;
+        background: rgba(#bdbdbd, 0.2);
+        height: 8px;
+        border-radius: 4px;
+        margin: 1px auto -10px auto;
+        display: flex;
+        justify-content: flex-end;
+
+        .progress {
+            border-radius: 8px;
+            height: 8px;
+            background: #2f80ed;
+        }
+    }
+}
