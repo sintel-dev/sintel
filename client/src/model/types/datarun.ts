@@ -21,6 +21,7 @@ export const UPLOAD_JSON_EVENTS = 'UPLOAD_JSON_EVENTS';
 export const EVENT_UPDATE_STATUS = 'EVENT_UPDATE_STATUS';
 export const TOGGLE_TIME_SYNC_RANGE = 'TOGGLE_TIME_SYNC_RANGE';
 export const SET_SCROLL_HISTORY = 'SET_SCROLL_HISTORY';
+export const SWITCH_CHART_STYLE = 'SWITCH_CHART_STYLE';
 
 export type SelectDatarunAction = {
   type: typeof SELECT_DATARUN;
@@ -77,6 +78,7 @@ export type DatarunState = {
     month: null | string;
     level: string;
   };
+  chartStyle: string;
 };
 
 /**

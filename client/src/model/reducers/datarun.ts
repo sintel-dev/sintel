@@ -39,6 +39,7 @@ const initialState: DatarunState = {
     month: null,
     level: 'year',
   },
+  chartStyle: 'linear',
 };
 
 /**
@@ -138,6 +139,10 @@ function SET_SCROLL_HISTORY(nextState, { scrollHistory }) {
   nextState.scrollHistory = scrollHistory;
 }
 
+function SWITCH_CHART_STYLE(nextState, { chartStyle }) {
+  nextState.chartStyle = chartStyle;
+}
+
 export default createReducer<DatarunState>(initialState, {
   SELECT_DATARUN,
   SET_TIMESERIES_PERIOD,
@@ -161,4 +166,5 @@ export default createReducer<DatarunState>(initialState, {
   SPEECH_STATUS,
   TOGGLE_TIME_SYNC_RANGE,
   SET_SCROLL_HISTORY,
+  SWITCH_CHART_STYLE,
 });
