@@ -26,6 +26,7 @@ import {
   getScrollHistory,
   getCurrentEventDetails,
   getActiveEventID,
+  getCurrentChartStyle,
 } from '../../../model/selectors/datarun';
 import './FocusChart.scss';
 
@@ -124,7 +125,7 @@ export class FocusChart extends Component<Props, State> {
   }
 
   drawLine(data) {
-    const { periodRange } = this.props;
+    const { periodRange, currentChartStyle } = this.props;
     const { zoomValue } = periodRange;
     const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
@@ -137,8 +138,7 @@ export class FocusChart extends Component<Props, State> {
       .x((d) => xCoord(d[0]))
       .y((d) => yCoord(d[1]));
 
-    // TODO: depends on the current chart style
-    line.curve(d3.curveStepAfter);
+    line.curve(currentChartStyle === 'linear' ? d3.curveLinear : d3.curveStepBefore);
     return line(data);
   }
 
@@ -471,6 +471,7 @@ const mapState = (state: RootState) => ({
   selectedEventDetails: getCurrentEventDetails(state),
   activeShape: getActiveShape(state),
   activeEventID: getActiveEventID(state),
+  currentChartStyle: getCurrentChartStyle(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({

@@ -31,6 +31,7 @@ export const getIsTranscriptSupported = (state) => state.datarun.isTranscriptSup
 export const getIsSpeechInProgress = (state) => state.datarun.isSpeechInProgress;
 export const getIsTimeSyncModeEnabled = (state) => state.datarun.isTimeSyncModeEnabled;
 export const getScrollHistory = (state) => state.datarun.scrollHistory;
+export const getCurrentChartStyle = (state) => state.datarun.chartStyle;
 
 export const getSelectedDatarunID = createSelector(
   [getSelectedExperimentData, isDatarunIDSelected],

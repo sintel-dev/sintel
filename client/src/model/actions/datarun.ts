@@ -38,6 +38,7 @@ import {
   EVENT_UPDATE_STATUS,
   TOGGLE_TIME_SYNC_RANGE,
   SET_SCROLL_HISTORY,
+  SWITCH_CHART_STYLE,
 } from '../types';
 import { toggleSimilarShapesAction } from './similarShapes';
 import { AUTHENTICATED_USER_ID, AUTH_USER_DATA } from '../utils/constants';
@@ -535,5 +536,14 @@ export function recordCommentAction(recordState) {
       dispatch(updateEventDetailsAction({ commentsDraft: comments }));
       dispatch({ type: 'SPEECH_STATUS', isSpeechInProgress: false });
     };
+  };
+}
+
+export function switchChartStyleAction(chartStyle) {
+  return function (dispatch) {
+    dispatch({
+      type: SWITCH_CHART_STYLE,
+      chartStyle,
+    });
   };
 }
