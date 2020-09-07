@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as fileDownload from 'react-file-download';
 import { faChevronRight, faChevronLeft, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentExperimentDetails, getSelectedExperimentData } from 'src/model/selectors/experiment';
-import { filterEventsByTagAction, toggleTimeSyncModeAction } from 'src/model/actions/datarun';
-import { getIsTimeSyncModeEnabled, getDatarunDetails } from 'src/model/selectors/datarun';
+import { filterEventsByTagAction, toggleTimeSyncModeAction, switchChartStyleAction } from 'src/model/actions/datarun';
+import { getIsTimeSyncModeEnabled, getDatarunDetails, getCurrentChartStyle } from 'src/model/selectors/datarun';
 import { AUTH_USER_DATA } from 'src/model/utils/constants';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { onUserLogoutAction } from '../../model/actions/users';
@@ -29,7 +29,16 @@ const downloadAsJSON = (dataRun) => {
 
 export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
-  const { experimentDetails, isTimeSyncEnabled, filterByTags, toggleTimeSync, datarunDetails, experimentData } = props;
+  const {
+    experimentDetails,
+    isTimeSyncEnabled,
+    filterByTags,
+    toggleTimeSync,
+    datarunDetails,
+    experimentData,
+    switchChartStyle,
+    currentChartStyle,
+  } = props;
   const { isExperimentDataLoading } = experimentData;
 
   let location = useLocation();
@@ -70,6 +79,8 @@ export const Header: React.FC<Props> = (props) => {
   const userData = JSON.parse(Cookies.get(AUTH_USER_DATA));
 
   const { name, picture } = userData;
+  const isLinearBtnActive = currentChartStyle === 'linear' ? 'active' : '';
+  const isStepBtnActive = currentChartStyle !== 'linear' ? 'active' : '';
   return (
     <header id="header" className="main-header">
       <div className="header-container">
@@ -131,11 +142,11 @@ export const Header: React.FC<Props> = (props) => {
                   <li className="view-options">
                     <span>Chart Style</span>
                     <div className="switch-control-wrapper">
-                      <button type="button" className="active">
+                      <button type="button" className={isLinearBtnActive} onClick={() => switchChartStyle('linear')}>
                         <LineIcon />
                         Line
                       </button>
-                      <button type="button">
+                      <button type="button" className={isStepBtnActive} onClick={() => switchChartStyle('step')}>
                         <StepIcon />
                         Step
                       </button>
@@ -195,12 +206,14 @@ const mapState = (state: RootState) => ({
   isTimeSyncEnabled: getIsTimeSyncModeEnabled(state),
   datarunDetails: getDatarunDetails(state),
   experimentData: getSelectedExperimentData(state),
+  currentChartStyle: getCurrentChartStyle(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
   userLogout: () => dispatch(onUserLogoutAction()),
   filterByTags: (tags) => dispatch(filterEventsByTagAction(tags)),
   toggleTimeSync: (mode) => dispatch(toggleTimeSyncModeAction(mode)),
+  switchChartStyle: (style) => dispatch(switchChartStyleAction(style)),
 });
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapState, mapDispatch)(Header);
