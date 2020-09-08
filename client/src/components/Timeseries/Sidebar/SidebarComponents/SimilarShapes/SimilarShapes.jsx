@@ -29,6 +29,7 @@ import { timestampToDate } from 'src/components/Timeseries/AggregationLevels/Agg
 import { setActiveEventAction } from 'src/model/actions/datarun';
 import Dropdown from 'src/components/Common/Dropdown';
 import { selectedOption } from 'src/components/Timeseries/FocusChart/EventDetails/eventUtils';
+import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
 import FilterShapes from './FilterShapes';
 
 const shapesLanding = () => (
@@ -178,14 +179,12 @@ class SimilarShapes extends Component {
   }
 
   renderShapes() {
-    const { similarShapes, currentEvent } = this.props;
-
+    const { similarShapes, currentEvent, activeShape, setActiveShape, changeShapeTag } = this.props;
     if (currentEvent === null) {
       return null;
     }
 
     return similarShapes.map((currentShape) => {
-      const { activeShape, setActiveShape, changeShapeTag } = this.props;
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
       const shapeClassName =
         activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
@@ -219,8 +218,8 @@ class SimilarShapes extends Component {
           </table>
           <div className="drawing">
             <svg width="134" height="127" className="shape-chart">
-              <path d={this.drawLine(eventInterval)} />
-              <path d={this.getCurrentEventShape()} className="current-event-shape" />
+              <path d={this.drawLine(eventInterval)} className="similar-shape" />
+              <path d={this.getCurrentEventShape()} stroke={colorSchemes[currentEvent.tag]} />
             </svg>
           </div>
         </div>
