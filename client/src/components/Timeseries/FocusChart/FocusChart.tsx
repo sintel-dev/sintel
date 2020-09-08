@@ -5,7 +5,7 @@ import { getIsSimilarShapesActive, getSimilarShapesCoords, getActiveShape } from
 import { setActiveShapeAction } from 'src/model/actions/similarShapes';
 import { RootState } from '../../../model/types';
 import { FocusChartConstants, colorSchemes } from './Constants';
-import EventDetails from './EventDetails';
+// import EventDetails from './EventDetails';
 import AddEvent from './FocusChartEvents/AddEvent';
 import ShowErrors from './ShowErrors';
 import { setTimeseriesPeriod, setActiveEventAction } from '../../../model/actions/datarun';

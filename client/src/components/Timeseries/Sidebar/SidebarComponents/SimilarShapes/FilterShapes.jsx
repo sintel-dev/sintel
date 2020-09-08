@@ -75,13 +75,14 @@ class FilterShapes extends Component {
     const [minPercentage, maxPercentage] = percentageInterval;
 
     return percentage.map((currentPercent) => {
-      const activeClassName = currentPercent >= minPercentage && currentPercent <= 100 ? 'active' : '';
+      const activePercent = currentPercent >= minPercentage && currentPercent <= 100 ? 'active' : '';
+      const activeColumn = currentPercent > minPercentage && currentPercent <= 100 ? 'active' : '';
       const activeGlissor = currentPercent === minPercentage || currentPercent === maxPercentage ? 'active' : '';
 
       return graph ? (
         <li
           key={`step_${currentPercent}`}
-          className={`step ${activeClassName}`}
+          className={`step ${activeColumn}`}
           onClick={() => setPercentageInterval(currentPercent)}
         >
           <span className="step-graph" style={{ height: `${this.renderStepHeight(currentPercent)}%` }} />
@@ -89,7 +90,7 @@ class FilterShapes extends Component {
       ) : (
         <li
           key={`value_${currentPercent}`}
-          className={activeClassName}
+          className={activePercent}
           onClick={() => setPercentageInterval(currentPercent)}
         >
           <span className={`glissor ${activeGlissor}`} />

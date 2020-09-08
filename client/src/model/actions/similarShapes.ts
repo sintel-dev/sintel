@@ -1,10 +1,8 @@
 import Cookies from 'js-cookie';
 import {
   TOGGLE_SIMILAR_SHAPES_MODAL,
-  FETCH_SIMILAR_SHAPES,
   UPDATE_DATARUN_EVENTS,
   UPDATE_SIMILAR_SHAPES,
-  UPDATE_EVENT_DETAILS,
   SET_ACTIVE_SHAPE,
   CHANGE_SHAPES_METRICS,
 } from '../types';
@@ -16,9 +14,19 @@ import {
   getActiveShape,
   getCurrentShapeMetrics,
   similarShapesResults,
+  getPercentageInterval,
 } from '../selectors/similarShapes';
 import { getSelectedExperimentData } from '../selectors/experiment';
 import { AUTH_USER_DATA } from '../utils/constants';
+
+const percentageCount = () => {
+  const stepValues = [];
+  for (let iterator = 0; iterator <= 100; iterator += 5) {
+    stepValues.push(iterator);
+  }
+
+  return stepValues;
+};
 
 export function toggleSimilarShapesAction(modalState) {
   return async function (dispatch) {
@@ -30,22 +38,32 @@ export function toggleSimilarShapesAction(modalState) {
 }
 
 export function getSimilarShapesAction() {
-  return function (dispatch, getState) {
+  return async function (dispatch, getState) {
     const eventDetails = getCurrentEventDetails(getState());
     const shapeMetric = getCurrentShapeMetrics(getState());
     let { datarun, start_time, stop_time } = eventDetails;
     start_time /= 1000;
     stop_time /= 1000;
-    const action = {
-      type: FETCH_SIMILAR_SHAPES,
-      promise: API.similar_windows.all(
-        {},
-        { start: start_time, end: stop_time, datarun_id: datarun, metric: shapeMetric },
-      ),
+
+    const getMinpercentage = (currentPercent) => {
+      const percentageRange = percentageCount();
+      const percentageIndex = percentageRange.findIndex((current) => current >= currentPercent);
+      return percentageRange[percentageIndex];
     };
 
-    dispatch(action);
-    dispatch(toggleSimilarShapesAction(true));
+    dispatch({ type: 'FETCH_SIMILAR_SHAPES_REQUEST' });
+    await API.similar_windows
+      .all({}, { start: start_time, end: stop_time, datarun_id: datarun, metric: shapeMetric })
+      .then((shapesData) => {
+        dispatch({ type: 'FETCH_SIMILAR_SHAPES_SUCCESS', similarShapes: shapesData.windows });
+        const currentShapes = getSimilarShapesCoords(getState());
+        const currentPercent = currentShapes[4]?.similarity * 100 || 0;
+        const minPercentage = getMinpercentage(currentPercent);
+
+        dispatch(updateCurrentPercentage(minPercentage));
+        dispatch(toggleSimilarShapesAction(true));
+      })
+      .catch((error) => dispatch({ type: 'FETCH_SIMILAR_SHAPES_FAILURE', error }));
   };
 }
 
@@ -82,12 +100,15 @@ export function saveSimilarShapesAction() {
   return async function (dispatch, getState) {
     // @TODO - backend should provide a single endpoint, single API call instead of 5
     const currentShapes = getSimilarShapesCoords(getState());
+    const [minPercentage] = getPercentageInterval(getState());
+
+    currentShapes.filter((shape) => shape.similarity >= minPercentage);
 
     const dataRun = getDatarunDetails(getState());
     const selectedExperimentData = getSelectedExperimentData(getState());
     const datarunIndex = selectedExperimentData.data.dataruns.findIndex((dataItem) => dataItem.id === dataRun.id);
 
-    await currentShapes.map((current) =>
+    await currentShapes.forEach((current) =>
       dispatch(saveNewShape(current)).then(async () => {
         await API.events.all(dataRun.id).then((newEvents) => {
           const newDatarunEvents = newEvents.events.filter((currentEvent) => currentEvent.datarun === dataRun.id);
@@ -95,13 +116,13 @@ export function saveSimilarShapesAction() {
             type: UPDATE_DATARUN_EVENTS,
             newDatarunEvents,
             datarunIndex,
-          }).then(() => {
-            dispatch(resetSimilarShapesAction());
-            dispatch(toggleSimilarShapesAction(false));
           });
         });
       }),
     );
+
+    dispatch(resetSimilarShapesAction());
+    dispatch(toggleSimilarShapesAction(false));
   };
 }
 

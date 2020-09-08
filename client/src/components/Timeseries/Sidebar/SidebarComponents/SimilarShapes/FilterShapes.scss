@@ -40,6 +40,8 @@
         &.step {
             height: 40px;
             display: flex;
+            transform: translate(-11px, 0px);
+            cursor: initial;
 
             span {
                 &.step-graph {
