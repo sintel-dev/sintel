@@ -143,7 +143,7 @@ class PeriodicalView extends Component {
 
   drawData() {
     const { width, radius } = this.state;
-    const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled, isRelativeScaleEnabled } = this.props;
+    const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled } = this.props;
     const currentPeriodExtent = [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
     _.each(dataRun.period, (currentPeriod) => {
       currentPeriodExtent[0] = Math.min(_.min(currentPeriod.bins), currentPeriodExtent[0]);
