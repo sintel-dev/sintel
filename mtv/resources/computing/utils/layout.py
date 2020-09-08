@@ -1,8 +1,9 @@
-from sklearn.manifold import TSNE
-from mtv.resources.computing.utils.signal_distance import event_overlap_distance
-from mtv.db import schema
 import numpy as np
 from mongoengine import connect
+from sklearn.manifold import TSNE
+
+from mtv.db import schema
+from mtv.resources.computing.utils.signal_distance import event_overlap_distance
 
 
 def tsne(signalruns):

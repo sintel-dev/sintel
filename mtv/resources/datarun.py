@@ -6,8 +6,8 @@ from flask_restful import Resource
 
 from mtv.db import DBExplorer, schema
 from mtv.resources.auth_utils import verify_auth
-from mtv.resources.experiment import validate_experiment_id
 from mtv.resources.computing.utils.layout import tsne
+from mtv.resources.experiment import validate_experiment_id
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,12 +51,12 @@ def get_signalrun(signalrun_doc):
     }
 
     # get raw
-    raw_docs = schema.Period.find(signalrun=signalrun_doc.id).order_by('+year')
-    for raw_doc in raw_docs:
+    period_docs = schema.Period.find(signalrun=signalrun_doc.id).order_by('+year')
+    for period_doc in period_docs:
         signalrun['raw'].append({
-            'timestamp': raw_doc.timestamp,
-            'year': raw_doc.year,
-            'data': raw_doc.data
+            'timestamp': period_doc.timestamp,
+            'year': period_doc.year,
+            'data': period_doc.data
         })
 
     return signalrun
@@ -70,7 +70,8 @@ def get_datarun(datarun_doc):
         signalruns.append(signalrun)
 
     # TODO: add option
-    signalruns = tsne(signalruns)
+    if len(signalruns) > 1:
+        signalruns = tsne(signalruns)
     return signalruns
 
 
