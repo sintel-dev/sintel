@@ -169,9 +169,10 @@ class Event(Resource):
 
         action_tag = False
         if d['tag'] != 'Untagged':
-            if (d['tag'] != event_doc.tag):
-                action_tag = True
-            event_doc.tag = d['tag']
+            if d['tag'] != 'None':
+                if (d['tag'] != event_doc.tag):
+                    action_tag = True
+                event_doc.tag = d['tag']
 
         # return result
         try:
