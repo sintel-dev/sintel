@@ -69,7 +69,13 @@ class PeriodicalView extends Component {
   getPathData(periodRange, currentPeriodExtent) {
     const { radius } = this.state;
     const { isRelativeScaleEnabled } = this.props;
+
+    if (periodRange.length === 1) {
+      periodRange = new Array(360).fill(periodRange[0]);
+    }
+
     const { area } = getDataScale(radius * 0.1, radius, periodRange, isRelativeScaleEnabled, currentPeriodExtent);
+
     return area(periodRange);
   }
 
@@ -139,6 +145,10 @@ class PeriodicalView extends Component {
     const { width, radius } = this.state;
     const { setPeriodRange, dataRun, grouppedEvents, isEventModeEnabled, isRelativeScaleEnabled } = this.props;
     const currentPeriodExtent = [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
+    _.each(dataRun.period, (currentPeriod) => {
+      currentPeriodExtent[0] = Math.min(_.min(currentPeriod.bins), currentPeriodExtent[0]);
+      currentPeriodExtent[1] = Math.max(_.max(currentPeriod.bins), currentPeriodExtent[1]);
+    });
 
     return (
       width > 0 &&
@@ -147,9 +157,6 @@ class PeriodicalView extends Component {
         const { horizontalShift, verticalShift } = this.getFeatureCellCoords(currentPeriod, periodIndex);
         const arcData = drawArc(currentPeriod, grouppedEvents, radius, periodIndex);
         const { name, bins, level } = currentPeriod;
-        currentPeriodExtent[0] = Math.min(_.min(currentPeriod.bins), currentPeriodExtent[0]);
-        currentPeriodExtent[1] = Math.max(_.max(currentPeriod.bins), currentPeriodExtent[1]);
-
         return (
           <g key={name}>
             <g
