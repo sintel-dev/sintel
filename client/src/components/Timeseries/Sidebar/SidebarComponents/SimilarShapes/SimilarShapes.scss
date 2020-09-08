@@ -255,11 +255,11 @@
     .shape-chart {
         path {
             fill: transparent;
-            stroke: #7d87ae;
             stroke-width: 2px;
-            opacity: 0.7;
-            &.current-event-shape {
-                stroke: #f2ff00;
+
+            &.similar-shape {
+                stroke: #7d87ae;
+                opacity: 0.7;
             }
         }
     }
