@@ -18,9 +18,14 @@ function FETCH_SIMILAR_SHAPES_REQUEST(nextState) {
   nextState.isSimilarShapesLoading = true;
 }
 
-function FETCH_SIMILAR_SHAPES_SUCCESS(nextState, action) {
+function FETCH_SIMILAR_SHAPES_SUCCESS(nextState, { similarShapes }) {
   nextState.isSimilarShapesLoading = false;
-  nextState.similarShapes = action.result.windows;
+  nextState.similarShapes = similarShapes;
+}
+
+function FETCH_SIMILAR_SHAPES_FAILURE(nextState) {
+  nextState.isSimilarShapesLoading = false;
+  nextState.similarShapes = [];
 }
 
 function RESET_SIMILAR_SHAPES(nextState) {
@@ -51,6 +56,7 @@ export default createReducer(initialState, {
   TOGGLE_SIMILAR_SHAPES_MODAL,
   FETCH_SIMILAR_SHAPES_SUCCESS,
   FETCH_SIMILAR_SHAPES_REQUEST,
+  FETCH_SIMILAR_SHAPES_FAILURE,
   RESET_SIMILAR_SHAPES,
   UPDATE_SIMILAR_SHAPES,
   SET_ACTIVE_SHAPE,

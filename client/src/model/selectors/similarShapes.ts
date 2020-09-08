@@ -41,7 +41,7 @@ export const getSimilarShapesCoords = createSelector(
     const currentEvents = [];
 
     // Avoid shapes overlaping entirely current events
-    events.map((current) => {
+    events.forEach((current) => {
       currentEvents.push(current.start_time);
       currentEvents.push(current.stop_time);
     });
@@ -49,6 +49,7 @@ export const getSimilarShapesCoords = createSelector(
     const filteredShapes = similarShapes.filter(
       (shape) => currentEvents.indexOf(shape.start) === -1 && shape.similarity * 100 >= percentageInterval[0],
     );
+
     return filteredShapes.map((currentShape) => {
       const { start, end } = currentShape;
       const startIndex = timeSeries.findIndex((element) => start * 1000 - element[0] < 0) - 1;

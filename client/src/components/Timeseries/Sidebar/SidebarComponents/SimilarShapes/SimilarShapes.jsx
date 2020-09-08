@@ -219,7 +219,7 @@ class SimilarShapes extends Component {
           <div className="drawing">
             <svg width="134" height="127" className="shape-chart">
               <path d={this.drawLine(eventInterval)} className="similar-shape" />
-              <path d={this.getCurrentEventShape()} stroke={colorSchemes[currentEvent.tag]} />
+              <path d={this.getCurrentEventShape()} stroke={colorSchemes[currentEvent.tag] || '#D5D5D5'} />
             </svg>
           </div>
         </div>
