@@ -1,3 +1,4 @@
+import copy
 import logging
 import pickle
 from calendar import monthrange
@@ -171,7 +172,7 @@ def _split_large_prediction_data(doc, signal):
         schema.Prediction.insert(**pred_doc)
 
 
-def _update_prediction(signalrun, v):
+def _update_prediction(signalrun, v, stock=True):
 
     try:
         data = list()
@@ -184,7 +185,7 @@ def _update_prediction(signalrun, v):
         # the first window does not have prediction values
         # fill the first window with the original values
         for i, idx in enumerate(v['raw_index']):
-            if idx == v['target_index'][0]:
+            if idx >= v['target_index'][0]:
                 break
 
             if y_hat_is_list:
@@ -237,9 +238,14 @@ def _update_prediction(signalrun, v):
             except Exception:
                 print(idx, type(idx))
 
+        data_ = copy.deepcopy(data)
+
         # convert format
         for i in range(len(data)):
             data[i][1] = float(data[i][1])
+            data[i][3] = float(data[i][3])
+            data[i][4] = float(data[i][4])
+            data[i][6] = float(data[i][6])
             if y_hat_is_list:
                 # data[i][2] = [float(d2) for d2 in data[i][2]]
                 # data[i][5] = [float(d5) for d5 in data[i][5]]
@@ -249,16 +255,37 @@ def _update_prediction(signalrun, v):
             else:
                 data[i][2] = float(data[i][2])
                 data[i][5] = float(data[i][5])
-            data[i][3] = float(data[i][3])
-            data[i][4] = float(data[i][4])
-            data[i][6] = float(data[i][6])
 
+            if signalrun.signal.name[0] != '%':
+                continue
+            if (i == 0):
+                for j in range(1, 7):
+                    data_[i][j] = 0
+            else:
+                data_[i][3] = float(data[i][3])
+                data_[i][6] = float(data[i][6])
+
+                if (data[i - 1][1] == 0):
+                    data_[i][1] = 0
+                    data_[i][2] = 0
+                else:
+                    data_[i][1] = (data[i][1] - data[i - 1][1]) / data[i - 1][1] * 100
+                    data_[i][2] = (data[i][2] - data[i - 1][1]) / data[i - 1][1] * 100
+
+                if (data[i - 1][4] == 0):
+                    data_[i][4] = 0
+                    data_[i][5] = 0
+                else:
+                    data_[i][4] = (data[i][4] - data[i - 1][4]) / data[i - 1][4] * 100
+                    data_[i][5] = (data[i][5] - data[i - 1][4]) / data[i - 1][4] * 100
+        if signalrun.signal.name[0] != '%':
+            data_ = data
         doc = {
             'signalrun': signalrun.id,
             'attrs': ['timestamp',
                       'y_raw', 'y_raw_hat', 'es_raw',
                       'y', 'y_hat', 'es'],
-            'data': data
+            'data': data_
         }
 
         _split_large_prediction_data(doc, signalrun.signal)
@@ -266,13 +293,9 @@ def _update_prediction(signalrun, v):
         print(e)
 
 
-def _update_period(signalrun, v, utc):
-    if (utc):
-        year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
-        year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
-    else:
-        year_start = datetime.fromtimestamp(v['raw_index'][0]).year
-        year_end = datetime.fromtimestamp(v['raw_index'][-1]).year
+def _update_period(signalrun, v, stock=True):
+    year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
+    year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
 
     # construct dataframe from ndarrays
     data = pd.DataFrame(data=v['X_raw'], index=v['raw_index'])
@@ -290,10 +313,7 @@ def _update_period(signalrun, v, utc):
     docs = []
     # year
     for y in range(year_start, year_end + 1):
-        if (utc):
-            dt = datetime(y, 1, 1, tzinfo=timezone.utc)
-        else:
-            dt = datetime(y, 1, 1)
+        dt = datetime(y, 1, 1, tzinfo=timezone.utc)
 
         docs.append({
             'signalrun': signalrun.id,
@@ -309,16 +329,10 @@ def _update_period(signalrun, v, utc):
                 days.append({'means': [], 'counts': []})
                 # bin
                 for n in range(day_bin_num):
-                    if (utc):
-                        st = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
-                            + n * my_interval * 60
-                        ed = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
-                            + (n + 1) * my_interval * 60
-                    else:
-                        st = datetime(y, m, d + 1).timestamp() \
-                            + n * my_interval * 60
-                        ed = datetime(y, m, d + 1).timestamp() \
-                            + (n + 1) * my_interval * 60
+                    st = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
+                        + n * my_interval * 60
+                    ed = datetime(y, m, d + 1, tzinfo=timezone.utc).timestamp() \
+                        + (n + 1) * my_interval * 60
                     mean = data.loc[st:ed - 1].mean(skipna=True)[0]
                     count = data.loc[st:ed - 1].count()[0]
                     if (count == 0):
@@ -347,6 +361,7 @@ def _update_raw(signal, interval=360, method=['mean'], stock=True):
     signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
 
     if stock:
+        # day - 24 hour
         values = X.values
         index = X.index.values
         interval = 24 * 60 * 60
@@ -407,13 +422,11 @@ def _update_raw(signal, interval=360, method=['mean'], stock=True):
         schema.SignalRaw.insert(**raw_doc)
 
 
-def update_db(fs, exp_filter=None):
+def update_db(fs, exp_filter=None, stock=True):
 
     # get signalrun list
 
     # TODO: remove utc setting, it should be always True
-    utc = True
-
     signals = schema.Signal.find().timeout(False)
     cc = 0
     total = signals.count()
@@ -422,7 +435,7 @@ def update_db(fs, exp_filter=None):
             cc += 1
             LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
             if not schema.SignalRaw.find_one(signal=signal):
-                _update_raw(signal)
+                _update_raw(signal, stock=stock)
             else:
                 LOGGER.info('Skip - this signal data has been processed previously')
         except Exception as e:
@@ -447,13 +460,13 @@ def update_db(fs, exp_filter=None):
                 v = dict()
                 for grid_out in fs.find({'signalrun_id': signalrun.id}, no_cursor_timeout=True):
                     v[grid_out.variable] = pickle.loads(grid_out.read())
-                _update_prediction(signalrun, v)
+                _update_prediction(signalrun, v, stock=stock)
 
             # ------ Raw -------- #
             if (schema.Period.find_one(signalrun=signalrun.id) is not None):
                 continue
             else:
-                _update_period(signalrun, v, utc)
+                _update_period(signalrun, v, stock=stock)
 
         except Exception as e:
             print(e)

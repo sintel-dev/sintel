@@ -60,6 +60,9 @@ class MTV:
 
     def update_db(self):
 
+        # TODO: to be removed later
+        self._db.drop_database(self._cf['db'])
+
         # copy from orion
         DBUtils.copy_from_partial(
             cols=['comment', 'datarun', 'dataset', 'event',

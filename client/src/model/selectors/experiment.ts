@@ -74,24 +74,32 @@ const groupDataByPeriod = (data) => {
         let day = {
           level: 'day',
           name: dayIterator + 1,
-          bins: data[yearIterator].data[monthIterator][dayIterator].means,
-          counts: data[yearIterator].data[monthIterator][dayIterator].counts,
+          bins: _.cloneDeep(data[yearIterator].data[monthIterator][dayIterator].means),
+          counts: _.cloneDeep(data[yearIterator].data[monthIterator][dayIterator].counts),
           children: undefined,
           parent: month,
         };
 
+        let dayData = data[yearIterator].data[monthIterator][dayIterator];
+        let count = _.sum(dayData.counts);
+        let mean = _.sum(dayData.means) / dayData.means.length;
+
+        // for (let dayBinIterator = 0; dayBinIterator < day.bins.length; dayBinIterator += 1) {
+        //   day.bins[dayBinIterator] =
+        //     day.counts[dayBinIterator] > 0 ? day.bins[dayBinIterator] : -Number.MAX_SAFE_INTEGER;
+        // }
+        // if (count == 0) {
+        //   mean = -Number.MAX_SAFE_INTEGER;
+        // }
+
+        // push day
         month.children.push(day);
 
-        let dayData = data[yearIterator].data[monthIterator][dayIterator];
-        const count = _.sum(dayData.counts);
-        const mean = _.sum(dayData.means) / dayData.means.length;
-        // const count = dayData.counts.reduce((currentCount, nextCount) => currentCount + nextCount, 0);
-        // const mean = dayData.means.reduce((currentMean, nextMean) => currentMean + nextMean, 0) / dayData.means.length;
-
-        // one day one bin
+        // push day to the year
         year.bins.push(mean);
         year.counts.push(count);
 
+        // push day to the month
         month.bins.push(mean);
         month.counts.push(count);
       }
@@ -123,7 +131,9 @@ const groupDataByPeriod = (data) => {
         i = 367;
       }
       if (c === 0) {
-        nbins.push(0);
+        // clamp(true)
+        // so the minimum integer will always return radius 0
+        nbins.push(-Number.MAX_SAFE_INTEGER);
       } else {
         nbins.push(v);
       }
@@ -139,6 +149,9 @@ const groupDataByPeriod = (data) => {
 const normalizePeriodRange = (periodData) => {
   let minRange = Number.MAX_SAFE_INTEGER;
   let maxRange = Number.MIN_SAFE_INTEGER;
+  let meanSum = 0;
+  let meanCount = 0;
+
   periodData.forEach((year) => {
     for (let monthIterator = 0; monthIterator < year.children.length; monthIterator += 1) {
       for (let dayIterator = 0; dayIterator < year.children[monthIterator].children.length; dayIterator += 1) {
@@ -147,43 +160,61 @@ const normalizePeriodRange = (periodData) => {
           if (counts[i] !== 0) {
             minRange = Math.min(minRange, bins[i]);
             maxRange = Math.max(maxRange, bins[i]);
+            meanCount += 1;
+            meanSum += bins[i];
           }
         }
       }
     }
   });
-  return { minRange, maxRange };
+  return { minRange, maxRange, mean: meanSum / meanCount };
 };
 
 const normalizePeriodData = (periodData) => {
-  const { minRange, maxRange } = normalizePeriodRange(periodData);
-  const normalizeScale = d3.scaleLinear().domain([minRange, maxRange]).range([0, 1]);
+  const { minRange, maxRange, mean } = normalizePeriodRange(periodData);
+  const normalizeScale = d3.scaleLinear().domain([minRange, maxRange]).range([0, 1]).clamp(true);
 
+  let previousHoldValueY = mean;
+  let previousHoldValueM = mean;
+  let previousHoldValueD = mean;
   periodData.forEach((year) => {
     let countsY = year.counts;
     year.bins = _.map(year.bins, (bin, i) => {
+      let newBin: number;
       if (countsY[i] === 0) {
-        return bin;
+        newBin = normalizeScale(previousHoldValueY);
+      } else {
+        newBin = normalizeScale(bin);
+        previousHoldValueY = bin;
       }
-      return normalizeScale(bin);
+      return newBin;
     });
+
     for (let monthIterator = 0; monthIterator < year.children.length; monthIterator += 1) {
       let countsM = year.children[monthIterator].counts;
       year.children[monthIterator].bins = _.map(year.children[monthIterator].bins, (bin, i) => {
+        let newBin: number;
         if (countsM[i] === 0) {
-          return bin;
+          newBin = normalizeScale(previousHoldValueM);
+        } else {
+          newBin = normalizeScale(bin);
+          previousHoldValueM = bin;
         }
-        return normalizeScale(bin);
+        return newBin;
       });
       for (let dayIterator = 0; dayIterator < year.children[monthIterator].children.length; dayIterator += 1) {
         let countsD = year.children[monthIterator].children[dayIterator].counts;
         year.children[monthIterator].children[dayIterator].bins = _.map(
           year.children[monthIterator].children[dayIterator].bins,
           (bin, i) => {
+            let newBin: number;
             if (countsD[i] === 0) {
-              return bin;
+              newBin = normalizeScale(previousHoldValueD);
+            } else {
+              newBin = normalizeScale(bin);
+              previousHoldValueD = bin;
             }
-            return normalizeScale(bin);
+            return newBin;
           },
         );
       }
