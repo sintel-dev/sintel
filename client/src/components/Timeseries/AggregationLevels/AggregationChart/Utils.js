@@ -1,11 +1,10 @@
 import React from 'react';
+
 export const timeIntervals = [
   '30 hours',
   '24 hours',
   '12 hours',
   '6 hours',
-
-  // need timesedies granulation under 6 hours, for now isn't working
   '3 hours',
   '1 hour',
   '30 mins',
@@ -33,14 +32,14 @@ export const timestampToDate = (timeStamp) => {
   // return `<span>${date[1]}/${date[2]}/${date[3]}</span> <span>${date[4]}</span>`;
 };
 
-export const timeToMiliseconds = (interval) => {
+export const timeToSeconds = (interval) => {
   const timeParts = interval.split(' ');
   const time = timeParts[0];
   const period = timeParts[1];
 
   if (period === 'mins') {
-    return time * 60000;
+    return time * 60;
   }
 
-  return time * (60000 * 60);
+  return time * (60 * 60);
 };

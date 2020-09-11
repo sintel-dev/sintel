@@ -14,6 +14,7 @@ export type EventDataType = {
   datarun?: string;
   comments?: CommentDataType[];
   source?: string;
+  signalrunID: string;
 };
 
 export type EventsResponse = {

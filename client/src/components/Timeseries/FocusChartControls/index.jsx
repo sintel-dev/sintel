@@ -12,8 +12,29 @@ class FocusChartControls extends Component {
 
     return (
       <div className="chart-controls" id="chartControls">
-        <div className="linechart-controls">
-          <div className="row">
+        <div className="legend">
+          <p>Signal Focused View</p>
+        </div>
+
+        <div className="controls">
+          <div className="linechart-controls">
+            <div className="row">
+              <div className="switch-control">
+                <div className="row">
+                  <label htmlFor="showPredictions">
+                    <input
+                      type="checkbox"
+                      id="showPredictions"
+                      checked={isEnabledPrediction}
+                      onChange={(event) => togglePredictions(event.target.checked)}
+                    />
+                    <span className="switch" />
+                    Show Predictions
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               className="btn btn-add-event"
@@ -23,20 +44,6 @@ class FocusChartControls extends Component {
               <span>+</span>
               Add Event
             </button>
-          </div>
-          <div className="switch-control reversed">
-            <div className="row">
-              <label htmlFor="showPredictions">
-                Show Predictions
-                <input
-                  type="checkbox"
-                  id="showPredictions"
-                  checked={isEnabledPrediction}
-                  onChange={(event) => togglePredictions(event.target.checked)}
-                />
-                <span className="switch" />
-              </label>
-            </div>
           </div>
         </div>
       </div>

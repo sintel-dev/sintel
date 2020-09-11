@@ -48,6 +48,8 @@ export class RestClient {
 
   public eventInteraction: Resource<any, EventInteractions>;
 
+  public signalraw: Resource<any, any>;
+
   /**
    *
    * @param config AxiosRequestConfig
@@ -67,6 +69,7 @@ export class RestClient {
     this.similar_windows = new Resource(this.server, 'computings/similar_windows/');
     this.users = new Resource(this.server, 'users/');
     this.eventInteraction = new Resource(this.server, 'event_interaction/');
+    this.signalraw = new Resource(this.server, 'signalraw/');
     this.server.interceptors.request.use(this.requestInterceptor);
     this.server.interceptors.response.use(this.responseSuccessInterceptor, this.responseFailInterceptor);
   }
