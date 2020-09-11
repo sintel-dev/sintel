@@ -30,6 +30,7 @@ def get_event(event_doc):
         'insert_time': event_doc.insert_time.isoformat(),
         'start_time': event_doc.start_time,
         'stop_time': event_doc.stop_time,
+        'signalrun': str(event_doc.signal.id),
         'score': event_doc.severity,
         'tag': event_doc.tag,
         'datarun': str(event_doc.signalrun.id),
