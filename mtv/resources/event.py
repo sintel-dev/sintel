@@ -359,6 +359,9 @@ class Events(Resource):
             doc['signalrun'] = args['datarun_id']
             doc['severity'] = args['score']
 
+            signalrun_doc = schema.Signalrun.find_one(signalrun=args['datarun_id'])
+            doc['signal'] = str(signalrun_doc.signal.id)
+
             event_doc = schema.Event.insert(**doc)
 
             doc = {
