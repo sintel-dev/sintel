@@ -158,3 +158,64 @@ class SignalRaw(Resource):
             return {'message', str(e)}, 500
         else:
             return {'data': data}
+
+
+class AvailableSignalruns(Resource):
+
+    def __init__(self):
+        parser_get = reqparse.RequestParser(bundle_errors=True)
+        parser_get.add_argument('signalrun', type=str, required=True,
+                                location='args')
+        self.parser_get = parser_get
+
+    def get(self):
+        """
+        @api {get} /available_signalruns/ Get available signalruns for a signal
+        @apiName GetAvailableSignalruns
+        @apiGroup Signal
+        @apiVersion 1.0.0
+
+        @apiParam {String} signalrun Signalrun ID.
+
+        @apiSuccess {Object[]} data Data.
+        @apiSuccess {String} data.id Timestamp
+        @apiSuccess {Int} data.interval Interval used in this signalrun
+        """
+
+        res, status = verify_auth()
+        if status == 401:
+            return res, status
+
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        try:
+            current_signalrun_doc = schema.Signalrun.find_one(signalrun=args.signalrun)
+            signalrun_docs = schema.Signalrun.find(signal=current_signalrun_doc.signal)
+
+            data = list()
+            interval_set = set()
+            for signalrun_doc in signalrun_docs:
+                primitive_name = 'orion.primitives.timeseries_preprocessing.time_segments_aggregate#1'
+                pipeline = signalrun_doc.datarun.pipeline
+                interval = int(pipeline.json['hyperparameters']
+                               [primitive_name].get('interval', None))
+                if interval is None:
+                    raise Exception(
+                        'signalrun - {}: interval = None'.format(str(signalrun_doc.id)))
+                # this is HACK: only return one signalrun with the same interval
+                if interval not in interval_set:
+                    interval_set.add(interval)
+                    item = {
+                        'id': str(signalrun_doc.id),
+                        'interval': interval
+                    }
+                    data.append(item)
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 500
+        else:
+            return {'data': data}
