@@ -13,8 +13,15 @@ LOGGER = logging.getLogger(__name__)
 
 
 def get_signalrun(signalrun_doc):
+
+    primitive_name = 'orion.primitives.timeseries_preprocessing.time_segments_aggregate#1'
+    pipeline = signalrun_doc.datarun.pipeline
+    interval = int(pipeline.json['hyperparameters']
+                   [primitive_name].get('interval', None))
+
     signalrun = {
         'id': str(signalrun_doc.id),
+        'interval': interval,
         'experiment': str(signalrun_doc.datarun.experiment.id),
         'signal': signalrun_doc.signal.name,
         'start_time': signalrun_doc.start_time.isoformat(),
@@ -22,7 +29,7 @@ def get_signalrun(signalrun_doc):
         'status': signalrun_doc.status,
         'events': [],
         'prediction': None,
-        'raw': []
+        'raw': [],
     }
 
     # get events of this signalrun
