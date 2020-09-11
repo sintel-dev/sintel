@@ -105,6 +105,7 @@ export type DatarunDataType = {
   eventWindows?: any;
   timeSeries?: Array<[number, number]>;
   maxTimeSeries?: Array<number>;
+  signal_id: string;
 };
 
 /**

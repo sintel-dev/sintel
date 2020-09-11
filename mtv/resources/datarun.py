@@ -21,9 +21,11 @@ def get_signalrun(signalrun_doc):
 
     signalrun = {
         'id': str(signalrun_doc.id),
+        'signalrun_id': str(signalrun_doc.id),
         'interval': interval,
         'experiment': str(signalrun_doc.datarun.experiment.id),
         'signal': signalrun_doc.signal.name,
+        'signal_id': str(signalrun_doc.signal.id),
         'start_time': signalrun_doc.start_time.isoformat(),
         'end_time': signalrun_doc.end_time.isoformat(),
         'status': signalrun_doc.status,
@@ -45,7 +47,6 @@ def get_signalrun(signalrun_doc):
                 'score': event_doc.severity,
                 'tag': event_doc.tag,
                 'source': event_doc.source,
-                'signalrunID': str(event_doc.signal.id)
             })
             # signalrun['events'][-1]['tag'] = \
             #     None if annotation_doc is None else annotation_doc.tag

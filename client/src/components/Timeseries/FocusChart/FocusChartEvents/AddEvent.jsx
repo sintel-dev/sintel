@@ -17,19 +17,11 @@ import {
 } from '../../../../model/selectors/datarun';
 
 import { FocusChartConstants } from '../Constants';
-import { getWrapperSize, normalizeHanlers } from '../FocusChartUtils';
+import { normalizeHanlers } from '../FocusChartUtils';
 
 const { CHART_MARGIN, TRANSLATE_LEFT, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
 export class AddEvents extends Component {
-  componentDidMount() {
-    const { width, height } = getWrapperSize();
-    this.setState({
-      width,
-      height,
-    });
-  }
-
   componentDidUpdate(prevProps) {
     if (
       prevProps.isAddingNewEvent !== this.props.isAddingNewEvent ||
@@ -40,7 +32,8 @@ export class AddEvents extends Component {
     }
   }
 
-  getScale(width = this.state.width, height = this.state.height) {
+  getScale() {
+    const { width, height } = this.props;
     const { dataRun } = this.props;
     const { maxTimeSeries } = dataRun;
     const [minTX, maxTX] = d3.extent(maxTimeSeries, (time) => time[0]);
@@ -102,7 +95,7 @@ export class AddEvents extends Component {
   }
 
   renderBrush() {
-    const { width, height } = this.state;
+    const { width, height } = this.props;
     const {
       dataRun,
       updateNewEventDetails,

@@ -204,7 +204,8 @@ export const getCurrentEventDetails = createSelector(
     const stop_time = datarun.timeSeries[eventIndex[1]][0];
     const score = eventIndex[2];
     const eventTag = eventIndex[4];
-    const { source, signalrunID } = eventInfo;
+    const { source } = eventInfo;
+    const signalrunID = datarun.signal_id;
 
     const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0);

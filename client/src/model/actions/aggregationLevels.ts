@@ -36,7 +36,8 @@ export function getSignalRawDataAction() {
     const { timeSeries } = dataRun;
     const currentEventDetails = getCurrentEventDetails(getState());
     const currentAggregationLevel = getAggregationTimeLevel(getState());
-    const { signalrunID, start_time, stop_time } = currentEventDetails;
+    const { start_time, stop_time } = currentEventDetails;
+    const signalrunID = dataRun.signal_id;
 
     const eventInterval = timeSeries.filter((current) => current[0] >= start_time && current[0] <= stop_time);
     const startIndex =
@@ -71,7 +72,6 @@ export function getSignalRawDataAction() {
 
 export function setContextValueAction(contextValue) {
   return function (dispatch) {
-    debugger;
     dispatch({ type: 'SET_CONTEXT_VALUE', contextValue });
     dispatch(getSignalRawDataAction());
   };

@@ -455,7 +455,7 @@ export class FocusChart extends Component<Props, State> {
             <g className="axis axis--x" transform={`translate(0, ${height - 3.5 * CHART_MARGIN})`} />
             <g className="axis axis--y" />
           </g>
-          <AddEvent />
+          <AddEvent width={width} height={height} />
         </g>
       )
     );
@@ -464,8 +464,6 @@ export class FocusChart extends Component<Props, State> {
   render() {
     const { isPredictionVisible, isAggregationActive } = this.props;
     const { width, height, isTooltipVisible } = this.state;
-    // this.setChartHeight();
-    // const chartHeight = isPredictionVisible ? height : height + 90;
     return (
       <div className="focus-chart" id="focusChartWrapper">
         {isTooltipVisible && this.renderEventTooltip()}
@@ -474,13 +472,15 @@ export class FocusChart extends Component<Props, State> {
         {isAggregationActive ? (
           <AggregationLevels width={width} height={height} toggleTooltip={() => this.toggleEventTooltip(false)} />
         ) : (
-          <svg width={width} height={height} id="focusChart">
-            {this.drawChartData()}
-          </svg>
+          <>
+            <svg width={width} height={height} id="focusChart">
+              {this.drawChartData()}
+            </svg>
+            <div className="zoomControlsHolder">
+              <ZoomControls />
+            </div>
+          </>
         )}
-        <div className="zoomControlsHolder">
-          <ZoomControls />
-        </div>
       </div>
     );
   }
