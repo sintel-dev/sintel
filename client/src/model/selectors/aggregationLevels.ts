@@ -5,6 +5,7 @@ export const getIsAggregationModalOpen = (state) => state.aggregationLevels.isAg
 export const getAggregationTimeLevel = (state) => state.aggregationLevels.aggregationTimeLevel;
 export const getIsSigRawLoading = (state) => state.aggregationLevels.isSignalRawLoading;
 export const getCurrentSignalRawData = (state) => state.aggregationLevels.singalRawData;
+export const getContextInfoValue = (state) => state.aggregationLevels.contextValue;
 
 export const getSignalRawData = createSelector(
   [getIsSigRawLoading, getCurrentSignalRawData],

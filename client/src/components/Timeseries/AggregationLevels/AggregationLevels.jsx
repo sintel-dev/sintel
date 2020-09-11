@@ -8,14 +8,18 @@ import {
   getIsSigRawLoading,
   getEventInterval,
 } from 'src/model/selectors/aggregationLevels';
-import { setAggregationLevelAction, getSignalRawDataAction } from 'src/model/actions/aggregationLevels';
+import {
+  setAggregationLevelAction,
+  getSignalRawDataAction,
+  setContextValueAction,
+} from 'src/model/actions/aggregationLevels';
 import Loader from 'src/components/Common/Loader';
+import Dropdown from 'src/components/Common/Dropdown';
 import { FocusChartConstants, colorSchemes } from '../FocusChart/Constants';
 import { timeIntervals } from './AggregationChart/Utils';
 import './AggregationLevels.scss';
 
 const { MIN_VALUE, MAX_VALUE, TRANSLATE_LEFT, CHART_MARGIN, TIME_INTERVALS_HEIGHT } = FocusChartConstants;
-
 const TRANSLATE_CHART = TRANSLATE_LEFT + 20;
 
 class AggregationLevels extends Component {
@@ -215,7 +219,21 @@ class AggregationLevels extends Component {
   }
 
   renderIntervalLevels() {
-    const { setAggregationLevel, currentAggregationLevel } = this.props;
+    const { setAggregationLevel, currentAggregationLevel, setContextInfo } = this.props;
+    const contextInfoValues = [
+      { value: 1, label: '0x' },
+      { value: 2, label: '1x' },
+      { value: 3, label: '2x' },
+    ];
+
+    const dropDownProps = {
+      isMulti: false,
+      closeMenuOnSelect: true,
+      onChange: (event) => setContextInfo(event.value),
+      placeholder: '0x',
+      options: contextInfoValues,
+      formatLabel: false,
+    };
     return (
       <div className="aggregation-wrapper">
         <ul className="aggregation-controls">
@@ -230,6 +248,10 @@ class AggregationLevels extends Component {
               </button>
             </li>
           ))}
+          <li className="context-info">
+            <span>Context info</span>
+            <Dropdown {...dropDownProps} />
+          </li>
         </ul>
       </div>
     );
@@ -265,5 +287,6 @@ export default connect(
   (dispatch) => ({
     setAggregationLevel: (periodLevel) => dispatch(setAggregationLevelAction(periodLevel)),
     getSignalRawData: () => dispatch(getSignalRawDataAction()),
+    setContextInfo: (contextValue) => dispatch(setContextValueAction(contextValue)),
   }),
 )(AggregationLevels);

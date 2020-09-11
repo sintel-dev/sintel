@@ -42,12 +42,12 @@ export const formatOptionLabel = ({ label, icon }) => (
 );
 
 export const Dropdown = (props) => {
-  const { onChange, isSearchable, isMulti, closeMenuOnSelect, value, placeholder } = props;
+  const { onChange, isSearchable, isMulti, closeMenuOnSelect, value, placeholder, options, formatLabel } = props;
 
   return (
     <Select
-      formatOptionLabel={formatOptionLabel}
-      options={filterOptions}
+      formatOptionLabel={formatLabel && formatOptionLabel}
+      options={options}
       classNamePrefix="tag-options"
       className="tag-select"
       placeholder={placeholder}
@@ -56,6 +56,7 @@ export const Dropdown = (props) => {
       isMulti={isMulti}
       closeMenuOnSelect={closeMenuOnSelect}
       value={value}
+      debug
     />
   );
 };
@@ -66,6 +67,8 @@ Dropdown.defaultProps = {
   isMulti: false,
   isSearchable: false,
   closeMenuOnSelect: true,
+  options: filterOptions,
+  formatLabel: true,
 };
 
 export default Dropdown;

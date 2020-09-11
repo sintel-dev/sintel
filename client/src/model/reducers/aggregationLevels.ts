@@ -11,6 +11,7 @@ const initialState: AggregationLevelsType = {
   isSignalRawLoading: true,
   singalRawData: [],
   eventInterval: [],
+  contextValue: 1,
 };
 
 function TOGGLE_AGGREGATION_MODAL(nextState, { isAggregationModalOpen }) {
@@ -38,6 +39,10 @@ function SET_EVENT_INTERVAL(nextState, { eventInterval }) {
   nextState.eventInterval = eventInterval;
 }
 
+function SET_CONTEXT_VALUE(nextState, { contextValue }) {
+  nextState.contextValue = contextValue;
+}
+
 export default createReducer(initialState, {
   TOGGLE_AGGREGATION_MODAL,
   SET_AGGREGATION_TIME_LEVEL,
@@ -45,4 +50,5 @@ export default createReducer(initialState, {
   FETCH_SIGNAL_RAW_SUCCESS,
   FETCH_SIGNAL_RAW_FAILURE,
   SET_EVENT_INTERVAL,
+  SET_CONTEXT_VALUE,
 });

@@ -14,4 +14,5 @@ export type AggregationLevelsType = {
   isSignalRawLoading: boolean;
   singalRawData: Array<any>;
   eventInterval: Array<any>;
+  contextValue: number;
 };

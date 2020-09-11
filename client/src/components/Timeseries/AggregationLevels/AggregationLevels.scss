@@ -118,5 +118,24 @@
                 }
             }
         }
+        .context-info {
+            span {
+                display: inline-block;
+                margin-right: 16px;
+            }
+            .tag-select {
+                .tag-options__menu {
+                    min-height: 30px;
+                    font-size: 14px;
+                }
+                .tag-options__control {
+                    min-height: 30px;
+                }
+                .tag-options__menu,
+                .tag-options__control {
+                    min-width: 65px;
+                }
+            }
+        }
     }
 }

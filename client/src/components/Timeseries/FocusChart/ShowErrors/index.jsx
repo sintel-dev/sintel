@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getWrapperSize, getScale } from '../FocusChartUtils';
 import { getSelectedPeriodRange, getDatarunDetails } from '../../../../model/selectors/datarun';
+import { FocusChartConstants } from '../Constants';
 import './ShowErrors.scss';
+
+const { TRANSLATE_TOP } = FocusChartConstants;
 
 class ShowErrors extends Component {
   constructor(props) {
     super(props);
     this.state = {
       width: 0,
-      height: 90,
+      height: TRANSLATE_TOP,
     };
   }
 

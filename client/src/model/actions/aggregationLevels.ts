@@ -1,7 +1,7 @@
 import { timeToSeconds } from 'src/components/Timeseries/AggregationLevels/AggregationChart/Utils';
 import { TOGGLE_AGGREGATION_MODAL, SET_AGGREGATION_TIME_LEVEL, FETCH_SIGNAL_RAW } from '../types';
 import { getCurrentEventDetails, getDatarunDetails } from '../selectors/datarun';
-import { getAggregationTimeLevel } from '../selectors/aggregationLevels';
+import { getAggregationTimeLevel, getContextInfoValue } from '../selectors/aggregationLevels';
 import API from '../utils/api';
 
 export function toggleAggregationModal(currentState: boolean) {
@@ -31,14 +31,18 @@ export function setAggregationLevelAction(timeStamp) {
 export function getSignalRawDataAction() {
   return async function (dispatch, getState) {
     const dataRun = getDatarunDetails(getState());
+    const contextInfo = getContextInfoValue(getState());
 
     const { timeSeries } = dataRun;
     const currentEventDetails = getCurrentEventDetails(getState());
     const currentAggregationLevel = getAggregationTimeLevel(getState());
     const { signalrunID, start_time, stop_time } = currentEventDetails;
+
     const eventInterval = timeSeries.filter((current) => current[0] >= start_time && current[0] <= stop_time);
-    const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1 - eventInterval.length;
-    const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0) + eventInterval.length;
+    const startIndex =
+      timeSeries.findIndex((element) => start_time - element[0] < 0) - 1 - eventInterval.length * contextInfo;
+    const stopIndex =
+      timeSeries.findIndex((element) => stop_time - element[0] < 0) + eventInterval.length * contextInfo;
 
     const eventWrapper = timeSeries.slice(startIndex, stopIndex);
     const startTime = eventWrapper[0][0] / 1000;
@@ -62,5 +66,13 @@ export function getSignalRawDataAction() {
     };
 
     dispatch(action);
+  };
+}
+
+export function setContextValueAction(contextValue) {
+  return function (dispatch) {
+    debugger;
+    dispatch({ type: 'SET_CONTEXT_VALUE', contextValue });
+    dispatch(getSignalRawDataAction());
   };
 }
