@@ -1,16 +1,6 @@
 import React from 'react';
 
-export const timeIntervals = [
-  '30 hours',
-  '24 hours',
-  '12 hours',
-  '6 hours',
-  '3 hours',
-  '1 hour',
-  '30 mins',
-  '10 mins',
-  '1 mins',
-];
+export const timeIntervals = ['30 days', '21 days', '14 days', '7 days', '5 days', '3 days', '2 days', '1 day'];
 
 export const getAggregationChartCoords = () => {
   const ref = document.querySelector('.aggregation-levels-modal .modal-body');
@@ -37,9 +27,13 @@ export const timeToSeconds = (interval) => {
   const time = timeParts[0];
   const period = timeParts[1];
 
+  if (period === 'days' || period === 'day') {
+    return time * 60 * 60 * 24;
+  }
   if (period === 'mins') {
     return time * 60;
   }
 
+  // default: hours
   return time * (60 * 60);
 };
