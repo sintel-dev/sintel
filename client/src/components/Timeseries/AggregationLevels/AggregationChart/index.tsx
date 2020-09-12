@@ -174,7 +174,9 @@ class AggregationChart extends Component<StateProps, State> {
     const yAxis = d3.axisLeft(yCoord);
 
     d3.select('.aggregation-axis .axis.axis--x').call(xAxis);
-    d3.select('.aggregation-axis .axis.axis--y').call(yAxis).call(yAxis.ticks(5, ',f'));
+    d3.select('.aggregation-axis .axis.axis--y')
+      .call(yAxis)
+      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
   }
 
   renderEventDetails() {

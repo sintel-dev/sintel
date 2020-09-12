@@ -306,7 +306,7 @@ export class FocusChart extends Component<Props, State> {
     d3.select('.axis.axis--x').call(xAxis);
     d3.select('.axis.axis--y')
       .call(yAxis)
-      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.0s')));
+      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
   }
 
   initZoom() {

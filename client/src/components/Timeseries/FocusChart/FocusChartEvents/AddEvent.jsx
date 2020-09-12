@@ -28,6 +28,16 @@ export class AddEvents extends Component {
     normalizeHanlers('brush-instance');
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.isAddingNewEvent !== this.props.isAddingNewEvent ||
+      prevProps.isEditingEventRange !== this.props.isEditingEventRange
+    ) {
+      this.renderBrush();
+      normalizeHanlers('brush-instance');
+    }
+  }
+
   getScale() {
     const { width, height } = this.props;
     const { dataRun } = this.props;
@@ -103,7 +113,6 @@ export class AddEvents extends Component {
     const { zoomValue } = periodRange;
     const { timeSeries } = dataRun;
     const { xCoord } = this.getScale();
-
     const { brushStart, brushEnd } = this.getBrushCoords();
 
     if (zoomValue !== undefined && zoomValue !== 1) {
@@ -131,8 +140,6 @@ export class AddEvents extends Component {
           timeSeries.findIndex((element) => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex((element) => xCoord.invert(selection_end).getTime() - element[0] < 0);
 
-        console.log(stopIndex);
-        debugger;
         if (startIndex !== -1 && stopIndex !== -1) {
           const eventDetails = {
             ...newEventDetails,
@@ -162,6 +169,7 @@ export class AddEvents extends Component {
 
   render() {
     const { isAddingNewEvent, isEditingEventRange, toggleActivePanel } = this.props;
+
     return (isAddingNewEvent || isEditingEventRange) && <g className="brush-instance" onClick={toggleActivePanel} />;
   }
 }

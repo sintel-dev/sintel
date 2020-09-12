@@ -144,7 +144,9 @@ class AggregationLevels extends Component {
     const yAxis = d3.axisLeft(yCoord);
 
     d3.select('.axis.axis--x').call(xAxis);
-    d3.select('.axis.axis--y').call(yAxis).call(yAxis.ticks(5, ',f'));
+    d3.select('.axis.axis--y')
+      .call(yAxis)
+      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
   }
 
   renderEventArea() {
