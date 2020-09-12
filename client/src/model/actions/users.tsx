@@ -51,7 +51,12 @@ export function onUserLoginAction(userData) {
         Cookies.set(SESSION_TOKEN, token, {
           expires: Date.now() + (userData.rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 24),
         });
+
+        Cookies.set(AUTH_USER_DATA, JSON.stringify(data));
+        Cookies.set(AUTHENTICATED_USER_ID, data.uid);
+
         dispatch({ type: 'SET_LOGIN_STATUS', loginStatus: 'authenticated' });
+
         return response;
       })
       .catch(() => {

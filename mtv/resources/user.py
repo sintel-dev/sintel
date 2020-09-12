@@ -117,6 +117,9 @@ class Signup(Resource):
             user['email'] = body['email']
             user['name'] = body['name']
             user['password'] = password_encrypted
+            user['picture'] = ('https://user-images.githubusercontent.com/'
+                               '8490637/93004647-d895c100-f516-11ea-8c74-3'
+                               '32d98bbf2ad.png')
             if schema.User.find_one(email=user['email']):
                 raise Exception('Email already exist')
             # if schema.User.find_one(name=user['name']):
@@ -164,6 +167,7 @@ class Signin(Resource):
                         'uid': str(user.id),
                         'name': user.name,
                         'email': user.email,
+                        'picture': user.picture,
                         'token': token
                     }
                 }, 200
