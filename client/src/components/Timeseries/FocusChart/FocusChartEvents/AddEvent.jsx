@@ -6,7 +6,7 @@ import {
   updateNewEventDetailsAction,
   updateEventDetailsAction,
   // openEventDetailsPopupAction,
-} from '../../../../model/actions/datarun';
+} from 'src/model/actions/datarun';
 
 import {
   getIsAddingNewEvents,
@@ -14,7 +14,8 @@ import {
   getSelectedPeriodRange,
   getIsEditingEventRange,
   getCurrentEventDetails,
-} from '../../../../model/selectors/datarun';
+  getIsAggregationActive,
+} from 'src/model/selectors/datarun';
 
 import { FocusChartConstants } from '../Constants';
 import { normalizeHanlers } from '../FocusChartUtils';
@@ -22,14 +23,9 @@ import { normalizeHanlers } from '../FocusChartUtils';
 const { CHART_MARGIN, TRANSLATE_LEFT, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
 export class AddEvents extends Component {
-  componentDidUpdate(prevProps) {
-    if (
-      prevProps.isAddingNewEvent !== this.props.isAddingNewEvent ||
-      prevProps.isEditingEventRange !== this.props.isEditingEventRange
-    ) {
-      this.renderBrush();
-      normalizeHanlers('brush-instance');
-    }
+  componentDidMount() {
+    this.renderBrush();
+    normalizeHanlers('brush-instance');
   }
 
   getScale() {
@@ -135,6 +131,8 @@ export class AddEvents extends Component {
           timeSeries.findIndex((element) => xCoord.invert(selection_start).getTime() - element[0] < 0) - 1;
         const stopIndex = timeSeries.findIndex((element) => xCoord.invert(selection_end).getTime() - element[0] < 0);
 
+        console.log(stopIndex);
+        debugger;
         if (startIndex !== -1 && stopIndex !== -1) {
           const eventDetails = {
             ...newEventDetails,
@@ -175,6 +173,7 @@ export default connect(
     periodRange: getSelectedPeriodRange(state),
     isEditingEventRange: getIsEditingEventRange(state),
     currentEventDetails: getCurrentEventDetails(state),
+    isAggregationActive: getIsAggregationActive(state),
   }),
   (dispatch) => ({
     updateNewEventDetails: (eventDetails) => dispatch(updateNewEventDetailsAction(eventDetails)),
