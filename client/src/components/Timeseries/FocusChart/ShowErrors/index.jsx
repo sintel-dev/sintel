@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
 import { connect } from 'react-redux';
 import { getWrapperSize, getScale } from '../FocusChartUtils';
 import { getSelectedPeriodRange, getDatarunDetails } from '../../../../model/selectors/datarun';
 import { FocusChartConstants } from '../Constants';
 import './ShowErrors.scss';
 
-const { TRANSLATE_TOP } = FocusChartConstants;
+const { TRANSLATE_TOP, TRANSLATE_LEFT } = FocusChartConstants;
 
 class ShowErrors extends Component {
   constructor(props) {
@@ -25,8 +25,13 @@ class ShowErrors extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.periodRange.zoomValue !== this.props.periodRange.zoomValue) {
-      this.updateZoom();
+    if (
+      prevProps.datarun !== this.props.periodRange.zoomValue ||
+      prevProps.periodRange.zoomValue !== this.props.periodRange.zoomValue
+    ) {
+      if (typeof this.props.periodRange.zoomValue !== 'number') {
+        this.updateZoom();
+      }
     }
   }
 
@@ -44,6 +49,10 @@ class ShowErrors extends Component {
       .y1((d) => yRange(d[1]) / 2);
 
     return area(timeseriesErr);
+  }
+
+  getTransform() {
+    return `translate(${TRANSLATE_LEFT}px,${TRANSLATE_TOP / 2}px)`;
   }
 
   updateZoom() {
@@ -72,9 +81,9 @@ class ShowErrors extends Component {
     const active = isOpen ? 'active' : '';
     return (
       <div className="show-errors">
-        <svg id="showErrors" className={active} width={width} heigh={height}>
+        <svg id="showErrors" className={active} width={width} height={height}>
           <rect className="err-bg" width={width} />
-          <path d={this.getArea()} className="err-data" />
+          <path d={this.getArea()} className="err-data" style={{ transform: this.getTransform() }} />
         </svg>
       </div>
     );

@@ -304,7 +304,9 @@ export class FocusChart extends Component<Props, State> {
     const yAxis = d3.axisLeft(yCoord);
 
     d3.select('.axis.axis--x').call(xAxis);
-    d3.select('.axis.axis--y').call(yAxis).call(yAxis.ticks(5, ',f'));
+    d3.select('.axis.axis--y')
+      .call(yAxis)
+      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.0s')));
   }
 
   initZoom() {
@@ -331,6 +333,9 @@ export class FocusChart extends Component<Props, State> {
   updateZoom() {
     const { periodRange } = this.props;
     d3.select('.zoom').call(this.zoom.transform, periodRange.zoomValue);
+    const kk = Math.min(Math.floor(periodRange.zoomValue.k), 3);
+    d3.select('.focus-chart path.chart-wawes').style('stroke-width', kk);
+    d3.select('.focus-chart path.predictions').style('stroke-width', kk);
   }
 
   zoomHandler() {

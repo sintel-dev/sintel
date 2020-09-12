@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import * as d3 from 'd3';
 
 import {
   getCurrentEventDetails,
@@ -50,6 +51,8 @@ class EventDetailsView extends Component {
     const currentEvent = isAddingNewEvent ? newEventDetails : eventDetails;
     const { start_time, stop_time, score, tag, source } = currentEvent;
 
+    const scoreFormatter = d3.format('.3f');
+
     return (
       <div className="evt-ops">
         <div className="evt-detail">
@@ -85,15 +88,7 @@ class EventDetailsView extends Component {
                 </td>
                 <td width="29%">
                   <p>Severity Score</p>
-                  <input
-                    type="text"
-                    name="severity-score"
-                    id="sevScore"
-                    maxLength="2"
-                    placeholder="-"
-                    value={score}
-                    onChange={(evt) => updateEventDetails({ score: evt.target.value })}
-                  />
+                  {scoreFormatter(score)}
                 </td>
                 <td>
                   <p>Source</p>
