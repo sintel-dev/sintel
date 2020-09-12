@@ -45,7 +45,7 @@ export function getSignalRawDataAction() {
     const stopIndex =
       timeSeries.findIndex((element) => stop_time - element[0] < 0) + eventInterval.length * contextInfo;
 
-    const eventWrapper = timeSeries.slice(startIndex, stopIndex);
+    const eventWrapper = timeSeries.slice(Math.max(startIndex, 0), stopIndex > -1 ? stopIndex : timeSeries.length - 1);
     const startTime = eventWrapper[0][0] / 1000;
     const stopTime = eventWrapper[eventWrapper.length - 1][0] / 1000;
 
