@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Collapse } from 'react-collapse';
-import { FillTriangleUpIcon, FillTriangleDownIcon } from 'src/components/Common/icons';
 import { tagSeq, fromTagToClassName } from '../../../../Landing/utils';
 import { fromMonthToIndex } from '../../../../../model/utils/Utils';
+import * as _ from 'lodash';
 
 import './EventSummary.scss';
 
@@ -22,8 +21,45 @@ const countEventsPerTag = (tag, events) => {
   return currentEvents.filter((currentEvent) => currentEvent.tag === tag).length;
 };
 
-const renderTagEvents = (events) =>
-  tagSeq.map((currentTag) => <td key={currentTag}>{(events && countEventsPerTag(currentTag, events)) || '-'}</td>);
+const renderTagEventsAll = (grouppedEvents) => {
+  if (grouppedEvents === undefined) {
+    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
+  }
+  return tagSeq.map((currentTag) => {
+    let eventSum = 0;
+    let eventSet = new Set();
+    _.each(grouppedEvents, (value) => {
+      _.each(value.events, (event, eventId) => {
+        if (event.tag === currentTag) {
+          eventSet.add(eventId);
+        }
+      });
+    });
+    eventSum = eventSet.size;
+    return <td key={currentTag}>{eventSum}</td>;
+  });
+};
+
+const renderTagEventsPerYear = (periodRange, grouppedEvents) => {
+  if (periodRange.level === 'year' || grouppedEvents === undefined) {
+    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
+  }
+  return tagSeq.map((currentTag) => <td key={currentTag}>{countEventsPerTag(currentTag, grouppedEvents.events)}</td>);
+};
+
+const renderTagEventsPerMonth = (periodRange, month, monthEvents) => {
+  if (periodRange.level !== 'day' || monthEvents === undefined) {
+    return tagSeq.map((currentTag) => <td key={currentTag}>-</td>);
+  }
+  const currentMonthEvents = monthEvents.months[fromMonthToIndex(month)];
+  if (currentMonthEvents) {
+    return tagSeq.map((currentTag) => (
+      <td key={currentTag}>{countEventsPerTag(currentTag, currentMonthEvents.events)}</td>
+    ));
+  } else {
+    return tagSeq.map((currentTag) => <td key={currentTag}>0</td>);
+  }
+};
 
 class EventSummary extends Component {
   componentDidMount() {
@@ -87,46 +123,48 @@ class EventSummary extends Component {
   }
 
   render() {
-    const { showPeriod, toggleEventSummary, isSummaryViewActive } = this.props;
-    const eventsPerRange = this.getTimeRangeEvents();
-    const activeSummary = isSummaryViewActive ? 'active' : '';
+    const { filteredPeriodRange, grouppedEvents } = this.props;
+
+    let currentYear = '';
+    let currentMonth = '';
+    let currentYearStr = '';
+    let currentMonthStr = '';
+
+    let periodRange = filteredPeriodRange[0];
+    if (periodRange.level === 'month') {
+      currentYear = periodRange.parent.name;
+      currentYearStr = '- ' + periodRange.parent.name;
+    } else if (periodRange.level === 'day') {
+      currentYear = periodRange.parent.parent.name;
+      currentYearStr = '- ' + periodRange.parent.parent.name;
+      currentMonth = periodRange.parent.name;
+      currentMonthStr = '- ' + periodRange.parent.name;
+    }
+
     return (
       <div className="event-summary">
-        <div className="event-header">
-          <div className="left-wrapper wrapper">
-            <span>{this.props.signalName}</span>
-          </div>
-          <div className="right-wrapper wrapper">
-            <ul>
-              <li>{showPeriod}</li>
-              <li>
-                <button type="button" onClick={toggleEventSummary} className="toggle clean">
-                  {isSummaryViewActive ? <FillTriangleUpIcon /> : <FillTriangleDownIcon />}
-                </button>
-              </li>
-            </ul>
-          </div>
+        <div className={`summary-details`}>
+          <table>
+            <tbody>
+              <tr>
+                <th>event tag</th>
+                {renderTagIcon()}
+              </tr>
+              <tr>
+                <th>All</th>
+                {renderTagEventsAll(grouppedEvents)}
+              </tr>
+              <tr>
+                <th>Year {currentYearStr} </th>
+                {renderTagEventsPerYear(filteredPeriodRange[0], grouppedEvents[currentYear])}
+              </tr>
+              <tr>
+                <th>Month {currentMonthStr}</th>
+                {renderTagEventsPerMonth(filteredPeriodRange[0], currentMonth, grouppedEvents[currentYear])}
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <Collapse isOpened={isSummaryViewActive}>
-          <div className={`summary-details ${activeSummary}`}>
-            <table>
-              <tbody>
-                <tr>
-                  <th>event tag</th>
-                  {renderTagIcon()}
-                </tr>
-                <tr>
-                  <th>Year</th>
-                  {renderTagEvents(eventsPerRange.perYear)}
-                </tr>
-                <tr>
-                  <th>Month</th>
-                  {renderTagEvents(eventsPerRange.perMonth)}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </Collapse>
       </div>
     );
   }
