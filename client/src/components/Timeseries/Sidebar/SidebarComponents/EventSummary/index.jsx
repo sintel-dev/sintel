@@ -131,14 +131,15 @@ class EventSummary extends Component {
     let currentMonthStr = '';
 
     let periodRange = filteredPeriodRange[0];
-    if (periodRange.level === 'month') {
+    const { level } = periodRange;
+    if (level === 'month') {
       currentYear = periodRange.parent.name;
-      currentYearStr = '- ' + periodRange.parent.name;
-    } else if (periodRange.level === 'day') {
+      currentYearStr = `- ${periodRange.parent.name}`;
+    } else if (level === 'day') {
       currentYear = periodRange.parent.parent.name;
-      currentYearStr = '- ' + periodRange.parent.parent.name;
+      currentYearStr = `- ${periodRange.parent.parent.name}`;
       currentMonth = periodRange.parent.name;
-      currentMonthStr = '- ' + periodRange.parent.name;
+      currentMonthStr = `- ${periodRange.parent.name}`;
     }
 
     return (

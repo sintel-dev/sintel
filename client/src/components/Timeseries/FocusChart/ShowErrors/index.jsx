@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import PropTypes, { instanceOf } from 'prop-types';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getWrapperSize, getScale } from '../FocusChartUtils';
 import { getSelectedPeriodRange, getDatarunDetails } from '../../../../model/selectors/datarun';
@@ -51,10 +51,6 @@ class ShowErrors extends Component {
     return area(timeseriesErr);
   }
 
-  getTransform() {
-    return `translate(${TRANSLATE_LEFT}px,${TRANSLATE_TOP / 2}px)`;
-  }
-
   updateZoom() {
     const { width, height } = this.state;
     const { datarun, periodRange } = this.props;
@@ -83,7 +79,11 @@ class ShowErrors extends Component {
       <div className="show-errors">
         <svg id="showErrors" className={active} width={width} height={height}>
           <rect className="err-bg" width={width} />
-          <path d={this.getArea()} className="err-data" style={{ transform: this.getTransform() }} />
+          <path
+            d={this.getArea()}
+            className="err-data"
+            style={{ transform: `translate(${TRANSLATE_LEFT}px, ${TRANSLATE_TOP / 2}px)` }}
+          />
         </svg>
       </div>
     );
