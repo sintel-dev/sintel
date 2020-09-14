@@ -4,9 +4,10 @@ export const FocusChartConstants = {
   CHART_WIDTH: 0,
   CHART_HEIGHT: 0,
   TRANSLATE_TOP: 90,
-  TRANSLATE_LEFT: 38,
+  TRANSLATE_LEFT: 65,
   DRAW_EVENTS_TIMEOUT: 400,
   CHART_MARGIN: 10,
+  TIME_INTERVALS_HEIGHT: 65,
 };
 
 export const colorSchemes = {

@@ -23,7 +23,7 @@
         z-index: 999;
         color: #fff;
         text-transform: capitalize;
-        top: -37px;
+        top: 0;
         left: 0;
         white-space: nowrap;
         display: none;
@@ -91,7 +91,7 @@
     }
 
     .summary-details {
-        border-top: 1px solid #23242b;
+        // border-top: 1px solid #23242b;
         border-width: 90%;
 
         .indicator {

@@ -12,7 +12,6 @@
     border-bottom-right-radius: 5px;
     border: 1px solid #2c3034;
     transition: all 0.2s ease-in-out;
-    margin-bottom: 20px;
 
     .time-row {
         border: 1px solid #2c3034;
@@ -113,7 +112,7 @@
 
 .brush-tooltip {
     position: fixed;
-    width: 170px;
+    width: 180px;
     font-size: 12px;
     background: rgba(103, 106, 130, 0.7);
     padding: 10px;

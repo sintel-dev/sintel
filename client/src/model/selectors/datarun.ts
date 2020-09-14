@@ -4,6 +4,7 @@ import { RootState } from '../types';
 import { getSelectedExperimentData, getProcessedDataRuns } from './experiment';
 import { groupEventsByTimestamp, fromMonthToIndex } from '../utils/Utils';
 import { getCurrentEventHistory } from './events';
+import { getCurrentActivePanel } from './sidebar';
 
 // @TODO - set state: RootState
 const getEventComments = (state) => state.datarun.eventComments;
@@ -204,6 +205,7 @@ export const getCurrentEventDetails = createSelector(
     const score = eventIndex[2];
     const eventTag = eventIndex[4];
     const { source } = eventInfo;
+    const signalrunID = datarun.signal_id;
 
     const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1;
     const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0);
@@ -224,6 +226,7 @@ export const getCurrentEventDetails = createSelector(
       isCommentsLoading,
       score,
       source,
+      signalrunID,
     };
     return eventDetails;
   },
@@ -249,4 +252,10 @@ export const getEventSortedHistory = createSelector(
 
     return sortedHistory;
   },
+);
+
+export const getIsAggregationActive = createSelector(
+  [getActiveEventID, getCurrentActivePanel, getIsEditingEventRange],
+  (eventID, activePanel, isEditingEventRange) =>
+    eventID !== null && activePanel === 'eventView' && !isEditingEventRange,
 );

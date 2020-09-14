@@ -1,32 +1,53 @@
 @import '../../../assets/sass/form.scss';
 
 .chart-controls {
-    color: #fff;
-    display: inline-block;
-    margin-top: 10px;
-    margin: 0px 0px 20px 0;
-    width: 100%;
-
-    .tag-select {
-        min-width: 160px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 65px;
+    .legend {
+        p {
+            color: rgba(#fff, 0.4);
+        }
     }
-    .tag-wrapper {
-        float: right;
-    }
-
-    .linechart-controls {
+    .controls {
         display: flex;
         justify-content: space-between;
+
         .row {
-            justify-content: space-between;
-            margin: 0;
+            display: inline-block;
+            margin-right: 25px;
         }
     }
 }
 
-.tag-wrapper {
-    float: right;
-}
+// .chart-controls {
+//     color: #fff;
+//     display: inline-block;
+//     margin-top: 10px;
+//     margin: 0px 0px 20px 0;
+//     width: 100%;
+
+//     .tag-select {
+//         min-width: 160px;
+//     }
+//     .tag-wrapper {
+//         float: right;
+//     }
+
+//     .linechart-controls {
+//         display: flex;
+//         justify-content: space-between;
+//         .row {
+//             justify-content: space-between;
+//             margin: 0;
+//         }
+//     }
+// }
+
+// .tag-wrapper {
+//     float: right;
+// }
 
 .btn-add-event {
     background: #2474f4;

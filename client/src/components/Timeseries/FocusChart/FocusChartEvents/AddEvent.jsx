@@ -6,7 +6,7 @@ import {
   updateNewEventDetailsAction,
   updateEventDetailsAction,
   // openEventDetailsPopupAction,
-} from '../../../../model/actions/datarun';
+} from 'src/model/actions/datarun';
 
 import {
   getIsAddingNewEvents,
@@ -14,20 +14,18 @@ import {
   getSelectedPeriodRange,
   getIsEditingEventRange,
   getCurrentEventDetails,
-} from '../../../../model/selectors/datarun';
+  getIsAggregationActive,
+} from 'src/model/selectors/datarun';
 
 import { FocusChartConstants } from '../Constants';
-import { getWrapperSize, normalizeHanlers } from '../FocusChartUtils';
+import { normalizeHanlers } from '../FocusChartUtils';
 
 const { CHART_MARGIN, TRANSLATE_LEFT, MIN_VALUE, MAX_VALUE } = FocusChartConstants;
 
 export class AddEvents extends Component {
   componentDidMount() {
-    const { width, height } = getWrapperSize();
-    this.setState({
-      width,
-      height,
-    });
+    this.renderBrush();
+    normalizeHanlers('brush-instance');
   }
 
   componentDidUpdate(prevProps) {
@@ -40,7 +38,8 @@ export class AddEvents extends Component {
     }
   }
 
-  getScale(width = this.state.width, height = this.state.height) {
+  getScale() {
+    const { width, height } = this.props;
     const { dataRun } = this.props;
     const { maxTimeSeries } = dataRun;
     const [minTX, maxTX] = d3.extent(maxTimeSeries, (time) => time[0]);
@@ -102,7 +101,7 @@ export class AddEvents extends Component {
   }
 
   renderBrush() {
-    const { width, height } = this.state;
+    const { width, height } = this.props;
     const {
       dataRun,
       updateNewEventDetails,
@@ -114,7 +113,6 @@ export class AddEvents extends Component {
     const { zoomValue } = periodRange;
     const { timeSeries } = dataRun;
     const { xCoord } = this.getScale();
-
     const { brushStart, brushEnd } = this.getBrushCoords();
 
     if (zoomValue !== undefined && zoomValue !== 1) {
@@ -171,6 +169,7 @@ export class AddEvents extends Component {
 
   render() {
     const { isAddingNewEvent, isEditingEventRange, toggleActivePanel } = this.props;
+
     return (isAddingNewEvent || isEditingEventRange) && <g className="brush-instance" onClick={toggleActivePanel} />;
   }
 }
@@ -182,6 +181,7 @@ export default connect(
     periodRange: getSelectedPeriodRange(state),
     isEditingEventRange: getIsEditingEventRange(state),
     currentEventDetails: getCurrentEventDetails(state),
+    isAggregationActive: getIsAggregationActive(state),
   }),
   (dispatch) => ({
     updateNewEventDetails: (eventDetails) => dispatch(updateNewEventDetailsAction(eventDetails)),

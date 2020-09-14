@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import * as d3 from 'd3';
 
 import {
   getCurrentEventDetails,
@@ -15,6 +16,7 @@ import {
   saveEventDetailsAction,
   deleteEventAction,
   setActiveEventAction,
+  cancelEventEditing,
 } from 'src/model/actions/datarun';
 
 import { selectedOption } from './eventUtils';
@@ -49,6 +51,8 @@ class EventDetailsView extends Component {
     const { eventDetails, updateEventDetails, editEventRange, newEventDetails, isAddingNewEvent } = this.props;
     const currentEvent = isAddingNewEvent ? newEventDetails : eventDetails;
     const { start_time, stop_time, score, tag, source } = currentEvent;
+
+    const scoreFormatter = d3.format('.3f');
 
     return (
       <div className="evt-ops">
@@ -85,15 +89,7 @@ class EventDetailsView extends Component {
                 </td>
                 <td width="29%">
                   <p>Severity Score</p>
-                  <input
-                    type="text"
-                    name="severity-score"
-                    id="sevScore"
-                    maxLength="2"
-                    placeholder="-"
-                    value={score}
-                    onChange={(evt) => updateEventDetails({ score: evt.target.value })}
-                  />
+                  {scoreFormatter(score)}
                 </td>
                 <td>
                   <p>Source</p>
@@ -107,8 +103,13 @@ class EventDetailsView extends Component {
     );
   }
 
+  onCancel() {
+    const { cancelEventEditing } = this.props;
+    cancelEventEditing();
+  }
+
   renderEventFooter() {
-    const { saveEventDetails, deleteEvent, setActiveEvent } = this.props;
+    const { saveEventDetails, deleteEvent } = this.props;
     return (
       <div className="evt-footer">
         <ul>
@@ -120,7 +121,7 @@ class EventDetailsView extends Component {
         </ul>
         <ul>
           <li>
-            <button type="button" className="clean" onClick={() => setActiveEvent(null)}>
+            <button type="button" className="clean" onClick={() => this.onCancel()}>
               Cancel
             </button>
           </li>
@@ -177,5 +178,6 @@ export default connect(
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     deleteEvent: () => dispatch(deleteEventAction()),
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
+    cancelEventEditing: () => dispatch(cancelEventEditing()),
   }),
 )(EventDetailsView);

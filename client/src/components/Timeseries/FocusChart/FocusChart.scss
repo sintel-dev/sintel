@@ -21,44 +21,44 @@
             fill: $gray-text-color;
         }
     }
+    path {
+        stroke-width: 1;
+        stroke: $path-color;
+    }
+    path,
+    rect {
+        &.evt-highlight {
+            stroke: $yellow-color;
+        }
+        &.predictions {
+            stroke: #b9782d;
+            fill: none;
+        }
 
-    .chart-data {
-        path {
-            stroke-width: 1;
-            stroke: $path-color;
-            &.evt-highlight {
-                stroke: $yellow-color;
-            }
-            &.predictions {
-                stroke: #b9782d;
-                fill: none;
-            }
+        &.investigate {
+            stroke: #ff9100;
+        }
 
-            &.investigate {
-                stroke: #ff9100;
-            }
+        &.do_not_investigate {
+            stroke: #4684ff;
+        }
 
-            &.do_not_investigate {
-                stroke: #4684ff;
-            }
+        &.postpone {
+            stroke: #8446c2;
+        }
+        &.problem {
+            stroke: #c24d4d;
+        }
+        &.previously_seen {
+            stroke: #f2ff00;
+        }
 
-            &.postpone {
-                stroke: #8446c2;
-            }
-            &.problem {
-                stroke: #c24d4d;
-            }
-            &.previously_seen {
-                stroke: #f2ff00;
-            }
+        &.normal {
+            stroke: #6bc969;
+        }
 
-            &.normal {
-                stroke: #6bc969;
-            }
-
-            &.untagged {
-                stroke: #d5d5d5;
-            }
+        &.untagged {
+            stroke: #d5d5d5;
         }
     }
 
@@ -150,7 +150,7 @@
     }
 
     .tooltip-data {
-        width: 170px;
+        width: 180px;
         font-size: 12px;
         background: rgba(103, 106, 130, 0.7);
         padding: 10px;

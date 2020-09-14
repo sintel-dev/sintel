@@ -1,26 +1,24 @@
-.show-errors{
+@import '../../../../assets/sass/colors.scss';
+
+.show-errors {
     height: 90px;
 
-    .err-data{
-        transform: translate(32px, 47px);
-        fill: #767E8B;
+    .err-data {
+        fill: rgba(#d8d8d8, 0.5);
+        stroke-width: 1;
+        stroke: $path-color;
     }
 
-    .err-bg{
-        background: #1A1B20;
-        width: 100%;
+    .err-bg {
+        background: #1a1b20;
         height: 90px;
     }
 
-    .err-zoom{
+    .err-zoom {
         fill: transparent;
     }
 
-    svg{
-        opacity: 0;
-        transition: all .2s ease-in-out;
-        &.active{
-            opacity: 1;
-        }
+    svg {
+        transition: all 0.2s ease-in-out;
     }
 }
