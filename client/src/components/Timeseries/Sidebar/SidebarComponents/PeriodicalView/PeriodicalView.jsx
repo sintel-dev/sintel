@@ -231,7 +231,8 @@ class PeriodicalView extends Component {
               <defs>
                 <radialGradient id="blueGradient">
                   <stop offset="0" stopColor="rgba(178, 193, 255, 0.7)" />
-                  <stop offset="100" stopColor="rgba(89, 93, 106, 0.1)" />
+                  <stop offset="100" stopColor="rgba(178, 193, 255, 0.2)" />
+                  {/* <stop offset="100" stopColor="rgba(89, 93, 106, 0.2)" /> */}
                 </radialGradient>
               </defs>
             </svg>

@@ -1,9 +1,12 @@
+@import '../../../../assets/sass/colors.scss';
+
 .show-errors {
     height: 90px;
 
     .err-data {
-        transform: translate(32px, 47px);
-        fill: rgba(#d8d8d8, 0.8);
+        fill: rgba(#d8d8d8, 0.5);
+        stroke-width: 1;
+        stroke: $path-color;
     }
 
     .err-bg {

@@ -83,6 +83,32 @@ export function setTimeseriesPeriod(eventRange: {
   };
 }
 
+export function cancelEventEditing() {
+  return async function (dispatch, getState) {
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+    const currentEventDetails = getCurrentEventDetails(getState());
+    if (currentEventDetails) {
+      await API.events.find(`${currentEventDetails.id}/`).then((response) => {
+        const { start_time, stop_time } = response;
+        dispatch({
+          type: UPDATE_EVENT_DETAILS,
+          eventDetails: {
+            ...response,
+            start_time: start_time * 1000,
+            stop_time: stop_time * 1000,
+          },
+        });
+      });
+    }
+    dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
+    dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
+    dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
+    dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
+    dispatch(toggleSimilarShapesAction(false));
+    dispatch(setActiveEventAction(null));
+  };
+}
+
 export function setActiveEventAction(eventID) {
   return function (dispatch, getState) {
     dispatch(toggleSimilarShapesAction(false));

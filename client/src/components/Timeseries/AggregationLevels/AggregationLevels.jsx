@@ -144,7 +144,9 @@ class AggregationLevels extends Component {
     const yAxis = d3.axisLeft(yCoord);
 
     d3.select('.axis.axis--x').call(xAxis);
-    d3.select('.axis.axis--y').call(yAxis).call(yAxis.ticks(5, ',f'));
+    d3.select('.axis.axis--y')
+      .call(yAxis)
+      .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
   }
 
   renderEventArea() {
@@ -221,16 +223,16 @@ class AggregationLevels extends Component {
   renderIntervalLevels() {
     const { setAggregationLevel, currentAggregationLevel, setContextInfo } = this.props;
     const contextInfoValues = [
-      { value: 1, label: '0x' },
-      { value: 2, label: '1x' },
-      { value: 3, label: '2x' },
+      { value: 1, label: '1x' },
+      { value: 2, label: '2x' },
+      { value: 3, label: '3x' },
     ];
 
     const dropDownProps = {
       isMulti: false,
       closeMenuOnSelect: true,
       onChange: (event) => setContextInfo(event.value),
-      placeholder: '0x',
+      placeholder: '1x',
       options: contextInfoValues,
       formatLabel: false,
     };

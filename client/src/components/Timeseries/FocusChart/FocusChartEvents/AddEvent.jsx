@@ -113,7 +113,6 @@ export class AddEvents extends Component {
     const { zoomValue } = periodRange;
     const { timeSeries } = dataRun;
     const { xCoord } = this.getScale();
-
     const { brushStart, brushEnd } = this.getBrushCoords();
 
     if (zoomValue !== undefined && zoomValue !== 1) {
@@ -170,6 +169,7 @@ export class AddEvents extends Component {
 
   render() {
     const { isAddingNewEvent, isEditingEventRange, toggleActivePanel } = this.props;
+
     return (isAddingNewEvent || isEditingEventRange) && <g className="brush-instance" onClick={toggleActivePanel} />;
   }
 }

@@ -69,7 +69,7 @@ class SimilarShapes extends Component {
     activeShape && activeShape.scrollIntoView();
   }
 
-  getScale(data) {
+  getScale(data, data2) {
     const MIN_VALUE = Number.MAX_SAFE_INTEGER;
     const MAX_VALUE = Number.MIN_SAFE_INTEGER;
     const width = 210;
@@ -79,12 +79,13 @@ class SimilarShapes extends Component {
 
     const [minTX, maxTX] = d3.extent(data, (time) => time[0]);
     const [minTY, maxTY] = d3.extent(data, (time) => time[1]);
+    const [minTY2, maxTY2] = d3.extent(data2, (time) => time[1]);
 
     const minX = Math.min(MIN_VALUE, minTX);
     const maxX = Math.max(MAX_VALUE, maxTX);
 
-    const minY = Math.min(MIN_VALUE, minTY);
-    const maxY = Math.max(MAX_VALUE, maxTY);
+    const minY = Math.min(MIN_VALUE, minTY, minTY2);
+    const maxY = Math.max(MAX_VALUE, maxTY, maxTY2);
 
     xCoord.domain([minX, maxX]);
     yCoord.domain([minY, maxY]);
@@ -92,8 +93,8 @@ class SimilarShapes extends Component {
     return { xCoord, yCoord };
   }
 
-  drawLine(event) {
-    const { xCoord, yCoord } = this.getScale(event);
+  drawLine(event, event2) {
+    const { xCoord, yCoord } = this.getScale(event, event2);
 
     const line = d3
       .line()
@@ -126,7 +127,7 @@ class SimilarShapes extends Component {
     const stopIndex = timeSeries.findIndex((currentSeries) => currentSeries[0] === stop_time);
     const eventInterval = timeSeries.slice(startIndex, stopIndex + 1);
 
-    return this.drawLine(eventInterval);
+    return eventInterval;
   }
 
   renderShapeFooter() {
@@ -148,7 +149,7 @@ class SimilarShapes extends Component {
         <ul>
           <li>
             <button type="button" className="clean delete" onClick={deleteShape} disabled={!activeShape}>
-              Delete
+              Delete_Seg
             </button>
           </li>
           <li>
@@ -158,7 +159,7 @@ class SimilarShapes extends Component {
               onClick={() => resetShapesTags()}
               disabled={isRsetBtnDisabled}
             >
-              Reset
+              Reset_Tags
             </button>
           </li>
         </ul>
@@ -183,11 +184,13 @@ class SimilarShapes extends Component {
     if (currentEvent === null) {
       return null;
     }
+    const currentEventShape = this.getCurrentEventShape();
 
     return similarShapes.map((currentShape) => {
       const { startTime, stopTime, similarity, eventInterval } = this.getShapeDetails(currentShape);
       const shapeClassName =
         activeShape && activeShape.start === currentShape.start && activeShape.end === currentShape.end ? 'active' : '';
+
       return (
         <div
           className={`shape-details ${shapeClassName}`}
@@ -218,8 +221,11 @@ class SimilarShapes extends Component {
           </table>
           <div className="drawing">
             <svg width="134" height="127" className="shape-chart">
-              <path d={this.drawLine(eventInterval)} className="similar-shape" />
-              <path d={this.getCurrentEventShape()} stroke={colorSchemes[currentEvent.tag] || '#D5D5D5'} />
+              <path d={this.drawLine(eventInterval, currentEventShape)} className="similar-shape" />
+              <path
+                d={this.drawLine(currentEventShape, eventInterval)}
+                stroke={colorSchemes[currentEvent.tag] || '#D5D5D5'}
+              />
             </svg>
           </div>
         </div>

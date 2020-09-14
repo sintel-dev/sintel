@@ -4,18 +4,11 @@ export const fromIndexToMonth = (monthIndex) => months[monthIndex];
 export const maxDaysInMonth = (currentYear, monthIndex) => new Date(currentYear, monthIndex, 0).getDate();
 
 export function formatDate(date) {
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-  hours %= 12;
-  hours = hours || 12;
-  minutes = minutes < 10 ? `0${minutes}` : minutes;
-  const ampm = hours >= 12 ? 'pm' : 'am';
-  let strTime = `${hours}:${minutes}`;
   const formattedTime = {
-    year: date.getFullYear(),
-    month: date.getMonth() + 1,
-    day: date.getDate(),
-    time: `${strTime}:${ampm}`,
+    year: date.getUTCFullYear(),
+    month: months[date.getUTCMonth()],
+    day: date.getUTCDate(),
+    time: date.toUTCString().split(' ')[4],
   };
   return formattedTime;
 }

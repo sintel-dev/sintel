@@ -280,8 +280,16 @@ export class DrawChart extends Component<ChartProps, ChartState> {
 
     const tooltipDOM = `
       <ul>
-        <li><span>starts:</span> <span>${startDate.day}/${startDate.month}/${startDate.year}</span> <span>${startDate.time}</span> </li>
-        <li><span>ends:</span> <span>${endDate.day}/${endDate.month}/${endDate.year}</span> <span>${endDate.time}</span></li>
+        <li>
+          <span>starts:</span>
+          <span>${startDate.day}/${startDate.month}/${startDate.year}</span>
+          <span>${startDate.time}</span>
+        </li>
+        <li>
+          <span>ends:</span>
+          <span>${endDate.day}/${endDate.month}/${endDate.year}</span>
+          <span>${endDate.time}</span>
+        </li>
       </ul>`;
 
     rootTooltip.classList.add('active');
