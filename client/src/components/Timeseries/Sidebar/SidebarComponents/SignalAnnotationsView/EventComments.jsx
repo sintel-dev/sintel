@@ -15,7 +15,9 @@ class EventComments extends Component {
     const { eventDetails } = this.props;
     const lastActivity =
       eventDetails && document.querySelector(`#_${eventDetails.id}_details .user-activity.last-activity`);
-    document.querySelector(`#_${eventDetails.id}_details`).scrollIntoView();
+    const scrollTo = (eventDetails && document.querySelector(`#_${eventDetails.id}_details`)) || null;
+
+    scrollTo && scrollTo.scrollIntoView();
     lastActivity && lastActivity.scrollIntoView();
   }
 
