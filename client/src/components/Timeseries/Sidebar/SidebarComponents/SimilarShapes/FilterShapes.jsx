@@ -16,20 +16,6 @@ const percentageCount = () => {
 };
 
 class FilterShapes extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFilteringVisible: true,
-    };
-  }
-
-  toggleFilter() {
-    const { isFilteringVisible } = this.state;
-    this.setState({
-      isFilteringVisible: !isFilteringVisible,
-    });
-  }
-
   renderStepHeight(percentage) {
     const { grouppedShapes } = this.countSimilarity();
     const graphHeight = 40;
@@ -101,19 +87,18 @@ class FilterShapes extends Component {
   }
 
   render() {
-    const { isFilteringVisible } = this.state;
-    const { percentageInterval } = this.props;
+    const { percentageInterval, toggleShapesFiltering, isShapeFilteringVisible } = this.props;
     const collapseTheme = {
       collapse: 'filter-shapes-collapse',
       content: 'filter-shapes-content',
     };
 
-    const renderArrow = isFilteringVisible ? <TriangleUp /> : <TriangleDown />;
+    const renderArrow = isShapeFilteringVisible ? <TriangleUp /> : <TriangleDown />;
 
     return (
       <div className="filter-wrapper">
         <div>
-          <ul className="info" onClick={() => this.toggleFilter()}>
+          <ul className="info" onClick={() => toggleShapesFiltering()}>
             <li>Filter Results by Similarity</li>
             <li>
               <span>{percentageInterval[0]} - 100%</span>
@@ -123,7 +108,7 @@ class FilterShapes extends Component {
         </div>
 
         <div className="filter-collapsible">
-          <Collapse isOpened={isFilteringVisible} theme={collapseTheme}>
+          <Collapse isOpened={isShapeFilteringVisible} theme={collapseTheme}>
             <div className="filtering">
               <ul>{this.renderSteps(true)}</ul>
               <div className="progress-bar">

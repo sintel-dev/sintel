@@ -52,7 +52,19 @@ const noShapesFound = () => (
   </div>
 );
 
+const getShapesResultHeight = (visibility) => {
+  const maxHeight = visibility ? '30.3vh' : '38.3vh';
+  return { maxHeight };
+};
+
 class SimilarShapes extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isShapeFilteringVisible: true,
+    };
+  }
+
   componentDidMount() {
     this.props.resetSimilarShapes();
   }
@@ -298,6 +310,13 @@ class SimilarShapes extends Component {
     );
   }
 
+  toggleShapesFiltering() {
+    const { isShapeFilteringVisible } = this.state;
+    this.setState({
+      isShapeFilteringVisible: !isShapeFilteringVisible,
+    });
+  }
+
   resetShapes() {
     const { setActiveEvent, toggleSimilarShapes, resetSimilarShapes } = this.props;
     resetSimilarShapes();
@@ -380,20 +399,28 @@ class SimilarShapes extends Component {
   renderShapeFormular() {
     const { currentEvent, isEditingEventRange, isSimilarShapesLoading, rawShapes } = this.props;
     const shapesDisabled = currentEvent === null || isEditingEventRange ? 'disabled' : '';
+    const { isShapeFilteringVisible } = this.state;
 
     return (
       <div className={`shapes-option ${shapesDisabled}`}>
         <div className="shape-container">
           <div className="shape-form">
             {this.renderEventData()}
-            {rawShapes.length !== 0 && <FilterShapes />}
+            {rawShapes.length !== 0 && (
+              <FilterShapes
+                toggleShapesFiltering={() => this.toggleShapesFiltering()}
+                isShapeFilteringVisible={isShapeFilteringVisible}
+              />
+            )}
             {this.renderShapeOptions()}
           </div>
           {this.renderSearchControls()}
           {isSimilarShapesLoading ? (
             shapesLoader()
           ) : (
-            <div className="shapes-results scroll-style">{this.renderShapes()}</div>
+            <div className="shapes-results scroll-style" style={getShapesResultHeight(isShapeFilteringVisible)}>
+              {this.renderShapes()}
+            </div>
           )}
         </div>
       </div>
