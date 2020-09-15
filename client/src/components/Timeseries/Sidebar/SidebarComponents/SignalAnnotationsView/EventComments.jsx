@@ -12,8 +12,11 @@ import './EventComments.scss';
 
 class EventComments extends Component {
   componentDidUpdate() {
-    const lastActivity = document.querySelectorAll('.last-activity');
-    lastActivity && lastActivity.forEach((activity) => activity.scrollIntoView());
+    const { eventDetails } = this.props;
+    const lastActivity =
+      eventDetails && document.querySelector(`#_${eventDetails.id}_details .user-activity.last-activity`);
+    document.querySelector(`#_${eventDetails.id}_details`).scrollIntoView();
+    lastActivity && lastActivity.scrollIntoView();
   }
 
   findUser(userName) {
