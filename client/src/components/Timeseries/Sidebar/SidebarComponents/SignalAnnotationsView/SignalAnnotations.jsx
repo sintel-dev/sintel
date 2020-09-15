@@ -12,13 +12,6 @@ import EventComments from './EventComments';
 import './SignalAnnotations.scss';
 import CommentControl from './CommentControl';
 
-window.addEventListener('click', function (evt) {
-  const dropdown = document.querySelector('.assign-tag');
-
-  dropdown && !dropdown.contains(evt.target) && document.querySelector('.filters').classList.remove('active');
-  return null;
-});
-
 class SignalAnnotations extends Component {
   renderEventDetails() {
     const { dataRun, eventDetails, setActiveEvent, activeEvent } = this.props;
@@ -34,7 +27,7 @@ class SignalAnnotations extends Component {
           const eventClassName = tag?.replace(/\s/g, '_').toLowerCase() || 'untagged';
 
           return (
-            <div key={id} className="annotation-wrapper">
+            <div key={id} className="annotation-wrapper" id={`_${id}_details`}>
               <div className="annotation-heading" onClick={() => toggleEventState(id)}>
                 <div className="annotation-wrapper-left">
                   <span className={`evt-tag ${eventClassName}`} style={{ backgroundColor: color }}>

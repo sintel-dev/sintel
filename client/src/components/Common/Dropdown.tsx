@@ -56,7 +56,6 @@ export const Dropdown = (props) => {
       isMulti={isMulti}
       closeMenuOnSelect={closeMenuOnSelect}
       value={value}
-      debug
     />
   );
 };

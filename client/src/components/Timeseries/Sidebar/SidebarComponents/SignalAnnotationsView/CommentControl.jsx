@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getIsSpeechInProgress, getUpdatedEventDetails } from 'src/model/selectors/datarun';
-import { filterOptions } from 'src/components/Common/Dropdown';
+import { filterOptions, formatOptionLabel } from 'src/components/Common/Dropdown';
 import { colorSchemes } from 'src/components/Timeseries/FocusChart/Constants';
 import {
   recordCommentAction,
@@ -10,31 +10,10 @@ import {
   saveEventDetailsAction,
 } from 'src/model/actions/datarun';
 import { RecordingIcon, MicrophoneIcon, CloseIcon } from 'src/components/Common/icons';
+import Select from 'react-select';
 import './CommentControl.scss';
 
 class CommentControl extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFilterOpen: false,
-    };
-  }
-
-  toggleFilterState() {
-    const { isFilterOpen } = this.state;
-    this.setState({
-      isFilterOpen: !isFilterOpen,
-    });
-  }
-
-  updateEventTag(newTag) {
-    const { updateEventDetails } = this.props;
-    this.setState({
-      isFilterOpen: false,
-    });
-    updateEventDetails({ tag: newTag });
-  }
-
   renderTagBadge() {
     const { tag } = this.props.updatedEventDetails;
 
@@ -55,7 +34,6 @@ class CommentControl extends Component {
   }
 
   render() {
-    const { isFilterOpen } = this.state;
     const {
       eventDetails,
       isSpeechInProgress,
@@ -85,19 +63,17 @@ class CommentControl extends Component {
           <ul className="comment-holder">
             <li className="dropdown">
               {isChangeTagEnabled && (
-                <>
-                  <button type="button" className="clean assign-tag" onClick={() => this.toggleFilterState()}>
-                    Assign a tag
-                  </button>
-                  <ul className={`filters ${isFilterOpen ? 'active' : ''}`}>
-                    {filterOptions.map((currentFilter) => (
-                      <li key={currentFilter.value} onClick={() => this.updateEventTag(currentFilter.value)}>
-                        <i className="badge" style={{ background: colorSchemes[currentFilter.value] }} />{' '}
-                        <span>{currentFilter.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
+                <Select
+                  formatOptionLabel={formatOptionLabel}
+                  options={filterOptions}
+                  classNamePrefix="tag-options"
+                  className="tag-select assign-tag"
+                  placeholder="Assign a tag"
+                  isMulti={false}
+                  isSearchable={false}
+                  value="Assing a tag"
+                  onChange={(option) => updateEventDetails({ tag: option.value })}
+                />
               )}
             </li>
 
