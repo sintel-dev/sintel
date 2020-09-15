@@ -31,7 +31,6 @@ export const filterOptions = [
   { value: 'Problem', label: 'Problem', icon: 'problem', isFixed: true },
   { value: 'Previously seen', label: 'Previously seen', icon: 'seen', isFixed: true },
   { value: 'Normal', label: 'Normal', icon: 'normal', isFixed: true },
-  { value: 'Untagged', label: 'Untagged', icon: 'untagged', isFixed: true },
 ];
 
 export const formatOptionLabel = ({ label, icon }) => (

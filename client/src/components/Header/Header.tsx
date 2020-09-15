@@ -27,6 +27,23 @@ const downloadAsJSON = (dataRun) => {
   fileDownload(jsonData, `Datarun_${id}.json`);
 };
 
+const filterOptions = [
+  { value: 'Investigate', label: 'Investigate', icon: 'investigate', isFixed: true },
+  { value: 'Do not Investigate', label: 'Do not Investigate', icon: 'not_investigate', isFixed: true },
+  { value: 'Postpone', label: 'Postpone', icon: 'postpone', isFixed: true },
+  { value: 'Problem', label: 'Problem', icon: 'problem', isFixed: true },
+  { value: 'Previously seen', label: 'Previously seen', icon: 'seen', isFixed: true },
+  { value: 'Normal', label: 'Normal', icon: 'normal', isFixed: true },
+  { value: 'Untagged', label: 'Untagged', icon: 'untagged', isFixed: true },
+];
+
+const formatOptionLabel = ({ label, icon }) => (
+  <div className="select-row">
+    <i className={`select ${icon}`} />
+    <span>{label}</span>
+  </div>
+);
+
 export const Header: React.FC<Props> = (props) => {
   const isSwitchVisible = props.selectedExperimentID ? 'active' : '';
   const {
@@ -61,6 +78,8 @@ export const Header: React.FC<Props> = (props) => {
     closeMenuOnSelect: false,
     placeholder: 'Filter',
     onChange: filterByTags,
+    formatOptionLabel,
+    options: filterOptions,
   };
 
   window.addEventListener('click', (evt: Event) => {
