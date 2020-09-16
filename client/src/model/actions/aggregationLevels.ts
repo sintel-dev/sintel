@@ -76,3 +76,12 @@ export function setContextValueAction(contextValue) {
     dispatch(getSignalRawDataAction());
   };
 }
+
+export function updateAggregationZoomAction(zoomValue) {
+  return function (dispatch) {
+    dispatch({
+      type: 'UPDATE_AGGREGATION_ZOOM',
+      zoomValue,
+    });
+  };
+}

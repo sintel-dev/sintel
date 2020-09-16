@@ -7,11 +7,13 @@ import {
   getSignalRawData,
   getIsSigRawLoading,
   getEventInterval,
+  getAggregationZoomValue,
 } from 'src/model/selectors/aggregationLevels';
 import {
   setAggregationLevelAction,
   getSignalRawDataAction,
   setContextValueAction,
+  updateAggregationZoomAction,
 } from 'src/model/actions/aggregationLevels';
 import Loader from 'src/components/Common/Loader';
 import Dropdown from 'src/components/Common/Dropdown';
@@ -23,13 +25,6 @@ const { MIN_VALUE, MAX_VALUE, TRANSLATE_LEFT, CHART_MARGIN, TIME_INTERVALS_HEIGH
 const TRANSLATE_CHART = TRANSLATE_LEFT + 20;
 
 class AggregationLevels extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      zoomValue: 1,
-    };
-  }
-
   componentDidMount() {
     this.props.getSignalRawData();
     this.props.toggleTooltip();
@@ -79,12 +74,8 @@ class AggregationLevels extends Component {
       if (currentZoom === 1) {
         return;
       }
-      this.setState({
-        zoomValue: currentZoom,
-      });
+      this.props.updateZoom(currentZoom);
     };
-
-    // this.zoom = zoom;
   }
 
   getScale() {
@@ -113,7 +104,7 @@ class AggregationLevels extends Component {
   }
 
   drawLine(eventInterval) {
-    const { zoomValue } = this.state;
+    const { zoomValue } = this.props;
     const { currentChartStyle } = this.props;
     const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
@@ -132,7 +123,7 @@ class AggregationLevels extends Component {
   }
 
   updateAxisOnZoom() {
-    const { zoomValue } = this.state;
+    const { zoomValue } = this.props;
     const { xCoord, yCoord } = this.getScale();
     const xCoordCopy = xCoord.copy();
 
@@ -150,17 +141,9 @@ class AggregationLevels extends Component {
   }
 
   renderEventArea() {
-    const { zoomValue } = this.state;
+    const { zoomValue } = this.props;
     const { height, currentEventDetails, eventInterval } = this.props;
-    const { timeSeries } = this.props.dataRun;
-    const { start_time, stop_time } = currentEventDetails;
-    const startIndex = timeSeries.findIndex((element) => start_time - element[0] < 0) - 1 - eventInterval.length;
-    const stopIndex = timeSeries.findIndex((element) => stop_time - element[0] < 0) + eventInterval.length;
-
     const { xCoord } = this.getScale();
-    const startDate = new Date(timeSeries[startIndex]).getTime();
-    const stopDate = new Date(timeSeries[stopIndex]).getTime();
-
     const chartHeight = height - TIME_INTERVALS_HEIGHT;
 
     const xCoordCopy = xCoord.copy();
@@ -221,7 +204,7 @@ class AggregationLevels extends Component {
   }
 
   renderIntervalLevels() {
-    const { setAggregationLevel, currentAggregationLevel, setContextInfo } = this.props;
+    const { setAggregationLevel, currentAggregationLevel, setContextInfo, updateZoom } = this.props;
     const contextInfoValues = [
       { value: 1, label: '1x' },
       { value: 2, label: '2x' },
@@ -231,7 +214,10 @@ class AggregationLevels extends Component {
     const dropDownProps = {
       isMulti: false,
       closeMenuOnSelect: true,
-      onChange: (event) => setContextInfo(event.value),
+      onChange: (event) => {
+        setContextInfo(event.value);
+        updateZoom(1);
+      },
       placeholder: '1x',
       options: contextInfoValues,
       formatLabel: false,
@@ -261,13 +247,12 @@ class AggregationLevels extends Component {
 
   render() {
     const { width, height, isSignalRawLoading } = this.props;
-    const chartHeight = height - TIME_INTERVALS_HEIGHT;
 
     return (
       <div className="aggregation-chart" id="aggregationChart" style={{ position: 'relative', width, height }}>
         {this.renderIntervalLevels()}
         <Loader isLoading={isSignalRawLoading}>
-          <svg width={width} height={chartHeight}>
+          <svg width={width} height={height}>
             {this.drawChartData()}
           </svg>
         </Loader>
@@ -285,10 +270,12 @@ export default connect(
     isSignalRawLoading: getIsSigRawLoading(state),
     signalRawData: getSignalRawData(state),
     eventInterval: getEventInterval(state),
+    zoomValue: getAggregationZoomValue(state),
   }),
   (dispatch) => ({
     setAggregationLevel: (periodLevel) => dispatch(setAggregationLevelAction(periodLevel)),
     getSignalRawData: () => dispatch(getSignalRawDataAction()),
     setContextInfo: (contextValue) => dispatch(setContextValueAction(contextValue)),
+    updateZoom: (zoomValue) => dispatch(updateAggregationZoomAction(zoomValue)),
   }),
 )(AggregationLevels);
