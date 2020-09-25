@@ -12,6 +12,7 @@ const initialState: AggregationLevelsType = {
   singalRawData: [],
   eventInterval: [],
   contextValue: 1,
+  aggZoomValue: 1,
 };
 
 function TOGGLE_AGGREGATION_MODAL(nextState, { isAggregationModalOpen }) {
@@ -43,6 +44,10 @@ function SET_CONTEXT_VALUE(nextState, { contextValue }) {
   nextState.contextValue = contextValue;
 }
 
+function UPDATE_AGGREGATION_ZOOM(nextState, { zoomValue }) {
+  nextState.aggZoomValue = zoomValue;
+}
+
 export default createReducer(initialState, {
   TOGGLE_AGGREGATION_MODAL,
   SET_AGGREGATION_TIME_LEVEL,
@@ -51,4 +56,5 @@ export default createReducer(initialState, {
   FETCH_SIGNAL_RAW_FAILURE,
   SET_EVENT_INTERVAL,
   SET_CONTEXT_VALUE,
+  UPDATE_AGGREGATION_ZOOM,
 });

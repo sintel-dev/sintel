@@ -15,4 +15,5 @@ export type AggregationLevelsType = {
   singalRawData: Array<any>;
   eventInterval: Array<any>;
   contextValue: number;
+  aggZoomValue: object | number;
 };
