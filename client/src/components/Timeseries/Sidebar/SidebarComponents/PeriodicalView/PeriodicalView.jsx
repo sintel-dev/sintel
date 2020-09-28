@@ -23,6 +23,7 @@ class PeriodicalView extends Component {
       radius: 0,
       colSpacing: 0,
       rowSpacing: 30,
+      initialHeight: 0,
     };
   }
 
@@ -90,7 +91,7 @@ class PeriodicalView extends Component {
     if (!isSummaryViewActive) {
       return wrapperHeight - 58;
     }
-    return wrapperHeight - 175;
+    return (wrapperHeight !== 0 && wrapperHeight - 175) || 0;
   };
 
   getColSpacing(period) {
@@ -226,7 +227,7 @@ class PeriodicalView extends Component {
         <div id="dataWrapper" className="data-wrapper">
           {this.renderWeekDays()}
           <div className="wrapper-container scroll-style" style={{ maxHeight: `${this.getWrapperHeight()}px` }}>
-            <svg id="multiPeriodChart" width={width} height={height}>
+            <svg id="multiPeriodChart" width={width} height={this.getWrapperHeight()}>
               {this.drawData()}
               <defs>
                 <radialGradient id="blueGradient">
