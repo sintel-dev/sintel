@@ -227,6 +227,10 @@
             margin-right: 6px;
         }
     }
+
+    &.tag-options--is-disabled {
+        opacity: 0.4;
+    }
 }
 
 i {

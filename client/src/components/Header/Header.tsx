@@ -7,7 +7,12 @@ import * as fileDownload from 'react-file-download';
 import { faChevronRight, faChevronLeft, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentExperimentDetails, getSelectedExperimentData } from 'src/model/selectors/experiment';
 import { filterEventsByTagAction, toggleTimeSyncModeAction, switchChartStyleAction } from 'src/model/actions/datarun';
-import { getIsTimeSyncModeEnabled, getDatarunDetails, getCurrentChartStyle } from 'src/model/selectors/datarun';
+import {
+  getIsTimeSyncModeEnabled,
+  getDatarunDetails,
+  getCurrentChartStyle,
+  getActiveEventID,
+} from 'src/model/selectors/datarun';
 import { AUTH_USER_DATA } from 'src/model/utils/constants';
 import { getSelectedExperiment } from '../../model/selectors/projects';
 import { onUserLogoutAction } from '../../model/actions/users';
@@ -55,6 +60,7 @@ export const Header: React.FC<Props> = (props) => {
     experimentData,
     switchChartStyle,
     currentChartStyle,
+    activeEvent,
   } = props;
   const { isExperimentDataLoading } = experimentData;
 
@@ -80,6 +86,7 @@ export const Header: React.FC<Props> = (props) => {
     onChange: filterByTags,
     formatOptionLabel,
     options: filterOptions,
+    isDisabled: activeEvent !== null,
   };
 
   window.addEventListener('click', (evt: Event) => {
@@ -226,6 +233,7 @@ const mapState = (state: RootState) => ({
   datarunDetails: getDatarunDetails(state),
   experimentData: getSelectedExperimentData(state),
   currentChartStyle: getCurrentChartStyle(state),
+  activeEvent: getActiveEventID(state),
 });
 
 const mapDispatch = (dispatch: Function) => ({
