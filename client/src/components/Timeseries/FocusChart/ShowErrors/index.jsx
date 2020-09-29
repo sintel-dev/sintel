@@ -114,7 +114,7 @@ class ShowErrors extends Component {
 
   updateZoom() {
     const { width, height } = this.state;
-    const { dataRun, periodRange, isAggregationActive, aggZoomValue } = this.props;
+    const { dataRun, periodRange, isAggregationActive, aggZoomValue, isPredictionVisible } = this.props;
     const zoomValue = isAggregationActive ? aggZoomValue : periodRange.zoomValue;
     const { timeseriesErr, maxTimeSeries } = dataRun;
     const { xCoord } = this.getScale(width, height, maxTimeSeries);
@@ -126,10 +126,12 @@ class ShowErrors extends Component {
       .y0((data) => -yRange(data[1]) / 2)
       .y1((data) => yRange(data[1]) / 2);
 
-    xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
-    yRange.domain(d3.extent(timeseriesErr, (tmsData) => tmsData[1]));
+    if (isPredictionVisible) {
+      xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+      yRange.domain(d3.extent(timeseriesErr, (tmsData) => tmsData[1]));
 
-    d3.select('.err-data').datum(timeseriesErr).attr('d', area);
+      d3.select('.err-data').datum(timeseriesErr).attr('d', area);
+    }
   }
 
   render() {

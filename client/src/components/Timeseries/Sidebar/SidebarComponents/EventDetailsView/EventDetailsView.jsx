@@ -16,7 +16,7 @@ import {
   saveEventDetailsAction,
   deleteEventAction,
   setActiveEventAction,
-  cancelEventEditing,
+  cancelEventEditingAction,
 } from 'src/model/actions/datarun';
 
 import { selectedOption } from './eventUtils';
@@ -103,13 +103,8 @@ class EventDetailsView extends Component {
     );
   }
 
-  onCancel() {
-    const { cancelEventEditing } = this.props;
-    cancelEventEditing();
-  }
-
   renderEventFooter() {
-    const { saveEventDetails, deleteEvent } = this.props;
+    const { saveEventDetails, deleteEvent, cancelEventEditing } = this.props;
     return (
       <div className="evt-footer">
         <ul>
@@ -121,7 +116,7 @@ class EventDetailsView extends Component {
         </ul>
         <ul>
           <li>
-            <button type="button" className="clean" onClick={() => this.onCancel()}>
+            <button type="button" className="clean" onClick={() => cancelEventEditing()}>
               Cancel
             </button>
           </li>
@@ -178,6 +173,6 @@ export default connect(
     saveEventDetails: () => dispatch(saveEventDetailsAction()),
     deleteEvent: () => dispatch(deleteEventAction()),
     setActiveEvent: (eventID) => dispatch(setActiveEventAction(eventID)),
-    cancelEventEditing: () => dispatch(cancelEventEditing()),
+    cancelEventEditing: () => dispatch(cancelEventEditingAction()),
   }),
 )(EventDetailsView);
