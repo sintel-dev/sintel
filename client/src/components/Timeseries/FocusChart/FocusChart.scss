@@ -193,4 +193,22 @@
             fill: none;
         }
     }
+
+    .grid-lines {
+        stroke: lightgrey;
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+        path {
+            stroke-width: 0;
+        }
+        text {
+            display: none;
+        }
+
+        line {
+            stroke: rgba(238, 241, 246, 0.15);
+            shape-rendering: crispEdges;
+            stroke-dasharray: (3, 5);
+        }
+    }
 }
