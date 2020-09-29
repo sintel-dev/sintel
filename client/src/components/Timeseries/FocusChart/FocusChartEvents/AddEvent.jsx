@@ -15,6 +15,7 @@ import {
   getIsEditingEventRange,
   getCurrentEventDetails,
   getIsAggregationActive,
+  getNewEventDetails,
 } from 'src/model/selectors/datarun';
 
 import { FocusChartConstants } from '../Constants';
@@ -35,6 +36,11 @@ export class AddEvents extends Component {
     ) {
       this.renderBrush();
       normalizeHanlers('brush-instance');
+    }
+
+    if (this.props.height !== prevProps.height) {
+      this.getScale();
+      this.renderBrush();
     }
   }
 
@@ -80,7 +86,7 @@ export class AddEvents extends Component {
   }
 
   getBrushCoords() {
-    const { currentEventDetails, isEditingEventRange, periodRange } = this.props;
+    const { currentEventDetails, isEditingEventRange, periodRange, newEventDetails } = this.props;
     const { zoomValue } = periodRange;
     const { xCoord } = this.getScale();
 
@@ -90,6 +96,13 @@ export class AddEvents extends Component {
     if (zoomValue !== undefined && zoomValue !== 1) {
       const xCoordCopy = xCoord.copy();
       xCoord.domain(zoomValue.rescaleX(xCoordCopy).domain());
+    }
+
+    if (newEventDetails !== null) {
+      const { start_time, stop_time } = newEventDetails;
+
+      brushStart = xCoord(start_time) || 0;
+      brushEnd = xCoord(stop_time) || 50;
     }
 
     if (isEditingEventRange) {
@@ -182,6 +195,7 @@ export default connect(
     isEditingEventRange: getIsEditingEventRange(state),
     currentEventDetails: getCurrentEventDetails(state),
     isAggregationActive: getIsAggregationActive(state),
+    newEventDetails: getNewEventDetails(state),
   }),
   (dispatch) => ({
     updateNewEventDetails: (eventDetails) => dispatch(updateNewEventDetailsAction(eventDetails)),
