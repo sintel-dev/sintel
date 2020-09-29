@@ -138,6 +138,16 @@ class AggregationLevels extends Component {
     d3.select('.axis.axis--y')
       .call(yAxis)
       .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
+
+    this.renderChartGrid();
+  }
+
+  renderChartGrid() {
+    const { yCoord } = this.getScale();
+    const { width } = this.props;
+    const chartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+    const drawGridLines = () => d3.axisLeft(yCoord).ticks(5);
+    d3.select('#aggGridLines').call(drawGridLines().tickSize(-chartWidth));
   }
 
   renderEventArea() {
@@ -183,6 +193,7 @@ class AggregationLevels extends Component {
               <rect width={chartWidth} height={chartHeight} />
             </clipPath>
           </defs>
+          <g id="aggGridLines" className="grid-lines" />
           <g className="aggregation-data" clipPath="url(#aggregationClip)">
             <path className="aggregation-wawes" d={this.drawLine(signalRawData, 'eventWrapper')} />
             <path

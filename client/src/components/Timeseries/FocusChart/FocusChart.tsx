@@ -97,9 +97,15 @@ export class FocusChart extends Component<Props, State> {
       if (prevProps.isEditingRange !== this.props.isEditingRange) {
         this.toggleZoom();
       }
+      // if () {
+      //   this.renderChartAxis();
+      // }
     }
     if (prevProps.isPredictionVisible !== this.props.isPredictionVisible) {
       this.setChartHeight();
+    }
+    if (prevProps.dataRun.id !== this.props.dataRun.id) {
+      this.renderChartAxis();
     }
   }
 
@@ -312,6 +318,16 @@ export class FocusChart extends Component<Props, State> {
     d3.select('.axis.axis--y')
       .call(yAxis)
       .call(yAxis.ticks(5, ',f').tickFormat(d3.format('.4s')));
+
+    this.renderChartGrid();
+  }
+
+  renderChartGrid() {
+    const { yCoord } = this.getScale();
+    const { width } = this.state;
+    const chartWidth = width - TRANSLATE_LEFT - 2 * CHART_MARGIN;
+    const drawGridLines = () => d3.axisLeft(yCoord).ticks(5);
+    d3.select('#gridLines').call(drawGridLines().tickSize(-chartWidth));
   }
 
   initZoom() {
@@ -427,9 +443,12 @@ export class FocusChart extends Component<Props, State> {
     const { isPredictionVisible } = this.props;
     const { height } = this.state;
     const chartHeight = isPredictionVisible ? height - TRANSLATE_TOP : height + TRANSLATE_TOP;
-    this.setState({
-      height: chartHeight,
-    });
+    this.setState(
+      {
+        height: chartHeight,
+      },
+      () => this.renderChartAxis(),
+    );
   }
 
   drawChartData() {
@@ -452,6 +471,7 @@ export class FocusChart extends Component<Props, State> {
               <rect width={focusChartWidth} height={height} />
             </clipPath>
           </defs>
+          <g id="gridLines" className="grid-lines" />
           <g className="chart-data" clipPath="url(#focusClip)">
             <g className="wawe-data">
               <path className="chart-wawes" d={this.drawLine(timeSeries)} />
