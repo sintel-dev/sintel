@@ -83,7 +83,7 @@ export function setTimeseriesPeriod(eventRange: {
   };
 }
 
-export function cancelEventEditing() {
+export function cancelEventEditingAction() {
   return async function (dispatch, getState) {
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     const currentEventDetails = getCurrentEventDetails(getState());
@@ -100,10 +100,12 @@ export function cancelEventEditing() {
         });
       });
     }
+
     dispatch({ type: ADDING_NEW_EVENTS, isAddingEvent: false });
     dispatch({ type: IS_UPDATE_POPUP_OPEN, isPopupOpen: false });
     dispatch({ type: IS_CHANGING_EVENT_RANGE, isEditingEventRange: false });
     dispatch({ type: UPDATE_EVENT_DETAILS, eventDetails: {} });
+    dispatch({ type: NEW_EVENT_DETAILS, newEventDetails: null });
     dispatch(toggleSimilarShapesAction(false));
     dispatch(setActiveEventAction(null));
   };
