@@ -79,7 +79,6 @@ export class FocusChart extends Component<Props, State> {
     if (prevProps.isAggregationActive !== this.props.isAggregationActive && !this.props.isAggregationActive) {
       this.renderChartAxis();
       this.initZoom();
-      this.updateZoom();
     }
 
     if (!this.props.isAggregationActive) {
@@ -97,9 +96,6 @@ export class FocusChart extends Component<Props, State> {
       if (prevProps.isEditingRange !== this.props.isEditingRange) {
         this.toggleZoom();
       }
-      // if () {
-      //   this.renderChartAxis();
-      // }
     }
     if (prevProps.isPredictionVisible !== this.props.isPredictionVisible) {
       this.setChartHeight();
