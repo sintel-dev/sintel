@@ -256,7 +256,7 @@ export const getEventSortedHistory = createSelector(
 );
 
 export const getIsAggregationActive = createSelector(
-  [getActiveEventID, getCurrentActivePanel, getIsEditingEventRange],
-  (eventID, activePanel, isEditingEventRange) =>
-    eventID !== null && activePanel === 'eventView' && !isEditingEventRange,
+  [getActiveEventID, getCurrentActivePanel, getIsEditingEventRange, getIsAddingNewEvents],
+  (eventID, activePanel, isEditingEventRange, isAddingNewEvent) =>
+    eventID !== null && activePanel === 'eventView' && !isEditingEventRange && !isAddingNewEvent,
 );

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import * as _ from 'lodash';
 import { tagSeq, fromTagToClassName } from '../../../../Landing/utils';
 import { fromMonthToIndex } from '../../../../../model/utils/Utils';
-import * as _ from 'lodash';
 
 import './EventSummary.scss';
 
@@ -56,9 +56,8 @@ const renderTagEventsPerMonth = (periodRange, month, monthEvents) => {
     return tagSeq.map((currentTag) => (
       <td key={currentTag}>{countEventsPerTag(currentTag, currentMonthEvents.events)}</td>
     ));
-  } else {
-    return tagSeq.map((currentTag) => <td key={currentTag}>0</td>);
   }
+  return tagSeq.map((currentTag) => <td key={currentTag}>0</td>);
 };
 
 class EventSummary extends Component {
@@ -144,7 +143,7 @@ class EventSummary extends Component {
 
     return (
       <div className="event-summary">
-        <div className={`summary-details`}>
+        <div className="summary-details">
           <table>
             <tbody>
               <tr>
