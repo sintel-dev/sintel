@@ -104,15 +104,17 @@ class EventDetailsView extends Component {
   }
 
   renderEventFooter() {
-    const { saveEventDetails, deleteEvent, cancelEventEditing } = this.props;
+    const { saveEventDetails, deleteEvent, cancelEventEditing, isAddingNewEvent } = this.props;
     return (
       <div className="evt-footer">
         <ul>
-          <li>
-            <button type="button" className="clean delete" onClick={deleteEvent}>
-              Delete
-            </button>
-          </li>
+          {!isAddingNewEvent && (
+            <li>
+              <button type="button" className="clean delete" onClick={deleteEvent}>
+                Delete
+              </button>
+            </li>
+          )}
         </ul>
         <ul>
           <li>
