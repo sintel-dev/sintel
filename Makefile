@@ -41,12 +41,12 @@ install: clean-build clean-pyc  ## install the packages for running mtv
 .PHONY: install-test
 install-test: clean-build clean-pyc ## install the package and test dependencies
 	pip install .[test]
-	$(MAKE) init-db && $(MAKE) load-test-db
+	$(MAKE) init-db && $(MAKE) load-db-test
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc  ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	$(MAKE) init-db && $(MAKE) load-db && $(MAKE) load-test-db
+	$(MAKE) init-db && $(MAKE) load-db && $(MAKE) load-db-test
 
 .PHONY: init-db
 init-db: clean-db
@@ -59,16 +59,16 @@ init-db: clean-db
 	mkdir -p db-instance/dump
 
 .PHONY: load-db
-load-db-mtv: init-db
+load-db: init-db
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	mongo mtv --eval "db.dropDatabase()"
 	mongorestore --db mtv ./db-instance/data/mtv/
 
-.PHONY: load-test-db
-load-db-mtv: init-db
+.PHONY: load-db-test
+load-db-test: init-db
 	curl -o mtv-test.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv-test.tar.bz2"
-	tar -xf mtv.test.tar.bz2 -C ./db-instance/data/ && rm mtv.test.tar.bz2
+	tar -xf mtv-test.tar.bz2 -C ./db-instance/data/ && rm mtv-test.tar.bz2
 	mongo mtv-test --eval "db.dropDatabase()"
 	mongorestore --db mtv-test ./db-instance/data/mtv-test/
 
