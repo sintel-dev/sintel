@@ -13,7 +13,7 @@
     "editor.suggestSelection": "first",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "editor.tabSize": 4,
-    "[yaml]": {
+    "[yml]": {
         "editor.tabSize": 2,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -21,12 +21,12 @@
         "editor.tabSize": 4,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[py]": {
+    "[python]": {
         "editor.tabSize": 4,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "cSpell.enabled": false,
-    "python.pythonPath": "/Users/dyu/anaconda3/envs/mtv/bin/python",
+    "python.pythonPath": "/Users/dyu/anaconda3/envs/mtv-api/bin/python",
     "code-runner.executorMap": {
         "python": "$pythonPath -u $fullFileName"
     },

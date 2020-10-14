@@ -21,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 
 class MTV:
 
-    def __init__(self, cf, docker):
+    def __init__(self, cf, docker=False):
         self._cf = cf.copy()
 
         if not docker:
@@ -35,8 +35,8 @@ class MTV:
         app = Flask(
             __name__,
             static_url_path='',
-            static_folder='../client/build',
-            template_folder='../client/build'
+            static_folder='../apidocs',
+            template_folder='../apidocs'
         )
 
         app.config.from_mapping(**self._cf)

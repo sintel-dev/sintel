@@ -50,7 +50,7 @@ install-develop: clean-build clean-pyc  ## install the package in editable mode 
 
 .PHONY: init-db
 init-db: clean-db
-	mkdir -p db-instanceis
+	mkdir -p db-instance
 	# this folder is for saving the downloaded demo mongodb data
 	mkdir -p db-instance/data
 	# this folder is for saving the log files

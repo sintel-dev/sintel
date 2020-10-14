@@ -77,7 +77,7 @@ def main():
     args = parser.parse_args()
 
     setup_logging(args.verbose, args.logfile)
-    config = read_config('./mtv/config.yaml')
+    config = read_config('./mtv/config.yml')
     explorer = MTV(config, args.docker)
 
     args.function(explorer, args)
