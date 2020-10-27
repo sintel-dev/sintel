@@ -13,18 +13,29 @@ LOGGER = logging.getLogger(__name__)
 class Comment(Resource):
     def get(self, comment_id):
         """
-        @api {get} /comments/:comment_id/ Get comment by ID
-        @apiName GetComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} comment_id Comment ID.
-
-        @apiSuccess {String} id Comment ID.
-        @apiSuccess {String} event Event ID.
-        @apiSuccess {String} text Comment content.
-        @apiSuccess {String} created_by User ID.
+        Find comment by comment ID
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /comments/:comment_id/ Get comment by ID
+        # @apiName GetComment
+        # @apiGroup Comment
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} comment_id Comment ID.
+
+        # @apiSuccess {String} id Comment ID.
+        # @apiSuccess {String} event Event ID.
+        # @apiSuccess {String} text Comment content.
+        # @apiSuccess {String} created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -54,19 +65,30 @@ class Comment(Resource):
 
     def put(self, comment_id):
         """
-        @api {put} /comments/:comment_id/ Update a comment
-        @apiName UpdateComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} comment_id Comment ID.
-        @apiParam {String} text Comment content.
-
-        @apiSuccess {String} id Comment ID.
-        @apiSuccess {String} event Event ID.
-        @apiSuccess {String} text Comment content.
-        @apiSuccess {String} created_by User ID.
+        Update a comment
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {put} /comments/:comment_id/ Update a comment
+        # @apiName UpdateComment
+        # @apiGroup Comment
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} comment_id Comment ID.
+        # @apiParam {String} text Comment content.
+
+        # @apiSuccess {String} id Comment ID.
+        # @apiSuccess {String} event Event ID.
+        # @apiSuccess {String} text Comment content.
+        # @apiSuccess {String} created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -119,21 +141,32 @@ class Comment(Resource):
 class Comments(Resource):
     def get(self):
         """
-        @api {get} /comments/ Get comments by event ID
-        @apiName GetCommentByEvent
-        @apiGroup Comment
-        @apiVersion 1.0.0
-        @apiDescription Each event can have multiple comments, from one or more users.
-        This api allows users to retrieve all the comments about one event.
-
-        @apiParam {String} event_id ID of event.
-
-        @apiSuccess {Object[]} comments An Array of Object Comment.
-        @apiSuccess {String} comments.id Comment ID.
-        @apiSuccess {String} comments.event Event ID.
-        @apiSuccess {String} comments.text Comment content.
-        @apiSuccess {String} comments.created_by User ID.
+        Return all comments of one event
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /comments/ Get comments by event ID
+        # @apiName GetCommentByEvent
+        # @apiGroup Comment
+        # @apiVersion 1.0.0
+        # @apiDescription Each event can have multiple comments, from one or more users.
+        # This api allows users to retrieve all the comments about one event.
+
+        # @apiParam {String} event_id ID of event.
+
+        # @apiSuccess {Object[]} comments An Array of Object Comment.
+        # @apiSuccess {String} comments.id Comment ID.
+        # @apiSuccess {String} comments.event Event ID.
+        # @apiSuccess {String} comments.text Comment content.
+        # @apiSuccess {String} comments.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -168,15 +201,26 @@ class Comments(Resource):
 
     def post(self):
         """
-        @api {post} /comments/ Create a comment
-        @apiName CreateComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
-        @apiParam {String} text Content of comment.
-        @apiParam {String} created_by User name.
+        Create a comment to an event
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {post} /comments/ Create a comment
+        # @apiName CreateComment
+        # @apiGroup Comment
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} event_id Event ID.
+        # @apiParam {String} text Content of comment.
+        # @apiParam {String} created_by User name.
+        # """
 
         res, status = verify_auth()
         if status == 401:

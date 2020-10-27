@@ -60,26 +60,37 @@ class Event(Resource):
 
     def get(self, event_id):
         """
-        @api {get} /events/:event_id/ Get event by ID
-        @apiName GetEvent
-        @apiGroup Event
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
-
-        @apiSuccess {String} id Event ID.
-        @apiSuccess {String} insert_time Event insert time.
-        @apiSuccess {String} datarun The belonged datarun.
-        @apiSuccess {String} tag Event tag.
-        @apiSuccess {Int} start_time Event start time.
-        @apiSuccess {Int} stop_time Event stop time.
-        @apiSuccess {Float} score Event anomaly score.
-        @apiSuccess {Object[]} comments Event comment list.
-        @apiSuccess {String} comments.id Comment ID.
-        @apiSuccess {String} comments.text Comment content.
-        @apiSuccess {String} comments.insert_time Comment creation time.
-        @apiSuccess {String} comments.created_by User ID.
+        Find event by ID
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /events/:event_id/ Get event by ID
+        # @apiName GetEvent
+        # @apiGroup Event
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} event_id Event ID.
+
+        # @apiSuccess {String} id Event ID.
+        # @apiSuccess {String} insert_time Event insert time.
+        # @apiSuccess {String} datarun The belonged datarun.
+        # @apiSuccess {String} tag Event tag.
+        # @apiSuccess {Int} start_time Event start time.
+        # @apiSuccess {Int} stop_time Event stop time.
+        # @apiSuccess {Float} score Event anomaly score.
+        # @apiSuccess {Object[]} comments Event comment list.
+        # @apiSuccess {String} comments.id Comment ID.
+        # @apiSuccess {String} comments.text Comment content.
+        # @apiSuccess {String} comments.insert_time Comment creation time.
+        # @apiSuccess {String} comments.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -102,31 +113,42 @@ class Event(Resource):
 
     def put(self, event_id):
         """
-        @api {put} /events/:event_id/ Update an event
-        @apiName UpdateEvent
-        @apiGroup Event
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
-        @apiParam {Int} start_time Event start time.
-        @apiParam {Int} stop_time Event stop time.
-        @apiParam {Float} score Event anomaly score.
-        @apiParam {String} tag Event tag.
-        @apiParam {String} created_by User name.
-
-        @apiSuccess {String} id Event ID.
-        @apiSuccess {String} insert_time Event insert time.
-        @apiSuccess {String} datarun The belonged datarun.
-        @apiSuccess {String} tag Event tag.
-        @apiSuccess {Int} start_time Event start time.
-        @apiSuccess {Int} stop_time Event stop time.
-        @apiSuccess {Float} score Event anomaly score.
-        @apiSuccess {Object[]} comments Event comment list.
-        @apiSuccess {String} comments.id Comment ID.
-        @apiSuccess {String} comments.text Comment content.
-        @apiSuccess {String} comments.insert_time Comment creation time.
-        @apiSuccess {String} comments.created_by User ID.
+        Update an event
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {put} /events/:event_id/ Update an event
+        # @apiName UpdateEvent
+        # @apiGroup Event
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} event_id Event ID.
+        # @apiParam {Int} start_time Event start time.
+        # @apiParam {Int} stop_time Event stop time.
+        # @apiParam {Float} score Event anomaly score.
+        # @apiParam {String} tag Event tag.
+        # @apiParam {String} created_by User name.
+
+        # @apiSuccess {String} id Event ID.
+        # @apiSuccess {String} insert_time Event insert time.
+        # @apiSuccess {String} datarun The belonged datarun.
+        # @apiSuccess {String} tag Event tag.
+        # @apiSuccess {Int} start_time Event start time.
+        # @apiSuccess {Int} stop_time Event stop time.
+        # @apiSuccess {Float} score Event anomaly score.
+        # @apiSuccess {Object[]} comments Event comment list.
+        # @apiSuccess {String} comments.id Comment ID.
+        # @apiSuccess {String} comments.text Comment content.
+        # @apiSuccess {String} comments.insert_time Comment creation time.
+        # @apiSuccess {String} comments.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -204,13 +226,24 @@ class Event(Resource):
 
     def delete(self, event_id):
         """
-        @api {delete} /events/:event_id/ Delete an event
-        @apiName DeleteEvent
-        @apiGroup Event
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
+        Delete an event
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {delete} /events/:event_id/ Delete an event
+        # @apiName DeleteEvent
+        # @apiGroup Event
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} event_id Event ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -253,29 +286,40 @@ class Events(Resource):
 
     def get(self):
         """
-        @api {get} /events/ Get events by datarun ID
-        @apiName GetEventByDatarun
-        @apiGroup Event
-        @apiVersion 1.0.0
-        @apiDescription Return event list of a given datarun. If the datarun is not
-        specified, return all events.
-
-        @apiParam {String} datarun_id Datarun ID.
-
-        @apiSuccess {String} events Event list.
-        @apiSuccess {String} events.id Event ID.
-        @apiSuccess {String} events.insert_time Event insert time.
-        @apiSuccess {String} events.datarun The belonged datarun.
-        @apiSuccess {String} events.tag Event tag.
-        @apiSuccess {Int} events.start_time Event start time.
-        @apiSuccess {Int} events.stop_time Event stop time.
-        @apiSuccess {Float} events.score Event anomaly score.
-        @apiSuccess {Object[]} events.comments Event comment list.
-        @apiSuccess {String} events.comments.id Comment ID.
-        @apiSuccess {String} events.comments.text Comment content.
-        @apiSuccess {String} events.comments.insert_time Comment creation time.
-        @apiSuccess {String} events.comments.created_by User ID.
+        Return all events of a signalrun
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /events/ Get events by datarun ID
+        # @apiName GetEventByDatarun
+        # @apiGroup Event
+        # @apiVersion 1.0.0
+        # @apiDescription Return event list of a given datarun. If the datarun is not
+        # specified, return all events.
+
+        # @apiParam {String} datarun_id Datarun ID.
+
+        # @apiSuccess {String} events Event list.
+        # @apiSuccess {String} events.id Event ID.
+        # @apiSuccess {String} events.insert_time Event insert time.
+        # @apiSuccess {String} events.datarun The belonged datarun.
+        # @apiSuccess {String} events.tag Event tag.
+        # @apiSuccess {Int} events.start_time Event start time.
+        # @apiSuccess {Int} events.stop_time Event stop time.
+        # @apiSuccess {Float} events.score Event anomaly score.
+        # @apiSuccess {Object[]} events.comments Event comment list.
+        # @apiSuccess {String} events.comments.id Comment ID.
+        # @apiSuccess {String} events.comments.text Comment content.
+        # @apiSuccess {String} events.comments.insert_time Comment creation time.
+        # @apiSuccess {String} events.comments.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -306,33 +350,44 @@ class Events(Resource):
 
     def post(self):
         """
-        @api {post} /events/ Create an event
-        @apiName CreateEvent
-        @apiGroup Event
-        @apiVersion 1.0.0
-
-        @apiParam {Int} start_time Event start time.
-        @apiParam {Int} stop_time Event stop time.
-        @apiParam {String} datarun_id Datarun ID (Use signalrun ID node;
-            TO be fixed in the future).
-        @apiParam {String} created_by User name.
-        @apiParam {Float} [score] Event anomaly score.
-        @apiParam {String} [tag] Event tag.
-        @apiParam {String="SHAPE_MATCHING","MANUALLY_CREATED"} [source] Source.
-
-        @apiSuccess {String} id Event ID.
-        @apiSuccess {String} insert_time Event insert time.
-        @apiSuccess {String} datarun The belonged datarun.
-        @apiSuccess {String} tag Event tag.
-        @apiSuccess {Int} start_time Event start time.
-        @apiSuccess {Int} stop_time Event stop time.
-        @apiSuccess {Float} score Event anomaly score.
-        @apiSuccess {Object[]} comments Event comment list.
-        @apiSuccess {String} comments.id Comment ID.
-        @apiSuccess {String} comments.text Comment content.
-        @apiSuccess {String} comments.insert_time Comment creation time.
-        @apiSuccess {String} comments.created_by User ID.
+        Create an event
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {post} /events/ Create an event
+        # @apiName CreateEvent
+        # @apiGroup Event
+        # @apiVersion 1.0.0
+
+        # @apiParam {Int} start_time Event start time.
+        # @apiParam {Int} stop_time Event stop time.
+        # @apiParam {String} datarun_id Datarun ID (Use signalrun ID node;
+        #     TO be fixed in the future).
+        # @apiParam {String} created_by User name.
+        # @apiParam {Float} [score] Event anomaly score.
+        # @apiParam {String} [tag] Event tag.
+        # @apiParam {String="SHAPE_MATCHING","MANUALLY_CREATED"} [source] Source.
+
+        # @apiSuccess {String} id Event ID.
+        # @apiSuccess {String} insert_time Event insert time.
+        # @apiSuccess {String} datarun The belonged datarun.
+        # @apiSuccess {String} tag Event tag.
+        # @apiSuccess {Int} start_time Event start time.
+        # @apiSuccess {Int} stop_time Event stop time.
+        # @apiSuccess {Float} score Event anomaly score.
+        # @apiSuccess {Object[]} comments Event comment list.
+        # @apiSuccess {String} comments.id Comment ID.
+        # @apiSuccess {String} comments.text Comment content.
+        # @apiSuccess {String} comments.insert_time Comment creation time.
+        # @apiSuccess {String} comments.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -419,25 +474,36 @@ class EventInteraction(Resource):
 
     def get(self):
         """
-        @api {get} /event_interaction/ Get event interaction history by EID
-        @apiName GetEventInteractionByEID
-        @apiGroup EventInteraction
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
-        @apiParam {String="CREATE","DELETE","MODIFY","TAG","COMMENT"} [action]
-            Action used to filter interaction records.
-        @apiSuccess {Object[]} records Record.
-        @apiSuccess {String} records.event ID of Event.
-        @apiSuccess {String} records.action Action type.
-        @apiSuccess {String} records.tag Updated tag if action='TAG'.
-        @apiSuccess {Int} records.start_time Updated event start time if
-            action='MODIFY' or 'CREATE'.
-        @apiSuccess {Int} records.stop_time Updated event stop time if
-            action='MODIFY' or 'CREATE'.
-        @apiSuccess {Float} records.created_by User name.
-        @apiSuccess {Float} records.insert_time Record insert time.
+        Get event interaction history by Event ID
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /event_interaction/ Get event interaction history by EID
+        # @apiName GetEventInteractionByEID
+        # @apiGroup EventInteraction
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} event_id Event ID.
+        # @apiParam {String="CREATE","DELETE","MODIFY","TAG","COMMENT"} [action]
+        #     Action used to filter interaction records.
+        # @apiSuccess {Object[]} records Record.
+        # @apiSuccess {String} records.event ID of Event.
+        # @apiSuccess {String} records.action Action type.
+        # @apiSuccess {String} records.tag Updated tag if action='TAG'.
+        # @apiSuccess {Int} records.start_time Updated event start time if
+        #     action='MODIFY' or 'CREATE'.
+        # @apiSuccess {Int} records.stop_time Updated event stop time if
+        #     action='MODIFY' or 'CREATE'.
+        # @apiSuccess {Float} records.created_by User name.
+        # @apiSuccess {Float} records.insert_time Record insert time.
+        # """
 
         res, status = verify_auth()
         if status == 401:

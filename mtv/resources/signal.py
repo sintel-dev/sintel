@@ -23,21 +23,32 @@ def get_signal(signal_doc):
 class Signal(Resource):
     def get(self, signal_name):
         """
-        @api {get} /signals/:signal_name/ Get signal by name
-        @apiName GetSignal
-        @apiGroup Signal
-        @apiVersion 1.0.0
-
-        @apiParam {String} signal_name Signal name.
-
-        @apiSuccess {String} id Signal ID.
-        @apiSuccess {String} insert_time Signal creation time.
-        @apiSuccess {String} name Signal name.
-        @apiSuccess {String} dataset Dataset name.
-        @apiSuccess {Int} start_time Signal start time.
-        @apiSuccess {Int} stop_time Signal stop time.
-        @apiSuccess {String} created_by User ID.
+        Find signal by name
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /signals/:signal_name/ Get signal by name
+        # @apiName GetSignal
+        # @apiGroup Signal
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} signal_name Signal name.
+
+        # @apiSuccess {String} id Signal ID.
+        # @apiSuccess {String} insert_time Signal creation time.
+        # @apiSuccess {String} name Signal name.
+        # @apiSuccess {String} dataset Dataset name.
+        # @apiSuccess {Int} start_time Signal start time.
+        # @apiSuccess {Int} stop_time Signal stop time.
+        # @apiSuccess {String} created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -63,21 +74,31 @@ class Signal(Resource):
 class Signals(Resource):
     def get(self):
         """
-        @api {get} /signals/ Get signals
-        @apiName GetSignals
-        @apiGroup Signal
-        @apiVersion 1.0.0
-
-
-        @apiSuccess {Object[]} signals Signal list.
-        @apiSuccess {String} signals.id Signal ID.
-        @apiSuccess {String} signals.insert_time Signal creation time.
-        @apiSuccess {String} signals.name Signal name.
-        @apiSuccess {String} signals.dataset Dataset name.
-        @apiSuccess {Int} signals.start_time Signal start time.
-        @apiSuccess {Int} signals.stop_time Signal stop time.
-        @apiSuccess {String} signals.created_by User ID.
+        Return all signals
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /signals/ Get signals
+        # @apiName GetSignals
+        # @apiGroup Signal
+        # @apiVersion 1.0.0
+
+        # @apiSuccess {Object[]} signals Signal list.
+        # @apiSuccess {String} signals.id Signal ID.
+        # @apiSuccess {String} signals.insert_time Signal creation time.
+        # @apiSuccess {String} signals.name Signal name.
+        # @apiSuccess {String} signals.dataset Dataset name.
+        # @apiSuccess {Int} signals.start_time Signal start time.
+        # @apiSuccess {Int} signals.stop_time Signal stop time.
+        # @apiSuccess {String} signals.created_by User ID.
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -125,21 +146,32 @@ class SignalRaw(Resource):
 
     def get(self):
         """
-        @api {get} /signalraw/ Get signal raw data
-        @apiName GetSignalRaw
-        @apiGroup Signal
-        @apiVersion 1.0.0
-
-        @apiParam {String} signal Signal ID.
-        @apiParam {Int} interval Interval (in seconds) and it will be used to
-            aggregate the raw data.
-        @apiParam {Int} [start_time] Timestamp
-        @apiParam {Int} [stop_time] Timestamp
-
-        @apiSuccess {2-Tuple[]} data Data.
-        @apiSuccess {Int} data.timestamp Timestamp
-        @apiSuccess {Float} data.value Value
+        Find signal raw time series data by signal ID.
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /signalraw/ Get signal raw data
+        # @apiName GetSignalRaw
+        # @apiGroup Signal
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} signal Signal ID.
+        # @apiParam {Int} interval Interval (in seconds) and it will be used to
+        #     aggregate the raw data.
+        # @apiParam {Int} [start_time] Timestamp
+        # @apiParam {Int} [stop_time] Timestamp
+
+        # @apiSuccess {2-Tuple[]} data Data.
+        # @apiSuccess {Int} data.timestamp Timestamp
+        # @apiSuccess {Float} data.value Value
+        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -170,17 +202,28 @@ class AvailableSignalruns(Resource):
 
     def get(self):
         """
-        @api {get} /available_signalruns/ Get available signalruns for a signal
-        @apiName GetAvailableSignalruns
-        @apiGroup Signal
-        @apiVersion 1.0.0
-
-        @apiParam {String} signalrun Signalrun ID.
-
-        @apiSuccess {Object[]} data Data.
-        @apiSuccess {String} data.id Timestamp
-        @apiSuccess {Int} data.interval Interval used in this signalrun
+        Return all other available signalruns for the same signal
+        ---
+        responses:
+          200:
+            description: A list of colors (may be filtered by palette)
+            schema:
+              $ref: '#/definitions/Dataset'
+            examples:
+              rgb: ['red', 'green', 'blue']
         """
+        # """
+        # @api {get} /available_signalruns/ Get available signalruns for a signal
+        # @apiName GetAvailableSignalruns
+        # @apiGroup Signal
+        # @apiVersion 1.0.0
+
+        # @apiParam {String} signalrun Signalrun ID.
+
+        # @apiSuccess {Object[]} data Data.
+        # @apiSuccess {String} data.id Timestamp
+        # @apiSuccess {Int} data.interval Interval used in this signalrun
+        # """
 
         res, status = verify_auth()
         if status == 401:

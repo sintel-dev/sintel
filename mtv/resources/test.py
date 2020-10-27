@@ -10,8 +10,13 @@ class Test(Resource):
 
     def get(self):
         """
-        Flasgger will try to load "./apidocs/resources/test/{method}.yml" as
-        swagger document
+        Example using a dictionary as specification
+        This is the description
+        You can also set 'summary' and 'description' in
+        specs_dict
+        ---
+        # values here overrides the specs dict
+        deprecated: true
         """
         res, status = verify_auth()
         if status == 401:
@@ -21,7 +26,7 @@ class Test(Resource):
 
     def post(self):
         """
-        Test Post
+        MTV Test Post
         Restful APIs
         ---
         parameters:
@@ -48,7 +53,7 @@ class Test(Resource):
 
     def delete(self):
         """
-        Test Del
+        MTV Test Del
         Restful APIs
         ---
         responses:
@@ -69,7 +74,7 @@ class Test(Resource):
 
     def put(self):
         """
-        Test Put
+        MTV Test Put
         Restful APIs
         ---
         responses:

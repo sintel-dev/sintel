@@ -1,13 +1,17 @@
-Test Get
+MTV Test Get
 In this example the specification is taken from external YAML file
 ---
 parameters:
-  - name: palette
-    in: path
-    type: string
-    enum: ['all', 'rgb', 'cmyk']
-    required: true
-    default: all
+  - name: limit
+    in: query
+    description: Limits the number of items on a page
+    schema:
+      type: integer
+  - name: offset
+    in: query
+    description: Specifies the page number of the artists to be displayed
+    schema:
+      type: integer
 definitions:
   Palette:
     type: object
