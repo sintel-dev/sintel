@@ -1,0 +1,14 @@
+MTV Test Post
+In this example the specification is taken from external YAML file
+---
+tags:
+  - test
+responses:
+  200:
+    description: Animals to be returned
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/Animal'

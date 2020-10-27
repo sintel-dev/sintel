@@ -7,7 +7,6 @@ mtv.tar*
 orion-stock/
 stock-data/
 
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

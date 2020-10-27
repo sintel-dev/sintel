@@ -25,11 +25,36 @@ class Signal(Resource):
         """
         Find signal by name
         ---
+        tags:
+          - signals
+        parameters:
+          - name: signal_name
+            in: path
+            schema:
+              type: integer
+        definitions:
+          Signal:
+            type: object
+            properties:
+              id:
+                type: string
+              insert_time:
+                type: string
+              name:
+                type: string
+              dataset:
+                type: string
+              start_time:
+                type: string
+              stop_time:
+                type: string
+              created_by:
+                type: string
         responses:
           200:
-            description: A list of colors (may be filtered by palette)
+            description: Signal
             schema:
-              $ref: '#/definitions/Dataset'
+              $ref: '#/definitions/Signal'
             examples:
               rgb: ['red', 'green', 'blue']
         """

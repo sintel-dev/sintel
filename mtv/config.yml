@@ -46,13 +46,13 @@ MAIL_PASSWORD: '8vn1las1lsh;]q1vn'
 GOOGLE_CLIENT_SECRET: '6Y3tUZbPCZHM9okPLbWB_OXK'
 AUTH_KEY: 'YT#XA&00ALKlkjG)JAN<[XC'
 
-# Swagger
-SWAGGER:
-  title: 'MTV RestAPI Documentation'
-  uiversion: 3
-  openapi: '3.0.2'
-  version: '1.0.0'
-  doc_dir: './apidocs/resources/'
+# # Swagger
+# SWAGGER:
+#   title: 'MTV RestAPI Documentation'
+#   uiversion: 3
+#   openapi: '3.0.2'
+#   version: '1.0.0'
+#   doc_dir: './apidocs/resources/'
 
 # Experiment List
 experiment_list:

@@ -1,6 +1,8 @@
 MTV Test Get
 In this example the specification is taken from external YAML file
 ---
+tags:
+  - test
 parameters:
   - name: limit
     in: query

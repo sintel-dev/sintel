@@ -29,22 +29,8 @@ class Test(Resource):
         MTV Test Post
         Restful APIs
         ---
-        parameters:
-          - in: path
-            name: username
-            type: string
-            required: true
-        responses:
-          200:
-            description: A single user item
-            schema:
-              id: User
-              properties:
-                username:
-                  type: string
-                  description: The name of the user
-                  default: Steven Wilson
-         """
+        # values here overrides the specs dict
+        """
 
         res, status = verify_auth()
         if status == 401:
