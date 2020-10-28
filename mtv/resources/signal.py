@@ -1,7 +1,6 @@
 import logging
 
 from flask_restful import Resource, reqparse
-
 from mtv.db import DBExplorer, schema
 from mtv.resources.auth_utils import verify_auth
 
@@ -23,57 +22,25 @@ def get_signal(signal_doc):
 class Signal(Resource):
     def get(self, signal_name):
         """
-        Find signal by name
+        Get a signal by name
         ---
         tags:
-          - signals
+          - signal
         parameters:
           - name: signal_name
             in: path
             schema:
-              type: integer
-        definitions:
-          Signal:
-            type: object
-            properties:
-              id:
-                type: string
-              insert_time:
-                type: string
-              name:
-                type: string
-              dataset:
-                type: string
-              start_time:
-                type: string
-              stop_time:
-                type: string
-              created_by:
-                type: string
+              type: string
+            required: true
+            description: name of the signal to get
         responses:
           200:
-            description: Signal
-            schema:
-              $ref: '#/definitions/Signal'
-            examples:
-              rgb: ['red', 'green', 'blue']
+            description: Signal to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Signal'
         """
-        # """
-        # @api {get} /signals/:signal_name/ Get signal by name
-        # @apiName GetSignal
-        # @apiGroup Signal
-        # @apiVersion 1.0.0
-
-        # @apiParam {String} signal_name Signal name.
-
-        # @apiSuccess {String} id Signal ID.
-        # @apiSuccess {String} insert_time Signal creation time.
-        # @apiSuccess {String} name Signal name.
-        # @apiSuccess {String} dataset Dataset name.
-        # @apiSuccess {Int} start_time Signal start time.
-        # @apiSuccess {Int} stop_time Signal stop time.
-        # @apiSuccess {String} created_by User ID.
-        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -101,29 +68,21 @@ class Signals(Resource):
         """
         Return all signals
         ---
+        tags:
+          - signal
         responses:
           200:
-            description: A list of colors (may be filtered by palette)
-            schema:
-              $ref: '#/definitions/Dataset'
-            examples:
-              rgb: ['red', 'green', 'blue']
+            description: All signals
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    signals:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Signal'
         """
-        # """
-        # @api {get} /signals/ Get signals
-        # @apiName GetSignals
-        # @apiGroup Signal
-        # @apiVersion 1.0.0
-
-        # @apiSuccess {Object[]} signals Signal list.
-        # @apiSuccess {String} signals.id Signal ID.
-        # @apiSuccess {String} signals.insert_time Signal creation time.
-        # @apiSuccess {String} signals.name Signal name.
-        # @apiSuccess {String} signals.dataset Dataset name.
-        # @apiSuccess {Int} signals.start_time Signal start time.
-        # @apiSuccess {Int} signals.stop_time Signal stop time.
-        # @apiSuccess {String} signals.created_by User ID.
-        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -171,33 +130,54 @@ class SignalRaw(Resource):
 
     def get(self):
         """
-        Find signal raw time series data by signal ID.
+        Get signal raw time series data by ID.
         ---
+        tags:
+            - signal
+        parameters:
+          - name: signal
+            in: query
+            required: true
+            schema:
+              type: string
+            description: ID of the signal to fetch
+          - name: interval
+            in: query
+            required: true
+            schema:
+              type: string
+            description: Interval used to aggregate raw time series; by default
+                         21600 is used
+          - name: start_time
+            in: query
+            schema:
+              type: integer
+            description: start time (timestamp) of the fetched segment
+          - name: stop_time
+            in: query
+            schema:
+              type: integer
+            description: stop time (timestamp) of the fetched segment
         responses:
           200:
-            description: A list of colors (may be filtered by palette)
-            schema:
-              $ref: '#/definitions/Dataset'
-            examples:
-              rgb: ['red', 'green', 'blue']
+            description: All signals
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: array
+                        items:
+                          type: integer
+                          minitems: 2
+                          maxitems: 2
+                      description: '[timestamp, value]'
+                example:
+                  data: [[1420070400, 12], [1420090400, 18]]
         """
-        # """
-        # @api {get} /signalraw/ Get signal raw data
-        # @apiName GetSignalRaw
-        # @apiGroup Signal
-        # @apiVersion 1.0.0
-
-        # @apiParam {String} signal Signal ID.
-        # @apiParam {Int} interval Interval (in seconds) and it will be used to
-        #     aggregate the raw data.
-        # @apiParam {Int} [start_time] Timestamp
-        # @apiParam {Int} [stop_time] Timestamp
-
-        # @apiSuccess {2-Tuple[]} data Data.
-        # @apiSuccess {Int} data.timestamp Timestamp
-        # @apiSuccess {Float} data.value Value
-        # """
-
         res, status = verify_auth()
         if status == 401:
             return res, status
@@ -227,28 +207,42 @@ class AvailableSignalruns(Resource):
 
     def get(self):
         """
-        Return all other available signalruns for the same signal
+        Return the available signalruns for the same signal
+        Given a signalrun, return all of the available signalruns \
+        that run on the same signal
         ---
+        tags:
+            - signalrun
+        parameters:
+          - name: signalrun
+            in: query
+            required: true
+            schema:
+              type: string
+            description: ID of the signalrun
         responses:
           200:
-            description: A list of colors (may be filtered by palette)
-            schema:
-              $ref: '#/definitions/Dataset'
-            examples:
-              rgb: ['red', 'green', 'blue']
+            description: List of available signalruns' meta info
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: signalrun ID
+                      interval:
+                        type: integer
+                        description: interval used in this signalrun
+                example:
+                  data:
+                    - id: 5f5b0b40013e4f912fba3363
+                      interval: 21600
+                    - id: 5f5b0cbb013e4f912fba33ae
+                      interval: 3600
         """
-        # """
-        # @api {get} /available_signalruns/ Get available signalruns for a signal
-        # @apiName GetAvailableSignalruns
-        # @apiGroup Signal
-        # @apiVersion 1.0.0
-
-        # @apiParam {String} signalrun Signalrun ID.
-
-        # @apiSuccess {Object[]} data Data.
-        # @apiSuccess {String} data.id Timestamp
-        # @apiSuccess {Int} data.interval Interval used in this signalrun
-        # """
 
         res, status = verify_auth()
         if status == 401:
@@ -261,19 +255,23 @@ class AvailableSignalruns(Resource):
             return {'message', str(e)}, 400
 
         try:
-            current_signalrun_doc = schema.Signalrun.find_one(signalrun=args.signalrun)
-            signalrun_docs = schema.Signalrun.find(signal=current_signalrun_doc.signal)
+            current_signalrun_doc = schema.Signalrun.find_one(
+                signalrun=args.signalrun)
+            signalrun_docs = schema.Signalrun.find(
+                signal=current_signalrun_doc.signal)
 
             data = list()
             interval_set = set()
             for signalrun_doc in signalrun_docs:
-                primitive_name = 'orion.primitives.timeseries_preprocessing.time_segments_aggregate#1'
+                primitive_name = ('orion.primitives.timeseries_preprocessing'
+                                  '.time_segments_aggregate#1')
                 pipeline = signalrun_doc.datarun.pipeline
                 interval = int(pipeline.json['hyperparameters']
                                [primitive_name].get('interval', None))
                 if interval is None:
                     raise Exception(
-                        'signalrun - {}: interval = None'.format(str(signalrun_doc.id)))
+                        'signalrun - {}: interval = None'.format(
+                            str(signalrun_doc.id)))
                 # this is HACK: only return one signalrun with the same interval
                 if interval not in interval_set:
                     interval_set.add(interval)

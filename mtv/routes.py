@@ -3,7 +3,7 @@ from flask_restful import Api
 from flasgger import Swagger
 
 import mtv.resources as ctrl
-from mtv.swagger_config import swagger_config
+from mtv.swagger import swagger_config, swagger_tpl
 
 API_VERSION = '/api/v1/'
 
@@ -18,8 +18,8 @@ def add_routes(app):
     api = Api(app)
 
     # configure API documentation
-    
-    Swagger(app, config=swagger_config, parse=True)
+
+    Swagger(app, config=swagger_config, template=swagger_tpl, parse=True)
 
     # user management
     api.add_resource(ctrl.user.Signup, API_VERSION + 'users/signup/')
