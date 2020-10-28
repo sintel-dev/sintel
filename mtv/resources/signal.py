@@ -2,7 +2,7 @@ import logging
 
 from flask_restful import Resource, reqparse
 from mtv.db import DBExplorer, schema
-from mtv.resources.auth_utils import verify_auth
+from mtv.resources.auth_utils import verify_auth, requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,6 +20,8 @@ def get_signal(signal_doc):
 
 
 class Signal(Resource):
+
+    @requires_auth
     def get(self, signal_name):
         """
         Get a signal by name
@@ -42,9 +44,6 @@ class Signal(Resource):
                   $ref: '#/components/schemas/Signal'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
         document = schema.Signal.find_one(name=signal_name)
 
         if document is None:
@@ -64,12 +63,16 @@ class Signal(Resource):
 
 
 class Signals(Resource):
+
+    @requires_auth
     def get(self):
         """
         Return all signals
         ---
         tags:
           - signal
+        security:
+          - apiKeyAuth: []
         responses:
           200:
             description: All signals
@@ -82,11 +85,9 @@ class Signals(Resource):
                       type: array
                       items:
                         $ref: '#/components/schemas/Signal'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
         """
-
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
         documents = schema.Signal.find()
 
@@ -128,6 +129,7 @@ class SignalRaw(Resource):
         }
         return record
 
+    @requires_auth
     def get(self):
         """
         Get signal raw time series data by ID.
@@ -178,9 +180,6 @@ class SignalRaw(Resource):
                 example:
                   data: [[1420070400, 12], [1420090400, 18]]
         """
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
         try:
             args = self.parser_get.parse_args()
@@ -205,6 +204,7 @@ class AvailableSignalruns(Resource):
                                 location='args')
         self.parser_get = parser_get
 
+    @requires_auth
     def get(self):
         """
         Return the available signalruns for the same signal
@@ -243,10 +243,6 @@ class AvailableSignalruns(Resource):
                     - id: 5f5b0cbb013e4f912fba33ae
                       interval: 3600
         """
-
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
         try:
             args = self.parser_get.parse_args()

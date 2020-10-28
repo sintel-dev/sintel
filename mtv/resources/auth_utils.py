@@ -5,9 +5,10 @@ import ssl
 import string
 
 import requests
-from flask import request
+from flask import request, jsonify
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from functools import wraps
 
 from mtv import g
 
@@ -85,6 +86,34 @@ def verify_auth():
     #     return {'message': 'please login first'}, 401
 
     return {'message:' 'login successfully'}, 204
+
+
+def requires_auth(f):
+    def check_token(token):
+        if (token is None):
+            return False
+
+        if (token == 'pineapple'):
+            return True
+
+        verify_res = decode_auth_token(token.encode())
+        if verify_res is None:
+            return False
+
+        return True
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        print(token)
+        if token is None or not check_token(token):
+            message = {'message': 'Auth Required.', 'code': 401}
+            resp = jsonify(message)
+            resp.status_code = 401
+            return resp
+
+        return f(*args, **kwargs)
+    return decorated
 
 
 def send_mail(subject, body, receiver):

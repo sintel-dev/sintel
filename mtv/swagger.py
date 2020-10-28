@@ -1,52 +1,25 @@
 schemas = {
-    'Species': {
-        'type': 'object',
-        'properties': {
-            'id': {
-                'type': 'integer',
-                'format': 'int64'
-            },
-            'name': {
-                'type': 'string'
-            }
-        }
-    },
-    'Animals': {
-        'type': 'object',
-        'properties': {
-            'species': {
-                '$ref': '#/components/schemas/Species'
-            },
-            'name': {
-                'type': 'string'
-            }
-        }
-    },
     'Signal': {
         'type': 'object',
         'properties': {
-            'id': {
-                'type': 'string',
-            },
-            'insert_time': {
-                'type': 'string',
-            },
-            'name': {
-                'type': 'string',
-            },
-            'dataset': {
-                'type': 'string',
-            },
-            'start_time': {
-                'type': 'integer',
-            },
-            'stop_time': {
-                'type': 'integer',
-            },
-            'created_by': {
-                'type': 'string',
-            }
-        }
+            'id': {'type': 'string'},
+            'insert_time': {'type': 'string'},
+            'name': {'type': 'string'},
+            'dataset': {'type': 'string'},
+            'start_time': {'type': 'integer'},
+            'stop_time': {'type': 'integer'},
+            'created_by': {'type': 'string'}
+        },
+        'required': ['id', 'insert_time', 'name', 'dataset',
+                     'start_time', 'stop_time', 'created_by']
+    },
+    'Error': {
+        'type': 'object',
+        'properties': {
+            'code': {'type': 'string'},
+            'message': {'type': 'string'}
+        },
+        'required': ['code', 'message']
     }
 }
 
@@ -73,7 +46,6 @@ swagger_config = {
     'title': 'MTV RestAPI Documentation',
     'uiversion': 3,
     'openapi': '3.0.2',
-    'version': '1.0.0',
     'doc_dir': './apidocs/resources/',
     "headers": [
     ],
@@ -89,9 +61,74 @@ swagger_config = {
     "specs_route": "/apidocs/"
 }
 
+markdown_text = """
+<p align="left">
+<img width=10% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/\
+Logo_DAI_highres.png" alt=“DAI-Lab” />
+<i>An open source project from Data to AI Lab at MIT.</i>
+</p>
+
+[![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)]\
+(https://travis-ci.com/dyuliu/mtv)
+[![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)]\
+(https://coveralls.io/github/dyuliu/MTV)
+[![Github All Releases](https://img.shields.io/github/downloads/dyuliu/MTV/\
+total)](https://github.com/dyuliu/MTV/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dyuliu/mtv)]\
+(https://hub.docker.com/r/dyuliu/mtv)
+
+# What is MTV?
+**MTV** (multivariate time series data visuaization) is a visual analytics \
+system built for anomaly analysis of multiple time-series data.
+
+## License
+
+[The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
+"""
+
 swagger_tpl = {
+    'info': {
+        'description': markdown_text,
+        'title': 'MTV RestAPI Documentation',
+        'version': '1.0.0'
+    },
     'tags': tags,
     'components': {
-        'schemas': schemas
-    }
+        'schemas': schemas,
+        'securitySchemes': {
+            'tokenAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'description': 'Use `pineapple` as the value to test the auth.'
+            },
+            'uidAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'uid',
+                'description': 'Use `pineapple` as the value to test the auth.'
+            }
+        },
+        'responses': {
+            'UnauthorizedError': {
+                'description': ('Authentication information is missing '
+                                'or invalid'),
+                'content': {
+                    'application/json': {
+                        'schema': {'$ref': '#/components/schemas/Error'}
+                    }
+                }
+            }
+        }
+    },
+    'servers': [
+        {
+            'url': 'http://localhost:3000/',
+            'description': 'Internal staging server for testing'
+        },
+        {
+            'url': 'http://mtv.lids.mit.edu:3000/',
+            'description': 'Main production server'
+        }
+    ]
 }

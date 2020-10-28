@@ -1,6 +1,6 @@
 from flask import render_template
 from flask_restful import Api
-from flasgger import Swagger
+from flasgger import Swagger, MK_SANITIZER
 
 import mtv.resources as ctrl
 from mtv.swagger import swagger_config, swagger_tpl
@@ -19,7 +19,7 @@ def add_routes(app):
 
     # configure API documentation
 
-    Swagger(app, config=swagger_config, template=swagger_tpl, parse=True)
+    Swagger(app, config=swagger_config, template=swagger_tpl, parse=True, sanitizer=MK_SANITIZER)
 
     # user management
     api.add_resource(ctrl.user.Signup, API_VERSION + 'users/signup/')
