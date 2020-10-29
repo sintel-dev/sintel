@@ -14,6 +14,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 class GoogleAuthentication(Resource):
+    # TODO: add openapi - oauth2.0 here
+
     def post(self):
         body = request.json
 
