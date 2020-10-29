@@ -1,8 +1,7 @@
 import logging
 
 from bson import ObjectId
-from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from mtv.db import schema
@@ -39,23 +38,38 @@ def validate_user_id(user_id):
 
 
 class User(Resource):
+
+    @auth_utils.requires_auth
     def get(self, user_id):
         """
-        @api {get} /users/<:user_id>/ Get User Info
-        @apiName GetUser
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiSuccess {Object} user
-        @apiSuccess {String} user.id user id.
-        @apiSuccess {String} user.name user name.
-        @apiSuccess {String} user.email user email.
-        @apiSuccess {String} user.picture user picture.
+        Get a user by ID
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: user_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: user ID - MongoDB ObjectId
+            example: '5f5b0bb5013e4f912fba337d'
+        responses:
+          200:
+            description: Signal to be returned
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '#/components/schemas/Signal'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
         """
-        res, status = auth_utils.verify_auth()
 
-        if status == 401:
-            return res, status
         user_doc, status = validate_user_id(user_id)
         if (status == 400):
             return {'message': 'Wrong user_id is given'}, 400
@@ -67,24 +81,31 @@ class User(Resource):
 
 
 class Users(Resource):
-    """
-        @api {get} /users/ Get User List
-        @apiName GetUsers
-        @apiGroup User
-        @apiVersion 1.0.0
 
-        @apiSuccess {Object[]} users
-        @apiSuccess {String} users.id user id.
-        @apiSuccess {String} users.name user name.
-        @apiSuccess {String} users.email user email.
-        @apiSuccess {String} users.pircture user picture.
-    """
-
+    @auth_utils.requires_auth
     def get(self):
-        res, status = auth_utils.verify_auth()
-
-        if status == 401:
-            return res, status
+        """
+        Return all users
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        responses:
+          200:
+            description: All users
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    users:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/User'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+        """
 
         users = list()
         user_docs = schema.User.find()
@@ -98,67 +119,179 @@ class Users(Resource):
 
 
 class Signup(Resource):
+
+    def __init__(self):
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('email', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('name', type=str, required=True,
+                                 location='json')
+        self.parser_post = parser_post
+
     def post(self):
         """
-        @api {post} /users/signup/ User signup
-        @apiName UserSignup
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        @apiParam {String} name  user name.
+        Register a new user account
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  name:
+                    type: string
+                required: ['email', 'name']
+        responses:
+          200:
+            description: Success Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+                example:
+                  code: 200
+                  message: 'password has been sent to your email'
+          400:
+            description: Failure Message - invalid arguments
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+          500:
+            description: Failure Message - register user error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
         """
 
-        body = request.json
         try:
-            password = auth_utils.generate_password()
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        try:
+            # create user profile
+            password = auth_utils.generate_password(size=4)
             password_encrypted = generate_password_hash(password)
             user = dict()
-            user['email'] = body['email']
-            user['name'] = body['name']
+            user['email'] = args['email']
+            user['name'] = args['name']
             user['password'] = password_encrypted
+            # always use the same placehold for avatar
             user['picture'] = ('https://user-images.githubusercontent.com/'
                                '8490637/93004647-d895c100-f516-11ea-8c74-3'
                                '32d98bbf2ad.png')
+
+            # check whether this email has been registered before
             if schema.User.find_one(email=user['email']):
                 raise Exception('Email already exist')
-            # if schema.User.find_one(name=user['name']):
-            #     raise Exception('Name already exist! Please use another one.')
-            origin_name = user['name']
-            # keep finding until we find the one unique
-            while schema.User.find_one(name=user['name']):
-                user['name'] = origin_name + auth_utils.generate_digits()
 
-            schema.User.insert(**user)
+            origin_name = user['name']
+            # if the name is used, random append 3 digits
+            # e.g., jack -> jack798
+            while schema.User.find_one(name=user['name']):
+                user['name'] = origin_name + auth_utils.generate_digits(size=3)
+
+            # send password to the user email
             auth_utils.send_mail('MTV: your password', password, user['email'])
-            return {'message': 'password has been sent to your email'}, 200
+
+            # insert user to DB
+            schema.User.insert(**user)
+
+            return {
+                'message': 'password has been sent to your email',
+                'code': 200
+            }, 200
+
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 500}, 500
 
 
 class Signin(Resource):
+
+    def __init__(self):
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('email', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('password', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('rememberMe', type=str, default=False,
+                                 location='json')
+        self.parser_post = parser_post
+
     def post(self):
         """
-        @api {post} /users/signin/ User signin
-        @apiName UserSignin
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        @apiParam {String} password password.
-        @apiParam {String} rememberMe  boolean value.
-
-        @apiSuccess {Object} data
-        @apiSuccess {String} data.name user name.
-        @apiSuccess {String} data.email user email.
-        @apiSuccess {String} data.token token for authentication.
+        User sign in
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+                required: ['email', 'password']
+        responses:
+          200:
+            description: User Object
+            content:
+              application/json:
+                schema:
+                  uid:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  picture:
+                    type: string
+                    description: base64 format
+                  token:
+                    type: string
+                    description: server token used to authenticate APIs
+          401:
+            description: Auth Error Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+          500:
+            description: Failure Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
         """
 
-        body = request.json
         try:
-            email = body['email']
-            password = body['password']
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        try:
+            email = args['email']
+            password = args['password']
+            # TODO: rememberME - token should not expire
+
             user = schema.User.find_one(email=email)
             if user and check_password_hash(user.password, password):
                 token = auth_utils.generate_auth_token(str(user.id)).decode()
@@ -172,56 +305,94 @@ class Signin(Resource):
                     }
                 }, 200
             else:
-                return {'message': 'Email and/or Passkey are wrong!'}, 401
+                return {
+                    'message': 'Email and/or Passkey are wrong!',
+                    'code': 401
+                }, 401
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 401
-
-
-class Reset(Resource):
-    def post(self):
-        """
-        @api {post} /users/reset/ Reset password
-        @apiName ResetPassword
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        """
-
-        # res, status = auth_utils.verify_auth()
-        # if status == 401:
-        #     return res, status
-
-        body = request.json
-        try:
-            password = auth_utils.generate_password()
-            password_encrypted = generate_password_hash(password)
-            email = body['email']
-            user = schema.User.find_one(email=email)
-            if user:
-                user['password'] = password_encrypted
-                user.save()
-                auth_utils.send_mail('MTV: your new password', password, user['email'])
-            return {}, 204
-        except Exception as e:
-            LOGGER.exception(e)
-            return {}, 204
+            return {'message': str(e), 'code': 500}, 500
 
 
 class Signout(Resource):
+
+    @auth_utils.requires_auth
     def get(self):
-        """
-        @api {post} /users/signout/ User signout
-        @apiName UserSignout
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} id user id.
-        """
-
-        res, status = auth_utils.verify_auth()
-        if status == 401:
-            return res, status
-
+        # TODO: use flask.session to maintain user pool
+        # require client pass UID to server
         return {}, 204
+
+
+class Reset(Resource):
+
+    def __init__(self):
+        parser_put = reqparse.RequestParser(bundle_errors=True)
+        parser_put.add_argument('email', type=str, required=True,
+                                location='json')
+        self.parser_put = parser_put
+
+    def put(self):
+        """
+        Reset password
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                required: ['email']
+        responses:
+          200:
+            description: Success Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+                example:
+                  code: 200
+                  message: 'New password has been sent to your email'
+          500:
+            description: Failure Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+        """
+
+        try:
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        try:
+            # create new password
+            password = auth_utils.generate_password()
+            password_encrypted = generate_password_hash(password)
+
+            # verify whether the email exists
+            email = args['email']
+            user = schema.User.find_one(email=email)
+
+            # if yes, send email notification and save new password to DB
+            if user:
+                auth_utils.send_mail('MTV: your new password',
+                                     password, user['email'])
+                user['password'] = password_encrypted
+                user.save()
+            return {
+                'message': 'password has been sent to your email',
+                'code': 200
+            }, 200
+
+        except Exception as e:
+            LOGGER.exception(e)
+            return {'message': str(e), 'code': 500}, 500

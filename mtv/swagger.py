@@ -1,4 +1,16 @@
 schemas = {
+    'User': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'name': {'type': 'string'},
+            'email': {'type': 'string'},
+            'picture': {
+                'type': 'string',
+                'description': 'base64 string'
+            },
+        }
+    },
     'Signal': {
         'type': 'object',
         'properties': {
@@ -13,22 +25,24 @@ schemas = {
         'required': ['id', 'insert_time', 'name', 'dataset',
                      'start_time', 'stop_time', 'created_by']
     },
-    'Error': {
+    'Message': {
         'type': 'object',
         'properties': {
-            'code': {'type': 'string'},
+            'code': {'type': 'string', 'minimum': 100, 'maximum': 600},
             'message': {'type': 'string'}
         },
         'required': ['code', 'message']
     },
     'TestMessage': {
-        'type': 'object',
-        'properties': {
-            'code': {'type': 'string'},
-            'message': {'type': 'string'},
-            'data': {}
-        },
-        'required': ['code', 'message']
+        'allOf': [
+            {'$ref': '#/components/schemas/Message'},
+            {
+                'type': 'object',
+                'properties': {
+                    'data': {}
+                }
+            }
+        ]
     }
 }
 
@@ -39,10 +53,13 @@ tags = [
     },
     {
         'name': 'signal',
-        'description': 'Everything bout signal interactions'
+        'description': 'Everything about signal interactions'
     }, {
         'name': 'signalrun',
-        'description': 'Everything bout signalrun interactions'
+        'description': 'Everything about signalrun interactions'
+    }, {
+        'name': 'user',
+        'description': 'User login/logout/register etc.'
     },
     {
         'name': 'test',
@@ -90,7 +107,7 @@ total)](https://github.com/dyuliu/MTV/releases)
 **MTV** (multivariate time series data visuaization) is a visual analytics \
 system built for anomaly analysis of multiple time-series data.
 
-## License
+# License
 
 [The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
 """
@@ -124,7 +141,7 @@ swagger_tpl = {
                                 'or invalid'),
                 'content': {
                     'application/json': {
-                        'schema': {'$ref': '#/components/schemas/Error'}
+                        'schema': {'$ref': '#/components/schemas/Message'}
                     }
                 }
             }

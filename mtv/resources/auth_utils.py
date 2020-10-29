@@ -18,7 +18,7 @@ def get_google_provider_cfg():
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()
 
 
-def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
+def generate_password(size=4, chars=string.ascii_uppercase + string.digits):
     """Randomly generate a password with length `size`.
 
     Args:
