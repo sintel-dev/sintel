@@ -1,11 +1,10 @@
 import logging
 
 from bson import ObjectId
-from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 from mtv.db import schema
-from mtv.resources.auth_utils import verify_auth
+from mtv.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -76,36 +75,36 @@ def validate_experiment_id(experiment_id):
 
 
 class Experiment(Resource):
+
+    @requires_auth
     def get(self, experiment_id):
         """
-        @api {get} /experiments/:experiment_id Get experiment by ID
-        @apiName GetExperiment
-        @apiGroup Experiment
-        @apiVersion 1.0.0
-
-        @apiParam {String} experiment_id Experiment ID.
-
-        @apiSuccess {String} id Experiment ID.
-        @apiSuccess {String} project Project name.
-        @apiSuccess {String} dataset Dataset name.
-        @apiSuccess {String} date_creation Date creation time.
-        @apiSuccess {String} created_by User ID.
-        @apiSuccess {String} pipeline Pipeline name.
-        @apiSuccess {String} name Experiment name.
-        @apiSuccess {Object[]} dataruns Datarun list.
-        @apiSuccess {String} dataruns.id Datarun id.
-        @apiSuccess {String} dataruns.signal Signal name.
-        @apiSuccess {String} dataruns.experiment Experiment id.
-        @apiSuccess {Object[]} dataruns.events Event list.
-        @apiSuccess {Int} dataruns.events.start_time Event start time.
-        @apiSuccess {Int} dataruns.events.stop_time Event stop time.
-        @apiSuccess {Float} dataruns.events.score Event anomaly score.
-        @apiSuccess {String} dataruns.events.tag Event tag.
+        Get an experiment by ID
+        ---
+        tags:
+          - experiment
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: experiment_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: ID of the experiment to get
+        responses:
+          200:
+            description: Experiment to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Experiment'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
         # validate experiment_id
         validate_result = validate_experiment_id(experiment_id)
         if validate_result[1] == 400:
@@ -125,41 +124,54 @@ class Experiment(Resource):
 
 class Experiments(Resource):
 
+    def __init__(self):
+        parser_get = reqparse.RequestParser(bundle_errors=True)
+        parser_get.add_argument('project', type=str, default=None,
+                                location='args')
+        self.parser_get = parser_get
+
+    @requires_auth
     def get(self):
         """
-        @api {get} /experiments/ Get experiments by project name
-        @apiName GetExperimentByProject
-        @apiGroup Experiment
-        @apiVersion 1.0.0
-        @apiDescription If project ID is given, then return the experiments
-        of that project; otherwise, return all the experiments.
-
-        @apiParam {String} [project] Project name.
-
-        @apiSuccess {Object[]} experiments Experiment.
-        @apiSuccess {String} experiments.id Experiment ID.
-        @apiSuccess {String} experiments.project Project name.
-        @apiSuccess {String} experiments.dataset Dataset name.
-        @apiSuccess {String} experiments.date_creation Date creation time.
-        @apiSuccess {String} experiments.created_by User ID.
-        @apiSuccess {String} experiments.pipeline Pipeline name.
-        @apiSuccess {String} experiments.name Experiment name.
-        @apiSuccess {Object[]} experiments.dataruns Datarun list.
-        @apiSuccess {String} experiments.dataruns.id Datarun id.
-        @apiSuccess {String} experiments.dataruns.signal Signal name.
-        @apiSuccess {String} experiments.dataruns.experiment Experiment id.
-        @apiSuccess {Object[]} experiments.dataruns.events Event list.
-        @apiSuccess {Int} experiments.dataruns.events.start_time Event start time.
-        @apiSuccess {Int} experiments.dataruns.events.stop_time Event stop time.
-        @apiSuccess {Float} experiments.dataruns.events.score Event anomaly score.
-        @apiSuccess {String} experiments.dataruns.events.tag Event tag.
+        Get a list of experiments by [project]
+        ---
+        tags:
+          - experiment
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: project
+            in: query
+            schema:
+              type: string
+            description: Name of the project to filter
+        responses:
+          200:
+            description: A list of experiments
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    experiments:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Experiment'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        project = request.args.get('project', None)
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
 
+        project = args['project']
+
+        # make query dict
         query = dict()
         if project is not None and project != '':
             query['project'] = project
@@ -167,7 +179,8 @@ class Experiments(Resource):
         experiment_docs = schema.Experiment.find(**query)
 
         try:
-            experiments = [get_experiment(experiment_doc) for experiment_doc in experiment_docs]
+            experiments = [get_experiment(experiment_doc)
+                           for experiment_doc in experiment_docs]
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

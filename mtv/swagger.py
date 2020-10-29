@@ -1,4 +1,23 @@
 schemas = {
+    'Experiment': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'name': {'type': 'string'},
+            'created_by': {'type': 'string'},
+            'date_creation': {'type': 'string'},
+            'project': {'type': 'string'},
+            'dataset': {'type': 'string'},
+            'pipeline': {'type': 'string'},
+            'dataruns': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': {}
+                }
+            },
+        }
+    },
     'Pipeline': {
         'type': 'object',
         'properties': {
@@ -63,6 +82,14 @@ tags = [
     {
         'name': 'default',
         'description': 'Uncategorized APIs'
+    },
+    {
+        'name': 'experiment',
+        'description': 'Everything about experiment interactions'
+    },
+    {
+        'name': 'pipeline',
+        'description': 'Everything about pipeline interactions'
     },
     {
         'name': 'signal',
