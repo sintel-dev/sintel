@@ -1,4 +1,47 @@
 schemas = {
+    'Annotation': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'event': {'type': 'string', 'description': 'event ID'},
+            'text': {'type': 'string'},
+            'created_by': {'type': 'string'}
+        }
+    },
+    'EventInteraction': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'event': {'type': 'string', 'description': 'event ID'},
+            'action': {'type': 'string'},
+            'tag': {'type': 'string'},
+            'annotation': {'type': 'string', 'description': 'annt ID'},
+            'start_time': {'type': 'integer'},
+            'stop_time': {'type': 'integer'},
+            'insert_time': {'type': 'string', 'description': 'ISO format'},
+            'created_by': {'type': 'string'}
+        }
+    },
+    'Event': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'insert_time': {'type': 'string'},
+            'start_time': {'type': 'integer'},
+            'stop_time': {'type': 'integer'},
+            'score': {'type': 'integer'},
+            'tag': {'type': 'string'},  # todo: use enum
+            'datarun': {'type': 'string', 'description': 'datarun ID'},
+            'source': {'type': 'string'},  # todo: use enum
+            'comments': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': {}
+                }
+            }
+        }
+    },
     'Dataset': {
         'type': 'object',
         'properties': {
@@ -134,8 +177,12 @@ schemas = {
 
 tags = [
     {
-        'name': 'default',
-        'description': 'Uncategorized APIs'
+        'name': 'annotation',
+        'description': 'Everything about annotation interactions'
+    },
+    {
+        'name': 'event',
+        'description': 'Everything about event interactions'
     },
     {
         'name': 'dataset',

@@ -211,6 +211,8 @@ class Dataruns(Resource):
                       description: should be named as signalruns later
           400:
             $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
           500:
             $ref: '#/components/responses/ErrorMessage'
         """
