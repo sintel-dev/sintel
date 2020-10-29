@@ -2,7 +2,7 @@ import logging
 
 from flask_restful import Resource, reqparse
 from mtv.db import DBExplorer, schema
-from mtv.resources.auth_utils import verify_auth, requires_auth
+from mtv.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -28,6 +28,8 @@ class Signal(Resource):
         ---
         tags:
           - signal
+        security:
+          - tokenAuth: []
         parameters:
           - name: signal_name
             in: path
@@ -72,7 +74,7 @@ class Signals(Resource):
         tags:
           - signal
         security:
-          - apiKeyAuth: []
+          - tokenAuth: []
         responses:
           200:
             description: All signals
@@ -136,6 +138,8 @@ class SignalRaw(Resource):
         ---
         tags:
             - signal
+        security:
+          - tokenAuth: []
         parameters:
           - name: signal
             in: query
@@ -213,6 +217,8 @@ class AvailableSignalruns(Resource):
         ---
         tags:
             - signalrun
+        security:
+          - tokenAuth: []
         parameters:
           - name: signalrun
             in: query

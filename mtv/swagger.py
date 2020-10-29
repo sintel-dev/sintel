@@ -20,6 +20,15 @@ schemas = {
             'message': {'type': 'string'}
         },
         'required': ['code', 'message']
+    },
+    'TestMessage': {
+        'type': 'object',
+        'properties': {
+            'code': {'type': 'string'},
+            'message': {'type': 'string'},
+            'data': {}
+        },
+        'required': ['code', 'message']
     }
 }
 

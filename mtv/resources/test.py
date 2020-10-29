@@ -1,7 +1,8 @@
 import logging
 
+from flask import request
 from flask_restful import Resource
-from mtv.resources.auth_utils import verify_auth
+from mtv.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -10,71 +11,44 @@ class Test(Resource):
 
     def get(self):
         """
-        Example using a dictionary as specification
-        This is the description
-        You can also set 'summary' and 'description' in
-        specs_dict
-        ---
-        # values here overrides the specs dict
-        deprecated: true
+        Refer to ./apidocs/resources/test/get.yml
         """
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
-        return {'message': 'auth pass'}, 200
+        return {
+            'code': 200,
+            'message': 'GET test succeeded',
+            'data': request.args
+        }, 200
 
     def post(self):
         """
-        MTV Test Post
-        Restful APIs
-        ---
-        # values here overrides the specs dict
+        Refer to ./apidocs/resources/test/post.yml
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        return {'message': 'post'}, 200, {'username': 'dyu'}
+        return {
+            'code': 200,
+            'message': 'POST test succeeded',
+            'data': request.json
+        }, 200
 
+    @requires_auth
     def delete(self):
         """
-        MTV Test Del
-        Restful APIs
-        ---
-        responses:
-          200:
-            description: A message object confirming delete status
-            schema:
-              properties:
-                message:
-                  type: string
-                  description: The message content
-                  default: testing
+        Refer to ./apidocs/resources/test/delete.yml
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        return {'message': 'delete'}, 200, {'username': 'dyu'}
+        return {
+            'code': 200,
+            'message': 'DELETE test succeeded'
+        }, 200
 
+    @requires_auth
     def put(self):
         """
-        MTV Test Put
-        Restful APIs
-        ---
-        responses:
-          200:
-            description: A message object confirming delete status
-            schema:
-              properties:
-                message:
-                  type: string
-                  description: The message content
-                  default: testing
+        Refer to ./apidocs/resources/test/put.yml
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        return {'message': 'put'}, 200, {'username': 'dyu'}
+        return {
+            'code': 200,
+            'message': 'PUT test succeeded'
+        }, 200

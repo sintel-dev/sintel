@@ -1,14 +1,29 @@
-MTV Test Post
-In this example the specification is taken from external YAML file
+Test POST method
 ---
 tags:
   - test
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          item1:
+            type: string
+          item2:
+            type: string
+        required: ['item1', 'item2']
 responses:
   200:
-    description: Animals to be returned
+    description: Test Message
     content:
       application/json:
         schema:
-          type: array
-          items:
-            $ref: '#/components/schemas/Animal'
+          $ref: '#/components/schemas/TestMessage'
+        example:
+          code: 200
+          message: 'POST test succeeded'
+          data:
+            item1: 'Your inputed item1 value'
+            item2: 'Your inputed item2 value'

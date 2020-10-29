@@ -1,13 +1,9 @@
-Test GET method
+Test PUT method
 ---
 tags:
   - test
-parameters:
-  - name: param1
-    in: query
-    schema:
-      type: string
-    required: false
+security:
+  - tokenAuth: []
 responses:
   200:
     description: Test Message
@@ -17,6 +13,4 @@ responses:
           $ref: '#/components/schemas/TestMessage'
         example:
           code: 200
-          message: 'GET test succeeded'
-          data:
-            param1: 'Your inputed value'
+          message: 'PUT test succeeded'
