@@ -1,4 +1,49 @@
 schemas = {
+    'Signalrun': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'signalrun_id': {'type': 'string'},
+            'experiment': {'type': 'string', 'description': 'exp ID'},
+            'signal': {'type': 'string', 'description': 'signal name'},
+            'signal_id': {'type': 'string', 'description': 'signal ID'},
+            'start_time': {'type': 'string', 'description': 'ISO format'},
+            'end_time': {'type': 'string', 'description': 'ISO format'},
+            'status': {'type': 'string'},
+            'events': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': {}
+                }
+            },
+            'raw': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': {}
+                }
+            },
+            'prediction': {
+                'type': 'object',
+                'properties': {
+                    'name': {
+                        'type': 'array',
+                        'items': {'type': 'string'},
+                        'maxItems': 7
+                    },
+                    'data': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'array',
+                            'items': {'type': 'number'},
+                            'maxItems': 7
+                        }
+                    }
+                }
+            }
+        }
+    },
     'Experiment': {
         'type': 'object',
         'properties': {
@@ -12,8 +57,7 @@ schemas = {
             'dataruns': {
                 'type': 'array',
                 'items': {
-                    'type': 'object',
-                    'additionalProperties': {}
+                    '$ref': '#/components/schemas/Signalrun'
                 }
             },
         }

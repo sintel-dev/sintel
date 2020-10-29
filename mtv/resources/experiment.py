@@ -65,10 +65,11 @@ def validate_experiment_id(experiment_id):
     experiment_doc = schema.Experiment.find_one(id=eid)
 
     if experiment_doc is None:
-        LOGGER.exception('Error getting experiment. '
-                         'Experiment %s does not exist.', experiment_id)
+        message = 'Experiment {} does not exist'.format(experiment_id)
+        LOGGER.exception(message)
         return {
-            'message': 'Experiment {} does not exist'.format(experiment_id)
+            'message': message,
+            'code': 400
         }, 400
 
     return experiment_doc, 200

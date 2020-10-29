@@ -6,7 +6,7 @@ from flask_restful import Resource, reqparse
 
 from mtv.db import schema
 from mtv.resources.auth_utils import verify_auth
-from mtv.resources.datarun import validate_datarun_id
+from mtv.resources.datarun import validate_signalrun_id
 
 LOGGER = logging.getLogger(__name__)
 
@@ -329,7 +329,7 @@ class Events(Resource):
 
         # validate datarun_id
         if datarun_id is not None and datarun_id != '':
-            validate_result = validate_datarun_id(datarun_id)
+            validate_result = validate_signalrun_id(datarun_id)
             if validate_result[1] == 400:
                 return validate_result
 
@@ -400,7 +400,7 @@ class Events(Resource):
             return {'message', str(e)}, 400
 
         # further validate datarun
-        validate_result = validate_datarun_id(args['datarun_id'])
+        validate_result = validate_signalrun_id(args['datarun_id'])
         if validate_result[1] == 400:
             return validate_result
 
