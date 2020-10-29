@@ -1,4 +1,17 @@
 schemas = {
+    'Pipeline': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'insert_time': {'type': 'string'},
+            'name': {'type': 'string'},
+            'created_by': {'type': 'string'},
+            'json': {
+                'type': 'object',
+                'additionalProperties': {}
+            },
+        }
+    },
     'User': {
         'type': 'object',
         'properties': {
@@ -136,6 +149,14 @@ swagger_tpl = {
             }
         },
         'responses': {
+            'ErrorMessage': {
+                'description': 'Error message',
+                'content': {
+                    'application/json': {
+                        'schema': {'$ref': '#/components/schemas/Message'}
+                    }
+                }
+            },
             'UnauthorizedError': {
                 'description': ('Authentication information is missing '
                                 'or invalid'),
