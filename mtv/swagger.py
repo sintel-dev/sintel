@@ -1,4 +1,14 @@
 schemas = {
+    'Dataset': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'string'},
+            'insert_time': {'type': 'string'},
+            'name': {'type': 'string'},
+            'entity': {'type': 'string'},
+            'created_by': {'type': 'string'}
+        }
+    },
     'Signalrun': {
         'type': 'object',
         'properties': {
@@ -126,6 +136,10 @@ tags = [
     {
         'name': 'default',
         'description': 'Uncategorized APIs'
+    },
+    {
+        'name': 'dataset',
+        'description': 'Everything about dataset interactions'
     },
     {
         'name': 'experiment',
