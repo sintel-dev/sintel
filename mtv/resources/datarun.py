@@ -1,123 +1,167 @@
 import logging
 
 from bson import ObjectId
-from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
-from mtv import model
+from mtv.db import DBExplorer, schema
+from mtv.resources.auth_utils import requires_auth
+from mtv.resources.computing.utils.layout import tsne
 from mtv.resources.experiment import validate_experiment_id
-from mtv.resources.auth_utils import verify_auth
-
 
 LOGGER = logging.getLogger(__name__)
 
 
-def get_datarun(datarun_doc):
-    datarun = {
-        'id': str(datarun_doc.id),
-        'experiment': str(datarun_doc.experiment.id),
-        'signal': datarun_doc.signal.name,
-        'start_time': datarun_doc.start_time.isoformat(),
-        'end_time': datarun_doc.end_time.isoformat(),
-        'status': datarun_doc.status,
+def get_signalrun(signalrun_doc):
+
+    primitive_name = ('orion.primitives.timeseries_preprocessing'
+                      '.time_segments_aggregate#1')
+    pipeline = signalrun_doc.datarun.pipeline
+    interval = int(pipeline.json['hyperparameters']
+                   [primitive_name].get('interval', None))
+
+    signalrun = {
+        'id': str(signalrun_doc.id),
+        'signalrun_id': str(signalrun_doc.id),
+        'interval': interval,
+        'experiment': str(signalrun_doc.datarun.experiment.id),
+        'signal': signalrun_doc.signal.name,
+        'signal_id': str(signalrun_doc.signal.id),
+        'start_time': signalrun_doc.start_time.isoformat(),
+        'end_time': signalrun_doc.end_time.isoformat(),
+        'status': signalrun_doc.status,
         'events': [],
         'prediction': None,
-        'raw': []
+        'raw': [],
     }
 
-    # get events
-    event_docs = model.Event.find(datarun=datarun_doc.id)
+    # get events of this signalrun
+    event_docs = schema.Event.find(signalrun=signalrun_doc.id)
     if event_docs is not None:
         for event_doc in event_docs:
-            datarun['events'].append({
+            # TODO
+            # annotation_doc = schema.Annotation.find_one(event=event_doc.id)
+            signalrun['events'].append({
                 'id': str(event_doc.id),
                 'start_time': event_doc.start_time,
                 'stop_time': event_doc.stop_time,
-                'score': event_doc.score,
-                'tag': event_doc.tag
+                'score': event_doc.severity,
+                'tag': event_doc.tag,
+                'source': event_doc.source,
             })
+            # signalrun['events'][-1]['tag'] = \
+            #     None if annotation_doc is None else annotation_doc.tag
 
     # get prediction
-    prediction_doc = model.Prediction.find_one(datarun=datarun_doc.id)
-    datarun['prediction'] = {
-        'names': prediction_doc.names,
-        'data': prediction_doc.data
+    prediction_data = DBExplorer.get_prediction(signalrun_doc)
+    # prediction_doc = schema.Prediction.find_one(signalrun=signalrun_doc.id)
+    signalrun['prediction'] = {
+        'names': prediction_data['attrs'],
+        'data': prediction_data['data']
     }
 
     # get raw
-    raw_docs = model.Raw.find(datarun=datarun_doc.id).order_by('+year')
-    for raw_doc in raw_docs:
-        datarun['raw'].append({
-            'timestamp': raw_doc.timestamp,
-            'year': raw_doc.year,
-            'data': raw_doc.data
+    period_docs = schema.Period.find(signalrun=signalrun_doc.id).order_by('+year')
+    for period_doc in period_docs:
+        signalrun['raw'].append({
+            'timestamp': period_doc.timestamp,
+            'year': period_doc.year,
+            'data': period_doc.data
         })
 
-    return datarun
+    return signalrun
 
 
-def validate_datarun_id(datarun_id):
+def get_datarun(datarun_doc):
+    """Extract signalruns out of a datarun.
+
+    The order in the returned list matters. TSNE is applied to put
+    similar signalruns as close as possible.
+
+    Args:
+        datarun_doc (mongoengine.Document):
+            datarun document.
+
+    Returns:
+        list:
+            List of Signalruns.
+    """
+    signalruns = list()
+    signalrun_docs = schema.Signalrun.find(datarun=datarun_doc.id)
+    for signalrun_doc in signalrun_docs:
+        signalrun = get_signalrun(signalrun_doc)
+        signalruns.append(signalrun)
+
+    # TODO: add layout option
+    if len(signalruns) > 1:
+        signalruns = tsne(signalruns)
+    return signalruns
+
+
+def validate_signalrun_id(signalrun_id):
     try:
-        did = ObjectId(datarun_id)
+        did = ObjectId(signalrun_id)
     except Exception as e:
         LOGGER.exception(e)
         return {'message': str(e)}, 400
 
-    datarun_doc = model.Datarun.find_one(id=did)
+    signalrun_doc = schema.Signalrun.find_one(id=did)
 
-    if datarun_doc is None:
-        LOGGER.exception('Datarun %s does not exist.', datarun_id)
+    if signalrun_doc is None:
+        message = 'Signalrun {} does not exist'.format(signalrun_id)
+        LOGGER.exception(message)
         return {
-            'message': 'Datarun {} does not exist'.format(datarun_id)
+            'message': message,
+            'code': 400
         }, 400
 
-    return datarun_doc, 200
+    return signalrun_doc, 200
 
 
 class Datarun(Resource):
+
+    @requires_auth
     def get(self, datarun_id):
         """
-        @api {get} /dataruns/:datarun_id Get datarun by ID
-        @apiName GetDatarun
-        @apiGroup Datarun
-        @apiVersion 1.0.0
+        Get a Signalrun by ID
+        This API fetch signalrun instead of datarun. We will change it \
+        to correct name soon.
 
-        @apiParam {String} datarun_id Datarun ID.
-
-        @apiSuccess {String} id Datarun ID.
-        @apiSuccess {String} experiment Experiment id.
-        @apiSuccess {String} signal Signal name.
-        @apiSuccess {String} start_time Datarun start time.
-        @apiSuccess {String} end_time Datarun end time.
-        @apiSuccess {String} status Datarun status.
-        @apiSuccess {Object[]} events Event list.
-        @apiSuccess {String} events.id Event ID.
-        @apiSuccess {Int} events.start_time Event start time.
-        @apiSuccess {Int} events.stop_time Event stop time.
-        @apiSuccess {Float} events.score Event anomaly score.
-        @apiSuccess {String} events.tag Event tag.
-        @apiSuccess {Object} prediction Datarun prediction result.
-        @apiSuccess {String[]} prediction.names Attribute name list.
-        @apiSuccess {Float[][]} prediction.data Attribute values.
-        @apiSuccess {Object[]} raw Signal raw aggregated values.
-        @apiSuccess {Int} raw.year The year of the storing data.
-        @apiSuccess {Float} raw.timestamp The start timestamp of the year.
-        @apiSuccess {Object[][]} raw.data The aggregated signal data.
+        Note that the returned data size could be very large.
+        ---
+        tags:
+          - signalrun
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: datarun_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: ID of the Signalrun
+        responses:
+          200:
+            description: Signalrun to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Signalrun'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
         # validate datarun_id
-        validate_result = validate_datarun_id(datarun_id)
+        validate_result = validate_signalrun_id(datarun_id)
         if validate_result[1] == 400:
             return validate_result
 
-        datarun_doc = validate_result[0]
+        signalrun_doc = validate_result[0]
 
         # return result
         try:
-            res = get_datarun(datarun_doc)
+            res = get_signalrun(signalrun_doc)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500
@@ -126,41 +170,60 @@ class Datarun(Resource):
 
 
 class Dataruns(Resource):
+
+    def __init__(self):
+        parser_get = reqparse.RequestParser(bundle_errors=True)
+        parser_get.add_argument('experiment_id', type=str, default=None,
+                                location='args')
+        self.parser_get = parser_get
+
+    @requires_auth
     def get(self):
         """
-        @api {get} /dataruns/ Get datarun by experiment ID
-        @apiName GetDatarunByExperiment
-        @apiGroup Datarun
-        @apiVersion 1.0.0
+        Return all Signalrun(s) by experiment ID
+        If the experiment ID is not given, it will return all signalruns.
 
-        @apiParam {String} experiment_id Experiment ID.
-
-        @apiSuccess {Object[]} dataruns Datarun list.
-        @apiSuccess {String} dataruns.id Datarun ID.
-        @apiSuccess {String} dataruns.experiment Experiment id.
-        @apiSuccess {String} dataruns.signal Signal name.
-        @apiSuccess {String} dataruns.start_time Datarun start time.
-        @apiSuccess {String} dataruns.end_time Datarun end time.
-        @apiSuccess {String} dataruns.status Datarun status.
-        @apiSuccess {Object[]} dataruns.events Event list.
-        @apiSuccess {String} dataruns.events.id Event ID.
-        @apiSuccess {Int} dataruns.events.start_time Event start time.
-        @apiSuccess {Int} dataruns.events.stop_time Event stop time.
-        @apiSuccess {Float} dataruns.events.score Event anomaly score.
-        @apiSuccess {String} dataruns.events.tag Event tag.
-        @apiSuccess {Object} dataruns.prediction Datarun prediction result.
-        @apiSuccess {String[]} dataruns.prediction.names Attribute name list.
-        @apiSuccess {Float[][]} dataruns.prediction.data Attribute values.
-        @apiSuccess {Object[]} dataruns.raw Signal raw aggregated values.
-        @apiSuccess {Int} dataruns.raw.year The year of the storing data.
-        @apiSuccess {Float} dataruns.raw.timestamp The start timestamp of the year.
-        @apiSuccess {Object[][]} dataruns.raw.data The aggregated signal data.
+        Note that the returned data size could be very large.
+        ---
+        tags:
+          - signalrun
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: experiment_id
+            in: query
+            schema:
+              type: string
+            required: true
+            description: ID of the Experiment to filter signalruns
+        responses:
+          200:
+            description: A list of Signalruns to be returned
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    dataruns:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Signalrun'
+                      description: should be named as signalruns later
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        experiment_id = request.args.get('experiment_id', None)
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        experiment_id = args['experiment_id']
 
         # validate experiment_id
         validate_result = validate_experiment_id(experiment_id)
@@ -169,12 +232,15 @@ class Dataruns(Resource):
 
         experiment_doc = validate_result[0]
 
-        datarun_docs = model.Datarun.find(experiment=experiment_doc.id)
+        datarun_docs = schema.Datarun.find(experiment=experiment_doc.id)
 
         try:
-            dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
+            dataruns = list()
+            for datarun_doc in datarun_docs:
+                dataruns.extend(get_datarun(datarun_doc))
+            # dataruns = [get_datarun(datarun_doc) for datarun_doc in datarun_docs]
             # sort by signal name
-            dataruns.sort(key=lambda x: x['signal'], reverse=False)
+            # dataruns.sort(key=lambda x: x['signal'], reverse=False)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

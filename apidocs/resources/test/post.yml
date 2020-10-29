@@ -1,0 +1,29 @@
+Test POST method
+---
+tags:
+  - test
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          item1:
+            type: string
+          item2:
+            type: string
+        required: ['item1', 'item2']
+responses:
+  200:
+    description: Test Message
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/TestMessage'
+        example:
+          code: 200
+          message: 'POST test succeeded'
+          data:
+            item1: 'Your inputed item1 value'
+            item2: 'Your inputed item2 value'

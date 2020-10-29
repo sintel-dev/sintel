@@ -1,10 +1,9 @@
 import logging
 
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
-from mtv import model
-from mtv.resources.auth_utils import verify_auth
-
+from mtv.db import schema
+from mtv.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -14,30 +13,45 @@ def get_dataset(dataset_doc):
         'id': str(dataset_doc.id),
         'insert_time': dataset_doc.insert_time.isoformat(),
         'name': dataset_doc.name,
-        'entity_id': dataset_doc.entity_id
+        'entity': dataset_doc.entity,
+        'created_by': dataset_doc.created_by
     }
 
 
 class Dataset(Resource):
+
+    @requires_auth
     def get(self, dataset_name):
         """
-        @api {get} /datasets/:dataset_name/ Get dataset by name
-        @apiName GetDataset
-        @apiGroup Dataset
-        @apiVersion 1.0.0
-
-        @apiParam {String} dataset_name Dataset name.
-
-        @apiSuccess {String} id Dataset ID.
-        @apiSuccess {String} insert_time Dataset creation time.
-        @apiSuccess {String} name Dataset name.
-        @apiSuccess {String} entity_id Dataset entity_id.
+        Get a dataset by name
+        ---
+        tags:
+          - dataset
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: dataset_name
+            in: path
+            schema:
+              type: string
+            required: true
+            description: name of the dataset to get
+        responses:
+          200:
+            description: Dataset to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Dataset'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        document = model.Dataset.find_one(name=dataset_name)
+        document = schema.Dataset.find_one(name=dataset_name)
 
         if document is None:
             LOGGER.exception('Error getting dataset. '
@@ -56,24 +70,35 @@ class Dataset(Resource):
 
 
 class Datasets(Resource):
+
+    @requires_auth
     def get(self):
         """
-        @api {get} /datasets/ Get datasets
-        @apiName GetDatasets
-        @apiGroup Dataset
-        @apiVersion 1.0.0
-
-        @apiSuccess {Object[]} datasets Dataset list.
-        @apiSuccess {String} datasets.id Dataset ID.
-        @apiSuccess {String} datasets.insert_time Dataset creation time.
-        @apiSuccess {String} datasets.name Dataset name.
-        @apiSuccess {String} datasets.entity_id Dataset entity_id.
+        Return all datasets
+        ---
+        tags:
+          - dataset
+        security:
+          - tokenAuth: []
+        responses:
+          200:
+            description: All datasets
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    datasets:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Dataset'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        documents = model.Dataset.find()
+        documents = schema.Dataset.find()
 
         try:
             datasets = [get_dataset(document) for document in documents]

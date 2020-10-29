@@ -34,35 +34,47 @@ help:
 # ----------------------- session: install ----------------------- #
 
 .PHONY: install
-install: clean-build clean-pyc clean-client ## install the packages for running mtv
-	pip install -e .
-	$(MAKE) init-db && 	$(MAKE) load-db-mtv
-	cd client && npm install --production && npm run build
+install: clean-build clean-pyc  ## install the packages for running mtv
+	pip install .
+	$(MAKE) init-db && $(MAKE) load-db
+
+.PHONY: install-test
+install-test: clean-build clean-pyc ## install the package and test dependencies
+	pip install .[test]
+	$(MAKE) init-db && $(MAKE) load-db-test
 
 .PHONY: install-develop
-install-develop: clean-build clean-pyc clean-client ## install the package in editable mode and dependencies for development
+install-develop: clean-build clean-pyc  ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	$(MAKE) init-db && 	$(MAKE) load-db-mtv
-	cd client && npm install && npm run build
+	$(MAKE) init-db && $(MAKE) load-db && $(MAKE) load-db-test
 
 .PHONY: init-db
 init-db: clean-db
 	mkdir -p db-instance
+	# this folder is for saving the downloaded demo mongodb data
 	mkdir -p db-instance/data
+	# this folder is for saving the log files
 	mkdir -p db-instance/log
+	# this folder is for saving the newly dumped mongodb data
 	mkdir -p db-instance/dump
 
-.PHONY: load-db-mtv
-load-db-mtv: init-db
-	rm -f -r db-instance/data/mtv/
+.PHONY: load-db
+load-db: init-db
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	mongo mtv --eval "db.dropDatabase()"
 	mongorestore --db mtv ./db-instance/data/mtv/
 
+.PHONY: load-db-test
+load-db-test: init-db
+	curl -o mtv-test.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv-test.tar.bz2"
+	tar -xf mtv-test.tar.bz2 -C ./db-instance/data/ && rm mtv-test.tar.bz2
+	mongo mtv-test --eval "db.dropDatabase()"
+	mongorestore --db mtv-test ./db-instance/data/mtv-test/
+
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
-docker-db-up: init-db			## download data and load them into mongodb  
+docker-db-up: init-db	## download data and load them into mongodb  
 	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
 	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
 	docker-compose -f docker-compose-db.yml up
@@ -84,7 +96,7 @@ docker-down: 			## remove containers, volumes, and networks
 	docker-compose down -v
 
 .PHONY: docker-clean
-docker-clean: 		## remove containers, volumes, networks, and images
+docker-clean: 			## remove containers, volumes, networks, and images
 	docker-compose down -v --rmi all
 
 # ----------------------- session: test ----------------------- #
@@ -99,10 +111,6 @@ test-server: ## run tests on server
 .PHONY: test-server-flask
 test-server-flask: ## run tests on server
 	py.test ./tests/test_flask.py
-
-.PHONY: test-client
-test-client: ## run tests on client
-	npm -C client run test:karma
 
 .PHONY: test-coverage
 test-coverage: ## check code coverage quickly with the default Python
@@ -148,9 +156,13 @@ view-docs: docs ## view docs in browser
 serve-docs: view-docs ## compile the docs watching for changes
 	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
 
-.PHONY: api-docs
-api-docs:	## generate server API docs
-	apidoc -i mtv\\resources\\ -o apidoc\\
+.PHONY: apidoc
+apidoc:	## generate server API docs
+	apidoc -i mtv/resources -o apidoc/
+
+.PHONY: view-apidoc
+view-apidoc:	## view server API docs
+	$(BROWSER) apidoc/index.html
 
 # -------------------- session: release ---------------------- #
 

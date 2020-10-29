@@ -1,9 +1,9 @@
 import logging
 
 from flask_restful import Resource
-from mtv.resources.auth_utils import verify_auth
 
-from mtv import model
+from mtv.db import schema
+from mtv.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -14,81 +14,96 @@ def get_pipeline(pipeline_doc):
         'insert_time': pipeline_doc.insert_time.isoformat(),
         'name': pipeline_doc.name,
         'created_by': pipeline_doc.created_by,
-        'mlpipeline': pipeline_doc.mlpipeline
+        # TODO syntex error position
+        # 'mlpipeline': pipeline_doc.json
     }
 
 
 class Pipeline(Resource):
+
+    @requires_auth
     def get(self, pipeline_name):
         """
-        @api {get} /pipelines/:pipeline_name/ Get pipeline by name
-        @apiName GetPipeline
-        @apiGroup Pipeline
-        @apiVersion 1.0.0
-
-        @apiParam {String} pipeline_name Pipeline name.
-
-        @apiSuccess {String} id Pipeline ID.
-        @apiSuccess {String} insert_time Pipeline creation time.
-        @apiSuccess {String} name Pipeline name.
-        @apiSuccess {String} created_by User ID.
-        @apiSuccess {Object} mlpipeline Pipeline structures and hyperparameters.
-        @apiSuccess {String[]} mlpipeline.primitives Primitive names.
-        @apiSuccess {Object} mlpipeline.init_params Primitive hyperparameters.
-        @apiSuccess {Object} mlpipeline.output_names Primitive output names.
-        @apiSuccess {Object} mlpipeline.outputs Primitive outputs.
+        Get a pipeline by name
+        ---
+        tags:
+          - pipeline
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: pipeline_name
+            in: path
+            schema:
+              type: string
+            required: true
+            description: name of the pipeline to get
+        responses:
+          200:
+            description: Pipeline to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Pipeline'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        document = model.Pipeline.find_one(name=pipeline_name)
+        document = schema.Template.find_one(name=pipeline_name)
 
         if document is None:
             LOGGER.exception('Error getting pipeline. '
                              'Pipeline %s does not exist.', pipeline_name)
             return {
-                'message': 'Pipeline {} does not exist'.format(pipeline_name)
+                'message': 'Pipeline {} does not exist'.format(pipeline_name),
+                'code': 400
             }, 400
 
         try:
             res = get_pipeline(document)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 500
+            return {'message': str(e), 'code': 500}, 500
         else:
             return res
 
 
 class Pipelines(Resource):
+
+    @requires_auth
     def get(self):
         """
-        @api {get} /pipelines/ Get pipelines
-        @apiName GetPipelines
-        @apiGroup Pipeline
-        @apiVersion 1.0.0
-
-        @apiSuccess {Object[]} pipelines Pipeline list
-        @apiSuccess {String} pipelines.id Comment ID.
-        @apiSuccess {String} pipelines.insert_time Pipeline creation time.
-        @apiSuccess {String} pipelines.name Pipeline name.
-        @apiSuccess {String} pipelines.created_by User ID.
-        @apiSuccess {Object} pipelines.mlpipeline Pipeline structures and hyperparameters.
-        @apiSuccess {String[]} pipelines.mlpipeline.primitives Primitive names.
-        @apiSuccess {Object} pipelines.mlpipeline.init_params Primitive hyperparameters.
-        @apiSuccess {Object} pipelines.mlpipeline.output_names Primitive output names.
-        @apiSuccess {Object} pipelines.mlpipeline.outputs Primitive outputs.
+        Get a pipeline by name
+        ---
+        tags:
+          - pipeline
+        security:
+          - tokenAuth: []
+        responses:
+          200:
+            description: A list of pipelines
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    pipelines:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Pipeline'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
-        documents = model.Pipeline.find()
+        documents = schema.Template.find()
 
         try:
             pipelines = [get_pipeline(document) for document in documents]
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 500
+            return {'message': str(e), 'code': 500}, 500
         else:
-            return {'pipelines': pipelines}
+            return {'pipelines': pipelines}, 200

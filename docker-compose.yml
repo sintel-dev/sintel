@@ -18,13 +18,3 @@ services:
     ports:
       - '3000:3000'
     command: mtv run --env production -v --docker
-
-  client:
-    build: client
-    container_name: mtv_client
-    depends_on:
-      - app
-    ports:
-      - 4200:4200
-      - 80:4200
-    command: serve -s /client/build -p 4200

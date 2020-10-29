@@ -4,6 +4,7 @@
 </p>
 
 <!-- [![PyPI Shield](https://img.shields.io/pypi/v/mtv.svg)](https://pypi.python.org/pypi/mtv) -->
+
 [![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)](https://travis-ci.com/dyuliu/mtv)
 [![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)](https://coveralls.io/github/dyuliu/MTV)
 [![Github All Releases](https://img.shields.io/github/downloads/dyuliu/MTV/total)](https://github.com/dyuliu/MTV/releases)
@@ -15,23 +16,22 @@
 
 The Restful APIs documentation: http://mtv.lids.mit.edu:8080/
 
-
-
 ## License
 
 [The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
-
 
 ## Before You Begin
 
 Before you begin we recommend you read about the basic building blocks that assemble the **MTV**:
 
 ## Prerequisites
+
 Make sure you have installed all of the following prerequisites on your development machine:
-- **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run. To this end, [Anaconda python](https://www.anaconda.com/distribution/#download-section) is suggested to maintain the virtual environments. 
-- **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
-- **Node.js (>= 10.0.0)** - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. Make sure to install gulp-cli globally after the installation of Node.js.
-- **MongoDB (>= 3.6)** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
+
+-   **Python (>=3.0)** - MTV has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run. To this end, [Anaconda python](https://www.anaconda.com/distribution/#download-section) is suggested to maintain the virtual environments.
+-   **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
+-   **Node.js (>= 10.0.0)** - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. Make sure to install gulp-cli globally after the installation of Node.js.
+-   **MongoDB (>= 3.6)** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
 
 ## Get Started
 
@@ -83,12 +83,12 @@ $ mtv run -v
 ```
 
 Then launch the client:
+
 ```bash
 $ npm -C client run serve
 ```
-Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome recommended).
 
-
+Your application should run on **port 4200** with the **_production_** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser (Chrome recommended).
 
 ### Development
 
@@ -121,25 +121,23 @@ $ mtv update db -v
 
 ## Production deploy with Docker
 
-- Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
+-   Install [Docker](https://docs.docker.com/install/) and [Compose](https://docs.docker.com/compose/install/)
 
-- Load data into the mongo container
+-   Load data into the mongo container
 
-  ```bash
-  $ make docker-db-up
-  ```
+    ```bash
+    $ make docker-db-up
+    ```
 
-- Run the application
+    ```bash
+    $ make docker-up
+    ```
 
-  ```bash
-  $ make docker-up
-  ```
+The application should be successfully running on **port 4200** using the **production** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your chrome browser to start your exploration.
 
-  The application should be successfully running on **port 4200** using the **production** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your chrome browser to start your exploration.
+The application should be successfully running on **port 3000** using the **production** environment by default. Just go to [http://localhost:3000](http://localhost:3000) in your chrome browser to start your exploration.
 
-  **Note:** if MTV is deployed in a remote server, please change the variable `server` in `.client/src/config.ts` to the server IP address with right port.
-
-  For further commands, please refer to `Makefile`, the session of Docker Installation. 
+For further commands, please refer to `Makefile`, the session of Docker Installation. 
 
 ## Production deploy with Docker in local secure environment
 
@@ -153,9 +151,9 @@ $ mtv update db -v
 
 - Then restore data back to database:
 
-  ```bash
-  $ docker-compose -f docker-compose-db.yml up
-  ```
+    ```bash
+    $ docker-compose -f docker-compose-db.yml up
+    ```
 
 - Finally start the application:
   ```bash
@@ -165,7 +163,8 @@ $ mtv update db -v
   Your application should run on **port 4200** with the ***production*** environment by default. Just go to [http://localhost:4200](http://localhost:4200) in your browser to start your exploration.
 
 ## Additional Resources
-  - [Install python Mac OS](https://www.python.org/downloads/mac-osx/)
-  - [Install python Ubuntu](https://linuxize.com/post/how-to-install-python-3-7-on-ubuntu-18-04/)
-  - [Install anaconda](https://docs.anaconda.com/anaconda/install/)
-  - [Install python virtual environment](https://virtualenv.pypa.io/en/latest/)
+
+-   [Install python Mac OS](https://www.python.org/downloads/mac-osx/)
+-   [Install python Ubuntu](https://linuxize.com/post/how-to-install-python-3-7-on-ubuntu-18-04/)
+-   [Install anaconda](https://docs.anaconda.com/anaconda/install/)
+-   [Install python virtual environment](https://virtualenv.pypa.io/en/latest/)

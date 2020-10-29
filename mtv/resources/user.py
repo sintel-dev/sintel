@@ -1,236 +1,398 @@
-import random
-import string
 import logging
-import json
-import requests
-import os
 
-from flask_restful import Resource
-from flask import Flask, request, redirect, url_for
-from mtv import model, g
+from bson import ObjectId
+from flask_restful import Resource, reqparse
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from mtv.db import schema
 from mtv.resources import auth_utils
-
 
 LOGGER = logging.getLogger(__name__)
 
 
+def get_user(user_doc):
+    return {
+        'id': str(user_doc.id),
+        'name': user_doc.name,
+        'email': user_doc.email,
+        'picture': user_doc.picture
+    }
+
+
+def validate_user_id(user_id):
+    try:
+        uid = ObjectId(user_id)
+    except Exception as e:
+        LOGGER.exception(e)
+        return {'message': str(e)}, 400
+
+    user_doc = schema.User.find_one(id=uid)
+
+    if user_doc is None:
+        LOGGER.exception('User %s does not exist.', user_id)
+        return {
+            'message': 'User {} does not exist'.format(user_id)
+        }, 400
+
+    return user_doc, 200
+
+
+class User(Resource):
+
+    @auth_utils.requires_auth
+    def get(self, user_id):
+        """
+        Get a user by ID
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: user_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: user ID - MongoDB ObjectId
+            example: '5f5b0bb5013e4f912fba337d'
+        responses:
+          200:
+            description: Signal to be returned
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '#/components/schemas/Signal'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+        """
+
+        user_doc, status = validate_user_id(user_id)
+        if (status == 400):
+            return {'message': 'Wrong user_id is given'}, 400
+
+        user = get_user(user_doc)
+        return {
+            'user': user
+        }, 200
+
+
+class Users(Resource):
+
+    @auth_utils.requires_auth
+    def get(self):
+        """
+        Return all users
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        responses:
+          200:
+            description: All users
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    users:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/User'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+        """
+
+        users = list()
+        user_docs = schema.User.find()
+        for user_doc in user_docs:
+            user = get_user(user_doc)
+            users.append(user)
+
+        return {
+            'users': users
+        }, 200
 
 
 class Signup(Resource):
+
+    def __init__(self):
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('email', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('name', type=str, required=True,
+                                 location='json')
+        self.parser_post = parser_post
+
     def post(self):
         """
-        @api {post} /auth/signup/ User signup
-        @apiName UserSignup
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        @apiParam {String} name  user name.
+        Register a new user account
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  name:
+                    type: string
+                required: ['email', 'name']
+        responses:
+          200:
+            description: Success Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+                example:
+                  code: 200
+                  message: 'password has been sent to your email'
+          400:
+            description: Failure Message - invalid arguments
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+          500:
+            description: Failure Message - register user error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
         """
 
-        body = request.json
         try:
-            password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
-            user = dict()
-            user['email'] = body['email']
-            user['name'] = body['name']
-            user['password'] = password_encrypted
-            if (model.User.find_one(email=user['email'])):
-                raise('email already exist')
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
 
-            model.User.insert(**user)
+        try:
+            # create user profile
+            password = auth_utils.generate_password(size=4)
+            password_encrypted = generate_password_hash(password)
+            user = dict()
+            user['email'] = args['email']
+            user['name'] = args['name']
+            user['password'] = password_encrypted
+            # always use the same placehold for avatar
+            user['picture'] = ('https://user-images.githubusercontent.com/'
+                               '8490637/93004647-d895c100-f516-11ea-8c74-3'
+                               '32d98bbf2ad.png')
+
+            # check whether this email has been registered before
+            if schema.User.find_one(email=user['email']):
+                raise Exception('Email already exist')
+
+            origin_name = user['name']
+            # if the name is used, random append 3 digits
+            # e.g., jack -> jack798
+            while schema.User.find_one(name=user['name']):
+                user['name'] = origin_name + auth_utils.generate_digits(size=3)
+
+            # send password to the user email
             auth_utils.send_mail('MTV: your password', password, user['email'])
-            return {'message': 'password has been sent to your email'}, 200
+
+            # insert user to DB
+            schema.User.insert(**user)
+
+            return {
+                'message': 'password has been sent to your email',
+                'code': 200
+            }, 200
+
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 500}, 500
 
 
 class Signin(Resource):
+
+    def __init__(self):
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('email', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('password', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('rememberMe', type=str, default=False,
+                                 location='json')
+        self.parser_post = parser_post
+
     def post(self):
         """
-        @api {post} /auth/signin/ User signin
-        @apiName UserSignin
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        @apiParam {String} password password.
-        @apiParam {String} rememberMe  boolean value.
-
-        @apiSuccess {Object} data
-        @apiSuccess {String} data.name user name.
-        @apiSuccess {String} data.email user email.
-        @apiSuccess {String} data.token token for authentication.
+        User sign in
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+                required: ['email', 'password']
+        responses:
+          200:
+            description: User Object
+            content:
+              application/json:
+                schema:
+                  uid:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  picture:
+                    type: string
+                    description: base64 format
+                  token:
+                    type: string
+                    description: server token used to authenticate APIs
+          401:
+            description: Auth Error Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+          500:
+            description: Failure Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
         """
 
-        body = request.json
         try:
-            email = body['email']
-            password = body['password']
-            user = model.User.find_one(email=email)
-            if user and auth_utils.check_password_hash(user.password, password):
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
+
+        try:
+            email = args['email']
+            password = args['password']
+            # TODO: rememberME - token should not expire
+
+            user = schema.User.find_one(email=email)
+            if user and check_password_hash(user.password, password):
                 token = auth_utils.generate_auth_token(str(user.id)).decode()
                 return {
                     'data': {
                         'uid': str(user.id),
                         'name': user.name,
                         'email': user.email,
+                        'picture': user.picture,
                         'token': token
                     }
                 }, 200
             else:
-                return {'message': 'Email and/or Passkey are wrong!'}, 401
+                return {
+                    'message': 'Email and/or Passkey are wrong!',
+                    'code': 401
+                }, 401
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 401
-
-
-class Reset(Resource):
-    def post(self):
-        """
-        @api {post} /auth/reset/ Reset password
-        @apiName ResetPassword
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} email email address.
-        """
-
-        # res, status = auth_utils.verify_auth()
-        # if status == 401:
-        #     return res, status
-
-        body = request.json
-        try:
-            password = auth_utils.generate_password()
-            password_encrypted = auth_utils.generate_password_hash(password)
-            email = body['email']
-            user = model.User.find_one(email=email)
-            if user:
-                user['password'] = password_encrypted
-                user.save()
-                auth_utils.send_mail('MTV: your new password', password, user['email'])
-            return {}, 204
-        except Exception as e:
-            LOGGER.exception(e)
-            return {}, 204
+            return {'message': str(e), 'code': 500}, 500
 
 
 class Signout(Resource):
+
+    @auth_utils.requires_auth
     def get(self):
-        """
-        @api {post} /auth/signout/ User signout
-        @apiName UserSignout
-        @apiGroup User
-        @apiVersion 1.0.0
-
-        @apiParam {String} id user id.
-        """
-
-        res, status = auth_utils.verify_auth()
-        if status == 401:
-            return res, status
-
+        # TODO: use flask.session to maintain user pool
+        # require client pass UID to server
         return {}, 204
 
 
-class GoogleAuthentication(Resource):
-    def post(self):
-        body = request.json
+class Reset(Resource):
 
-        # Temporarily addressed google auth
-        token = auth_utils.generate_auth_token(str(body['gid'])).decode()
-        return token
+    def __init__(self):
+        parser_put = reqparse.RequestParser(bundle_errors=True)
+        parser_put.add_argument('email', type=str, required=True,
+                                location='json')
+        self.parser_put = parser_put
 
-class GoogleLogin(Resource):
-    """
-        @api {post} /auth/google_login/ google login
-        @apiName GoogleLogin
-        @apiGroup User
-        @apiVersion 1.0.0
-    """
+    def put(self):
+        """
+        Reset password
+        ---
+        tags:
+          - user
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                required: ['email']
+        responses:
+          200:
+            description: Success Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+                example:
+                  code: 200
+                  message: 'New password has been sent to your email'
+          500:
+            description: Failure Message
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Message'
+        """
 
-    def get(self):
-        # Find out what URL to hit for Google login
-        google_provider_cfg = auth_utils.get_google_provider_cfg()
-        authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+        try:
+            args = self.parser_post.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
 
-        # Use library to construct the request for Google login and provide
-        # scopes that let you retrieve user's profile from Google
-        request_uri = g['client'].prepare_request_uri(
-            authorization_endpoint,
-            redirect_uri=request.base_url + "callback/",
-            scope=["openid", "email", "profile"],
-        )
-        return redirect(request_uri)
+        try:
+            # create new password
+            password = auth_utils.generate_password()
+            password_encrypted = generate_password_hash(password)
 
-class GoogleLoginCallback(Resource):
-    """
-        @api {post} /auth/google_login/callback google login
-        @apiName GoogleLogin
-        @apiGroup User
-        @apiVersion 1.0.0
-    """
+            # verify whether the email exists
+            email = args['email']
+            user = schema.User.find_one(email=email)
 
-    def get(self):
-        # Get a unique code from Google
-        code = request.args.get('code')
+            # if yes, send email notification and save new password to DB
+            if user:
+                auth_utils.send_mail('MTV: your new password',
+                                     password, user['email'])
+                user['password'] = password_encrypted
+                user.save()
+            return {
+                'message': 'password has been sent to your email',
+                'code': 200
+            }, 200
 
-        # Find out what URL to hit to get tokens that allow you to ask for
-        # things on behalf of a user
-        google_provider_cfg = auth_utils.get_google_provider_cfg()
-        token_endpoint = google_provider_cfg["token_endpoint"]
-
-        # Prepare and send a request to get tokens! Yay tokens!
-        token_url, headers, body = g['client'].prepare_token_request(
-            token_endpoint,
-            authorization_response=request.url,
-            redirect_url=request.base_url,
-            code=code
-        )
-        if g['config']['USE_SYS_ENV_KEYS']:
-            GOOGLE_CLIENT_SECRET = g['config']['GOOGLE_CLIENT_SECRET']
-        else:
-            GOOGLE_CLIENT_SECRET = os.environ['GOOGLE_CLIENT_SECRET']
-        token_response = requests.post(
-            token_url,
-            headers=headers,
-            data=body,
-            auth=(g['config']['GOOGLE_CLIENT_ID'], GOOGLE_CLIENT_SECRET)
-        )
-
-        # Parse the tokens!
-        g['client'].parse_request_body_response(json.dumps(token_response.json()))
-
-        # Find and hit the URL
-        # from Google that gives you the user's profile information,
-        # including their Google profile image and email
-        userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-        uri, headers, body = g['client'].add_token(userinfo_endpoint)
-        userinfo_response = requests.get(uri, headers=headers, data=body)
-
-        # Make sure their email is verified.
-        # The user authenticated with Google, authorized your
-        # app, and now you've verified their email through Google!
-        if userinfo_response.json().get("email_verified"):
-            unique_id = userinfo_response.json()["sub"]
-            users_email = userinfo_response.json()["email"]
-            picture = userinfo_response.json()["picture"]
-            users_name = userinfo_response.json()["given_name"]
-        else:
-            return "User email not available or not verified by Google.", 400
-
-        # if not in db, create the user with unique_id
-        user = dict()
-        user['email'] = users_email
-        user['name'] = users_name
-        user['gid'] = unique_id
-        user['picture'] = picture
-
-        if (not model.User.find_one(email=user['email'])):
-            model.User.insert(**user)
-
-        # return redirect(url_for('index'))
-        return redirect('http://127.0.0.1:3001/')
+        except Exception as e:
+            LOGGER.exception(e)
+            return {'message': str(e), 'code': 500}, 500

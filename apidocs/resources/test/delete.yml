@@ -1,0 +1,16 @@
+Test DELETE method
+---
+tags:
+  - test
+security:
+  - tokenAuth: []
+responses:
+  200:
+    description: Test Message
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/TestMessage'
+        example:
+          code: 200
+          message: 'DELETE test succeeded'

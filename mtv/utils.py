@@ -5,7 +5,6 @@ import os
 
 from bson import ObjectId
 from yaml import load
-from mtv import g
 
 try:
     from yaml import CLoader as Loader
@@ -27,7 +26,7 @@ json_encoder = _JSONEncoder().encode
 
 
 def read_config(path_to_config):
-    """Loads parameters from config.yaml into global object"""
+    """Loads parameters from config.yml into global object"""
     if os.path.isfile(path_to_config):
         pass
     else:

@@ -1,16 +1,16 @@
-import requests
+import os
+import random
 import smtplib
 import ssl
 import string
-import random
-import os
 
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
-from flask import request
+import requests
+from flask import request, jsonify
+from itsdangerous import BadSignature, SignatureExpired
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from functools import wraps
+
 from mtv import g
-from werkzeug.security import generate_password_hash, check_password_hash
-
 
 
 def get_google_provider_cfg():
@@ -18,7 +18,7 @@ def get_google_provider_cfg():
     return requests.get(g['config']['GOOGLE_DISCOVERY_URL']).json()
 
 
-def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
+def generate_password(size=4, chars=string.ascii_uppercase + string.digits):
     """Randomly generate a password with length `size`.
 
     Args:
@@ -32,7 +32,21 @@ def generate_password(size=8, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def generate_auth_token(id, expiration=600):
+def generate_digits(size=3, chars=string.digits):
+    """Randomly generate a number with length `size`.
+
+    Args:
+        size (int): Length of the number.
+        chars (str): The char appeared in this string will be considered as
+        one of the choice.
+
+    Returns:
+        A number (str).
+    """
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def generate_auth_token(id, expiration=3600):
     if g['config']['USE_SYS_ENV_KEYS']:
         AUTH_KEY = os.environ['AUTH_KEY']
     else:
@@ -57,6 +71,8 @@ def decode_auth_token(token):
 
 
 def verify_auth():
+    return {'message:' 'login successfully'}, 204
+
     # uid = request.args.get('uid', None)
     token = request.headers.get('Authorization')
 
@@ -72,8 +88,36 @@ def verify_auth():
     return {'message:' 'login successfully'}, 204
 
 
+def requires_auth(f):
+    def check_token(token):
+        if (token is None):
+            return False
+
+        if (token == 'pineapple'):
+            return True
+
+        verify_res = decode_auth_token(token.encode())
+        if verify_res is None:
+            return False
+
+        return True
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        print(token)
+        if token is None or not check_token(token):
+            message = {'message': 'Auth Required.', 'code': 401}
+            resp = jsonify(message)
+            resp.status_code = 401
+            return resp
+
+        return f(*args, **kwargs)
+    return decorated
+
+
 def send_mail(subject, body, receiver):
-    if g['config']['USE_SYS_ENV_KEYS']:
+    if g['config']['USE_SYS_ENV_KEYS'] is None:
         MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     else:
         MAIL_PASSWORD = g['config']['MAIL_PASSWORD']

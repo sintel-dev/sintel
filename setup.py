@@ -27,6 +27,10 @@ requirements = [
     # Math
     'numpy>=1.15.4,<1.17',
     'pandas>=0.23.4,<0.25',
+    'dtw >= 1.4.0',
+    'scikit-learn>=0.22.2',
+    'pyts==0.10.0',
+    'numba==0.50.1',    # dependency of pyts
 
     # Flask
     'Flask==1.0.2',
@@ -68,7 +72,7 @@ development_requirements = [
 
     # style check
     'flake8>=3.5.0',
-    'isort>=4.3.4',
+    'isort>=4.3.4,<5.0.0',
 
     # fix style issues
     'autoflake>=1.1',

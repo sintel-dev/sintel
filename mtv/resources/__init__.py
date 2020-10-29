@@ -1,14 +1,17 @@
-from . import user, comment, data, datarun, dataset, event, experiment, pipeline, signal, test
+from . import (
+    comment, computing, datarun, dataset, event, experiment, google_auth, pipeline, signal, test,
+    user)
 
 __all__ = [
     'user',
     'comment',
-    'data',
+    'computing',
     'datarun',
     'dataset',
     'event',
     'experiment',
     'pipeline',
     'signal',
-    'test'
+    'test',
+    'google_auth'
 ]

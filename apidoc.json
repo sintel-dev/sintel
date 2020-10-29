@@ -1,8 +1,0 @@
-{
-    "name": "mtv",
-    "version": "1.0.0",
-    "description": "Official documentation about MTV Restful APIs.",
-    "title": "MTV Restful APIs",
-    "url": "http://localhost:3000/api/v1",
-    "sampleUrl": "http://localhost:3000/api/v1"
-}

@@ -2,100 +2,136 @@ import logging
 
 from bson import ObjectId
 from flask import request
-from flask_restful import Resource
-from mtv import model
-from mtv.resources.auth_utils import verify_auth
-from mtv.resources.auth_utils import verify_auth
+from flask_restful import Resource, reqparse
 
+from mtv.db import schema
+from mtv.resources.auth_utils import verify_auth, requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
 
+def get_annotation(anno_doc):
+    return {
+        'id': str(anno_doc.id),
+        'event': anno_doc.event.id,
+        'text': anno_doc.comment,
+        'created_by': anno_doc.created_by
+    }
+
+
 class Comment(Resource):
+
+    def __init__(self):
+        parser_put = reqparse.RequestParser(bundle_errors=True)
+        parser_put.add_argument('text', type=str, required=True,
+                                location='json')
+        self.parser_put = parser_put
+
+        parser_delete = reqparse.RequestParser(bundle_errors=True)
+        parser_delete.add_argument('created_by', type=str, default=None,
+                                   required=True, location='args')
+        self.parser_delete = parser_delete
+
+    @requires_auth
     def get(self, comment_id):
         """
-        @api {get} /comments/:comment_id/ Get comment by ID
-        @apiName GetComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} comment_id Comment ID.
-
-        @apiSuccess {String} id Comment ID.
-        @apiSuccess {String} event Event ID.
-        @apiSuccess {String} text Comment content.
-        @apiSuccess {String} created_by User ID.
+        Get an annotation (comment) by ID
+        ---
+        tags:
+          - annotation
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: comment_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: ID of the annotation (comment) to get
+        responses:
+          200:
+            description: Annotation to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Annotation'
         """
-
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
         try:
             cid = ObjectId(comment_id)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 400}, 400
 
-        document = model.Comment.find_one(id=cid)
+        document = schema.Annotation.find_one(id=cid)
 
         if document is None:
-            LOGGER.exception('Error getting comment. '
-                             'Comment %s does not exist.', comment_id)
+            message = 'Comment {} does not exist'.format(comment_id)
+            LOGGER.exception(message)
             return {
-                'message': 'Comment {} does not exist'.format(comment_id)
+                'message': message,
+                'code': 400
             }, 400
 
-        return {
-            "id": str(document.id),
-            "event": str(document.event.id),
-            "text": document.text,
-            "created_by": document.created_by
-        }
+        return get_annotation(document)
 
+    @requires_auth
     def put(self, comment_id):
         """
-        @api {put} /comments/:comment_id/ Update a comment
-        @apiName UpdateComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} comment_id Comment ID.
-        @apiParam {String} text Comment content.
-
-        @apiSuccess {String} id Comment ID.
-        @apiSuccess {String} event Event ID.
-        @apiSuccess {String} text Comment content.
-        @apiSuccess {String} created_by User ID.
+        Update an annotation (comment)
+        ---
+        tags:
+          - annotation
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: comment_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: ID of the comment to update
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                required: ['text']
+        responses:
+          200:
+            description: Annotation (Comment) after updating
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Annotation'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
+        try:
+            args = self.parser_put.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message', str(e)}, 400
 
-        # get values from body or form
-        text = None
-
-        body = request.json
-        if body is not None:
-            text = body.get('text')
-        else:
-            if 'text' in request.form:
-                text = request.form['text']
-
-        # validate
-        # if text is None or text == '':
-        #     LOGGER.exception('Error updating comment. Lack of comment content.')
-        #     return {'message': 'Lack of comment content.'}, 400
+        text = args['text']
 
         # get data from db
         try:
             cid = ObjectId(comment_id)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 400}, 400
 
-        document = model.Comment.find_one(id=cid)
+        document = schema.Annotation.find_one(id=cid)
         if document is None:
             LOGGER.exception('Error updating the comment. '
                              'Comment %s does not exist.', comment_id)
@@ -104,112 +140,198 @@ class Comment(Resource):
             }, 400
         else:
             try:
-                document.text = text
+                document.comment = text
                 document.save()
-                return {
-                    "id": str(document.id),
-                    "event": str(document.event.id),
-                    "text": document.text,
-                    "created_by": document.created_by
-                }
+                # TODO: update event interactions
+                return get_annotation(document)
             except Exception as e:
                 LOGGER.exception(e)
-                return {'message': str(e)}, 400
+                return {'message': str(e)}, 500
+
+    @requires_auth
+    def delete(self, comment_id):
+        """
+        Delete an comment
+        ---
+        tags:
+          - annotation
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: comment_id
+            in: path
+            schema:
+              type: string
+            required: true
+            description: ID of the comment to get
+        responses:
+          200:
+            description: Event to be returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Annotation'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
+        """
+        # TODO: to be updated
+        pass
 
 
 class Comments(Resource):
+
+    def __init__(self):
+        parser_get = reqparse.RequestParser(bundle_errors=True)
+        parser_get.add_argument('event_id', type=str, required=True,
+                                location='args')
+        self.parser_get = parser_get
+
+        parser_post = reqparse.RequestParser(bundle_errors=True)
+        parser_post.add_argument('event_id', type=str, required=True,
+                                 location='json')
+        parser_post.add_argument('created_by', type=str, default="default",
+                                 required=True, location='json')
+        parser_post.add_argument('text', type=str, required=True,
+                                 location='json')
+        self.parser_post = parser_post
+
+    @requires_auth
     def get(self):
         """
-        @api {get} /comments/ Get comments by event ID
-        @apiName GetCommentByEvent
-        @apiGroup Comment
-        @apiVersion 1.0.0
-        @apiDescription Each event can have multiple comments, from one or more users.
-        This api allows users to retrieve all the comments about one event.
-
-        @apiParam {String} event_id ID of event.
-
-        @apiSuccess {Object[]} comments An Array of Object Comment.
-        @apiSuccess {String} comments.id Comment ID.
-        @apiSuccess {String} comments.event Event ID.
-        @apiSuccess {String} comments.text Comment content.
-        @apiSuccess {String} comments.created_by User ID.
+        Return all annotations (comment) of a given event (id)
+        ---
+        tags:
+          - annotation
+        security:
+          - tokenAuth: []
+        parameters:
+          - name: event_id
+            in: query
+            schema:
+              type: string
+            required: true
+            description: ID of the event to filter annotations
+        responses:
+          200:
+            description: A list of annotations of the given event
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    comments:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Annotation'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
 
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message': str(e), 'code': 400}, 400
         # get values from request args
-        event_id = request.args.get('event_id', None)
+        event_id = args['event_id']
 
         # validate
         if (event_id is None):
             LOGGER.exception('Error getting comments. Event is not specified.')
-            return {'message': 'Event is not specified.'}, 400
+            return {'message': 'Event is not specified.', 'code': 400}, 400
 
         try:
             eid = ObjectId(event_id)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 400}, 400
 
-        documents = model.Comment.find(event=eid)
+        documents = schema.Annotation.find(event=eid)
 
         comments = []
         for document in documents:
             comments.append({
                 "id": str(document.id),
                 "event": event_id,
-                "text": document.text,
-                "created_by": document.created_by
+                "text": document.comment,
+                "created_by": document.created_by,
+                "insert_time": str(document.insert_time)
             })
 
         return {'comments': comments}
 
+    @requires_auth
     def post(self):
         """
-        @api {post} /comments/ Create a comment
-        @apiName CreateComment
-        @apiGroup Comment
-        @apiVersion 1.0.0
-
-        @apiParam {String} event_id Event ID.
-        @apiParam {String} text Content of comment.
-        @apiParam {String} [created_by='default'] User ID.
+        Create an Annotation (Comment)
+        ---
+        tags:
+          - annotation
+        security:
+          - tokenAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: string
+                  text:
+                    type: string
+                  created_by:
+                    type: string
+                required: ['event_id', 'text', 'created_by']
+        responses:
+          200:
+            description: The newly created Annotation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Annotation'
+          400:
+            $ref: '#/components/responses/ErrorMessage'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          500:
+            $ref: '#/components/responses/ErrorMessage'
         """
-
-        res, status = verify_auth()
-        if status == 401:
-            return res, status
 
         event_id = None
         text = None
         created_by = 'default'
 
-        body = request.json
-        if body is not None:
-            event_id = body.get('event_id')
-            text = body.get('text')
-            created_by = body.get('created_by')
-        else:
-            if 'event_id' in request.form:
-                event_id = request.form['event_id']
-            if 'text' in request.form:
-                text = request.form['text']
-            if 'created_by' in request.form:
-                created_by = request.form['created_by']
+        try:
+            args = self.parser_get.parse_args()
+        except Exception as e:
+            LOGGER.exception(str(e))
+            return {'message': str(e), 'code': 400}, 400
+
+        event_id, text, created_by = [
+            args[k] for k in ['event_id', 'text', 'created_by']
+        ]
 
         if (event_id is None) or (text is None) or (event_id == ''):
-            LOGGER.exception('Error creating comments. Event_id or text is not specified.')
-            return {'message': 'Event_id or text is not specified.'}, 400
+            message = 'Event_id or text is not specified.'
+            LOGGER.exception(message)
+            return {'message': message, 'code': 400}, 400
 
         try:
             eid = ObjectId(event_id)
         except Exception as e:
             LOGGER.exception(e)
-            return {'message': str(e)}, 400
+            return {'message': str(e), 'code': 400}, 400
 
-        target_event = model.Event.find_one(id=eid)
+        target_event = schema.Event.find_one(id=eid)
         if target_event is None:
             LOGGER.exception('Error creating comments.'
                              'Event {} does not exist.'.format(event_id))
@@ -217,12 +339,20 @@ class Comments(Resource):
 
         comment = {
             'event': eid,
-            'text': text,
+            'comment': text,
             'created_by': created_by
         }
 
         try:
-            model.Comment.insert(**comment)
+            annotation_doc = schema.Annotation.insert(**comment)
+
+            doc = {
+                'event': target_event.id,
+                'action': 'COMMENT',
+                'annotation': annotation_doc.id,
+                'created_by': created_by
+            }
+            schema.EventInteraction.insert(**doc)
         except Exception as e:
             LOGGER.exception(e)
             return {'message': str(e)}, 500

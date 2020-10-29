@@ -1,6 +1,6 @@
 import argparse
 
-from mtv.explorer import MTVExplorer
+from mtv.core import MTV
 from mtv.utils import read_config, setup_logging
 
 
@@ -77,7 +77,7 @@ def main():
     args = parser.parse_args()
 
     setup_logging(args.verbose, args.logfile)
-    config = read_config('./mtv/config.yaml')
-    explorer = MTVExplorer(config, args.docker)
+    config = read_config('./mtv/config.yml')
+    explorer = MTV(config, args.docker)
 
     args.function(explorer, args)
