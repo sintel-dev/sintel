@@ -214,7 +214,7 @@ tags = [
 
 
 swagger_config = {
-    'title': 'MTV RestAPI Documentation',
+    'title': 'Sintel RestAPI Documentation',
     'uiversion': 3,
     'openapi': '3.0.2',
     'doc_dir': './apidocs/resources/',
@@ -239,28 +239,48 @@ Logo_DAI_highres.png" alt=“DAI-Lab” />
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p>
 
-[![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)]\
-(https://travis-ci.com/dyuliu/mtv)
-[![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)]\
-(https://coveralls.io/github/dyuliu/MTV)
-[![Github All Releases](https://img.shields.io/github/downloads/dyuliu/MTV/\
-total)](https://github.com/dyuliu/MTV/releases)
-[![Docker Pulls](https://img.shields.io/docker/pulls/dyuliu/mtv)]\
-(https://hub.docker.com/r/dyuliu/mtv)
-
-# What is MTV?
-**MTV** (multivariate time series data visuaization) is a visual analytics \
-system built for anomaly analysis of multiple time-series data.
+# What is Sintel?
+**Sintel** (Signal Intelligence) provides Restful APIs to process massive
+signal data for anomaly analysis in an efficient and user-friendly way.
+To showcase the use of this library, we have built an example visual analytics
+system, MTV (multivariate time series visualization) -- which is built upon
+Sintel, to support users investigating and annotating time series anomalies
+in an very efficient and organized way.
 
 # License
 
 [The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
 """
+# markdown_text = """
+# <p align="left">
+# <img width=10% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/\
+# Logo_DAI_highres.png" alt=“DAI-Lab” />
+# <i>An open source project from Data to AI Lab at MIT.</i>
+# </p>
+
+# [![Build Status](https://travis-ci.com/dyuliu/mtv.svg?branch=master)]\
+# (https://travis-ci.com/dyuliu/mtv)
+# [![Coverage Status](https://coveralls.io/repos/github/dyuliu/MTV/badge.svg)]\
+# (https://coveralls.io/github/dyuliu/MTV)
+# [![Github All Releases](https://img.shields.io/github/downloads/dyuliu/MTV/\
+# total)](https://github.com/dyuliu/MTV/releases)
+# [![Docker Pulls](https://img.shields.io/docker/pulls/dyuliu/mtv)]\
+# (https://hub.docker.com/r/dyuliu/mtv)
+
+# # What is MTV?
+# **MTV** (multivariate time series data visuaization) is a visual analytics \
+# system built for anomaly analysis of multiple time-series data.
+
+# # License
+
+# [The MIT License](https://github.com/HDI-Project/MTV/blob/master/LICENSE)
+# """
+
 
 swagger_tpl = {
     'info': {
         'description': markdown_text,
-        'title': 'MTV RestAPI Documentation',
+        'title': 'Sintel RestAPI Documentation',
         'version': '1.0.0'
     },
     'tags': tags,

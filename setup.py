@@ -96,7 +96,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6'
     ],
-    description="MTV is a visual analytics system built for satellite data analysis.",
+    description=("MTV is a visual analytics system built for anomaly analysis"
+                 "for multivariate time series (signals) data"),
     entry_points={
         'console_scripts': [
             'mtv=mtv.cli:main',
@@ -119,7 +120,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/HDI-Project/MTV',
+    url='https://github.com/signals-dev/MTV-api',
     version='0.1.0-dev',
     zip_safe=False,
 )

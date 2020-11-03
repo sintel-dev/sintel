@@ -18,7 +18,6 @@ def add_routes(app):
     api = Api(app)
 
     # configure API documentation
-
     Swagger(app, config=swagger_config, template=swagger_tpl, parse=True)
 
     # user management
