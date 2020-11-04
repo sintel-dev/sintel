@@ -21,7 +21,7 @@ from mongoengine import CASCADE, fields
 from pip._internal.operations import freeze
 
 from sintel.data import load_signal
-from sintel.db.base import SintelDocument, PipelineField, Status
+from sintel.db.base import PipelineField, SintelDocument, Status
 
 LOGGER = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import logging
 
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 
 from sintel.db import schema
 from sintel.resources.auth_utils import requires_auth

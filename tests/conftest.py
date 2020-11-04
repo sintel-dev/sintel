@@ -1,10 +1,11 @@
-import pytest
 import json
 import random
+
+import pytest
 from flasgger import Swagger
+
 from sintel.core import Sintel
 from sintel.utils import read_config
-
 
 TEST_DB = 'sintel-test'
 TEST_HOST = "localhost"

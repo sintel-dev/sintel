@@ -3,12 +3,12 @@ import random
 import smtplib
 import ssl
 import string
+from functools import wraps
 
 import requests
-from flask import request, jsonify
+from flask import jsonify, request
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from functools import wraps
 
 from sintel import g
 

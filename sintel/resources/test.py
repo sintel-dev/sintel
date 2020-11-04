@@ -2,6 +2,7 @@ import logging
 
 from flask import request
 from flask_restful import Resource
+
 from sintel.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)

@@ -1,6 +1,5 @@
 import os
 
-
 schemas = {
     'Annotation': {
         'type': 'object',

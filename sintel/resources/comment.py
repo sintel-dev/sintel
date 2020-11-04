@@ -1,11 +1,10 @@
 import logging
 
 from bson import ObjectId
-from flask import request
 from flask_restful import Resource, reqparse
 
 from sintel.db import schema
-from sintel.resources.auth_utils import verify_auth, requires_auth
+from sintel.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 
@@ -179,7 +178,6 @@ class Comment(Resource):
             $ref: '#/components/responses/ErrorMessage'
         """
         # TODO: to be updated
-        pass
 
 
 class Comments(Resource):
