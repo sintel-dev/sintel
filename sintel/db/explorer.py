@@ -1,0 +1,1133 @@
+"""Sintel DB Explorer model.
+
+This model defines the ``sintel.db.explorer.DBExplorer``, which provides
+a simple programatic access to creating and reading objects in the Sintel Database.
+"""
+import json
+import logging
+from datetime import datetime, timezone
+
+import numpy as np
+import pandas as pd
+from bson import ObjectId
+from gridfs import GridFS
+from mongoengine import connect
+from pymongo.database import Database
+from sklearn.impute import SimpleImputer
+
+from sintel.db import schema
+
+LOGGER = logging.getLogger(__name__)
+
+
+class DBExplorer:
+    """User interface for the Orion Database.
+
+    This class provides a user-frienly programming interface to
+    interact with the Orion database models.
+
+    Args:
+        user (str):
+            Unique identifier of the user that creates this OrionExporer
+            instance. This username or user ID will be used to populate
+            the ``created_by`` field of all the objects created in the
+            database during this session.
+        database (str):
+            Name of the MongoDB database to use. Defaults to ``orion``.
+        mongodb_config (dict or str):
+            A dict or a path to JSON file with additional arguments can be
+            passed to provide connection details different than the defaults
+            for the MongoDB Database:
+                * ``host``: Hostname or IP address of the MongoDB Instance.
+                * ``port``: Port to which MongoDB is listening.
+                * ``username``: username to authenticate with.
+                * ``password``: password to authenticate with.
+                * ``authentication_source``: database to authenticate against.
+
+    Examples:
+        Simples use case:
+        >>> orex = OrionExplorer('my_username')
+
+        Passing a path to a JSON file with connection details.
+        >>> orex = OrionExplorer(
+        ...      user='my_username',
+        ...      database='orion',
+        ...      mongodb_config='/path/to/my/mongodb_config.json',
+        ... )
+
+        Passing all the possible initialization arguments as a dict:
+        >>> mongodb_config = {
+        ...      'host': 'localhost',
+        ...      'port': 27017,
+        ...      'username': 'orion',
+        ...      'password': 'secret_password',
+        ...      'authentication_source': 'admin',
+        ... }
+        >>> orex = OrionExplorer(
+        ...      user='my_username',
+        ...      database='orion',
+        ...      mongodb_config=mongodb_config
+        ... )
+    """
+
+    def __init__(self, user, database='orion', mongodb_config=None):
+        """Initiaize this OrionDBExplorer.
+
+        Args:
+            user (str):
+                Unique identifier of the user that creates this OrionExporer
+                instance. This username or user ID will be used to populate
+                the ``created_by`` field of all the objects created in the
+                database during this session.
+            database (str):
+                Name of the MongoDB database to use. Defaults to ``orion``.
+            mongodb_config (dict or str):
+                A dict or a path to JSON file with additional arguments can be
+                passed to provide connection details different than the defaults
+                for the MongoDB Database:
+                    * ``host``: Hostname or IP address of the MongoDB Instance.
+                    * ``port``: Port to which MongoDB is listening.
+                    * ``username``: username to authenticate with.
+                    * ``password``: password to authenticate with.
+                    * ``authentication_source``: database to authenticate against.
+        """
+        if mongodb_config is None:
+            mongodb_config = dict()
+        elif isinstance(mongodb_config, str):
+            with open(mongodb_config) as config_file:
+                mongodb_config = json.load(config_file)
+        elif isinstance(mongodb_config, dict):
+            mongodb_config = mongodb_config.copy()
+
+        self.user = user
+        self.database = mongodb_config.pop('database', database)
+        self._db = connect(database, **mongodb_config)
+        self._fs = GridFS(Database(self._db, self.database))
+
+    def drop_database(self):
+        """Drop the database.
+
+        This method is used for development purposes and will
+        most likely be removed in the future.
+        """
+        self._db.drop_database(self.database)
+
+    # ####### #
+    # Dataset #
+    # ####### #
+
+    def add_dataset(self, name, entity=None):
+        """Add a new Dataset object to the database.
+
+        The Dataset needs to be given a name and, optionally, an identitifier,
+        name or ID, of the entity which produced the Dataset.
+
+        Args:
+            name (str):
+                Name of the Dataset
+            entity (str):
+                Name or Id of the entity which this Dataset is associated to.
+                Defaults to ``None``.
+
+        Raises:
+            NotUniqueError:
+                If a Dataset with the same name and entity values already exists.
+
+        Returns:
+            Dataset
+        """
+        return schema.Dataset.insert(
+            name=name,
+            entity=entity,
+            created_by=self.user
+        )
+
+    def get_datasets(self, name=None, entity=None, created_by=None):
+        """Query the Datasets collection.
+
+        All the details about the matching Datasets will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Datasets availabe.
+
+        Args:
+            name (str):
+                Name of the Dataset.
+            entity (str):
+                Name or Id of the entity which returned Datasets need to be
+                associated to.
+            created_by (str):
+                Unique identifier of the user that created the Datasets.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Dataset.find(
+            as_df_=True,
+            name=name,
+            entity=entity,
+            created_by=created_by
+        )
+
+    def get_dataset(self, dataset=None, name=None, entity=None, created_by=None):
+        """Get a Dataset object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            dataset (Dataset, ObjectID or str):
+                Dataset object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            name (str):
+                Name of the Dataset.
+            entity (str):
+                Name or Id of the entity which this Dataset is associated to.
+            created_by (str):
+                Unique identifier of the user that created the Dataset.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Dataset
+        """
+        return schema.Dataset.get(
+            dataset=dataset,
+            name=name,
+            entity=entity,
+            created_by=created_by
+        )
+
+    # ###### #
+    # Signal #
+    # ###### #
+
+    def get_signals(self, name=None, dataset=None, created_by=None):
+        """Query the Signals collection.
+
+        All the details about the matching Signals will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Signals availabe.
+
+        Args:
+            name (str):
+                Name of the Signal.
+            dataset (Dataset, ObjectID or str):
+                Dataset object (or the corresponding ObjectID, or its string
+                representation) to which the Signals have to belong.
+            created_by (str):
+                Unique identifier of the user that created the Signals.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Signal.find(
+            as_df_=True,
+            name=name,
+            dataset=dataset,
+            created_by=created_by
+        )
+
+    def get_signal(self, signal=None, name=None, dataset=None, created_by=None):
+        """Get a Signal object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            signal (Signal, ObjectID or str):
+                Signal object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            name (str):
+                Name of the Signal.
+            dataset (Dataset, ObjectID or str):
+                Dataset object (or the corresponding ObjectID, or its string
+                representation) to which the Signal has to belong.
+            created_by (str):
+                Unique identifier of the user that created the Signals.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Signal
+        """
+        return schema.Signal.get(
+            signal=signal,
+            name=name,
+            dataset=dataset,
+            created_by=created_by
+        )
+
+    # ######## #
+    # Template #
+    # ######## #
+
+    def get_templates(self, name=None, created_by=None):
+        """Query the Templates collection.
+
+        All the details about the matching Templates will be returned in
+        a ``pandas.DataFrame``, except for the JSON specification of the
+        template, which will be removed from the table for readability.
+
+        In order to access the JSON specification of each Template, please
+        retreive them using the ``get_template`` method.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Templates availabe.
+
+        Args:
+            name (str):
+                Name of the Template.
+            created_by (str):
+                Unique identifier of the user that created the Templates.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Template.find(
+            as_df_=True,
+            name=name,
+            created_by=created_by,
+            exclude_=['json']
+        )
+
+    def get_template(self, template=None, name=None, created_by=None):
+        """Get a Template object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            template (Template, ObjectID or str):
+                Template object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            name (str):
+                Name of the Template.
+            created_by (str):
+                Unique identifier of the user that created the Templates.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Template
+        """
+        return schema.Template.get(
+            template=template,
+            name=name,
+            created_by=created_by
+        )
+
+    # ######## #
+    # Pipeline #
+    # ######## #
+
+    def add_pipeline(self, name, template, hyperparameters):
+        """Add a new Pipeline object to the database.
+
+        The Pipeline will consist on a copy of the given Template using
+        the indicated hyperparameters.
+
+        The hyperparameters can be passed as a dictionary containing the
+        hyperparameter values following the MLBlocks specification format,
+        or a path to a JSON file containing the corresponding values.
+
+        Args:
+            name (str):
+                Name of the Pipeline.
+            template (Template or ObjectID or str):
+                Template object (or the corresponding ObjectID, or its string
+                representation) that we want to use to create this Pipeline.
+            hyperparamers (dict or str):
+                dict containing the hyperparameter values following the MLBlocks
+                specification format, or a path to a JSON file containing the
+                corresponding values.
+
+        Raises:
+            NotUniqueError:
+                If a Pipeline with the same name for this Template already exists.
+
+        Returns:
+            Pipeline
+        """
+        pipeline = self.get_template(template).load()
+        if isinstance(hyperparameters, str):
+            with open(hyperparameters, 'r') as f:
+                hyperparameters = json.load(f)
+
+        pipeline.set_hyperparameters(hyperparameters)
+
+        return schema.Pipeline.insert(
+            name=name,
+            template=template,
+            json=pipeline.to_dict(),
+            created_by=self.user
+        )
+
+    def get_pipelines(self, name=None, template=None, created_by=None):
+        """Query the Pipelines collection.
+
+        All the details about the matching Pipelines will be returned in
+        a ``pandas.DataFrame``, except for the JSON specification of the
+        pipeline, which will be removed from the table for readability.
+
+        In order to access the JSON specification of each Pipeline, please
+        retreive them using the ``get_pipeline`` method.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Pipelines availabe.
+
+        Args:
+            name (str):
+                Name of the Pipeline.
+            template (Template or ObjectID or str):
+                Template object (or the corresponding ObjectID, or its string
+                representation) from which the Pipelines have to be derived.
+            created_by (str):
+                Unique identifier of the user that created the Pipelines.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Pipeline.find(
+            as_df_=True,
+            name=name,
+            template=template,
+            created_by=created_by,
+            exclude_=['json']
+        )
+
+    def get_pipeline(self, pipeline=None, name=None, template=None, created_by=None):
+        """Get a Pipeline object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            pipeline (Template, ObjectID or str):
+                Pipeline object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            name (str):
+                Name of the Pipeline.
+            template (Template or ObjectID or str):
+                Template object (or the corresponding ObjectID, or its string
+                representation) from which the Pipeline has to be derived.
+            created_by (str):
+                Unique identifier of the user that created the Pipeline.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Pipeline
+        """
+        return schema.Pipeline.get(
+            pipeline=pipeline,
+            name=name,
+            template=template,
+            created_by=created_by,
+        )
+
+    # ########## #
+    # Experiment #
+    # ########## #
+
+    def add_experiment(self, name, template, dataset, signals=None, project=None):
+        """Add a new Experiment object to the database.
+
+        The Experiment will have to be associated to a Template and a Dataset.
+
+        Optionally, a list of Signal objects or the corresponding ObjectIds have to
+        can be passed to associate this Experiment to only a subset of Signals from
+        the Dataset. In this case, the Signals passed need to be part of the Dataset,
+        otherwise an Exception will be raised.
+
+        If no Signals are passed, all the Signals from the Dataset are used.
+
+        A project name can also be passed as a string to group experiments of
+        a single project together.
+
+        Args:
+            name (str):
+                Name of the Experiment.
+            template (Template or ObjectID or str):
+                Template object (or the corresponding ObjectID, or its string
+                representation) that we want to use in this Experiment.
+            dataset (Dataset or ObjectID or str):
+                Dataset object (or the corresponding ObjectID, or its string
+                representation) which will be used for this Experiment.
+            signals (list[Signal, ObjectId or str]):
+                list of Signals (or their corresponding ObjectIds) to be used for
+                this Experiment.
+            project (str):
+                Name of the project which this Experiment belongs to.
+
+        Raises:
+            NotUniqueError:
+                If an Experiment with the same name for this Template already exists.
+
+        Returns:
+            Experiment
+        """
+        dataset = self.get_dataset(dataset)
+
+        if not signals:
+            signals = dataset.signals
+        else:
+            for signal in signals:
+                if self.get_signal(signal).dataset != dataset:
+                    raise ValueError('All Signals must belong to the Dataset')
+
+        return schema.Experiment.insert(
+            name=name,
+            project=project,
+            template=template,
+            dataset=dataset,
+            signals=signals,
+            created_by=self.user
+        )
+
+    def get_experiments(self, name=None, template=None, dataset=None,
+                        signals=None, project=None, created_by=None):
+        """Query the Experiments collection.
+
+        All the details about the matching Experiments will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Experiments availabe.
+
+        Args:
+            name (str):
+                Name of the Experiment.
+            template (Template or ObjectID or str):
+                Template that the Experiments must use.
+            dataset (Dataset or ObjectID or str):
+                Dataset that the Experiments must use.
+            signals (list[Signal, ObjectId or str]):
+                Signals that the Experiments must use.
+            project (str):
+                Name of the project which the Experiments must belong to.
+            created_by (str):
+                Unique identifier of the user that created the Experiments.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Experiment.find(
+            as_df_=True,
+            name=name,
+            project=project,
+            template=template,
+            dataset=dataset,
+            signals=signals,
+            created_by=created_by,
+        )
+
+    def get_experiment(self, experiment=None, name=None, project=None, template=None,
+                       dataset=None, signals=None, created_by=None):
+        """Get an Experiment object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            experiment (Experiment, ObjectID or str):
+                Experiment object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            name (str):
+                Name of the Experiment.
+            template (Template or ObjectID or str):
+                Template that the Experiment must use.
+            dataset (Dataset or ObjectID or str):
+                Dataset that the Experiment must use.
+            signals (list[Signal, ObjectId or str]):
+                Signals that the Experiment must use.
+            project (str):
+                Name of the project which the Experiment must belong to.
+            created_by (str):
+                Unique identifier of the user that created the Experiment.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Experiment
+        """
+        return schema.Experiment.get(
+            experiment=experiment,
+            name=name,
+            project=project,
+            template=template,
+            dataset=dataset,
+            signals=signals,
+            created_by=created_by,
+        )
+
+    # ####### #
+    # Datarun #
+    # ####### #
+
+    def add_datarun(self, experiment, pipeline):
+        """Add a new Datarun object to the database.
+
+        The Datarun needs to be associated to an Experiment and a Pipeline.
+
+        Args:
+            experiment (Experiment or ObjectID or str):
+                Experiment object (or the corresponding ObjectID, or its string
+                representation) to which this Datarun belongs.
+            pipeline (Pipeline or ObjectID or str):
+                Pipeline object (or the corresponding ObjectID, or its string
+                representation) used by this Datarun.
+
+        Returns:
+            Datarun
+        """
+        return schema.Datarun.insert(
+            experiment=experiment,
+            pipeline=pipeline,
+        )
+
+    def get_dataruns(self, experiment=None, pipeline=None, status=None):
+        """Query the Dataruns collection.
+
+        All the details about the matching Dataruns will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Dataruns availabe.
+
+        Args:
+            experiment (Experiment or ObjectID or str):
+                Experiment to which the Dataruns must belong.
+            pipeline (Pipeline or ObjectID or str):
+                Pipeline which the Dataruns must use.
+            status (str):
+                Status which the Dataruns must have.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Datarun.find(
+            as_df_=True,
+            experiment=experiment,
+            pipeline=pipeline,
+            status=status,
+            exclude_=['software_versions'],
+        )
+
+    def get_datarun(self, datarun=None, experiment=None, pipeline=None, status=None):
+        """Get a Datarun object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            datarun (Datarun, ObjectID or str):
+                Datarun object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            experiment (Experiment or ObjectID or str):
+                Experiment to which the Datarun must belong.
+            pipeline (Pipeline or ObjectID or str):
+                Pipeline which the Datarun must use.
+            status (str):
+                Status which the Datarun must have.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Datarun
+        """
+        return schema.Datarun.get(
+            experiment=experiment,
+            pipeline=pipeline,
+            status=status,
+        )
+
+    # ######### #
+    # Signalrun #
+    # ######### #
+
+    def add_signalrun(self, datarun, signal):
+        """Add a new Signalrun object to the database.
+
+        The Signalrun needs to be associated to a Datarun and a Signal.
+
+        Args:
+            datarun (Datarun or ObjectID or str):
+                Datarun object (or the corresponding ObjectID, or its string
+                representation) to which this Signalrun belongs.
+            signal (Signal or ObjectID or str):
+                Signal object (or the corresponding ObjectID, or its string
+                representation) used by this Signalrun.
+
+        Returns:
+            Datarun
+        """
+        return schema.Signalrun.insert(
+            datarun=datarun,
+            signal=signal,
+        )
+
+    def get_signalruns(self, datarun=None, signal=None, status=None):
+        """Query the Signalruns collection.
+
+        All the details about the matching Signalruns will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Dataruns availabe.
+
+        Args:
+            datarun (Datarun or ObjectID or str):
+                Datarun to which the Signalruns must belong.
+            signal (Signal or ObjectID or str):
+                Signal which the Signalruns must use.
+            status (str):
+                Status which the Signalruns must have.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Signalrun.find(
+            as_df_=True,
+            datarun=datarun,
+            signal=signal,
+            status=status,
+        )
+
+    def get_signalrun(self, signalrun=None, datarun=None, signal=None, status=None):
+        """Get a Signalrun object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            signalrun (Signalrun, ObjectID or str):
+                Signalrun object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            datarun (Datarun or ObjectID or str):
+                Datarun to which the Signalrun must belong.
+            signal (Signal or ObjectID or str):
+                Signal which the Signalrun must use.
+            status (str):
+                Status which the Signalrun must have.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Signalrun
+        """
+        return schema.Signalrun.get(
+            signalrun=signalrun,
+            datarun=datarun,
+            signal=signal,
+            status=status,
+        )
+
+    # ##### #
+    # Event #
+    # ##### #
+
+    def add_event(self, start_time, stop_time, source, severity=None,
+                  signalrun=None, signal=None):
+        """Add a new Event object to the database.
+
+        The Event needs to have at least a start_time and a stop_time,
+        and be associated to either a Signal or a Signalrun.
+
+        If a Signalrun is given but no Signal is, the created Event will
+        be associated to the Signalrun signal value.
+
+        If both a Signalrun and a Signal are given, the Signal must be
+        the one used by the Signalrun.
+
+        Args:
+            start_time (int):
+                Timestamp at which the event starts.
+            stop_time (int):
+                Timestamp at which the event ends.
+            source (str):
+                Description of where this Event was created. It must be "orion",
+                "shape matching" or "manually created".
+            severity (float):
+                Severity score value. Optional.
+            signalrun (Signalrun or ObjectID or str):
+                Signalrun object (or the corresponding ObjectID, or its string
+                representation) to which this Event is associated.
+            signal (Signal or ObjectID or str):
+                Signal object (or the corresponding ObjectID, or its string
+                representation) to which this Event is associated.
+
+        Raises:
+            ValueError:
+                if neither a Signal or a Signalrun are given, or if the Signal
+                is not the one used by the Signalrun.
+
+        Returns:
+            Event
+        """
+        if signal is None and signalrun is None:
+            raise ValueError('An Event must be associated to either a Signalrun or a Signal')
+        if signal is not None and signalrun is not None:
+            if self.get_signal(signal) != self.get_signalrun(signalrun).signal:
+                raise ValueError('Signal cannot be different than Signalrun.signal')
+
+        return schema.Event.insert(
+            signalrun=signalrun,
+            signal=signal or signalrun.signal,
+            start_time=int(start_time),
+            stop_time=int(stop_time),
+            severity=severity,
+            source=source,
+        )
+
+    def get_events(self, signalrun=None, signal=None, source=None):
+        """Query the Events collection.
+
+        All the details about the matching Signalruns will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Events availabe.
+
+        Args:
+            signalrun (Signalrun or ObjectID or str):
+                Signalrun to which the Events must belong.
+            signal (Signal or ObjectID or str):
+                Signal to which the Events be associated.
+            source (str):
+                Source from which the Events must come.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Event.find(
+            as_df_=True,
+            signalrun=signalrun,
+            signal=signal,
+            source=source,
+        )
+
+    def get_event(self, event=None, signalrun=None, signal=None, source=None):
+        """Get an Event object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            event (Event, ObjectID or str):
+                Event object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            signalrun (Signalrun or ObjectID or str):
+                Signalrun to which the Events must belong.
+            signal (Signal or ObjectID or str):
+                Signal to which the Events be associated.
+            source (str):
+                Source from which the Events must come.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Event
+        """
+        return schema.Event.get(
+            event=event,
+            signalrun=signalrun,
+            signal=signal,
+            source=source,
+        )
+
+    # ########## #
+    # Annotation #
+    # ########## #
+
+    def add_annotation(self, event, tag=None, comment=None):
+        """Add a new Annotation object to the database.
+
+        The Event needs to be associated with an Event, and can be given a
+        ``tag`` and a text comment.
+
+        Args:
+            event (Event or ObjectID or str):
+                Event object (or the corresponding ObjectID, or its string
+                representation) to which this Annotation is associated.
+            tag (str):
+                Tag of this Annotation.
+            comment (str):
+                Text comment of this Annotation.
+
+        Returns:
+            Annotation
+        """
+        return schema.Annotation.insert(
+            event=event,
+            tag=tag,
+            comment=comment,
+        )
+
+    def get_annotations(self, event=None, tag=None, comment=None, created_by=None):
+        """Query the Annotations collection.
+
+        All the details about the matching Annotations will be returned in
+        a ``pandas.DataFrame``.
+
+        All the arguments are optional, so a call without arguments will
+        return a table with information about all the Annotations availabe.
+
+        Args:
+            event (Event or ObjectID or str):
+                Event to which the Annotations must belong.
+            tag (str):
+                Tag which the Annotations must have.
+            comment (str):
+                Comment which the Annotations must have.
+            created_by (str):
+                Unique identifier of the user that created the Annotations.
+
+        Returns:
+            pandas.DataFrame
+        """
+        return schema.Annotation.find(
+            as_df_=True,
+            event=event,
+            tag=tag,
+            created_by=created_by,
+        )
+
+    def get_annotation(self, annotation=None, event=None, tag=None, created_by=None):
+        """Get an Event object from the database.
+
+        All the arguments are optional but empty queries are not allowed, so at
+        least one argument needs to be passed with a value different than ``None``.
+
+        Args:
+            annotation (Annotation, ObjectID or str):
+                Annotation object (or the corresponding ObjectID, or its string
+                representation) that we want to retreive.
+            event (Event or ObjectID or str):
+                Event to which the Annotation must belong.
+            tag (str):
+                Tag which the Annotation must have.
+            comment (str):
+                Comment which the Annotation must have.
+            created_by (str):
+                Unique identifier of the user that created the Annotation.
+
+        Raises:
+            ValueError:
+                If the no arguments are passed with a value different than
+                ``None`` or the query resolves to more than one object.
+
+        Returns:
+            Annotation
+        """
+        return schema.Annotation.get(
+            annotation=annotation,
+            event=event,
+            tag=tag,
+            created_by=created_by,
+        )
+
+    # ########## #
+    # Prediction #
+    # ########## #
+
+    @classmethod
+    def get_prediction(cls, signalrun, start_time=None, stop_time=None):
+        """Get prediction data from the database
+
+        Only argument "signalrun" is required.
+
+        Args:
+            signalrun (Signalrun, ObjectID or str)
+                Signalrun object (or the corresponding ObjectID, or its string
+                representation) that we want to retrieve.
+            start_time (int):
+                Timestamp indicating the start time of the data you want search.
+                If not given, the corresponding signal start time will be used.
+            stop_time (int)
+                Timestamp indicating the stop time of the data you want search.
+                If not given, the corresponding signal stop time will be used.
+
+        Returns:
+            PredictionData
+        """
+
+        signalrun_doc = schema.Signalrun.find_one(signalrun=signalrun)
+        signal_doc = signalrun_doc.signal
+
+        signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
+
+        if start_time is None:
+            start_time = signal_doc.start_time
+        if stop_time is None:
+            stop_time = signal_doc.stop_time
+
+        start_dt = datetime.utcfromtimestamp(start_time)
+        stop_dt = datetime.utcfromtimestamp(stop_time)
+        start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
+        stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
+
+        pred_docs = schema.Prediction.find(signalrun=signalrun,
+                                           index__gte=start_idx, index__lte=stop_idx)
+        pred_docs = pred_docs.order_by('+index')
+
+        prediction_results = dict()
+        data = list()
+        for idx, doc in enumerate(pred_docs):
+
+            if idx == 0:
+                # first month
+                prediction_results['attrs'] = doc.attrs
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            elif idx != 0 and idx == len(pred_docs) - 1:
+                # last month but not the first
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            else:
+                data.extend(doc.data)
+
+        prediction_results['data'] = data
+        return prediction_results
+
+    # ########## #
+    # Raw #
+    # ########## #
+
+    @classmethod
+    def get_raw(cls, signal, interval=21600, start_time=None, stop_time=None):
+        """Get raw signal data at the given interval
+
+        Only argument "signal" is required.
+
+        Args:
+            signal (Signal, ObjectID or str)
+                Signal object (or the corresponding ObjectID, or its string
+                representation) that we want to retrieve.
+            interval (int):
+                In seconds. The interval will be used to aggregate the raw data.
+            start_time (int):
+                Timestamp indicating the start time of the data you want search.
+                If not given, the corresponding signal start time will be used.
+            stop_time (int)
+                Timestamp indicating the stop time of the data you want search.
+                If not given, the corresponding signal stop time will be used.
+
+        Returns:
+            Timeseries
+        """
+
+        signal_doc = schema.Signal.find_one(signal=signal)
+
+        signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
+
+        if start_time is None:
+            start_time = signal_doc.start_time
+        if stop_time is None:
+            stop_time = signal_doc.stop_time
+
+        start_dt = datetime.utcfromtimestamp(start_time)
+        stop_dt = datetime.utcfromtimestamp(stop_time)
+        start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
+        stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
+
+        raw_docs = schema.SignalRaw.find(
+            signal=signal, index__gte=start_idx, index__lte=stop_idx)
+
+        data = list()
+        for idx, doc in enumerate(raw_docs):
+
+            if idx == 0:
+                # first month
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            elif idx != 0 and idx == len(raw_docs) - 1:
+                # last month but not the first
+                for d in doc.data:
+                    if d[0] >= start_time and d[0] <= stop_time:
+                        data.append(d)
+            else:
+                data.extend(doc.data)
+
+        X = pd.DataFrame(data=np.asarray(data), columns=["timestamp", "value"])
+
+        X = X.sort_values('timestamp').set_index('timestamp')
+
+        start_ts = X.index.values[0]
+        max_ts = X.index.values[-1]
+
+        values = list()
+        index = list()
+        while start_ts <= max_ts:
+            end_ts = start_ts + interval
+            subset = X.loc[start_ts:end_ts - 1]
+            aggregated = [
+                getattr(subset, agg)(skipna=True).values
+                for agg in ['mean']
+            ]
+            values.append(np.concatenate(aggregated))
+            index.append(start_ts)
+            start_ts = end_ts
+
+        imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
+        V = np.asarray(values).reshape((-1, 1))
+        V = imp_mean.fit_transform(V)
+        values = V.flatten().tolist()
+
+        return np.stack((np.array(index), np.array(values)), axis=-1).tolist()
+
+
+def main():
+    """
+    Use the following command to run the main function.
+    Command:
+        sintel run -v -m sintel.db.explorer --args arg1 arg2
+    """
+
+    dbconfig = {
+        'host': 'localhost',  # mongodb server address
+        'port': 27017  # mongodb server port
+    }
+
+    explorer = DBExplorer('Liu Dongyu', 'sintel-demo', dbconfig)
+
+    start_time = datetime(2010, 2, 1 + 1, tzinfo=timezone.utc).timestamp()
+    stop_time = datetime(2010, 2, 2 + 1, tzinfo=timezone.utc).timestamp()
+
+    # signalrun = "5f33521c1219eb21ae2cdc5a"
+    # explorer.get_prediction(signalrun, start_time, stop_time)
+
+    signal = ObjectId("5f46ebfe4e33925bbf954c6c")
+    print(start_time, stop_time)
+    results = explorer.get_raw(signal, 21600, start_time, stop_time)
+    print(results)

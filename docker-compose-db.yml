@@ -1,10 +1,13 @@
-version: '3'
+version: "3"
 services:
   db:
     image: mongo:4.0
-    container_name: mtv_db
-    command: bash -c "mongod --bind_ip_all --port 27017 --logpath /mtv/log/db.log --fork && mongorestore --db mtv /mtv/data/mtv/"
+    container_name: sintel_db
+    command: >
+      bash -c "mongod --bind_ip_all --port 27017
+      --logpath /sintel/log/db.log --fork
+      && mongorestore --db sintel /sintel/data/sintel/"
     volumes:
-      - ./db-instance/data:/mtv/data
-      - ./db-instance/log:/mtv/log
-      - ./db-instance/dump:/mtv/dump
+      - ./db-instance/data:/sintel/data
+      - ./db-instance/log:/sintel/log
+      - ./db-instance/dump:/sintel/dump

@@ -10,8 +10,11 @@ insert_final_newline = true
 charset = utf-8
 end_of_line = lf
 
+[*.yml]
+indent_size = 2
+
 [*.py]
-max_line_length = 79
+max_line_length = 99
 
 [*.bat]
 indent_style = tab

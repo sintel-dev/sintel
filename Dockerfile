@@ -39,8 +39,8 @@ RUN apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # copy our application code
-ADD . /mtv
-WORKDIR /mtv
+ADD . /sintel
+WORKDIR /sintel
 
 # install application packages for python and node
 # RUN make install

@@ -1,0 +1,53 @@
+# MongoDB params
+#===================================
+
+# sintel
+host: "localhost" # mongodb server address
+port: 27017 # mongodb server port
+db: "sintel" # database name
+username: # for auth
+password: # for auth
+
+# orion
+or_host: "localhost" # mongodb server address
+or_port: 27018 # mongodb server port
+or_db: "orion" # database name
+or_username: # for auth
+or_password: # for auth
+
+# docker
+dk_host: "db" # mongodb server address
+dk_port: 27017 # mongodb server port
+dk_db: "sintel" # database name
+dk_username: # for auth
+dk_password: # for auth
+
+# FLASK ENV
+#===================================
+server_port: 3000 # the port that flask application is running on
+ENV: "production" # development, production, testing
+DEBUG: False
+TESTING: False
+BUNDLE_ERRORS: True
+
+# FLASK MAIL
+#===================================
+MAIL_SERVER: "smtp.gmail.com"
+MAIL_PORT: 465
+MAIL_USERNAME: "ExampleMtv@gmail.com"
+
+# Private Keys
+USE_SYS_ENV_KEYS: False
+MAIL_PASSWORD: "8vn1las1lsh;]q1vn"
+GOOGLE_CLIENT_SECRET: "6Y3tUZbPCZHM9okPLbWB_OXK"
+AUTH_KEY: "YT#XA&00ALKlkjG)JAN<[XC"
+
+# Experiment List
+experiment_list:
+  # None for all
+  # - { name: 'OneSignalEPS' }
+  # - { name: 'OneSignalACS' }
+  # - { name: 'OneSignalTCS' }
+  # - { name: 'OneSignalENV' }
+  # - { name: 'DifferentAggMethods' }
+  # - { name: 'DifferentADs-11125' }

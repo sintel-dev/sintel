@@ -1,12 +1,13 @@
-import pytest
 import json
 import random
+
+import pytest
 from flasgger import Swagger
-from mtv.core import MTV
-from mtv.utils import read_config
 
+from sintel.core import Sintel
+from sintel.utils import read_config
 
-TEST_DB = 'mtv-test'
+TEST_DB = 'sintel-test'
 TEST_HOST = "localhost"
 TEST_PORT = 27017
 
@@ -17,11 +18,11 @@ def app():
     Set up Flask App in testing environment
     """
 
-    config = read_config('./mtv/config.yml')
+    config = read_config('./sintel/config.yml')
     config['db'] = TEST_DB
     config['host'] = TEST_HOST
     config['port'] = TEST_PORT
-    explorer = MTV(config)
+    explorer = Sintel(config)
 
     app = explorer._init_flask_app('test')
 
