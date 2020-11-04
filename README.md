@@ -5,14 +5,11 @@
 
 [![Development Status](https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow)](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 [![PyPI Shield](https://img.shields.io/pypi/v/sintel.svg)](https://pypi.python.org/pypi/sintel)
-[![Github](https://img.shields.io/github/workflow/status/signals-dev/sintel/CI)](https://github.com/signals-dev/sintel/actions)
-[![Travis CI Shield](https://travis-ci.org/signals-dev/sintel.svg?branch=master)](https://travis-ci.org/signals-dev/sintel)
+[![Github Workflow Status](https://img.shields.io/github/workflow/status/signals-dev/sintel/CI)](https://github.com/signals-dev/sintel/actions)
+<!-- [![Travis CI Shield](https://travis-ci.org/signals-dev/sintel.svg?branch=master)](https://travis-ci.org/signals-dev/sintel) -->
 [![Coverage Status](https://codecov.io/gh/signals-dev/sintel/branch/master/graph/badge.svg?token=WwM2IJURrq)](https://codecov.io/gh/signals-dev/sintel)
-<!-- [![Coverage Status](https://codecov.io/gh/signals-dev/sintel/branch/master/graph/badge.svg)](https://codecov.io/gh/signals-dev/sintel) -->
 [![Downloads](https://pepy.tech/badge/sintel)](https://pepy.tech/project/sintel)
 <!-- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/signals-dev/sintel/master?filepath=tutorials) -->
-
-
 # Sintel
 
 **Sintel** (Signal Intelligence) provides Restful APIs to process massive signal data for anomaly analysis in an efficient and user-friendly way.
