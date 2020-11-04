@@ -156,7 +156,7 @@ publish: dist ## package and upload a release
 
 .PHONY: clean
 clean: clean-build clean-pyc clean-test clean-coverage \
-	   clean-logs clean-docs clean-db
+	   clean-logs clean-db
 
 .PHONY: clean-build
 clean-build: ## remove build artifacts
