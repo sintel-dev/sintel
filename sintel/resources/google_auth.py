@@ -6,9 +6,9 @@ import requests
 from flask import redirect, request
 from flask_restful import Resource
 
-from mtv import g
-from mtv.db import schema
-from mtv.resources import auth_utils
+from sintel import g
+from sintel.db import schema
+from sintel.resources import auth_utils
 
 LOGGER = logging.getLogger(__name__)
 

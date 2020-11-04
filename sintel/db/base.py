@@ -66,7 +66,7 @@ def _merge_meta(base, child):
     return base
 
 
-class MTVMeta(TopLevelDocumentMetaclass):
+class SintelMeta(TopLevelDocumentMetaclass):
     """Metaclass for the OrionDocument class.
 
     It ensures that the ``meta`` attribute from the OrionDocument
@@ -94,7 +94,7 @@ class MTVMeta(TopLevelDocumentMetaclass):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class MTVDocument(Document, metaclass=MTVMeta):
+class SintelDocument(Document, metaclass=SintelMeta):
     """Parent class for all the Document classes in Orion.
 
     This class defines a few defaults, such as the ``instert_time`` field

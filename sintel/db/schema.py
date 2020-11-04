@@ -20,13 +20,13 @@ from datetime import datetime
 from mongoengine import CASCADE, fields
 from pip._internal.operations import freeze
 
-from mtv.data import load_signal
-from mtv.db.base import MTVDocument, PipelineField, Status
+from sintel.data import load_signal
+from sintel.db.base import SintelDocument, PipelineField, Status
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Dataset(MTVDocument):
+class Dataset(SintelDocument):
     """Dataset object.
 
     A **Dataset** represents a group of Signals that are grouped together under a
@@ -43,7 +43,7 @@ class Dataset(MTVDocument):
         return Signal.find(dataset=self)
 
 
-class Signal(MTVDocument):
+class Signal(SintelDocument):
     """Signal object.
 
     A Signal belongs to a Dataset and contains all the required details to be
@@ -73,7 +73,7 @@ class Signal(MTVDocument):
         return data
 
 
-class Template(MTVDocument):
+class Template(SintelDocument):
     """Template object.
 
     A **Template** represents an MLPipeline template from which later on
@@ -94,7 +94,7 @@ class Template(MTVDocument):
         return Pipeline.find(template=self)
 
 
-class Pipeline(MTVDocument):
+class Pipeline(SintelDocument):
     """Pipeline object.
 
     A **Pipeline** represents an MLPipeline object.
@@ -109,7 +109,7 @@ class Pipeline(MTVDocument):
     unique_key_fields = ['name', 'template']
 
 
-class Experiment(MTVDocument):
+class Experiment(SintelDocument):
     """Experiment object.
 
     An Experiment is associated with a Dataset, a subset of its Signals and a Template.
@@ -130,7 +130,7 @@ class Experiment(MTVDocument):
         return Datarun.find(experiment=self)
 
 
-class Datarun(MTVDocument, Status):
+class Datarun(SintelDocument, Status):
     """Datarun object.
 
     The Datarun object represents a single execution of a Pipeline over a set
@@ -183,7 +183,7 @@ class Datarun(MTVDocument, Status):
         self.save()
 
 
-class Signalrun(MTVDocument, Status):
+class Signalrun(SintelDocument, Status):
     """Signalrun object.
 
     The Signalrun object represents a single executions of a Pipeline on a Signal
@@ -242,7 +242,7 @@ class Signalrun(MTVDocument, Status):
         self.save()
 
 
-class Event(MTVDocument):
+class Event(SintelDocument):
     """Event object.
 
     An Event represents an anomalous period on a Signal.
@@ -278,7 +278,7 @@ class Event(MTVDocument):
         return self.event_interactions.last()
 
 
-class Annotation(MTVDocument):
+class Annotation(SintelDocument):
     """Annotation object.
 
     User Annotation related to an event. The Annotations consist on a tag and
@@ -295,7 +295,7 @@ class Annotation(MTVDocument):
         self.event.save()
 
 
-class EventInteraction(MTVDocument):
+class EventInteraction(SintelDocument):
     """EventInteraction object.
 
     The EventInteraction object represents an interaction of a user with an
@@ -312,10 +312,10 @@ class EventInteraction(MTVDocument):
     stop_time = fields.IntField()
     created_by = fields.StringField()
 
-# the following Class is specific to MTV
+# the following Class is specific to Sintel
 
 
-class Period(MTVDocument):
+class Period(SintelDocument):
     signalrun = fields.ReferenceField(Signal)
     timestamp = fields.FloatField()
     year = fields.IntField()
@@ -328,7 +328,7 @@ class Period(MTVDocument):
     }
 
 
-class Prediction(MTVDocument):
+class Prediction(SintelDocument):
     signalrun = fields.ReferenceField(Datarun,
                                       reverse_delete_rule=CASCADE)
     attrs = fields.ListField(fields.StringField())
@@ -342,7 +342,7 @@ class Prediction(MTVDocument):
     }
 
 
-class SignalRaw(MTVDocument):
+class SignalRaw(SintelDocument):
     """ Raw signal data.
 
     Compared with the Prediction, Raw only save the raw data aggregated
@@ -360,7 +360,7 @@ class SignalRaw(MTVDocument):
     }
 
 
-class User(MTVDocument):
+class User(SintelDocument):
     name = fields.StringField(required=True)
     email = fields.StringField(required=True)
     password = fields.StringField()

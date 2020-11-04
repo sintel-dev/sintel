@@ -9,8 +9,8 @@ import pandas as pd
 from pymongo import MongoClient
 from sklearn.impute import SimpleImputer
 
-from mtv.data import load_signal
-from mtv.db import schema
+from sintel.data import load_signal
+from sintel.db import schema
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def _exp_is_in_for_mgeng(exp, exp_filter):
 
 def copy_from_partial(cols, fromdb, todb, fromhost='localhost', fromport=27017,
                       tohost='localhost', toport=27017, exp_filter=None):
-    """Copy the given list of collections from ORION database to MTV.
+    """Copy the given list of collections from ORION database to Sintel.
 
     If the collection already exists, it will further check whether all the
     documents are consistent. If not, copy all the newly added documents.
@@ -478,7 +478,7 @@ def merge_databases():
 
 def delete_datasets():
     cli = MongoClient('localhost', port=27017)
-    db = cli['mtv']
+    db = cli['sintel']
 
     for datarun_doc in db['datarun'].find():
         experiment_id = datarun_doc['experiment']
@@ -494,32 +494,6 @@ def delete_datasets():
     for experiment_doc in db['experiment'].find():
         if (experiment_doc['project'] == 'SES'):
             db['experiment'].delete_one({'_id': experiment_doc['_id']})
-
-
-def prune_dataruns():
-    cli = MongoClient('localhost', port=27017)
-    db = cli['mtv-nasa-lstm']
-    col = db['datarun']
-
-    needed = ['T-1', 'E-8', 'E-9', 'P-2', 'P-3', 'P-4', 'P-11',
-              'A-9', 'A-8', 'S-1', 'E-2']
-
-    for x in col.find():
-        doc = db['signal'].find_one({'_id': x['signal']})
-        if doc['name'] not in needed:
-            col.delete_one({'_id': x['_id']})
-            print('{} is deleted'.format(doc['name']))
-
-    # clean Prediction & Raw
-    for x in db['prediction'].find():
-        doc = col.find_one(x['datarun'])
-        if doc is None:
-            db['prediction'].delete_one({'_id': x['_id']})
-
-    for x in db['raw'].find():
-        doc = col.find_one(x['datarun'])
-        if doc is None:
-            db['raw'].delete_one({'_id': x['_id']})
 
 
 def main():

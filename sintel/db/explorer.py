@@ -1,7 +1,7 @@
-"""MTV DB Explorer model.
+"""Sintel DB Explorer model.
 
-This model defines the ``mtv.db.explorer.DBExplorer``, which provides
-a simple programatic access to creating and reading objects in the MTV Database.
+This model defines the ``sintel.db.explorer.DBExplorer``, which provides
+a simple programatic access to creating and reading objects in the Sintel Database.
 """
 import json
 import logging
@@ -15,7 +15,7 @@ from mongoengine import connect
 from pymongo.database import Database
 from sklearn.impute import SimpleImputer
 
-from mtv.db import schema
+from sintel.db import schema
 
 LOGGER = logging.getLogger(__name__)
 
@@ -1111,7 +1111,7 @@ def main():
     """
     Use the following command to run the main function.
     Command:
-        mtv run -v -m mtv.db.explorer --args arg1 arg2
+        sintel run -v -m sintel.db.explorer --args arg1 arg2
     """
 
     dbconfig = {
@@ -1119,7 +1119,7 @@ def main():
         'port': 27017  # mongodb server port
     }
 
-    explorer = DBExplorer('Liu Dongyu', 'mtv-demo', dbconfig)
+    explorer = DBExplorer('Liu Dongyu', 'sintel-demo', dbconfig)
 
     start_time = datetime(2010, 2, 1 + 1, tzinfo=timezone.utc).timestamp()
     stop_time = datetime(2010, 2, 2 + 1, tzinfo=timezone.utc).timestamp()

@@ -3,10 +3,10 @@ import logging
 from bson import ObjectId
 from flask_restful import Resource, reqparse
 
-from mtv.db import DBExplorer, schema
-from mtv.resources.auth_utils import requires_auth
-from mtv.resources.computing.utils.layout import tsne
-from mtv.resources.experiment import validate_experiment_id
+from sintel.db import DBExplorer, schema
+from sintel.resources.auth_utils import requires_auth
+from sintel.resources.computing.utils.layout import tsne
+from sintel.resources.experiment import validate_experiment_id
 
 LOGGER = logging.getLogger(__name__)
 

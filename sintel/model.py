@@ -2,7 +2,7 @@ from datetime import datetime
 
 from mongoengine import Document, fields
 
-from mtv.utils import remove_dots, restore_dots
+from sintel.utils import remove_dots, restore_dots
 
 
 class MongoUtils:

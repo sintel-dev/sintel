@@ -2,8 +2,8 @@ from flask import render_template
 from flask_restful import Api
 from flasgger import Swagger
 
-import mtv.resources as ctrl
-from mtv.swagger import swagger_config, swagger_tpl
+import sintel.resources as ctrl
+from sintel.swagger import swagger_config, swagger_tpl
 
 API_VERSION = '/api/v1/'
 

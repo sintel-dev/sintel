@@ -10,7 +10,7 @@ from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from functools import wraps
 
-from mtv import g
+from sintel import g
 
 
 def get_google_provider_cfg():

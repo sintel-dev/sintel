@@ -4,8 +4,8 @@ from bson import ObjectId
 from flask import request
 from flask_restful import Resource, reqparse
 
-from mtv.db import schema
-from mtv.resources.auth_utils import verify_auth, requires_auth
+from sintel.db import schema
+from sintel.resources.auth_utils import verify_auth, requires_auth
 
 LOGGER = logging.getLogger(__name__)
 

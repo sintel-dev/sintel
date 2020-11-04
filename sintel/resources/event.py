@@ -3,9 +3,9 @@ import logging
 from bson import ObjectId
 from flask_restful import Resource, reqparse
 
-from mtv.db import schema
-from mtv.resources.auth_utils import requires_auth
-from mtv.resources.datarun import validate_signalrun_id
+from sintel.db import schema
+from sintel.resources.auth_utils import requires_auth
+from sintel.resources.datarun import validate_signalrun_id
 
 LOGGER = logging.getLogger(__name__)
 

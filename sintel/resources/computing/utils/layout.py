@@ -2,8 +2,8 @@ import numpy as np
 from mongoengine import connect
 from sklearn.manifold import TSNE
 
-from mtv.db import schema
-from mtv.resources.computing.utils.signal_distance import event_overlap_distance
+from sintel.db import schema
+from sintel.resources.computing.utils.signal_distance import event_overlap_distance
 
 
 def tsne(signalruns):
@@ -65,7 +65,7 @@ def umap():
 
 if __name__ == '__main__':
 
-    db = connect('mtv', host='localhost', port=27017)
+    db = connect('sintel', host='localhost', port=27017)
 
     signalrun_docs = schema.Signalrun.find()
     event_list = list()

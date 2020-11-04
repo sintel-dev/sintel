@@ -2,8 +2,8 @@ import logging
 
 from flask_restful import Resource, reqparse
 
-from mtv.db import schema
-from mtv.resources.auth_utils import requires_auth
+from sintel.db import schema
+from sintel.resources.auth_utils import requires_auth
 
 LOGGER = logging.getLogger(__name__)
 

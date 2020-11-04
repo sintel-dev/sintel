@@ -11,15 +11,15 @@ from oauthlib.oauth2 import WebApplicationClient
 from pymongo import MongoClient
 from termcolor import colored
 
-from mtv import g
-from mtv.db import utils as DBUtils
-from mtv.routes import add_routes
-from mtv.utils import import_object
+from sintel import g
+from sintel.db import utils as DBUtils
+from sintel.routes import add_routes
+from sintel.utils import import_object
 
 LOGGER = logging.getLogger(__name__)
 
 
-class MTV:
+class Sintel:
 
     def __init__(self, cf, docker=False):
         self._cf = cf.copy()

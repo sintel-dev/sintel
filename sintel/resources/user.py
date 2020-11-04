@@ -4,8 +4,8 @@ from bson import ObjectId
 from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from mtv.db import schema
-from mtv.resources import auth_utils
+from sintel.db import schema
+from sintel.resources import auth_utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -202,7 +202,7 @@ class Signup(Resource):
                 user['name'] = origin_name + auth_utils.generate_digits(size=3)
 
             # send password to the user email
-            auth_utils.send_mail('MTV: your password', password, user['email'])
+            auth_utils.send_mail('Sintel: your password', password, user['email'])
 
             # insert user to DB
             schema.User.insert(**user)
@@ -384,7 +384,7 @@ class Reset(Resource):
 
             # if yes, send email notification and save new password to DB
             if user:
-                auth_utils.send_mail('MTV: your new password',
+                auth_utils.send_mail('Sintel: your new password',
                                      password, user['email'])
                 user['password'] = password_encrypted
                 user.save()

@@ -5,9 +5,9 @@ import pandas as pd
 from flask_restful import Resource, reqparse
 from sklearn.preprocessing import MinMaxScaler
 
-from mtv.db import DBExplorer, schema
-from mtv.resources.auth_utils import verify_auth
-from mtv.resources.computing.utils.search_similars import return_candidate_shapes
+from sintel.db import DBExplorer, schema
+from sintel.resources.auth_utils import verify_auth
+from sintel.resources.computing.utils.search_similars import return_candidate_shapes
 
 LOGGER = logging.getLogger(__name__)
 
