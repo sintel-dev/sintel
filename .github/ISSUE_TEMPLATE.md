@@ -1,6 +1,5 @@
--   MTV version:
+-   Sintel version:
 -   Python version:
--   Node version:
 -   Operating System:
 
 ### Description

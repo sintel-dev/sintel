@@ -1,20 +1,23 @@
-version: '3'
+version: "3"
 services:
   db:
     image: mongo:4.0
-    container_name: mtv_db
+    container_name: sintel_db
     ports:
-      - '127.0.0.1:27018:27017'
-    command: bash -c "mongod --bind_ip_all --port 27017 --logpath /mtv/log/db.log --fork && tail -F anything"
+      - "127.0.0.1:27018:27017"
+    command: >
+      bash -c "mongod --bind_ip_all --port 27017
+      --logpath /sintel/log/db.log --fork
+      && tail -F anything"
     volumes:
-      - ./db-instance/data:/mtv/data
-      - ./db-instance/log:/mtv/log
-      - ./db-instance/dump:/mtv/dump
+      - ./db-instance/data:/sintel/data
+      - ./db-instance/log:/sintel/log
+      - ./db-instance/dump:/sintel/dump
   app:
     build: .
-    container_name: mtv_app
+    container_name: sintel_app
     depends_on:
       - db
     ports:
-      - '3000:3000'
-    command: mtv run --env production -v --docker
+      - "3000:3000"
+    command: sintel run --env production -v --docker
