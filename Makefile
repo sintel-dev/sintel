@@ -104,7 +104,7 @@ docker-clean: 			## remove containers, volumes, networks, and images
 .PHONY: test
 test: ## run tests quickly with the default Python
 	# python -m pytest tests --cov=sintel
-	py.test -n 2 ./tests --cov=sintel
+	py.test -n 2 ./tests
 
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
