@@ -1,3 +1,6 @@
+import os
+
+
 schemas = {
     'Annotation': {
         'type': 'object',
@@ -213,6 +216,11 @@ tags = [
 ]
 
 
+# {ProjectRoot}/sintel
+dir_path = os.path.dirname(os.path.realpath(__file__))
+# {ProjectRoot}/
+dir_path = os.path.dirname(dir_path)
+
 swagger_config = {
     'title': 'Sintel RestAPI Documentation',
     'uiversion': 3,
@@ -229,6 +237,9 @@ swagger_config = {
         }
     ],
     "swagger_ui": True,
+    "static_url_path": "/flasgger_static",
+    "static_folder": dir_path + "/apidocs/ui3/static",
+    "template_folder": dir_path + "/apidocs/ui3/templates",
     "specs_route": "/apidocs/"
 }
 

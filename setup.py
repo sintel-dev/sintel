@@ -39,6 +39,7 @@ requirements = [
     'requests==2.24.0',
     'Werkzeug==0.15.3',
     'gevent==1.2.2',
+    'flasgger==0.9.5',
 
     # Database
     'mongoengine>=0.16.3,<0.17',
@@ -122,6 +123,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/signals-dev/sintel',
-    version='0.1.0-dev',
+    version='0.1.0.dev0',
     zip_safe=False,
 )

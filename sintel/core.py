@@ -7,7 +7,6 @@ from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 from gridfs import GridFS
 from mongoengine import connect
-from oauthlib.oauth2 import WebApplicationClient
 from pymongo import MongoClient
 from termcolor import colored
 
@@ -55,7 +54,6 @@ class Sintel:
 
         g['config'] = self._cf
         g['app'] = app
-        g['client'] = WebApplicationClient(self._cf['GOOGLE_CLIENT_ID'])
         return app
 
     def update_db(self):
