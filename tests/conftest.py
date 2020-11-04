@@ -2,8 +2,8 @@ import pytest
 import json
 import random
 from flasgger import Swagger
-from mtv.core import MTV
-from mtv.utils import read_config
+from sintel.core import MTV
+from sintel.utils import read_config
 
 
 TEST_DB = 'mtv-test'
