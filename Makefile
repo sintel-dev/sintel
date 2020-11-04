@@ -34,7 +34,7 @@ help:
 # ----------------------- session: install ----------------------- #
 
 .PHONY: install
-install: clean-build clean-pyc  ## install the packages for running mtv
+install: clean-build clean-pyc  ## install the packages for running sintel
 	pip install .
 	$(MAKE) init-db && $(MAKE) load-db
 
@@ -60,23 +60,23 @@ init-db: clean-db
 
 .PHONY: load-db
 load-db: init-db
-	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
-	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
-	mongo mtv --eval "db.dropDatabase()"
-	mongorestore --db mtv ./db-instance/data/mtv/
+	curl -o sintel.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel.tar.bz2"
+	tar -xf sintel.tar.bz2 -C ./db-instance/data/ && rm sintel.tar.bz2
+	mongo sintel --eval "db.dropDatabase()"
+	mongorestore --db sintel ./db-instance/data/sintel/
 
 .PHONY: load-db-test
 load-db-test: init-db
-	curl -o mtv-test.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv-test.tar.bz2"
-	tar -xf mtv-test.tar.bz2 -C ./db-instance/data/ && rm mtv-test.tar.bz2
-	mongo mtv-test --eval "db.dropDatabase()"
-	mongorestore --db mtv-test ./db-instance/data/mtv-test/
+	curl -o sintel-test.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel-test.tar.bz2"
+	tar -xf sintel-test.tar.bz2 -C ./db-instance/data/ && rm sintel-test.tar.bz2
+	mongo sintel-test --eval "db.dropDatabase()"
+	mongorestore --db sintel-test ./db-instance/data/sintel-test/
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up
-docker-db-up: init-db	## download data and load them into mongodb  
-	curl -o mtv.tar.bz2 "https://d3-ai-mtv.s3.us-east-2.amazonaws.com/mtv.tar.bz2"
-	tar -xf mtv.tar.bz2 -C ./db-instance/data/ && rm mtv.tar.bz2
+docker-db-up: init-db	## download data and load them into mongodb
+	curl -o sintel.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel.tar.bz2"
+	tar -xf sintel.tar.bz2 -C ./db-instance/data/ && rm sintel.tar.bz2
 	docker-compose -f docker-compose-db.yml up
 
 .PHONY: docker-up
@@ -102,67 +102,38 @@ docker-clean: 			## remove containers, volumes, networks, and images
 # ----------------------- session: test ----------------------- #
 
 .PHONY: test
-test: test-server test-client ## run tests on both server and client
+test: ## run tests quickly with the default Python
+	# python -m pytest tests --cov=sintel
+	py.test -n 2 ./tests --cov=sintel
 
-.PHONY: test-server
-test-server: ## run tests on server
-	py.test -n 2 ./tests
-
-.PHONY: test-server-flask
-test-server-flask: ## run tests on server
-	py.test ./tests/test_flask.py
+.PHONY: test-all
+test-all: ## run tests on every Python version with tox
+	tox -r
 
 .PHONY: test-coverage
 test-coverage: ## check code coverage quickly with the default Python
-	coverage run --source mtv -m pytest
+	coverage run --source sintel -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
-
-.PHONY: test-pyversion
-test-pyversion: ## run tests on every Python version with tox
-	tox
 
 # -------------- session: coding style check ---------------- #
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
-	flake8 mtv tests --ignore W503
-	isort -c --recursive mtv tests
+	flake8 sintel tests --ignore W503
+	isort -c --recursive sintel tests
 
 .PHONY: fix-lint
 fix-lint: ## fix lint issues using autoflake, autopep8, and isort
-	find mtv -name '*.py' | xargs autoflake --in-place --remove-all-unused-imports --remove-unused-variables
-	autopep8 --in-place --recursive --aggressive mtv
-	isort --apply --atomic --recursive mtv
+	find sintel -name '*.py' | xargs autoflake --in-place --remove-all-unused-imports --remove-unused-variables
+	autopep8 --in-place --recursive --aggressive sintel
+	isort --apply --atomic --recursive sintel
 
 	find tests -name '*.py' | xargs autoflake --in-place --remove-all-unused-imports --remove-unused-variables
 	autopep8 --in-place --recursive --aggressive tests
 	isort --apply --atomic --recursive tests
 
-
-# ---------------------- session: docs ----------------------- #
-
-.PHONY: docs
-docs: clean-docs ## generate Sphinx HTML documentation, including API docs
-	sphinx-apidoc --module-first --separate -o docs/api/ mtv
-	$(MAKE) -C docs html
-
-.PHONY: view-docs
-view-docs: docs ## view docs in browser
-	$(BROWSER) docs/_build/html/index.html
-
-.PHONY: serve-docs
-serve-docs: view-docs ## compile the docs watching for changes
-	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
-
-.PHONY: apidoc
-apidoc:	## generate server API docs
-	apidoc -i mtv/resources -o apidoc/
-
-.PHONY: view-apidoc
-view-apidoc:	## view server API docs
-	$(BROWSER) apidoc/index.html
 
 # -------------------- session: release ---------------------- #
 
@@ -185,7 +156,7 @@ publish: dist ## package and upload a release
 
 .PHONY: clean
 clean: clean-build clean-pyc clean-test clean-coverage \
-	   clean-logs clean-docs clean-client
+	   clean-logs clean-docs clean-db
 
 .PHONY: clean-build
 clean-build: ## remove build artifacts
@@ -216,15 +187,6 @@ clean-coverage: ## remove coverage artifacts
 .PHONY: clean-logs
 clean-logs: ## remove logs
 	rm -fr logs/
-
-.PHONY: clean-docs
-clean-docs: ## remove previously built docs
-	rm -f docs/api/*.rst
-	-$(MAKE) -C docs clean 2>/dev/null  # this fails if sphinx is not yet installed
-
-.PHONY: clean-client
-clean-client: ## remove build artifacts under ./client
-	npm -C client run clean
 
 .PHONY: clean-db
 clean-db:
