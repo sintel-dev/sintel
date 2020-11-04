@@ -96,11 +96,12 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6'
     ],
-    description=("MTV is a visual analytics system built for anomaly analysis"
-                 "for multivariate time series (signals) data"),
+    description=("Sintel(Signal Intelligence) provides Restful APIs to process"
+                 "massive signal data for anomaly analysis in an efficient"
+                 "and user-friendly way"),
     entry_points={
         'console_scripts': [
-            'mtv=mtv.cli:main',
+            'sintel=sintel.cli:main',
         ],
     },
     extras_require={
@@ -113,14 +114,14 @@ setup(
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    keywords='mtv',
-    name='mtv',
-    packages=find_packages(include=['mtv', 'mtv.*']),
+    keywords='sintel',
+    name='sintel',
+    packages=find_packages(include=['sintel', 'sintel.*']),
     python_requires='>=3.6',
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/signals-dev/MTV-api',
+    url='https://github.com/signals-dev/sintel',
     version='0.1.0-dev',
     zip_safe=False,
 )

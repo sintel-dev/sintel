@@ -2,10 +2,15 @@
 .DS_Store
 tempCodeRunnerFile.ts
 tempCodeRunnerFile.py
+
+# App specific
+client/public/data/
+db-instance/
+mtv/data/raw
+mtv/db/data
 mtv.tar*
 .vscode/
-orion-stock/
-stock-data/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -33,25 +38,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
-# Client
-node_modules/
-!/client/public/dist/
-/client/public/dist/*
-# The following two files are only used in prod mode
-!/client/public/dist/*.min.css
-!/client/public/dist/*.min.js
-/client/public/themes/
-npm-debug.log
-package-lock.json
-coverage/
-logs/
-
-# Data
-client/public/data/
-db-instance/
-mtv/data/raw
-mtv/db/data
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -89,13 +75,6 @@ instance/
 
 # Scrapy stuff:
 .scrapy
-
-# Sphinx documentation
-docs/_build/
-docs/api/
-
-# Restful API documentation
-apidoc/
 
 # PyBuilder
 target/
