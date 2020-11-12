@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
-class TestUtils(object):
+from sintel import utils
 
-    def setUp(self):
-        """Set up test fixtures, if any."""
 
-    def tearDown(self):
-        """Tear down test fixtures, if any."""
+def test__read_config():
+    path_to_config_file = 'config.yml'
+    config = utils.read_config(path_to_config_file)
 
-    def test_1(self):
-        """Test something."""
-        assert 11 == 11
+    assert isinstance(config, dict)
+    assert config['ENV'] == 'production'

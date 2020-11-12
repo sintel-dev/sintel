@@ -67,10 +67,10 @@ load-db: init-db
 
 .PHONY: load-db-test
 load-db-test: init-db
-	curl -o sintel-test.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel-test.tar.bz2"
-	tar -xf sintel-test.tar.bz2 -C ./db-instance/data/ && rm sintel-test.tar.bz2
-	mongo sintel-test --eval "db.dropDatabase()"
-	mongorestore --db sintel-test ./db-instance/data/sintel-test/
+	curl -o sintel_test.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel_test.tar.bz2"
+	tar -xf sintel_test.tar.bz2 -C ./db-instance/data/ && rm sintel_test.tar.bz2
+	mongo sintel_test --eval "db.dropDatabase()"
+	mongorestore --db sintel_test ./db-instance/data/sintel_test/
 
 # ------------------ session: docker installation ------------------- #
 .PHONY: docker-db-up

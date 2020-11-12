@@ -30,7 +30,7 @@ def read_config(path_to_config):
     if os.path.isfile(path_to_config):
         pass
     else:
-        path_to_config = '../{}'.format(path_to_config)
+        path_to_config = os.path.join(os.path.dirname(__file__), 'config.yml')
 
     dictionary = None
 
@@ -68,7 +68,7 @@ def create_dirs(dirs):
     else:
         LOGGER.exception('Error creating directories, argument "dirs" must be \
                          a string or a string list')
-        raise
+        raise Exception
 
 
 def get_dirs(dir):

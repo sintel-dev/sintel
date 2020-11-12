@@ -7,7 +7,7 @@ from flasgger import Swagger
 from sintel.core import Sintel
 from sintel.utils import read_config
 
-TEST_DB = 'sintel-test'
+TEST_DB = 'sintel_test'
 TEST_HOST = "localhost"
 TEST_PORT = 27017
 
@@ -22,9 +22,9 @@ def app():
     config['db'] = TEST_DB
     config['host'] = TEST_HOST
     config['port'] = TEST_PORT
-    explorer = Sintel(config)
 
-    app = explorer._init_flask_app('test')
+    sintel = Sintel(config)
+    app = sintel._init_flask_app('test')
 
     return app
 
