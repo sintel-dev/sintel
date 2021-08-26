@@ -75,7 +75,7 @@ The command `make install` or `make install-develop` has already pull the demo d
 You can type the following command to update the data from Orion to Sintel-supported formats. Note that you can configure the mongodb in the file `./sintel/config.yaml`.
 
 ```bash
-$ mtv update db -v
+$ sintel update db -v
 ```
 
 
