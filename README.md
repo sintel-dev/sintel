@@ -16,7 +16,7 @@
 
 * License: [MIT](https://github.com/signals-dev/sintel/blob/master/LICENSE)
 * Development Status: [Pre-Alpha](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
-* Homepage: https://github.com/signals-dev/sintel
+* Homepage: https://github.com/sintel-dev/sintel
 * Documentation:
     * http://mtv.lids.mit.edu:3000/apidocs (Swagger UI style)
     * http://mtv.lids.mit.edu:3000/redoc (Redoc UI style)
