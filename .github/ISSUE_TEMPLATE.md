@@ -1,5 +1,6 @@
 -   Sintel version:
 -   Python version:
+-   MongoDB version:
 -   Operating System:
 
 ### Description
