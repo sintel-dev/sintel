@@ -21,19 +21,19 @@ LOGGER = logging.getLogger(__name__)
 
 
 class DBExplorer:
-    """User interface for the Orion Database.
+    """User interface for the Sintel Database.
 
     This class provides a user-frienly programming interface to
-    interact with the Orion database models.
+    interact with the Sintel database models.
 
     Args:
         user (str):
-            Unique identifier of the user that creates this OrionExporer
+            Unique identifier of the user that creates this SintelExporer
             instance. This username or user ID will be used to populate
             the ``created_by`` field of all the objects created in the
             database during this session.
         database (str):
-            Name of the MongoDB database to use. Defaults to ``orion``.
+            Name of the MongoDB database to use. Defaults to ``sintel``.
         mongodb_config (dict or str):
             A dict or a path to JSON file with additional arguments can be
             passed to provide connection details different than the defaults
@@ -46,10 +46,10 @@ class DBExplorer:
 
     Examples:
         Simples use case:
-        >>> orex = OrionExplorer('my_username')
+        >>> orex = DBExplorer('my_username')
 
         Passing a path to a JSON file with connection details.
-        >>> orex = OrionExplorer(
+        >>> orex = DBExplorer(
         ...      user='my_username',
         ...      database='orion',
         ...      mongodb_config='/path/to/my/mongodb_config.json',
@@ -63,7 +63,7 @@ class DBExplorer:
         ...      'password': 'secret_password',
         ...      'authentication_source': 'admin',
         ... }
-        >>> orex = OrionExplorer(
+        >>> orex = DBExplorer(
         ...      user='my_username',
         ...      database='orion',
         ...      mongodb_config=mongodb_config
@@ -75,7 +75,7 @@ class DBExplorer:
 
         Args:
             user (str):
-                Unique identifier of the user that creates this OrionExporer
+                Unique identifier of the user that creates this DBExplorer
                 instance. This username or user ID will be used to populate
                 the ``created_by`` field of all the objects created in the
                 database during this session.

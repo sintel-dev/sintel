@@ -5,14 +5,21 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md', encoding='utf-8') as readme_file:
-    readme = readme_file.read()
+try:
+    with open('README.md', encoding='utf-8') as readme_file:
+        readme = readme_file.read()
+except IOError:
+    readme = ''
 
-with open('HISTORY.md', encoding='utf-8') as history_file:
-    history = history_file.read()
+try:
+    with open('HISTORY.md', encoding='utf-8') as history_file:
+        history = history_file.read()
+except IOError:
+    history = ''
 
 requirements = [
-    'Click>=6.0',
+    # Sintel
+    'orion-ml==0.2.0',
 
     # General
     'termcolor==1.1.0',
@@ -25,12 +32,7 @@ requirements = [
     'pyOpenSSL==19.1.0',
 
     # Math
-    'numpy>=1.15.4,<1.17',
-    'pandas>=0.23.4,<0.25',
-    'dtw >= 1.4.0',
-    'scikit-learn>=0.22.2',
     'pyts==0.10.0',
-    'numba==0.50.1',    # dependency of pyts
 
     # Flask
     'Flask==1.0.2',
@@ -38,26 +40,25 @@ requirements = [
     'Flask-RESTful==0.3.7',
     'requests==2.24.0',
     'Werkzeug==0.15.3',
-    'gevent==1.2.2',
+    'gevent>=21.12.0',
     'flasgger==0.9.5',
 
     # Database
-    'mongoengine>=0.16.3,<0.17',
-    'pymongo>=3.7.2,<4'
+    'pymongo>=3.7.2,<4',
+    'mongoengine>=0.20.0,<0.25'
 ]
 
 setup_requirements = [
-    'pytest-runner>=2.11.1',
+    'pytest-runner>=2.11.1'
 ]
 
 test_requirements = [
-    'coverage>=4.5.1',
-    'pytest>=4.0.2',
-    'tox>=2.9.1',
+    'pytest>=3.4.2',
+    'pytest-cov>=2.6.0',
 
-    # ------------- Flask --------------- #
+    # flask
     'pytest-flask>=0.14.0',
-    'pytest-xdist>=1.25.0',
+    'pytest-xdist>=1.25.0'
 ]
 
 development_requirements = [
@@ -65,6 +66,7 @@ development_requirements = [
     'bumpversion>=0.5.3',
     'pip>=9.0.1',
     'watchdog>=0.8.3',
+    'jupyter>=1.0.0',
 
     # docs
     'm2r>=0.2.0',
@@ -82,7 +84,11 @@ development_requirements = [
     # distribute on PyPI
     'twine>=1.10.0',
     'wheel>=0.30.0',
-    'jupyter>=1.0.0'
+
+    # advanced testing
+    'coverage>=4.5.1,<6',
+    'tox>=2.9.1,<4',
+    'invoke'
 ]
 
 
@@ -95,7 +101,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ],
     description=("Sintel(Signal Intelligence) provides Restful APIs to process"
                  "massive signal data for anomaly analysis in an efficient"
@@ -118,11 +125,11 @@ setup(
     keywords='sintel',
     name='sintel',
     packages=find_packages(include=['sintel', 'sintel.*']),
-    python_requires='>=3.6',
+    python_requires='>=3.6, <3.8',
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/signals-dev/sintel',
+    url='https://github.com/sintel-dev/sintel',
     version='0.1.0.dev0',
-    zip_safe=False,
+    zip_safe=False
 )
