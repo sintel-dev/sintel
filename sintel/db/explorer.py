@@ -1163,7 +1163,6 @@ class DBExplorer:
         prediction_results = dict()
         data = list()
         for idx, doc in enumerate(pred_docs):
-
             if idx == 0:
                 # first month
                 prediction_results['attrs'] = doc.attrs
