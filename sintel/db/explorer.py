@@ -5,16 +5,20 @@ a simple programatic access to creating and reading objects in the Sintel Databa
 """
 import json
 import logging
-from datetime import datetime, timezone
-
+import os
 import numpy as np
 import pandas as pd
+
 from bson import ObjectId
+from datetime import datetime, timezone
 from gridfs import GridFS
+from mlblocks import MLPipeline
 from mongoengine import connect
+from mongoengine.errors import NotUniqueError
 from pymongo.database import Database
 from sklearn.impute import SimpleImputer
 
+from sintel.data import load_signal
 from sintel.db import schema
 
 LOGGER = logging.getLogger(__name__)
@@ -51,7 +55,7 @@ class DBExplorer:
         Passing a path to a JSON file with connection details.
         >>> orex = DBExplorer(
         ...      user='my_username',
-        ...      database='orion',
+        ...      database='sintel',
         ...      mongodb_config='/path/to/my/mongodb_config.json',
         ... )
 
@@ -59,19 +63,19 @@ class DBExplorer:
         >>> mongodb_config = {
         ...      'host': 'localhost',
         ...      'port': 27017,
-        ...      'username': 'orion',
+        ...      'username': 'sintel',
         ...      'password': 'secret_password',
         ...      'authentication_source': 'admin',
         ... }
         >>> orex = DBExplorer(
         ...      user='my_username',
-        ...      database='orion',
+        ...      database='sintel',
         ...      mongodb_config=mongodb_config
         ... )
     """
 
-    def __init__(self, user, database='orion', mongodb_config=None):
-        """Initiaize this OrionDBExplorer.
+    def __init__(self, user, database='sintel', mongodb_config=None):
+        """Initiaize this DBExplorer.
 
         Args:
             user (str):
@@ -80,7 +84,7 @@ class DBExplorer:
                 the ``created_by`` field of all the objects created in the
                 database during this session.
             database (str):
-                Name of the MongoDB database to use. Defaults to ``orion``.
+                Name of the MongoDB database to use. Defaults to ``sintel``.
             mongodb_config (dict or str):
                 A dict or a path to JSON file with additional arguments can be
                 passed to provide connection details different than the defaults
@@ -206,6 +210,113 @@ class DBExplorer:
     # Signal #
     # ###### #
 
+    def add_signal(self, name, dataset, data_location=None, start_time=None,
+                   stop_time=None, timestamp_column=None, value_column=None,
+                   abspath=False):
+        """Add a new Signal object to the database.
+
+        The signal needs to be given a name and be associated to a Dataset.
+
+        Args:
+            name (str):
+                Name of the Signal.
+            dataset (Dataset or ObjectID or str):
+                Dataset object which the created Signal belongs to or the
+                corresponding ObjectId.
+            data_location (str):
+                Path to the CSV containing the Signal data. If the signal is
+                one of the signals provided by Orion, this can be omitted and
+                the signal will be loaded based on the signal name.
+            start_time (int):
+                Optional. Minimum timestamp to use for this signal. If not provided
+                this defaults to the minimum timestamp found in the signal data.
+            stop_time (int):
+                Optional. Maximum timestamp to use for this signal. If not provided
+                this defaults to the maximum timestamp found in the signal data.
+            timestamp_column (int):
+                Optional. Index of the timestamp column.
+            value_column (int):
+                Optional. Index of the value column.
+            abspath (bool):
+                Optional. Whether to store data location in absolute path.
+
+        Raises:
+            NotUniqueError:
+                If a Signal with the same name already exists for this Dataset.
+
+        Returns:
+            Signal
+        """
+        data_location = data_location or name
+        data = load_signal(data_location, None, timestamp_column, value_column)
+        timestamps = data['timestamp']
+        if not start_time:
+            start_time = timestamps.min()
+
+        if not stop_time:
+            stop_time = timestamps.max()
+
+        if abspath and os.path.isfile(data_location):
+            data_location = os.path.abspath(abspath)
+
+        dataset = self.get_dataset(dataset)
+
+        return schema.Signal.insert(
+            name=name,
+            dataset=dataset,
+            start_time=start_time,
+            stop_time=stop_time,
+            data_location=data_location,
+            timestamp_column=timestamp_column,
+            value_column=value_column,
+            created_by=self.user
+        )
+
+    def add_signals(self, dataset, signals_path=None, start_time=None,
+                    stop_time=None, timestamp_column=None, value_column=None,
+                    abspath=False):
+        """Add a multiple Signal objects to the database.
+
+        All the signals will be added to the Dataset using the CSV filename
+        as their name.
+
+        Args:
+            dataset (Dataset or ObjectID or str):
+                Dataset object which the created Signals belongs to or the
+                corresponding ObjectId.
+            signals_path (str):
+                Path to the folder where the signals can be found. All the CSV
+                files in this folder will be added.
+            start_time (int):
+                Optional. Minimum timestamp to use for these signals. If not provided
+                this defaults to the minimum timestamp found in the signal data.
+            stop_time (int):
+                Optional. Maximum timestamp to use for these signals. If not provided
+                this defaults to the maximum timestamp found in the signal data.
+            timestamp_column (int):
+                Optional. Index of the timestamp column.
+            value_column (int):
+                Optional. Index of the value column.
+            abspath (bool):
+                Optional. Whether to store data location in absolute path.
+        """
+        for filename in os.listdir(signals_path):
+            if filename.endswith('.csv'):
+                signal_name = filename[:-4]   # remove from filename .csv
+                try:
+                    self.add_signal(
+                        name=signal_name,
+                        dataset=dataset,
+                        data_location=os.path.join(signals_path, filename),
+                        start_time=start_time,
+                        stop_time=stop_time,
+                        timestamp_column=timestamp_column,
+                        value_column=value_column,
+                        abspath=abspath
+                    )
+                except NotUniqueError:
+                    pass
+
     def get_signals(self, name=None, dataset=None, created_by=None):
         """Query the Signals collection.
 
@@ -270,6 +381,57 @@ class DBExplorer:
     # ######## #
     # Template #
     # ######## #
+
+    def add_template(self, name, template=None):
+        """Add a new Template object to the database.
+
+        The template can be passed as a name of a registered MLPipeline,
+        or as a path to an MLPipeline JSON specification, or as a full
+        dictionary specification of an MLPipeline or directly as an
+        MLPipeline instance.
+
+        If the ``template`` argument is not passed, the given ``name`` will
+        be used to load an MLPipeline.
+
+        During this step, apart from the Template object, a new Pipeline object
+        using the default hyperparameters and with the same name as the
+        Template will also be created.
+
+        Args:
+            name (str):
+                Name of the Template.
+            template (str, dict or MLPipeline):
+                Name of the MLBlocks template to load or path to its JSON
+                file or dictionary specification or MLPipeline instance.
+                If not given, the ``name`` of the template is used.
+
+        Raises:
+            NotUniqueError:
+                If a Template with the same name already exists.
+
+        Returns:
+            Template
+        """
+        template = template or name
+        if isinstance(template, str) and os.path.isfile(template):
+            with open(template, 'r') as f:
+                template = json.load(f)
+
+        pipeline_dict = MLPipeline(template).to_dict()
+
+        template = schema.Template.insert(
+            name=name,
+            json=pipeline_dict,
+            created_by=self.user
+        )
+        schema.Pipeline.insert(
+            name=name,
+            template=template,
+            json=pipeline_dict,
+            created_by=self.user
+        )
+
+        return template
 
     def get_templates(self, name=None, created_by=None):
         """Query the Templates collection.
@@ -1119,7 +1281,7 @@ def main():
         'port': 27017  # mongodb server port
     }
 
-    explorer = DBExplorer('Liu Dongyu', 'sintel-demo', dbconfig)
+    explorer = DBExplorer('dyu', 'sintel-demo', dbconfig)
 
     start_time = datetime(2010, 2, 1 + 1, tzinfo=timezone.utc).timestamp()
     stop_time = datetime(2010, 2, 2 + 1, tzinfo=timezone.utc).timestamp()

@@ -172,7 +172,7 @@ def _split_large_prediction_data(doc, signal):
         schema.Prediction.insert(**pred_doc)
 
 
-def _update_prediction(signalrun, v, stock=True):
+def _update_prediction(signalrun, v, stock=False):
 
     try:
         data = list()
@@ -293,7 +293,7 @@ def _update_prediction(signalrun, v, stock=True):
         print(e)
 
 
-def _update_period(signalrun, v, stock=True):
+def _update_period(signalrun, v, stock=False):
     year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
     year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
 
@@ -348,7 +348,11 @@ def _update_period(signalrun, v, stock=True):
     schema.Period.insert_many(docs)
 
 
-def _update_raw(signal, interval=360, method=['mean'], stock=True):
+def _update_raw(signal, interval=21600, method=['mean'], stock=False):
+    # interval should be changed case by case
+    # ses -> 360 seconds
+    # nasa -> 4 hours
+    # stock -> 1 day
     X = load_signal(signal.data_location, timestamp_column=signal.timestamp_column,
                     value_column=signal.value_column, stock=stock)
 
@@ -422,7 +426,7 @@ def _update_raw(signal, interval=360, method=['mean'], stock=True):
         schema.SignalRaw.insert(**raw_doc)
 
 
-def update_db(fs, exp_filter=None, stock=True):
+def update_db(fs, exp_filter=None, stock=False):
 
     # get signalrun list
 
@@ -462,7 +466,7 @@ def update_db(fs, exp_filter=None, stock=True):
                     v[grid_out.variable] = pickle.loads(grid_out.read())
                 _update_prediction(signalrun, v, stock=stock)
 
-            # ------ Raw -------- #
+            # ------ Period -------- #
             if (schema.Period.find_one(signalrun=signalrun.id) is not None):
                 continue
             else:

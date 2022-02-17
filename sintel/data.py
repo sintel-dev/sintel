@@ -96,7 +96,7 @@ def download_demo(path='demo-data', split=False):
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
 
-    LOGGER.info('Downloading Orion Demo Data to folder %s', path)
+    LOGGER.info('Downloading Sintel Demo Data to folder %s', path)
     for signal in NASA_SIGNALS[0:3]:
         if split:
             download(signal + '-train', data_path=path)
@@ -158,6 +158,8 @@ def load_stock_csv(path, timestamp_column=0, value_column=4):
 
 
 def load_signal(signal, test_size=None, timestamp_column=None, value_column=None, stock=False):
+    # TODO: stock parameter is a currently hack solution
+    # to deal with stock data
     if os.path.isfile(signal):
         if (stock):
             data = load_stock_csv(signal, timestamp_column, value_column)

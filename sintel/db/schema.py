@@ -17,6 +17,7 @@ This module contains the classes that define the Orion Database Schema:
 import logging
 from datetime import datetime
 
+from mlblocks import MLPipeline
 from mongoengine import CASCADE, fields
 from pip._internal.operations import freeze
 
@@ -89,6 +90,14 @@ class Template(SintelDocument):
 
     unique_key_fields = ['name']
 
+    def load(self):
+        """Load this Template as an MLPipeline.
+
+        Returns:
+            MLPipeline
+        """
+        return MLPipeline(self.json)
+
     @property
     def pipelines(self):
         return Pipeline.find(template=self)
@@ -107,6 +116,14 @@ class Pipeline(SintelDocument):
     created_by = fields.StringField()
 
     unique_key_fields = ['name', 'template']
+
+    def load(self):
+        """Load this Pipeline as an MLPipeline.
+
+        Returns:
+            MLPipeline
+        """
+        return MLPipeline(self.json)
 
 
 class Experiment(SintelDocument):
