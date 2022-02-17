@@ -6,11 +6,11 @@ a simple programatic access to creating and reading objects in the Sintel Databa
 import json
 import logging
 import os
+from datetime import datetime, timezone
+
 import numpy as np
 import pandas as pd
-
 from bson import ObjectId
-from datetime import datetime, timezone
 from gridfs import GridFS
 from mlblocks import MLPipeline
 from mongoengine import connect
