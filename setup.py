@@ -17,7 +17,7 @@ try:
 except IOError:
     history = ''
 
-requirements = [
+install_requires = [
     # Sintel
     'orion-ml==0.2.0',
 
@@ -38,6 +38,8 @@ requirements = [
     'Flask==1.0.2',
     'Flask-Cors==3.0.7',
     'Flask-RESTful==0.3.7',
+    'itsdangerous==2.0.1',
+    'MarkupSafe==2.0.1',
     'requests==2.24.0',
     'Werkzeug==0.15.3',
     'gevent>=21.12.0',
@@ -48,30 +50,19 @@ requirements = [
     'mongoengine>=0.20.0,<0.25'
 ]
 
-setup_requirements = [
-    'pytest-runner>=2.11.1'
-]
-
-test_requirements = [
+tests_require = [
     'pytest>=3.4.2',
     'pytest-cov>=2.6.0',
-
-    # flask
     'pytest-flask>=0.14.0',
     'pytest-xdist>=1.25.0'
 ]
 
-development_requirements = [
+development_requires = [
     # general
     'bumpversion>=0.5.3',
     'pip>=9.0.1',
     'watchdog>=0.8.3',
     'jupyter>=1.0.0',
-
-    # docs
-    'm2r>=0.2.0',
-    'Sphinx>=1.7.1',
-    'sphinx_rtd_theme>=0.2.4',
 
     # style check
     'flake8>=3.5.0',
@@ -104,20 +95,19 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
-    description=("Sintel(Signal Intelligence) provides Restful APIs to process"
-                 "massive signal data for anomaly analysis in an efficient"
-                 "and user-friendly way"),
+    description=("Sintel (Signal Intelligence): A Machine Learning Framework"
+                 "to Extract Insights from Signals"),
     entry_points={
         'console_scripts': [
             'sintel=sintel.cli:main',
         ],
     },
     extras_require={
-        'test': test_requirements,
-        'dev': development_requirements + test_requirements,
+        'test': tests_require,
+        'dev': development_requires + tests_require,
     },
     install_package_data=True,
-    install_requires=requirements,
+    install_requires=install_requires,
     license="MIT license",
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
@@ -126,9 +116,7 @@ setup(
     name='sintel',
     packages=find_packages(include=['sintel', 'sintel.*']),
     python_requires='>=3.6, <3.8',
-    setup_requires=setup_requirements,
     test_suite='tests',
-    tests_require=test_requirements,
     url='https://github.com/sintel-dev/sintel',
     version='0.1.0.dev0',
     zip_safe=False

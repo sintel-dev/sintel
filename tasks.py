@@ -8,7 +8,7 @@ from invoke import task
 
 @task
 def pytest(c):
-    c.run('python -m pytest -n 2 ./tests --cov=sintel')
+    c.run('python -m pytest -n 2 ./tests')
 
 
 @task
@@ -23,8 +23,9 @@ def install_minimum(c):
             if line == ']':
                 started = False
                 continue
-
             line = line.strip()
+            if (len(line) > 0) and (line[0] == '#'):
+                continue
             line = re.sub(r',?<=?[\d.]*,?', '', line)
             line = re.sub(r'>=?', '==', line)
             line = re.sub(r"""['",]""", '', line)
@@ -40,7 +41,7 @@ def install_minimum(c):
 def minimum(c):
     install_minimum(c)
     c.run('python -m pip check')
-    c.run('python -m pytest')
+    c.run('python -m pytest -n 2 ./tests')
 
 
 @task
