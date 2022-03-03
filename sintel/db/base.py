@@ -1,4 +1,4 @@
-"""Orion Database Schema.
+"""Sintel Database Schema.
 
 This module contains some utility functions and classes that assist
 on the usage of MongoEngine to define a DB Schema.
@@ -67,9 +67,9 @@ def _merge_meta(base, child):
 
 
 class SintelMeta(TopLevelDocumentMetaclass):
-    """Metaclass for the OrionDocument class.
+    """Metaclass for the SintelDocument class.
 
-    It ensures that the ``meta`` attribute from the OrionDocument
+    It ensures that the ``meta`` attribute from the SintelDocument
     parent class is used even if the child class defines a new one
     by merging both of them together.
     """
@@ -95,7 +95,7 @@ class SintelMeta(TopLevelDocumentMetaclass):
 
 
 class SintelDocument(Document, metaclass=SintelMeta):
-    """Parent class for all the Document classes in Orion.
+    """Parent class for all the Document classes in Sintel.
 
     This class defines a few defaults, such as the ``instert_time`` field
     and index, as well as a few utility methods to ease the interaction

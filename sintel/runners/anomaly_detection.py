@@ -1,8 +1,9 @@
-"""Orion runner.
+"""Machnie Learning Task Runner.
 
-Functions responsible for executing Pipelines on Signals
-and storing the results inside an Orion Database using
-the Orion Explorer.
+This module focuses on anomaly detection and includes
+functions responsible for executing Pipelines on Signals
+and storing the results inside an Sintel Database using
+the DBExplorer.
 """
 import logging
 import pickle
@@ -77,8 +78,8 @@ def start_datarun(dbex, experiment, pipeline):
     """Start executing a Datarun and store the results on DB.
 
     Args:
-        dbex (OrionExplorer):
-            OrionExplorer instance to use to store the results
+        dbex (DBExplorer):
+            DBExplorer instance to use to store the results
             inside the Database.
         experiment (Experiment or ObjectId or str):
             The Experiment to which the created Datarun will

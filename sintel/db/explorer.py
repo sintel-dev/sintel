@@ -225,7 +225,7 @@ class DBExplorer:
                 corresponding ObjectId.
             data_location (str):
                 Path to the CSV containing the Signal data. If the signal is
-                one of the signals provided by Orion, this can be omitted and
+                one of the signals provided by Sintel, this can be omitted and
                 the signal will be loaded based on the signal name.
             start_time (int):
                 Optional. Minimum timestamp to use for this signal. If not provided

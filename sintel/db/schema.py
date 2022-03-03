@@ -1,6 +1,6 @@
-"""Orion Database Schema.
+"""Sintel Database Schema.
 
-This module contains the classes that define the Orion Database Schema:
+This module contains the classes that define the Sintel Database Schema:
     * Dataset
     * Signal
     * Template
