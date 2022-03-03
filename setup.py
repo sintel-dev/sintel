@@ -96,7 +96,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
     description=("Sintel (Signal Intelligence): A Machine Learning Framework"
@@ -119,7 +118,7 @@ setup(
     keywords='sintel',
     name='sintel',
     packages=find_packages(include=['sintel', 'sintel.*']),
-    python_requires='>=3.6, <3.8',
+    python_requires='>=3.7, <3.8',
     test_suite='tests',
     url='https://github.com/sintel-dev/sintel',
     version='0.1.0.dev0',
