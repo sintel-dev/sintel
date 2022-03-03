@@ -100,17 +100,23 @@ docker-clean: 			## remove containers, volumes, networks, and images
 
 # ----------------------- session: test ----------------------- #
 
+.PHONY: test-unit
+test-unit: ## run tests quickly with the default Python
+	invoke unit
+
+.PHONY: test-restapi
+test-restapi: ## run tests quickly with the default Python
+	invoke restapi
+
 .PHONY: test
-test: ## run tests quickly with the default Python
-	# python -m pytest tests --cov=sintel
-	py.test -n 2 ./tests
+test: test-unit test-restapi ## test everything that needs test dependencies
 
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
 	tox -r
 
-.PHONY: test-coverage
-test-coverage: ## check code coverage quickly with the default Python
+.PHONY: coverage
+coverage: ## check code coverage quickly with the default Python
 	coverage run --source sintel -m pytest
 	coverage report -m
 	coverage html
@@ -120,8 +126,7 @@ test-coverage: ## check code coverage quickly with the default Python
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
-	flake8 sintel tests --ignore W503
-	isort -c --recursive sintel tests
+	invoke lint
 
 .PHONY: fix-lint
 fix-lint: ## fix lint issues using autoflake, autopep8, and isort

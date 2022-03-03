@@ -37,7 +37,7 @@ install_requires = [
     # Flask
     'Flask==1.0.2',
     'Flask-Cors==3.0.7',
-    'Flask-RESTful==0.3.7',
+    'Flask-RESTful==0.3.9',
     'itsdangerous==2.0.1',
     'MarkupSafe==2.0.1',
     'requests==2.24.0',
@@ -79,7 +79,10 @@ development_requires = [
     # advanced testing
     'coverage>=4.5.1,<6',
     'tox>=2.9.1,<4',
-    'invoke'
+    'invoke',
+
+    # Documentation style
+    'pydocstyle==3.0.0,<4',
 ]
 
 

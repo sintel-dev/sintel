@@ -7,9 +7,12 @@ from invoke import task
 
 
 @task
-def pytest(c):
-    c.run('python -m pytest -n 2 ./tests')
+def restapi(c):
+    c.run('python -m pytest -n 4 ./tests/restapi')
 
+@task
+def unit(c):
+    c.run('python -m pytest ./tests/unit --cov=sintel')
 
 @task
 def install_minimum(c):
@@ -41,13 +44,15 @@ def install_minimum(c):
 def minimum(c):
     install_minimum(c)
     c.run('python -m pip check')
-    c.run('python -m pytest -n 2 ./tests')
+    unit(c)
+    restapi(c)
 
 
 @task
 def lint(c):
     c.run('flake8 sintel tests --ignore W503')
     c.run('isort -c --recursive sintel tests')
+    # c.run('pydocstyle sintel')
 
 
 def remove_readonly(func, path, _):
