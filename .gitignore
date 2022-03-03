@@ -4,11 +4,9 @@ tempCodeRunnerFile.ts
 tempCodeRunnerFile.py
 
 # App specific
-client/public/data/
+tutorials/data/
 db-instance/
-mtv/data/raw
-mtv/db/data
-mtv.tar*
+sintel/data
 .vscode/
 
 # Byte-compiled / optimized / DLL files

@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 def get_signalrun(signalrun_doc):
 
-    primitive_name = ('orion.primitives.timeseries_preprocessing'
+    primitive_name = ('mlprimitives.custom.timeseries_preprocessing'
                       '.time_segments_aggregate#1')
     pipeline = signalrun_doc.datarun.pipeline
     interval = int(pipeline.json['hyperparameters']
@@ -53,6 +53,7 @@ def get_signalrun(signalrun_doc):
 
     # get prediction
     prediction_data = DBExplorer.get_prediction(signalrun_doc)
+
     # prediction_doc = schema.Prediction.find_one(signalrun=signalrun_doc.id)
     signalrun['prediction'] = {
         'names': prediction_data['attrs'],

@@ -36,17 +36,16 @@ help:
 .PHONY: install
 install: clean-build clean-pyc  ## install the packages for running sintel
 	pip install .
-	$(MAKE) init-db && $(MAKE) load-db
 
 .PHONY: install-test
 install-test: clean-build clean-pyc ## install the package and test dependencies
 	pip install .[test]
-	$(MAKE) init-db && $(MAKE) load-db-test
 
 .PHONY: install-develop
 install-develop: clean-build clean-pyc  ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
-	$(MAKE) init-db && $(MAKE) load-db && $(MAKE) load-db-test
+
+# ----------------------- session: mongodb ----------------------- #
 
 .PHONY: init-db
 init-db: clean-db
@@ -59,20 +58,20 @@ init-db: clean-db
 	mkdir -p db-instance/dump
 
 .PHONY: load-db
-load-db: init-db
+load-db: init-db  ## load the demo dataset (NASA)
 	curl -o sintel.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel.tar.bz2"
 	tar -xf sintel.tar.bz2 -C ./db-instance/data/ && rm sintel.tar.bz2
 	mongo sintel --eval "db.dropDatabase()"
 	mongorestore --db sintel ./db-instance/data/sintel/
 
 .PHONY: load-db-test
-load-db-test: init-db
+load-db-test: init-db  ## load the demo testing dataset for pytest
 	curl -o sintel_test.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel_test.tar.bz2"
 	tar -xf sintel_test.tar.bz2 -C ./db-instance/data/ && rm sintel_test.tar.bz2
 	mongo sintel_test --eval "db.dropDatabase()"
 	mongorestore --db sintel_test ./db-instance/data/sintel_test/
 
-# ------------------ session: docker installation ------------------- #
+# ------------------ session: docker ------------------- #
 .PHONY: docker-db-up
 docker-db-up: init-db	## download data and load them into mongodb
 	curl -o sintel.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel.tar.bz2"
@@ -101,17 +100,23 @@ docker-clean: 			## remove containers, volumes, networks, and images
 
 # ----------------------- session: test ----------------------- #
 
+.PHONY: test-unit
+test-unit: ## run tests quickly with the default Python
+	invoke unit
+
+.PHONY: test-restapi
+test-restapi: ## run tests quickly with the default Python
+	invoke restapi
+
 .PHONY: test
-test: ## run tests quickly with the default Python
-	# python -m pytest tests --cov=sintel
-	py.test -n 2 ./tests
+test: test-unit test-restapi ## test everything that needs test dependencies
 
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
 	tox -r
 
-.PHONY: test-coverage
-test-coverage: ## check code coverage quickly with the default Python
+.PHONY: coverage
+coverage: ## check code coverage quickly with the default Python
 	coverage run --source sintel -m pytest
 	coverage report -m
 	coverage html
@@ -121,8 +126,7 @@ test-coverage: ## check code coverage quickly with the default Python
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
-	flake8 sintel tests --ignore W503
-	isort -c --recursive sintel tests
+	invoke lint
 
 .PHONY: fix-lint
 fix-lint: ## fix lint issues using autoflake, autopep8, and isort
