@@ -251,7 +251,7 @@ class Signalrun(SintelDocument, Status):
                 )
         except Exception:
             LOGGER.exception('Error storing signalrun %s events', self.id)
-            status = self.STATUS_ERROR
+            status = self.STATUS_ERRORED
 
         self.end_time = datetime.utcnow()
         self.status = status
