@@ -63,7 +63,7 @@ development_requires = [
     'pip>=9.0.1',
     'watchdog>=0.8.3',
     'jupyter>=1.0.0',
-    'Jinja2<3.1',
+    'Jinja2>=2,<3',
 
     # style check
     'flake8>=3.5.0',
