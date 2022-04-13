@@ -63,6 +63,7 @@ development_requires = [
     'pip>=9.0.1',
     'watchdog>=0.8.3',
     'jupyter>=1.0.0',
+    'Jinja2<3.1',
 
     # style check
     'flake8>=3.5.0',
@@ -82,7 +83,7 @@ development_requires = [
     'invoke',
 
     # Documentation style
-    'pydocstyle==3.0.0,<4',
+    'pydocstyle==3.0.0,<4'
 ]
 
 
