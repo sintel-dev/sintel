@@ -44,6 +44,7 @@ install_requires = [
     'Werkzeug==0.15.3',
     'gevent>=21.12.0',
     'flasgger==0.9.5',
+    'Jinja2>=2,<3',
 
     # Database
     'pymongo>=3.7.2,<4',
@@ -63,7 +64,6 @@ development_requires = [
     'pip>=9.0.1',
     'watchdog>=0.8.3',
     'jupyter>=1.0.0',
-    'Jinja2>=2,<3',
 
     # style check
     'flake8>=3.5.0',
