@@ -44,6 +44,7 @@ install_requires = [
     'Werkzeug==0.15.3',
     'gevent>=21.12.0',
     'flasgger==0.9.5',
+    'Jinja2>=2.10,<3.1',
 
     # Database
     'pymongo>=3.7.2,<4',
@@ -82,7 +83,7 @@ development_requires = [
     'invoke',
 
     # Documentation style
-    'pydocstyle==3.0.0,<4',
+    'pydocstyle==3.0.0,<4'
 ]
 
 
