@@ -196,3 +196,8 @@ clean-logs: ## remove logs
 clean-db:
 	rm -f -r ./db-instance/data/*
 	rm -f -r ./db-instance/log/*
+
+.PHONY: checkdeps
+checkdeps: # Save the currently installed versions of the dependencies as the latest versions
+	$(eval allow_list='orion-ml|pymongo|mongoengine|gevent|Jinja2')
+	pip freeze | grep -v "sintel-dev/sintel.git" | grep -E $(allow_list) > $(OUTPUT_PATH)
