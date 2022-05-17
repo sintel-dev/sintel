@@ -19,7 +19,7 @@ except IOError:
 
 install_requires = [
     # Sintel
-    'orion-ml==0.2.0',
+    'orion-ml>=0.2.0,<1',
 
     # General
     'termcolor==1.1.0',
