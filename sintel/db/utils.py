@@ -14,7 +14,6 @@ from sintel.db import schema
 
 LOGGER = logging.getLogger(__name__)
 
-
 def _exp_is_in(exp, exp_filter):
     for f in exp_filter:
         name = f.get('name', None)
@@ -134,42 +133,60 @@ def _inverse_scale_transform(v, a0, b0, a1, b1):
     return k * (b1 - a1) + a1
 
 
-def _split_large_prediction_data(doc, signal):
-    current_year = -1
-    current_month = -1
-    year_month_data = list()
+def _split_large_prediction_data(doc, signalrun):
+    
+    # save as gridfs
+    kwargs = {
+        "filename": f'sp-{signalrun.id}',
+        "variable": 'prediction doc'
+    }
+    with g_fs.new_file(**kwargs) as f:
+        pickle.dump(doc, f)
+        
+    return
+    # test load
+    # for grid_out in g_fs.find({'filename': f'sp-{signalrun.id}'}, no_cursor_timeout=True):
+    #     daa = pickle.loads(grid_out.read())
+    #     print(daa.keys())
+    # grid_out_doc = g_fs.find_one({'filename': f'sp-{signalrun.id}'}, no_cursor_timeout=True)
+    # daa = pickle.loads(grid_out_doc.read())
+    # print(daa.keys())
+    
+#     current_year = -1
+#     current_month = -1
+#     year_month_data = list()
 
-    signal_start_dt = datetime.utcfromtimestamp(signal.start_time)
+#     signal_start_dt = datetime.utcfromtimestamp(signalrun.signal.start_time)
 
-    for d in doc['data']:
-        dt = datetime.utcfromtimestamp(d[0])
-        y_idx = dt.year - signal_start_dt.year
-        m_idx = dt.month
-        index = y_idx * 12 + (m_idx - 1)
-        if (dt.year != current_year or current_month != dt.month):
-            if len(year_month_data) > 0:
-                pred_doc = {
-                    'signalrun': doc['signalrun'],
-                    'attrs': doc['attrs'],
-                    'index': index,
-                    'data': year_month_data
-                }
-                schema.Prediction.insert(**pred_doc)
-            year_month_data = list()
-            current_year = dt.year
-            current_month = dt.month
+#     for d in doc['data']:
+#         dt = datetime.utcfromtimestamp(d[0])
+#         y_idx = dt.year - signal_start_dt.year
+#         m_idx = dt.month
+#         index = y_idx * 12 + (m_idx - 1)
+#         if (dt.year != current_year or current_month != dt.month):
+#             if len(year_month_data) > 0:
+#                 pred_doc = {
+#                     'signalrun': doc['signalrun'],
+#                     'attrs': doc['attrs'],
+#                     'index': index,
+#                     'data': year_month_data
+#                 }
+#                 schema.Prediction.insert(**pred_doc)
+#             year_month_data = list()
+#             current_year = dt.year
+#             current_month = dt.month
 
-        year_month_data.append(d)
+#         year_month_data.append(d)
 
-    # handle the last one
-    if len(year_month_data) > 0:
-        pred_doc = {
-            'signalrun': doc['signalrun'],
-            'attrs': doc['attrs'],
-            'index': index,
-            'data': year_month_data
-        }
-        schema.Prediction.insert(**pred_doc)
+#     # handle the last one
+#     if len(year_month_data) > 0:
+#         pred_doc = {
+#             'signalrun': doc['signalrun'],
+#             'attrs': doc['attrs'],
+#             'index': index,
+#             'data': year_month_data
+#         }
+#         schema.Prediction.insert(**pred_doc)
 
 
 def _update_prediction(signalrun, v, stock=False):
@@ -288,7 +305,7 @@ def _update_prediction(signalrun, v, stock=False):
             'data': data_
         }
 
-        _split_large_prediction_data(doc, signalrun.signal)
+        _split_large_prediction_data(doc, signalrun)
     except Exception as e:
         print(e)
 
@@ -296,19 +313,21 @@ def _update_prediction(signalrun, v, stock=False):
 def _update_period(signalrun, v, stock=False):
     year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
     year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
-
+    
     # construct dataframe from ndarrays
     data = pd.DataFrame(data=v['X_raw'], index=v['raw_index'])
-
+    
     # optimal interval for periodical description
     diff = (v['raw_index'][1] - v['raw_index'][0]) / 60
     my_interval = 1440
-    for interval in [30, 60, 120, 180, 240, 360, 480, 720]:
+    for interval in [6, 30, 60, 120, 180, 240, 360, 480, 720]:
         if diff <= interval:
             my_interval = interval
             break
 
     day_bin_num = 24 * 60 // my_interval
+    
+    print(f'*update period* my_interval: {my_interval}m, day_bin_num: {day_bin_num}')
 
     docs = []
     # year
@@ -348,11 +367,12 @@ def _update_period(signalrun, v, stock=False):
     schema.Period.insert_many(docs)
 
 
-def _update_raw(signal, interval=21600, method=['mean'], stock=False):
+def _update_raw(signal, interval=360, method=['mean'], stock=False):
     # interval should be changed case by case
     # ses -> 360 seconds
     # nasa -> 4 hours
     # stock -> 1 day
+    print(f'*update raw*  interval: {interval}s')
     X = load_signal(signal.data_location, timestamp_column=signal.timestamp_column,
                     value_column=signal.value_column, stock=stock)
 
@@ -428,6 +448,9 @@ def _update_raw(signal, interval=21600, method=['mean'], stock=False):
 
 def update_db(fs, exp_filter=None, stock=False):
 
+    global g_fs
+    g_fs = fs
+    
     # get signalrun list
 
     # TODO: remove utc setting, it should be always True

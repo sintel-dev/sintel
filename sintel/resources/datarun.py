@@ -1,4 +1,6 @@
 import logging
+import sys
+import json
 
 from bson import ObjectId
 from flask_restful import Resource, reqparse
@@ -9,6 +11,7 @@ from sintel.resources.computing.utils.layout import tsne
 from sintel.resources.experiment import validate_experiment_id
 
 LOGGER = logging.getLogger(__name__)
+
 
 
 def get_signalrun(signalrun_doc):
@@ -68,7 +71,7 @@ def get_signalrun(signalrun_doc):
             'year': period_doc.year,
             'data': period_doc.data
         })
-
+    
     return signalrun
 
 
@@ -93,8 +96,9 @@ def get_datarun(datarun_doc):
         signalruns.append(signalrun)
 
     # TODO: add layout option
-    if len(signalruns) > 1:
-        signalruns = tsne(signalruns)
+    # Do not use tse layout for now - jan 24 2023
+    # if len(signalruns) > 1:
+    #     signalruns = tsne(signalruns)
     return signalruns
 
 
@@ -246,4 +250,9 @@ class Dataruns(Resource):
             LOGGER.exception(e)
             return {'message': str(e)}, 500
         else:
+            print(f'ready to return dataruns: {experiment_doc.id}')
+            print(len(dataruns), sys.getsizeof(dataruns))
+            print(dataruns[0].keys())
+            with open('/home/dongyu/apps/sintel-mtvtest/tutorials/dataruns-2week.json', 'w') as f:
+                json.dump(dataruns, f)
             return {'dataruns': dataruns}
