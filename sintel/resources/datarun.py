@@ -249,8 +249,8 @@ class Dataruns(Resource):
             return {'message': str(e)}, 500
         else:
             print(f'ready to return dataruns: {experiment_doc.id}')
-            print(len(dataruns), sys.getsizeof(dataruns))
-            print(dataruns[0].keys())
-            with open('/home/dongyu/apps/sintel-mtvtest/tutorials/dataruns-2week.json', 'w') as f:
-                json.dump(dataruns, f)
+            # print(len(dataruns), sys.getsizeof(dataruns))
+            # print(dataruns[0].keys())
+            # with open('/home/dongyu/apps/sintel/tutorials/dataruns-1week.json', 'w') as f:
+            #     json.dump(dataruns, f)
             return {'dataruns': dataruns}
