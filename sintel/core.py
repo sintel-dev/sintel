@@ -8,6 +8,7 @@ from gevent.pywsgi import WSGIServer
 from gridfs import GridFS
 from mongoengine import connect
 from pymongo import MongoClient
+from pymongo.database import Database
 from termcolor import colored
 
 from sintel import g
@@ -26,9 +27,12 @@ class Sintel:
         if not docker:
             self._db = connect(db=cf['db'], host=cf['host'], port=cf['port'],
                                username=cf['username'], password=cf['password'])
+            _fs = GridFS(Database(self._db, cf['db']))
         else:
             self._db = connect(db=cf['dk_db'], host=cf['dk_host'], port=cf['dk_port'],
                                username=cf['dk_username'], password=cf['dk_password'])
+            _fs = GridFS(Database(self._db, cf['dk_db']))
+        g['_fs'] = _fs
 
     def _init_flask_app(self, env):
         app = Flask(

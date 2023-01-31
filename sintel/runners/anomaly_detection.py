@@ -7,6 +7,8 @@ the Orion Explorer.
 import logging
 import pickle
 
+import numpy as np
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -33,6 +35,8 @@ def process_pipeline_output(dbex, signalrun, pipeline_output, output_names):
         visualization = pipeline_output[-len(output_names):]
         visualization_dict = dict(zip(output_names, visualization))
         for name, value in visualization_dict.items():
+            print(name, type(value), value.shape)
+            print('value[0]', type(value[0]), value[0])
             kwargs = {
                 "filename": '{}-{}.pkl'.format(signalrun.id, name),
                 "signalrun_id": signalrun.id,
@@ -73,6 +77,55 @@ def start_signalrun(dbex, datarun, signal):
     signalrun.end(status, events)
 
 
+def start_signalrun_without_mlpipeline(dbex, datarun, signal):
+    signalrun = dbex.add_signalrun(datarun, signal)
+    signalrun.start()
+    LOGGER.info('Signalrun %s started', signalrun.id)
+
+    try:
+        data = signalrun.signal.load()
+        pipeline = signalrun.datarun.pipeline
+        mlpipeline = pipeline.load()
+        outputs, output_names = get_outputs_spec(mlpipeline)
+
+        LOGGER.info('Signal %s; Signalrun %s', signal.name, signalrun.id)
+        pipeline_output = list()
+        output_names = ['X_raw', 'raw_index', 'X_nm', 'target_index', 'y', 'y_hat', 'es']
+        _X = data['value'].values.reshape((-1, 1))
+        _index = data['timestamp'].values
+        pipeline_output = [
+            [],
+            _X, _index, _X, _index,
+            _X, _X,
+            np.zeros(data['value'].shape[0], dtype=float)
+        ]
+
+        if output_names:
+            # There might be multiple `default` outputs before the `visualization`
+            # outputs in the pipeline_output tuple, thus we get the last entries
+            # corresponding to visualization
+            visualization = pipeline_output[1:]
+            visualization_dict = dict(zip(output_names, visualization))
+            for name, value in visualization_dict.items():
+                kwargs = {
+                    "filename": '{}-{}.pkl'.format(signalrun.id, name),
+                    "signalrun_id": signalrun.id,
+                    "variable": name
+                }
+                with dbex._fs.new_file(**kwargs) as f:
+                    pickle.dump(value, f)
+
+        events = pipeline_output[0]
+        status = signalrun.STATUS_SUCCESS
+
+    except Exception:
+        LOGGER.exception('Signalrun %s crashed', signalrun.id)
+        events = []
+        status = signalrun.STATUS_ERRORED
+
+    signalrun.end(status, events)
+
+
 def start_datarun(dbex, experiment, pipeline):
     """Start executing a Datarun and store the results on DB.
 
@@ -92,7 +145,8 @@ def start_datarun(dbex, experiment, pipeline):
 
     try:
         for signal in experiment.signals:
-            start_signalrun(dbex, datarun, signal)
+            # start_signalrun(dbex, datarun, signal)
+            start_signalrun_without_mlpipeline(dbex, datarun, signal)
 
         status = datarun.STATUS_SUCCESS
 

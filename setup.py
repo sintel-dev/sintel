@@ -19,8 +19,8 @@ except IOError:
 
 install_requires = [
     # Sintel
-    'orion-ml>=0.2.0,<1',
-
+    # 'orion-ml>=0.4.0',
+    'orion-ml@git+https://git@github.com/sintel-dev/Orion.git',
     # General
     'termcolor==1.1.0',
     'PyYAML==5.1',
@@ -29,7 +29,7 @@ install_requires = [
 
     # Auth
     'oauthlib==3.1.0',
-    'pyOpenSSL==19.1.0',
+    'pyOpenSSL==23.0.0',
 
     # Math
     'pyts==0.10.0',
@@ -41,7 +41,7 @@ install_requires = [
     'itsdangerous==2.0.1',
     'MarkupSafe==2.0.1',
     'requests==2.24.0',
-    'Werkzeug==0.15.3',
+    'Werkzeug==0.15.5',
     'gevent>=21.12.0',
     'flasgger==0.9.5',
     'Jinja2>=2.10,<3.1',
@@ -97,7 +97,8 @@ setup(
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8'
     ],
     description=("Sintel (Signal Intelligence): A Machine Learning Framework"
                  "to Extract Insights from Signals"),
@@ -119,7 +120,7 @@ setup(
     keywords='sintel',
     name='sintel',
     packages=find_packages(include=['sintel', 'sintel.*']),
-    python_requires='>=3.6, <3.8',
+    python_requires='>=3.6, <3.9',
     test_suite='tests',
     url='https://github.com/sintel-dev/sintel',
     version='0.1.0.dev0',

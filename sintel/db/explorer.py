@@ -6,6 +6,7 @@ a simple programatic access to creating and reading objects in the Sintel Databa
 import json
 import logging
 import os
+import pickle
 from datetime import datetime, timezone
 
 import numpy as np
@@ -18,6 +19,7 @@ from mongoengine.errors import NotUniqueError
 from pymongo.database import Database
 from sklearn.impute import SimpleImputer
 
+from sintel import g
 from sintel.data import load_signal
 from sintel.db import schema
 
@@ -1142,42 +1144,49 @@ class DBExplorer:
         """
 
         signalrun_doc = schema.Signalrun.find_one(signalrun=signalrun)
-        signal_doc = signalrun_doc.signal
+#         signal_doc = signalrun_doc.signal
 
-        signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
+#         signal_start_year = datetime.utcfromtimestamp(signal_doc.start_time).year
 
-        if start_time is None:
-            start_time = signal_doc.start_time
-        if stop_time is None:
-            stop_time = signal_doc.stop_time
+#         if start_time is None:
+#             start_time = signal_doc.start_time
+#         if stop_time is None:
+#             stop_time = signal_doc.stop_time
 
-        start_dt = datetime.utcfromtimestamp(start_time)
-        stop_dt = datetime.utcfromtimestamp(stop_time)
-        start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
-        stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
+#         start_dt = datetime.utcfromtimestamp(start_time)
+#         stop_dt = datetime.utcfromtimestamp(stop_time)
+#         start_idx = (start_dt.year - signal_start_year) * 12 + start_dt.month
+#         stop_idx = (stop_dt.year - signal_start_year) * 12 + stop_dt.month
 
-        pred_docs = schema.Prediction.find(signalrun=signalrun,
-                                           index__gte=start_idx, index__lte=stop_idx)
-        pred_docs = pred_docs.order_by('+index')
+#         pred_docs = schema.Prediction.find(signalrun=signalrun,
+#                                            index__gte=start_idx, index__lte=stop_idx)
+#         pred_docs = pred_docs.order_by('+index')
 
+#         prediction_results = dict()
+#         data = list()
+#         for idx, doc in enumerate(pred_docs):
+#             if idx == 0:
+#                 # first month
+#                 prediction_results['attrs'] = doc.attrs
+#                 for d in doc.data:
+#                     if d[0] >= start_time and d[0] <= stop_time:
+#                         data.append(d)
+#             elif idx != 0 and idx == len(pred_docs) - 1:
+#                 # last month but not the first
+#                 for d in doc.data:
+#                     if d[0] >= start_time and d[0] <= stop_time:
+#                         data.append(d)
+#             else:
+#                 data.extend(doc.data)
+
+#         prediction_results['data'] = data
         prediction_results = dict()
-        data = list()
-        for idx, doc in enumerate(pred_docs):
-            if idx == 0:
-                # first month
-                prediction_results['attrs'] = doc.attrs
-                for d in doc.data:
-                    if d[0] >= start_time and d[0] <= stop_time:
-                        data.append(d)
-            elif idx != 0 and idx == len(pred_docs) - 1:
-                # last month but not the first
-                for d in doc.data:
-                    if d[0] >= start_time and d[0] <= stop_time:
-                        data.append(d)
-            else:
-                data.extend(doc.data)
+        grid_out_doc = g['_fs'].find_one(
+            {'filename': f'sp-{signalrun_doc.id}'}, no_cursor_timeout=True)
+        pdata = pickle.loads(grid_out_doc.read())
+        prediction_results['attrs'] = pdata['attrs']
+        prediction_results['data'] = pdata['data']
 
-        prediction_results['data'] = data
         return prediction_results
 
     # ########## #
