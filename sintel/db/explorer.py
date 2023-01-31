@@ -6,9 +6,9 @@ a simple programatic access to creating and reading objects in the Sintel Databa
 import json
 import logging
 import os
+import pickle
 from datetime import datetime, timezone
 
-import pickle
 import numpy as np
 import pandas as pd
 from bson import ObjectId
@@ -1181,11 +1181,12 @@ class DBExplorer:
 
 #         prediction_results['data'] = data
         prediction_results = dict()
-        grid_out_doc = g['_fs'].find_one({'filename': f'sp-{signalrun_doc.id}'}, no_cursor_timeout=True)
+        grid_out_doc = g['_fs'].find_one(
+            {'filename': f'sp-{signalrun_doc.id}'}, no_cursor_timeout=True)
         pdata = pickle.loads(grid_out_doc.read())
         prediction_results['attrs'] = pdata['attrs']
         prediction_results['data'] = pdata['data']
-        
+
         return prediction_results
 
     # ########## #

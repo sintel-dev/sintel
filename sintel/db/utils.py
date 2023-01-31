@@ -14,6 +14,7 @@ from sintel.db import schema
 
 LOGGER = logging.getLogger(__name__)
 
+
 def _exp_is_in(exp, exp_filter):
     for f in exp_filter:
         name = f.get('name', None)
@@ -134,7 +135,7 @@ def _inverse_scale_transform(v, a0, b0, a1, b1):
 
 
 def _split_large_prediction_data(doc, signalrun):
-    
+
     # save as gridfs
     kwargs = {
         "filename": f'sp-{signalrun.id}',
@@ -142,7 +143,7 @@ def _split_large_prediction_data(doc, signalrun):
     }
     with g_fs.new_file(**kwargs) as f:
         pickle.dump(doc, f)
-        
+
     return
     # test load
     # for grid_out in g_fs.find({'filename': f'sp-{signalrun.id}'}, no_cursor_timeout=True):
@@ -151,7 +152,7 @@ def _split_large_prediction_data(doc, signalrun):
     # grid_out_doc = g_fs.find_one({'filename': f'sp-{signalrun.id}'}, no_cursor_timeout=True)
     # daa = pickle.loads(grid_out_doc.read())
     # print(daa.keys())
-    
+
 #     current_year = -1
 #     current_month = -1
 #     year_month_data = list()
@@ -313,10 +314,10 @@ def _update_prediction(signalrun, v, stock=False):
 def _update_period(signalrun, v, stock=False):
     year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
     year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
-    
+
     # construct dataframe from ndarrays
     data = pd.DataFrame(data=v['X_raw'], index=v['raw_index'])
-    
+
     # optimal interval for periodical description
     diff = (v['raw_index'][1] - v['raw_index'][0]) / 60
     my_interval = 1440
@@ -326,7 +327,7 @@ def _update_period(signalrun, v, stock=False):
             break
 
     day_bin_num = 24 * 60 // my_interval
-    
+
     print(f'*update period* my_interval: {my_interval}m, day_bin_num: {day_bin_num}')
 
     docs = []
@@ -450,7 +451,7 @@ def update_db(fs, exp_filter=None, stock=False):
 
     global g_fs
     g_fs = fs
-    
+
     # get signalrun list
 
     # TODO: remove utc setting, it should be always True

@@ -1,17 +1,15 @@
+import json
 import logging
 import sys
-import json
 
 from bson import ObjectId
 from flask_restful import Resource, reqparse
 
 from sintel.db import DBExplorer, schema
 from sintel.resources.auth_utils import requires_auth
-from sintel.resources.computing.utils.layout import tsne
 from sintel.resources.experiment import validate_experiment_id
 
 LOGGER = logging.getLogger(__name__)
-
 
 
 def get_signalrun(signalrun_doc):
@@ -71,7 +69,7 @@ def get_signalrun(signalrun_doc):
             'year': period_doc.year,
             'data': period_doc.data
         })
-    
+
     return signalrun
 
 

@@ -6,6 +6,7 @@ the Orion Explorer.
 """
 import logging
 import pickle
+
 import numpy as np
 
 LOGGER = logging.getLogger(__name__)
@@ -74,7 +75,8 @@ def start_signalrun(dbex, datarun, signal):
         status = signalrun.STATUS_ERRORED
 
     signalrun.end(status, events)
-    
+
+
 def start_signalrun_without_mlpipeline(dbex, datarun, signal):
     signalrun = dbex.add_signalrun(datarun, signal)
     signalrun.start()
@@ -89,15 +91,15 @@ def start_signalrun_without_mlpipeline(dbex, datarun, signal):
         LOGGER.info('Signal %s; Signalrun %s', signal.name, signalrun.id)
         pipeline_output = list()
         output_names = ['X_raw', 'raw_index', 'X_nm', 'target_index', 'y', 'y_hat', 'es']
-        _X = data['value'].values.reshape((-1,1))
+        _X = data['value'].values.reshape((-1, 1))
         _index = data['timestamp'].values
-        pipeline_output = [ 
-            [], 
+        pipeline_output = [
+            [],
             _X, _index, _X, _index,
             _X, _X,
             np.zeros(data['value'].shape[0], dtype=float)
         ]
-        
+
         if output_names:
             # There might be multiple `default` outputs before the `visualization`
             # outputs in the pipeline_output tuple, thus we get the last entries
@@ -112,7 +114,7 @@ def start_signalrun_without_mlpipeline(dbex, datarun, signal):
                 }
                 with dbex._fs.new_file(**kwargs) as f:
                     pickle.dump(value, f)
-                    
+
         events = pipeline_output[0]
         status = signalrun.STATUS_SUCCESS
 
