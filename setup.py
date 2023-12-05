@@ -32,7 +32,7 @@ install_requires = [
     'pyOpenSSL==23.0.0',
 
     # Math
-    'pyts==0.10.0',
+    'pyts>=0.10.0',
 
     # Flask
     'Flask==1.0.2',
