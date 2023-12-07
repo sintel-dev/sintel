@@ -320,7 +320,6 @@ def _update_period(signalrun, v, my_interval=1440, stock=False):
 
     # optimal interval for periodical description
     diff = (v['raw_index'][1] - v['raw_index'][0]) / 60
-    my_interval = 1440
     for interval in [6, 30, 60, 120, 180, 240, 360, 480, 720]:
         if diff <= interval:
             my_interval = interval
