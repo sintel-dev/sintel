@@ -311,7 +311,7 @@ def _update_prediction(signalrun, v, stock=False):
         print(e)
 
 
-def _update_period(signalrun, v, stock=False):
+def _update_period(signalrun, v, my_interval=1440, stock=False):
     year_start = datetime.utcfromtimestamp(v['raw_index'][0]).year
     year_end = datetime.utcfromtimestamp(v['raw_index'][-1]).year
 
@@ -320,7 +320,6 @@ def _update_period(signalrun, v, stock=False):
 
     # optimal interval for periodical description
     diff = (v['raw_index'][1] - v['raw_index'][0]) / 60
-    my_interval = 1440
     for interval in [6, 30, 60, 120, 180, 240, 360, 480, 720]:
         if diff <= interval:
             my_interval = interval
@@ -447,7 +446,7 @@ def _update_raw(signal, interval=360, method=['mean'], stock=False):
         schema.SignalRaw.insert(**raw_doc)
 
 
-def update_db(fs, exp_filter=None, stock=False):
+def update_db(fs, interval=360, my_interval=1440, exp_filter=None, stock=False):
 
     global g_fs
     g_fs = fs
@@ -463,7 +462,7 @@ def update_db(fs, exp_filter=None, stock=False):
             cc += 1
             LOGGER.info('{}/{}: Processing signal {}'.format(cc, total, signal.name))
             if not schema.SignalRaw.find_one(signal=signal):
-                _update_raw(signal, stock=stock)
+                _update_raw(signal, interval=interval, stock=stock)
             else:
                 LOGGER.info('Skip - this signal data has been processed previously')
         except Exception as e:
@@ -494,7 +493,7 @@ def update_db(fs, exp_filter=None, stock=False):
             if (schema.Period.find_one(signalrun=signalrun.id) is not None):
                 continue
             else:
-                _update_period(signalrun, v, stock=stock)
+                _update_period(signalrun, v, my_interval=my_interval, stock=stock)
 
         except Exception as e:
             print(e)
