@@ -19,8 +19,8 @@ except IOError:
 
 install_requires = [
     # Sintel
-    # 'orion-ml>=0.4.0',
-    'orion-ml@git+https://git@github.com/sintel-dev/Orion.git',
+    'orion-ml==0.5.2',
+    # 'orion-ml@git+https://git@github.com/sintel-dev/Orion.git',
     # General
     'termcolor==1.1.0',
     'PyYAML==5.1',
