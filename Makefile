@@ -61,14 +61,14 @@ init-db: clean-db
 load-db: init-db  ## load the demo dataset (NASA)
 	curl -o sintel.tar.bz2 "https://sintel-db.s3.us-east-2.amazonaws.com/sintel.tar.bz2"
 	tar -xf sintel.tar.bz2 -C ./db-instance/data/ && rm sintel.tar.bz2
-	mongo sintel --eval "db.dropDatabase()"
+	mongosh sintel --eval "db.dropDatabase()"
 	mongorestore --db sintel ./db-instance/data/sintel/
 
 .PHONY: load-db-test
 load-db-test: init-db  ## load the demo testing dataset for pytest
 	curl -o sintel_test.tar.bz2 "https://d3-ai-sintel.s3.us-east-2.amazonaws.com/sintel_test.tar.bz2"
 	tar -xf sintel_test.tar.bz2 -C ./db-instance/data/ && rm sintel_test.tar.bz2
-	mongo sintel_test --eval "db.dropDatabase()"
+	mongosh sintel_test --eval "db.dropDatabase()"
 	mongorestore --db sintel_test ./db-instance/data/sintel_test/
 
 # ------------------ session: docker ------------------- #

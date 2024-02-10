@@ -26,9 +26,9 @@
 
 Make sure you have installed all of the following prerequisites on your development machine:
 
--   **Python (>= 3.0)** - Sintel has been developed and runs on [Python 3.6](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run. To this end, [Anaconda python](https://www.anaconda.com/distribution/#download-section) is suggested to maintain the virtual environments.
+-   **Python (>= 3.8)** - Sintel has been developed and runs on [Python 3.8](https://www.python.org/downloads/release/python-360/). Although it is not strictly required, the usage of a [virtualenv](https://virtualenv.pypa.io/en/latest/) is highly recommended in order to avoid interfering with other software installed in the system where **MTV** is run. To this end, [Anaconda python](https://www.anaconda.com/distribution/#download-section) is suggested to maintain the virtual environments.
 -   **Git** - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
--   **MongoDB (>= 3.6)** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
+-   **MongoDB (>= 4.4)** - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).
 
 ## Get Started
 
@@ -46,6 +46,11 @@ dependencies for code linting and testing
 
 ```bash
 $ make install-develop
+```
+
+Download demo data and load it to the mongodb. The database name by default is `sintel`.
+```bash
+$ make load-db
 ```
 
 ### Running Your Application
@@ -66,17 +71,10 @@ Run the following command for the purpose of development
 $ sintel run -E development -v
 ```
 
-### Data
+### Use Your Own Data
 
-The command `make install` or `make install-develop` has already pull the demo dataset and restore it into MongoDB. The database name by default is `sintel`.
 
-##### Working with [Orion](https://github.com/D3-AI/Orion) to generate your own data
-
-You can type the following command to update the data from Orion to Sintel-supported formats. Note that you can configure the mongodb in the file `./sintel/config.yaml`.
-
-```bash
-$ sintel update db -v
-```
+Follow the tutorial `.tutorials/Anomaly Detection.ipynb` for detail.
 
 
 ## Use Docker to deploy

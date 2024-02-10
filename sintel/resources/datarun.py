@@ -14,8 +14,9 @@ LOGGER = logging.getLogger(__name__)
 
 def get_signalrun(signalrun_doc):
 
-    primitive_name = ('mlprimitives.custom.timeseries_preprocessing'
+    primitive_name = ('mlstars.custom.timeseries_preprocessing'
                       '.time_segments_aggregate#1')
+    print(primitive_name)
     pipeline = signalrun_doc.datarun.pipeline
     interval = int(pipeline.json['hyperparameters']
                    [primitive_name].get('interval', None))
