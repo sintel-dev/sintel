@@ -6,10 +6,8 @@
 [![Development Status](https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow)](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 [![PyPI Shield](https://img.shields.io/pypi/v/sintel.svg)](https://pypi.python.org/pypi/sintel)
 [![Github Workflow Status](https://img.shields.io/github/workflow/status/signals-dev/sintel/CI)](https://github.com/signals-dev/sintel/actions)
-<!-- [![Travis CI Shield](https://travis-ci.org/signals-dev/sintel.svg?branch=master)](https://travis-ci.org/signals-dev/sintel) -->
 [![Coverage Status](https://codecov.io/gh/signals-dev/sintel/branch/master/graph/badge.svg?token=WwM2IJURrq)](https://codecov.io/gh/signals-dev/sintel)
 [![Downloads](https://pepy.tech/badge/sintel)](https://pepy.tech/project/sintel)
-<!-- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/signals-dev/sintel/master?filepath=tutorials) -->
 # Sintel
 
 **Sintel** (Signal Intelligence) provides Restful APIs to process massive signal data for anomaly analysis in an efficient and user-friendly way.
@@ -17,9 +15,6 @@
 * License: [MIT](https://github.com/signals-dev/sintel/blob/master/LICENSE)
 * Development Status: [Pre-Alpha](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 * Homepage: https://github.com/sintel-dev/sintel
-* Documentation:
-    * http://mtv.lids.mit.edu:3000/apidocs (Swagger UI style)
-    * http://mtv.lids.mit.edu:3000/redoc (Redoc UI style)
 
 
 ## Prerequisites
@@ -71,9 +66,13 @@ Run the following command for the purpose of development
 $ sintel run -E development -v
 ```
 
+### API Documentations
+Once the server runs up, you should be able to open the following API interfaces:
+
+- http://localhost:3000/apidocs (Swagger UI style)
+- http://localhost:3000/redoc (Redoc UI style)
+
 ### Use Your Own Data
-
-
 Follow the tutorial `.tutorials/Anomaly Detection.ipynb` for detail.
 
 
