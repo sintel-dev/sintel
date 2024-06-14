@@ -1,15 +1,15 @@
 {
     "primitives": [
-        "mlprimitives.custom.timeseries_preprocessing.time_segments_aggregate",
+        "mlstars.custom.timeseries_preprocessing.time_segments_aggregate",
         "sklearn.impute.SimpleImputer",
         "sklearn.preprocessing.MinMaxScaler",
-        "mlprimitives.custom.timeseries_preprocessing.rolling_window_sequences",
+        "mlstars.custom.timeseries_preprocessing.rolling_window_sequences",
         "keras.Sequential.LSTMTimeSeriesRegressor",
         "orion.primitives.timeseries_errors.regression_errors",
         "orion.primitives.timeseries_anomalies.find_anomalies"
     ],
     "init_params": {
-        "mlprimitives.custom.timeseries_preprocessing.time_segments_aggregate#1": {
+        "mlstars.custom.timeseries_preprocessing.time_segments_aggregate#1": {
             "time_column": "timestamp",
             "interval": 21600,
             "method": "mean"
@@ -20,7 +20,7 @@
                 1
             ]
         },
-        "mlprimitives.custom.timeseries_preprocessing.rolling_window_sequences#1": {
+        "mlstars.custom.timeseries_preprocessing.rolling_window_sequences#1": {
             "target_column": 0,
             "window_size": 250
         },
@@ -57,7 +57,7 @@
             },
             {
                 "name": "raw_index",
-                "variable": "mlprimitives.custom.timeseries_preprocessing.time_segments_aggregate#1.index"
+                "variable": "mlstars.custom.timeseries_preprocessing.time_segments_aggregate#1.index"
             },
             {
                 "name": "X_nm",
@@ -65,11 +65,11 @@
             },
             {
                 "name": "target_index",
-                "variable": "mlprimitives.custom.timeseries_preprocessing.rolling_window_sequences#1.target_index"
+                "variable": "mlstars.custom.timeseries_preprocessing.rolling_window_sequences#1.target_index"
             },
             {
                 "name": "y",
-                "variable": "mlprimitives.custom.timeseries_preprocessing.rolling_window_sequences#1.y"
+                "variable": "mlstars.custom.timeseries_preprocessing.rolling_window_sequences#1.y"
             },
             {
                 "name": "y_hat",
